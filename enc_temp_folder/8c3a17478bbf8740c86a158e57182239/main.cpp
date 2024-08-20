@@ -604,9 +604,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	D3DResourceLeakChecker leakChecker;
 
-	DirectXcommon* dxCommon = nullptr;
-	dxCommon = new DirectXcommon();
-	dxCommon->Initialize();
+#pragma endregion
 
 #ifdef _DEBUG
 
