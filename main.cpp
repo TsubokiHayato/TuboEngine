@@ -184,7 +184,7 @@ IDxcBlob* CompileShader(
 
 
 	//これからシェーダをコンパイルする旨をログに出す
-	Log(ConvertString(std::format(L"Begin CompileShader,path:{},profile:{}\n", filePath, profile)));
+	Logger::Log(StringUtility::ConvertString(std::format(L"Begin CompileShader,path:{},profile:{}\n", filePath, profile)));
 
 	//hlslファイルを読み込む
 	IDxcBlobEncoding* shaderSource = nullptr;
@@ -232,7 +232,7 @@ IDxcBlob* CompileShader(
 	IDxcBlobUtf8* shaderError = nullptr;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-		Log(shaderError->GetStringPointer());
+		Logger::Log(shaderError->GetStringPointer());
 		assert(false);
 	}
 
@@ -247,7 +247,7 @@ IDxcBlob* CompileShader(
 	assert(SUCCEEDED(hr));
 
 	//成功したログを出す
-	Log(ConvertString(std::format(L"Compile Succeeded,path:{},profile:{}\n", filePath, profile)));
+	Logger::Log(StringUtility::ConvertString(std::format(L"Compile Succeeded,path:{},profile:{}\n", filePath, profile)));
 
 	//もう使わないリソースを解放
 	shaderSource->Release();
@@ -263,7 +263,7 @@ DirectX::ScratchImage LoadTexture(const std::string& filePath) {
 
 	//テクスチャファイルを読んでプログラムで扱えるようにする
 	DirectX::ScratchImage image{};
-	std::wstring filePathW =ConvertString(filePath);
+	std::wstring filePathW =StringUtility::ConvertString(filePath);
 	HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 	assert(SUCCEEDED(hr));
 
@@ -795,7 +795,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 
 	if (FAILED(hr)) {
-		Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		Logger:: Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 	//バイナリを元に作成
