@@ -5,7 +5,9 @@
 #include<dxgi1_6.h>
 #include<wrl.h>
 
-class DirectXcommon
+#include"Logger.h"
+#include"StringUtility.h"
+class DirectXCommon
 {
 public:
 	void Initialize();
@@ -65,7 +67,16 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetDSVCPUDescriptorHandle(uint32_t index);
 	//DSVの指定番号のGPUディスクリプタハンドルを取得する
 	D3D12_GPU_DESCRIPTOR_HANDLE GetDSVGPUDescriptorHandle(uint32_t index);
+
 private:
 
+	//DXGIファクトリーの設置
+	Microsoft::WRL::ComPtr <IDXGIFactory7> dxgiFactory = nullptr;
+
+	//HRESULTはWindow系のエラーコードであり、
+	//関数が成功したかどうかSUCCEEDEDマクロで判断出来る
+	HRESULT hr;
+
+	Microsoft::WRL::ComPtr <ID3D12Device> device = nullptr;
 };
 
