@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 
 
 #include<d3d12.h>
 #include<dxgi1_6.h>
 #include<wrl.h>
 
-#include"Logger.h"
+
 #include"StringUtility.h"
 class DirectXCommon
 {
@@ -13,68 +13,87 @@ public:
 	void Initialize();
 	void Update();
 
-	//ƒfƒoƒCƒX‚Ì‰Šú‰»
+	//ãƒ‡ãƒã‚¤ã‚¹ã®åˆæœŸåŒ–
 	void Device_Initialize();
-	//ƒRƒ}ƒ“ƒhŠÖ˜A‚Ì‰Šú‰»
-	void Command_Initialize();
-	//ƒXƒƒbƒvƒ`ƒF[ƒ“‚Ì¶¬
-	void SwapChain_Create();
-	//[“xƒoƒbƒtƒ@‚Ì¶¬
-	void DepthBuffer_Create();
-	//ŠeíƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ì¶¬
-	void DescriptorHeap_Create();
-	//ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgƒrƒ…[‚Ì‰Šú‰»
-	void RTV_Initialize();
-	//[“xƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚Ì‰Šú‰»
-	void DSV_Initialize();
-	//ƒtƒFƒ“ƒX‚Ì¶¬
-	void Fence_Create();
-	//ƒrƒ…[ƒ|[ƒg‹éŒ`‚Ì‰Šú‰»
-	void viewport_Initialize();
-	//ƒVƒUƒŠƒ“ƒO‹éŒ`‚Ì‰Šú‰»
-	void scissor_Initialize();
-	//DXCƒRƒ“ƒpƒCƒ‰‚Ì¶¬
-	void dxcCompiler_Create();
-	//ImGui‚Ì‰Šú‰»
-	void ImGui_Initialize();
+	////ã‚³ãƒãƒ³ãƒ‰é–¢é€£ã®åˆæœŸåŒ–
+	//void Command_Initialize();
+	////ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ãƒ¼ãƒ³ã®ç”Ÿæˆ
+	//void SwapChain_Create();
+	////æ·±åº¦ãƒãƒƒãƒ•ã‚¡ã®ç”Ÿæˆ
+	//void DepthBuffer_Create();
+	////å„ç¨®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®ç”Ÿæˆ
+	//void DescriptorHeap_Create();
+	////ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãƒ“ãƒ¥ãƒ¼ã®åˆæœŸåŒ–
+	//void RTV_Initialize();
+	////æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒ“ãƒ¥ãƒ¼ã®åˆæœŸåŒ–
+	//void DSV_Initialize();
+	////ãƒ•ã‚§ãƒ³ã‚¹ã®ç”Ÿæˆ
+	//void Fence_Create();
+	////ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆçŸ©å½¢ã®åˆæœŸåŒ–
+	//void viewport_Initialize();
+	////ã‚·ã‚¶ãƒªãƒ³ã‚°çŸ©å½¢ã®åˆæœŸåŒ–
+	//void scissor_Initialize();
+	////DXCã‚³ãƒ³ãƒ‘ã‚¤ãƒ©ã®ç”Ÿæˆ
+	//void dxcCompiler_Create();
+	////ImGuiã®åˆæœŸåŒ–
+	//void ImGui_Initialize();
 
 
-	//DescriptorHeap‚Ì‚³‚­‚¹‚¢‚©‚ñ‚·‚¤
-	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> CreateDescriptorHeap(
-		Microsoft::WRL::ComPtr <ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+	////DescriptorHeapã®ã•ãã›ã„ã‹ã‚“ã™ã†
+	//Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> CreateDescriptorHeap(
+	//	Microsoft::WRL::ComPtr <ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
 
-	Microsoft::WRL::ComPtr <ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr <ID3D12Device> device, int32_t width, int32_t height);
+	//Microsoft::WRL::ComPtr <ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr <ID3D12Device> device, int32_t width, int32_t height);
 
 
-	//CPU‚ÌDescriptorHandle‚ğæ“¾‚·‚éŠÖ”
-	static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
+	//
+	//âˆ§__âˆ§
+	//(ï½€Ğ”Â´ ï¼‰
+	//(ã£â–„ï¸»â–‡ã€“â”³â•getttttttttttttttttttttttttttttttttttttttttttttttttttttter
+	///    )
+	//(/ ï¿£âˆª
+	
+	HRESULT GetHr()const { return hr; }
+	Microsoft::WRL::ComPtr <IDXGIFactory7> GetDxgiFactory()const { return dxgiFactory; }
+	Microsoft::WRL::ComPtr <ID3D12Device> GetDevice()const { return device; }
 
-	//GPU‚ÌDescriptorHandle‚ğæ“¾‚·‚éŠÖ”
-	static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
+/*Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> GetCommandList()const { return commandList; }
+	Microsoft::WRL::ComPtr <ID3D12CommandQueue> GetCommandQueue()const { return commandQueue; }*/
 
-	//SRV‚Ìw’è”Ô†‚ÌCPUƒfƒBƒXƒNƒŠƒvƒ^ƒnƒ“ƒhƒ‹‚ğæ“¾‚·‚é
-	D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
-	//SRV‚Ìw’è”Ô†‚ÌGPUƒfƒBƒXƒNƒŠƒvƒ^ƒnƒ“ƒhƒ‹‚ğæ“¾‚·‚é
-	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
 
-	//RTV‚Ìw’è”Ô†‚ÌCPUƒfƒBƒXƒNƒŠƒvƒ^ƒnƒ“ƒhƒ‹‚ğæ“¾‚·‚é
-	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVCPUDescriptorHandle(uint32_t index);
-	//RTV‚Ìw’è”Ô†‚ÌGPUƒfƒBƒXƒNƒŠƒvƒ^ƒnƒ“ƒhƒ‹‚ğæ“¾‚·‚é
-	D3D12_GPU_DESCRIPTOR_HANDLE GetRTVGPUDescriptorHandle(uint32_t index);
+	////CPUã®DescriptorHandleã‚’å–å¾—ã™ã‚‹é–¢æ•°
+	//static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
-	//DSV‚Ìw’è”Ô†‚ÌCPUƒfƒBƒXƒNƒŠƒvƒ^ƒnƒ“ƒhƒ‹‚ğæ“¾‚·‚é
-	D3D12_CPU_DESCRIPTOR_HANDLE GetDSVCPUDescriptorHandle(uint32_t index);
-	//DSV‚Ìw’è”Ô†‚ÌGPUƒfƒBƒXƒNƒŠƒvƒ^ƒnƒ“ƒhƒ‹‚ğæ“¾‚·‚é
-	D3D12_GPU_DESCRIPTOR_HANDLE GetDSVGPUDescriptorHandle(uint32_t index);
+	////GPUã®DescriptorHandleã‚’å–å¾—ã™ã‚‹é–¢æ•°
+	//static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index);
+
+
+	////SRVã®æŒ‡å®šç•ªå·ã®CPUãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã™ã‚‹
+	//D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
+	////SRVã®æŒ‡å®šç•ªå·ã®GPUãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã™ã‚‹
+	//D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
+
+
+	////RTVã®æŒ‡å®šç•ªå·ã®CPUãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã™ã‚‹
+	//D3D12_CPU_DESCRIPTOR_HANDLE GetRTVCPUDescriptorHandle(uint32_t index);
+	////RTVã®æŒ‡å®šç•ªå·ã®GPUãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã™ã‚‹
+	//D3D12_GPU_DESCRIPTOR_HANDLE GetRTVGPUDescriptorHandle(uint32_t index);
+
+
+	////DSVã®æŒ‡å®šç•ªå·ã®CPUãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã™ã‚‹
+	//D3D12_CPU_DESCRIPTOR_HANDLE GetDSVCPUDescriptorHandle(uint32_t index);
+	////DSVã®æŒ‡å®šç•ªå·ã®GPUãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã™ã‚‹
+	//D3D12_GPU_DESCRIPTOR_HANDLE GetDSVGPUDescriptorHandle(uint32_t index);
+
 
 private:
 
-	//DXGIƒtƒ@ƒNƒgƒŠ[‚Ìİ’u
+	//DXGIãƒ•ã‚¡ã‚¯ãƒˆãƒªãƒ¼ã®è¨­ç½®
 	Microsoft::WRL::ComPtr <IDXGIFactory7> dxgiFactory = nullptr;
 
-	//HRESULT‚ÍWindowŒn‚ÌƒGƒ‰[ƒR[ƒh‚Å‚ ‚èA
-	//ŠÖ”‚ª¬Œ÷‚µ‚½‚©‚Ç‚¤‚©SUCCEEDEDƒ}ƒNƒ‚Å”»’fo—ˆ‚é
+	//HRESULTã¯Windowç³»ã®ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰ã§ã‚ã‚Šã€
+	//é–¢æ•°ãŒæˆåŠŸã—ãŸã‹ã©ã†ã‹SUCCEEDEDãƒã‚¯ãƒ­ã§åˆ¤æ–­å‡ºæ¥ã‚‹
 	HRESULT hr;
 
 	Microsoft::WRL::ComPtr <ID3D12Device> device = nullptr;

@@ -1,6 +1,4 @@
 
-#include<string>
-#include<format>
 
 #include<dxgidebug.h>
 #pragma comment(lib,"dxguid.lib")
@@ -186,7 +184,7 @@ IDxcBlob* CompileShader(
 
 
 	//これからシェーダをコンパイルする旨をログに出す
-	Logger::Log(StringUtility::ConvertString(std::format(L"Begin CompileShader,path:{},profile:{}\n", filePath, profile)));
+	Log(ConvertString(std::format(L"Begin CompileShader,path:{},profile:{}\n", filePath, profile)));
 
 	//hlslファイルを読み込む
 	IDxcBlobEncoding* shaderSource = nullptr;
@@ -234,7 +232,7 @@ IDxcBlob* CompileShader(
 	IDxcBlobUtf8* shaderError = nullptr;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-		Logger::Log(shaderError->GetStringPointer());
+		Log(shaderError->GetStringPointer());
 		assert(false);
 	}
 
@@ -249,7 +247,7 @@ IDxcBlob* CompileShader(
 	assert(SUCCEEDED(hr));
 
 	//成功したログを出す
-	Logger::Log(StringUtility::ConvertString(std::format(L"Compile Succeeded,path:{},profile:{}\n", filePath, profile)));
+	Log(ConvertString(std::format(L"Compile Succeeded,path:{},profile:{}\n", filePath, profile)));
 
 	//もう使わないリソースを解放
 	shaderSource->Release();
@@ -265,7 +263,7 @@ DirectX::ScratchImage LoadTexture(const std::string& filePath) {
 
 	//テクスチャファイルを読んでプログラムで扱えるようにする
 	DirectX::ScratchImage image{};
-	std::wstring filePathW = StringUtility::ConvertString(filePath);
+	std::wstring filePathW =ConvertString(filePath);
 	HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 	assert(SUCCEEDED(hr));
 
@@ -567,6 +565,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	dxCommon = new DirectXCommon();
 	dxCommon->Initialize();
 
+	HRESULT hr = dxCommon->GetHr();
+	Microsoft::WRL::ComPtr <ID3D12Device> device = dxCommon->GetDevice();
+	Microsoft::WRL::ComPtr <IDXGIFactory7> dxgiFactory = dxCommon->GetDxgiFactory();
 
 #pragma region commandQueue
 	//コマンドキューを生成する
@@ -794,7 +795,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 
 	if (FAILED(hr)) {
-		Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 	//バイナリを元に作成
