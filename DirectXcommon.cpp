@@ -2,21 +2,22 @@
 
 
 #include<cassert>
+#include <format>
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 
 using namespace Microsoft::WRL;
 
-void DirectXcommon::Initialize()
+void DirectXCommon::Initialize()
 {
 	Device_Initialize();
 }
 
-void DirectXcommon::Update()
+void DirectXCommon::Update()
 {
 }
 
-void DirectXcommon::Device_Initialize()
+void DirectXCommon::Device_Initialize()
 {
 
 
@@ -37,12 +38,11 @@ void DirectXcommon::Device_Initialize()
 
 #pragma region DXGIFactory
 	/*DXGIFactoryの作成*/
-	//DXGIファクトリーの設置
-	Microsoft::WRL::ComPtr <IDXGIFactory7> dxgiFactory = nullptr;
+	
 
 	//HRESULTはWindow系のエラーコードであり、
 	//関数が成功したかどうかSUCCEEDEDマクロで判断出来る
-	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
+	hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
 
 	//初期化の根本的な部分でエラーが出た場合はプログラムが間違っているか、
 	//どうにもできない場合が多いのでassertにしておく
@@ -64,7 +64,7 @@ void DirectXcommon::Device_Initialize()
 		//ソフトウェアアダプタ出ないならば採用
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
 			//採用したアダプタの情報をログに出力
-			Log(ConvertString(std::format(L"USE Adapter:{}\n", adapterDesc.Description)));
+			Logger::Log(StringUtility::ConvertString(std::format(L"USE Adapter:{}\n", adapterDesc.Description)));
 			break;
 		}
 		//ソフトウェアアダプタならば見なかったことにする
@@ -77,7 +77,7 @@ void DirectXcommon::Device_Initialize()
 
 #pragma region D3D12Device
 
-	Microsoft::WRL::ComPtr <ID3D12Device> device = nullptr;
+	
 	//機能レベルとログ出力用の文字列
 	D3D_FEATURE_LEVEL featureLevels[] = {
 	D3D_FEATURE_LEVEL_12_2,D3D_FEATURE_LEVEL_12_1,D3D_FEATURE_LEVEL_12_0
@@ -90,7 +90,7 @@ void DirectXcommon::Device_Initialize()
 		//指定した機能レベルでデバイスが生成できたか確認
 		if (SUCCEEDED(hr)) {
 			//生成できたのでロ出力をしてループを抜ける
-			Log(std::format("FeatureLevel : {}\n", featureLevelStrings[i]));
+			Logger::Log(std::format("FeatureLevel : {}\n", featureLevelStrings[i]));
 			break;
 		}
 
@@ -98,7 +98,7 @@ void DirectXcommon::Device_Initialize()
 	//デバイスの生成がうまくいかなかったので起動できない
 	assert(device != nullptr);
 	//初期化完了のログを出す
-	Log("Complete create D3D12Device!!!\n");
+	Logger::Log("Complete create D3D12Device!!!\n");
 
 #pragma endregion 
 
