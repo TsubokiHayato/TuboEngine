@@ -4,8 +4,9 @@
 #include<d3d12.h>
 #include<dxgi1_6.h>
 #include<wrl.h>
+#include <format>
 
-
+#include"Logger.h"
 #include"StringUtility.h"
 class DirectXCommon
 {
