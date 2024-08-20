@@ -25,9 +25,9 @@ void DirectXCommon::Device_Initialize()
 
 	Microsoft::WRL::ComPtr <ID3D12Debug1> debugController = nullptr;
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
-		//�f�o�b�N���C����L��������
+		//デバックレイヤを有効化する
 		debugController->EnableDebugLayer();
-		//�����GPU���ł��`�F�b�N���s����悤�ɂ���
+		//さらにGPU側でもチェックを行えるようにする
 		debugController->SetEnableGPUBasedValidation(true);
 
 	}
@@ -37,40 +37,40 @@ void DirectXCommon::Device_Initialize()
 
 
 #pragma region DXGIFactory
-	/*DXGIFactory�̍쐬*/
+	/*DXGIFactoryの作成*/
 	
 
-	//HRESULT��Window�n�̃G���[�R�[�h�ł���A
-	//�֐��������������ǂ���SUCCEEDED�}�N���Ŕ��f�o����
+	//HRESULTはWindow系のエラーコードであり、
+	//関数が成功したかどうかSUCCEEDEDマクロで判断出来る
 	hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
 
-	//�������̍��{�I�ȕ����ŃG���[���o���ꍇ�̓v���O�������Ԉ���Ă��邩�A
-	//�ǂ��ɂ��ł��Ȃ��ꍇ�������̂�assert�ɂ��Ă���
+	//初期化の根本的な部分でエラーが出た場合はプログラムが間違っているか、
+	//どうにもできない場合が多いのでassertにしておく
 
 	assert(SUCCEEDED(hr));
 #pragma endregion
 
 #pragma region adapter
-	//�g�p����A�_�v�^�p�̕ϐ�
+	//使用するアダプタ用の変数
 	Microsoft::WRL::ComPtr <IDXGIAdapter4> useAdapter = nullptr;
-	//��Ԃ������т̃A�_�v�^�𗊂�
+	//一番いい並びのアダプタを頼む
 	for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(i,
 		DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) !=
 		DXGI_ERROR_NOT_FOUND; ++i) {
-		//�A�_�v�^�̏��擾
+		//アダプタの情報取得
 		DXGI_ADAPTER_DESC3 adapterDesc{};
 		hr = useAdapter->GetDesc3(&adapterDesc);
 		assert(SUCCEEDED(hr));
-		//�\�t�g�E�F�A�A�_�v�^�o�Ȃ��Ȃ�΍̗p
+		//ソフトウェアアダプタ出ないならば採用
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
-			//�̗p�����A�_�v�^�̏������O�ɏo��
+			//採用したアダプタの情報をログに出力
 			Logger::Log(StringUtility::ConvertString(std::format(L"USE Adapter:{}\n", adapterDesc.Description)));
 			break;
 		}
-		//�\�t�g�E�F�A�A�_�v�^�Ȃ�Ό��Ȃ��������Ƃɂ���
+		//ソフトウェアアダプタならば見なかったことにする
 		useAdapter = nullptr;
 	}
-	//�K�؂ȃA�_�v�^��������Ȃ������̂ŋN���ł��Ȃ�
+	//適切なアダプタが見つからなかったので起動できない
 	assert(useAdapter != nullptr);
 
 #pragma endregion
@@ -78,26 +78,26 @@ void DirectXCommon::Device_Initialize()
 #pragma region D3D12Device
 
 	
-	//�@�\���x���ƃ��O�o�͗p�̕�����
+	//機能レベルとログ出力用の文字列
 	D3D_FEATURE_LEVEL featureLevels[] = {
 	D3D_FEATURE_LEVEL_12_2,D3D_FEATURE_LEVEL_12_1,D3D_FEATURE_LEVEL_12_0
 	};
 	const char* featureLevelStrings[] = { "12.2","12.1","12.0" };
-	//�������̗p�ł��邩�����Ă���
+	//高い順採用できるか試していく
 	for (size_t i = 0; i < _countof(featureLevels); i++) {
-		//�̗p�����A�_�v�^�[�Ńf�o�C�X�𐶐�
+		//採用したアダプターでデバイスを生成
 		hr = D3D12CreateDevice(useAdapter.Get(), featureLevels[i], IID_PPV_ARGS(&device));
-		//�w�肵���@�\���x���Ńf�o�C�X�������ł������m�F
+		//指定した機能レベルでデバイスが生成できたか確認
 		if (SUCCEEDED(hr)) {
-			//�����ł����̂Ń��o�͂����ă��[�v�𔲂���
+			//生成できたのでロ出力をしてループを抜ける
 			Logger::Log(std::format("FeatureLevel : {}\n", featureLevelStrings[i]));
 			break;
 		}
 
 	}
-	//�f�o�C�X�̐��������܂������Ȃ������̂ŋN���ł��Ȃ�
+	//デバイスの生成がうまくいかなかったので起動できない
 	assert(device != nullptr);
-	//�����������̃��O���o��
+	//初期化完了のログを出す
 	Logger::Log("Complete create D3D12Device!!!\n");
 
 #pragma endregion 
@@ -105,29 +105,29 @@ void DirectXCommon::Device_Initialize()
 #ifdef _DEBUG
 	ID3D12InfoQueue* infoQueue = nullptr;
 	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
-		//��΂��G���[���Ɏ~�܂�
+		//やばいエラー時に止まる
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
-		//�G���[���Ɏ~�܂�
+		//エラー時に止まる
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
-		//�x�����Ɏ~�܂�
+		//警告時に止まる
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
 
 
 		D3D12_MESSAGE_ID denyIds[] = {
-			//window11�ł�DXG�f�o�b�O���C���̑��ݍ�p�o�O�ɂ��G���[���b�Z�[�W
+			//window11でのDXGデバッグレイヤの相互作用バグによるエラーメッセージ
 			//https://stackoverflow.com/questions/69805245/directx-12-application-crashing-window-11
 			D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE
 		};
-		//�}�����郌�x��
+		//抑制するレベル
 		D3D12_MESSAGE_SEVERITY severities[] = { D3D12_MESSAGE_SEVERITY_INFO };
 		D3D12_INFO_QUEUE_FILTER filter{};
 		filter.DenyList.NumIDs = _countof(denyIds);
 		filter.DenyList.pIDList = denyIds;
 		filter.DenyList.NumSeverities = _countof(severities);
 		filter.DenyList.pSeverityList = severities;
-		//�w�肵�����b�Z�[�W�̕\����}������
+		//指定したメッセージの表示を抑制する
 		infoQueue->PushStorageFilter(&filter);
-		//���
+		//解放
 		infoQueue->Release();
 
 	}
