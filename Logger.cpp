@@ -1,5 +1,12 @@
-#include "Logger.h"
+#include"Logger.h"
+#include <debugapi.h>
 
-void Logger::Log(const std::string& message)
-{
+#include<Windows.h>
+namespace Logger {
+
+    // log作成
+    void Log(const std::string& message) {
+        OutputDebugStringA(message.c_str());
+    }
+
 }
