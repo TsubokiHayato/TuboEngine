@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-
 #include<d3d12.h>
 #include<dxgi1_6.h>
 #include<wrl.h>
@@ -8,8 +7,18 @@
 
 #include"Logger.h"
 #include"StringUtility.h"
-
+#include"array"
 #include"WinApp.h"
+
+
+#include <dxcapi.h>
+
+#include "externals/imgui/imgui.h"
+#include "externals/imgui/imgui_impl_win32.h"
+#include "externals/imgui/imgui_impl_dx12.h"
+
+
+
 class DirectXCommon
 {
 public:
@@ -23,23 +32,24 @@ public:
 	//スワップチェーンの生成
 	void SwapChain_Create();
 	//深度バッファの生成
-	void DepthBuffer_Create();
+	void DepthBuffer_Create(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
 	//各種ディスクリプタヒープの生成
 	void DescriptorHeap_Create();
-	////レンダーターゲットビューの初期化
-	//void RTV_Initialize();
-	////深度ステンシルビューの初期化
-	//void DSV_Initialize();
-	////フェンスの生成
-	//void Fence_Create();
-	////ビューポート矩形の初期化
-	//void viewport_Initialize();
-	////シザリング矩形の初期化
-	//void scissor_Initialize();
-	////DXCコンパイラの生成
-	//void dxcCompiler_Create();
-	////ImGuiの初期化
-	//void ImGui_Initialize();
+	//レンダーターゲットビューの初期化
+	void RTV_Initialize();
+	//深度ステンシルビューの初期化
+	void DSV_Initialize();
+	
+	//フェンスの生成
+	void Fence_Create();
+	//ビューポート矩形の初期化
+	void Viewport_Initialize();
+	//シザリング矩形の初期化
+	void Scissor_Initialize();
+	//DXCコンパイラの生成
+	void dxcCompiler_Create();
+	//ImGuiの初期化
+	void ImGui_Initialize();
 
 
 	//DescriptorHeapのさくせいかんすう
@@ -47,9 +57,7 @@ public:
 		Microsoft::WRL::ComPtr <ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
 
-	//Microsoft::WRL::ComPtr <ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr <ID3D12Device> device, int32_t width, int32_t height);
-
-
+	
 	//
 	//∧__∧
 	//(｀Д´ ）
@@ -98,9 +106,48 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetDSVGPUDescriptorHandle(uint32_t index);
 
 
+
+	uint32_t GetDescriptorSizeSRV() {
+		return descriptorSizeSRV;
+	}
+	uint32_t GetDescriptorSizeRTV() {
+		return descriptorSizeRTV;
+	}
+	uint32_t GetDescriptorSizeDSV() {
+		return descriptorSizeDSV;
+	}
+
+	//RTVディスクイリプタヒープの生成
+	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> GetRtvDescriptorHeap() { return rtvDescriptorHeap; }
+
+
+	//SRVディスクイリプタヒープの生成
+	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> GetSrvDescriptorHeap() { return srvDescriptorHeap; }
+
+	//DSVディスクイリプタヒープの生成
+	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> GetDsvDescriptorHeap() { return dsvDescriptorHeap; }
+
+
+	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+
+	Microsoft::WRL::ComPtr<ID3D12Fence> GetFence() { return fence; }
+	uint64_t GetFenceValue() { return fenceValue; }
+	HANDLE GetFenceEvent() { return fenceEvent; }
+
+	//ビューポート
+	D3D12_VIEWPORT GetViewport() { return viewport; }
+	//シザー矩形
+	D3D12_RECT GetScissorRect() { return scissorRect; }
+
+	//dxcCompilerを初期化
+	IDxcUtils* GetDxcUtils() { return dxcUtils; }
+	IDxcCompiler3* GetDxcCompiler() { return dxcCompiler; }
+	IDxcIncludeHandler* GetIncludeHandler() { return includeHandler; }
+
 private:
 
-	WinApp* winApp_ = nullptr;
+	WinApp* winApp = nullptr;
 
 	//DXGIファクトリーの設置
 	Microsoft::WRL::ComPtr <IDXGIFactory7> dxgiFactory = nullptr;
@@ -119,5 +166,41 @@ private:
 	//swapChain
 	Microsoft::WRL::ComPtr <IDXGISwapChain4> swapChain = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+
+
+	uint32_t descriptorSizeSRV ;
+	uint32_t descriptorSizeRTV ;
+	uint32_t descriptorSizeDSV;
+
+
+	//RTVディスクイリプタヒープの生成
+	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> rtvDescriptorHeap ;
+
+	//SRVディスクイリプタヒープの生成
+	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> srvDescriptorHeap ;
+
+	//DSVディスクイリプタヒープの生成
+	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> dsvDescriptorHeap  ;
+
+	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources;
+
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+	
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
+	uint64_t fenceValue = 0;
+	HANDLE fenceEvent ;
+
+	Microsoft::WRL::ComPtr <ID3D12Resource> depthStencilResource;
+
+	//ビューポート
+	D3D12_VIEWPORT viewport{};
+	//シザー矩形
+	D3D12_RECT scissorRect{};
+	
+	//dxcCompilerを初期化
+	IDxcUtils* dxcUtils = nullptr;
+	IDxcCompiler3* dxcCompiler = nullptr;
+	IDxcIncludeHandler* includeHandler = nullptr;
+
 };
 
