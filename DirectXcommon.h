@@ -23,7 +23,13 @@ class DirectXCommon
 {
 public:
 	void Initialize(WinApp* winApp);
-	void Update();
+	
+	//描画前処理 Begin
+	void PreDraw();
+	//描画後処理 End
+	void PostDraw();
+
+
 
 	//デバイスの初期化
 	void Device_Initialize();
@@ -50,6 +56,8 @@ public:
 	void dxcCompiler_Create();
 	//ImGuiの初期化
 	void ImGui_Initialize();
+
+
 
 
 	//DescriptorHeapのさくせいかんすう
