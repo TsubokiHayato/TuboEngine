@@ -23,13 +23,6 @@ class DirectXCommon
 {
 public:
 	void Initialize(WinApp* winApp);
-	
-	//描画前処理 Begin
-	void PreDraw();
-	//描画後処理 End
-	void PostDraw();
-
-
 
 	//デバイスの初期化
 	void Device_Initialize();
@@ -38,14 +31,14 @@ public:
 	//スワップチェーンの生成
 	void SwapChain_Create();
 	//深度バッファの生成
-	void DepthBuffer_Create(Microsoft::WRL::ComPtr<ID3D12Device> device, int32_t width, int32_t height);
+	void DepthBuffer_Create(int32_t width, int32_t height);
 	//各種ディスクリプタヒープの生成
 	void DescriptorHeap_Create();
 	//レンダーターゲットビューの初期化
 	void RTV_Initialize();
 	//深度ステンシルビューの初期化
 	void DSV_Initialize();
-	
+
 	//フェンスの生成
 	void Fence_Create();
 	//ビューポート矩形の初期化
@@ -56,13 +49,13 @@ public:
 	void dxcCompiler_Create();
 	//ImGuiの初期化
 	void ImGui_Initialize();
+	
+	//描画前処理 Begin
+	void PreDraw();
+	//描画後処理 End
+	void PostDraw();
 
 
-
-
-	//DescriptorHeapのさくせいかんすう
-	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> CreateDescriptorHeap(
-		Microsoft::WRL::ComPtr <ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
 
 	
@@ -155,6 +148,15 @@ public:
 
 private:
 
+
+	
+
+	//DescriptorHeapのさくせいかんすう
+	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> CreateDescriptorHeap(
+		Microsoft::WRL::ComPtr <ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+
+
+
 	WinApp* winApp = nullptr;
 
 	//DXGIファクトリーの設置
@@ -210,5 +212,11 @@ private:
 	IDxcCompiler3* dxcCompiler = nullptr;
 	IDxcIncludeHandler* includeHandler = nullptr;
 
+	//TransitionBarrierの設定
+	D3D12_RESOURCE_BARRIER barrier{};
+
+	UINT backBufferIndex;
+
+	
 };
 
