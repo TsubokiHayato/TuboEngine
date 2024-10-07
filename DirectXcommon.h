@@ -19,6 +19,10 @@
 
 
 
+#include "externals/DirectXTex/d3dx12.h"
+#include "externals/DirectXTex/DirectXTex.h"
+
+
 class DirectXCommon
 {
 public:
@@ -49,7 +53,7 @@ public:
 	void dxcCompiler_Create();
 	//ImGuiの初期化
 	void ImGui_Initialize();
-	
+
 	//描画前処理 Begin
 	void PreDraw();
 	//描画後処理 End
@@ -58,7 +62,7 @@ public:
 
 
 
-	
+
 	//
 	//∧__∧
 	//(｀Д´ ）
@@ -118,6 +122,8 @@ public:
 		return descriptorSizeDSV;
 	}
 
+
+
 	//RTVディスクイリプタヒープの生成
 	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> GetRtvDescriptorHeap() { return rtvDescriptorHeap; }
 
@@ -146,10 +152,44 @@ public:
 	IDxcCompiler3* GetDxcCompiler() { return dxcCompiler; }
 	IDxcIncludeHandler* GetIncludeHandler() { return includeHandler; }
 
+
+	//シェーダーのコンパイル
+	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
+		const std::wstring& filePath,
+		const wchar_t* profile);
+
+
+	///<summary>
+	///バッファリソースの生成
+	///</summary>
+	Microsoft::WRL::ComPtr <ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
+
+
+	///<summary>
+	///テクスチャリソースの生成
+	///</summary>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
+
+
+	///<summary>
+	///テクスチャデータの転送
+	///</summary>
+	void UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture,
+		const DirectX::ScratchImage& mipImages);
+
+
+	///<summary>
+	///テクスチャファイルの読み込み
+	///</summary>
+	/// <param name="filePath>テクスチャファイルのパス</parqam>
+	/// <returns>画像イメージデータ</returns>
+	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
+
+
 private:
 
 
-	
+
 
 	//DescriptorHeapのさくせいかんすう
 	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> CreateDescriptorHeap(
@@ -178,27 +218,27 @@ private:
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 
 
-	uint32_t descriptorSizeSRV ;
-	uint32_t descriptorSizeRTV ;
+	uint32_t descriptorSizeSRV;
+	uint32_t descriptorSizeRTV;
 	uint32_t descriptorSizeDSV;
 
 
 	//RTVディスクイリプタヒープの生成
-	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> rtvDescriptorHeap ;
+	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> rtvDescriptorHeap;
 
 	//SRVディスクイリプタヒープの生成
-	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> srvDescriptorHeap ;
+	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> srvDescriptorHeap;
 
 	//DSVディスクイリプタヒープの生成
-	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> dsvDescriptorHeap  ;
+	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> dsvDescriptorHeap;
 
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources;
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-	
+
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
 	uint64_t fenceValue = 0;
-	HANDLE fenceEvent ;
+	HANDLE fenceEvent;
 
 	Microsoft::WRL::ComPtr <ID3D12Resource> depthStencilResource;
 
@@ -206,7 +246,7 @@ private:
 	D3D12_VIEWPORT viewport{};
 	//シザー矩形
 	D3D12_RECT scissorRect{};
-	
+
 	//dxcCompilerを初期化
 	IDxcUtils* dxcUtils = nullptr;
 	IDxcCompiler3* dxcCompiler = nullptr;
@@ -217,6 +257,6 @@ private:
 
 	UINT backBufferIndex;
 
-	
+
 };
 
