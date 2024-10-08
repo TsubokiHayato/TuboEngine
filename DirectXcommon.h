@@ -22,6 +22,10 @@
 #include "externals/DirectXTex/d3dx12.h"
 #include "externals/DirectXTex/DirectXTex.h"
 
+#include<vector>
+
+#include<chrono>
+
 
 class DirectXCommon
 {
@@ -174,8 +178,9 @@ public:
 	///<summary>
 	///テクスチャデータの転送
 	///</summary>
-	void UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture,
-		const DirectX::ScratchImage& mipImages);
+	[[nodiscard]]
+	Microsoft::WRL::ComPtr <ID3D12Resource> UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
+
 
 
 	///<summary>
@@ -187,6 +192,11 @@ public:
 
 
 private:
+
+	//FPS固定初期化
+	void InitializeFixFPS();
+	//FPS固定更新
+	void UpdateFixFPS();
 
 
 
@@ -257,6 +267,8 @@ private:
 
 	UINT backBufferIndex;
 
+	//記録時間(FPS固定用)
+	std::chrono::steady_clock::time_point reference_;
 
 };
 
