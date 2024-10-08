@@ -707,13 +707,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	DirectX::ScratchImage mipImages = dxCommon->LoadTexture("Resources/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	Microsoft::WRL::ComPtr <ID3D12Resource> textureResource = dxCommon->CreateTextureResource(metadata);
-	dxCommon->UploadTextureData(textureResource.Get(), mipImages);
+ Microsoft::WRL::ComPtr< ID3D12Resource> intermediateResource=	dxCommon->UploadTextureData(textureResource.Get(), mipImages);
 
 	//2枚目のTextureを読んで転送する
 	DirectX::ScratchImage mipImages2 = dxCommon->LoadTexture(modelData.material.textureFilePath);
 	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
 	Microsoft::WRL::ComPtr <ID3D12Resource> textureResource2 = dxCommon->CreateTextureResource(metadata2);
-	dxCommon->UploadTextureData(textureResource2.Get(), mipImages2);
+	Microsoft::WRL::ComPtr< ID3D12Resource> intermediateResource2=dxCommon->UploadTextureData(textureResource2.Get(), mipImages2);
 
 	//metaDataを基にSRVの	設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
