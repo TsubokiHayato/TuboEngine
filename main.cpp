@@ -254,7 +254,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-	HRESULT hr = dxCommon->GetHr();
+
 
 	Microsoft::WRL::ComPtr <ID3D12Device> device = dxCommon->GetDevice();
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList = dxCommon->GetCommandList();
@@ -325,18 +325,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Microsoft::WRL::ComPtr <ID3DBlob> signatureBlob = nullptr;
 	Microsoft::WRL::ComPtr <ID3DBlob> errorBlob = nullptr;
 
-	hr = D3D12SerializeRootSignature(&descriptionRootSignature,
+	dxCommon->hr = D3D12SerializeRootSignature(&descriptionRootSignature,
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 
-	if (FAILED(hr)) {
+	if (FAILED(dxCommon->hr)) {
 		Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 	//バイナリを元に作成
 	Microsoft::WRL::ComPtr <ID3D12RootSignature> rootSignature = nullptr;
-	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
+	dxCommon->hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
 		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
-	assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(dxCommon->hr));
 
 	/*------------
 	  InputLayOut
@@ -455,9 +455,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//実際に生成
 	Microsoft::WRL::ComPtr <ID3D12PipelineState> graphicsPipeLineState = nullptr;
-	hr = device->CreateGraphicsPipelineState(&graphicPipelineStateDesc,
+	dxCommon->hr = device->CreateGraphicsPipelineState(&graphicPipelineStateDesc,
 		IID_PPV_ARGS(&graphicsPipeLineState));
-	assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(dxCommon->hr));
 
 #pragma endregion
 
@@ -651,13 +651,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	DirectX::ScratchImage mipImages = dxCommon->LoadTexture("Resources/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	Microsoft::WRL::ComPtr <ID3D12Resource> textureResource = dxCommon->CreateTextureResource(metadata);
- Microsoft::WRL::ComPtr< ID3D12Resource> intermediateResource=	dxCommon->UploadTextureData(textureResource.Get(), mipImages);
+	Microsoft::WRL::ComPtr< ID3D12Resource> intermediateResource = dxCommon->UploadTextureData(textureResource.Get(), mipImages);
 
 	//2枚目のTextureを読んで転送する
 	DirectX::ScratchImage mipImages2 = dxCommon->LoadTexture(modelData.material.textureFilePath);
 	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
 	Microsoft::WRL::ComPtr <ID3D12Resource> textureResource2 = dxCommon->CreateTextureResource(metadata2);
-	Microsoft::WRL::ComPtr< ID3D12Resource> intermediateResource2=dxCommon->UploadTextureData(textureResource2.Get(), mipImages2);
+	Microsoft::WRL::ComPtr< ID3D12Resource> intermediateResource2 = dxCommon->UploadTextureData(textureResource2.Get(), mipImages2);
 
 	//metaDataを基にSRVの	設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -712,7 +712,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	SpriteCommon* spriteCommon = nullptr;
 	//スプライト共通部分の初期化
 	spriteCommon = new SpriteCommon;
-	spriteCommon->Initialize();
+	spriteCommon->Initialize(dxCommon);
 
 	//スプライトの初期化
 	Sprite* sprite = new Sprite();
@@ -832,11 +832,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma region Command//Triangle
 
 	  //RootSignatureを設定。
-		commandList->SetGraphicsRootSignature(rootSignature.Get());
-		commandList->SetPipelineState(graphicsPipeLineState.Get());//PSOを設定
+		spriteCommon->DrawSettingsCommon();
+
 		commandList->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
-		//形状設定
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		//マテリアルCBufferの場所を設定_02_01
 		commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 
@@ -882,7 +880,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 	//リソースリークチェック
-	
+
 	//WindowsAppの削除
 	winApp->Finalize();
 	delete winApp;
