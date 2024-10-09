@@ -75,7 +75,7 @@ public:
 	//(/ ￣∪
 	// 
 	//Device
-	HRESULT GetHr()const { return hr; }
+	
 	Microsoft::WRL::ComPtr <IDXGIFactory7> GetDxgiFactory()const { return dxgiFactory; }
 	Microsoft::WRL::ComPtr <ID3D12Device> GetDevice()const { return device; }
 
@@ -191,6 +191,11 @@ public:
 	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
 
+	//HRESULTはWindow系のエラーコードであり、
+	//関数が成功したかどうかSUCCEEDEDマクロで判断出来る
+	HRESULT hr;
+
+
 private:
 
 	//FPS固定初期化
@@ -212,9 +217,7 @@ private:
 	//DXGIファクトリーの設置
 	Microsoft::WRL::ComPtr <IDXGIFactory7> dxgiFactory = nullptr;
 
-	//HRESULTはWindow系のエラーコードであり、
-	//関数が成功したかどうかSUCCEEDEDマクロで判断出来る
-	HRESULT hr;
+	
 
 	Microsoft::WRL::ComPtr <ID3D12Device> device = nullptr;
 
