@@ -798,32 +798,6 @@ UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const D
 
 	return intermediateResource;
 }
-//
-//void DirectXCommon::UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages)
-//{
-//
-//		//Meta情報を取得
-//		const DirectX::TexMetadata& metaData = mipImages.GetMetadata();
-//		//全MipMapについて
-//		for (size_t mipLevel = 0; mipLevel < metaData.mipLevels; ++mipLevel) {
-//
-//			//MipLevelを指定してImageを取得
-//			const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
-//			//Textureに転送
-//			HRESULT hr = texture->WriteToSubresource(
-//				UINT(mipLevel),
-//				nullptr,//全領域へコピ
-//				img->pixels,//元データアドレス
-//				UINT(img->rowPitch),//1ラインサイズ
-//				UINT(img->slicePitch)//1枚サイズ
-//			);
-//			assert(SUCCEEDED(hr));
-//		}
-//
-//		
-//	
-//}
-
 
 DirectX::ScratchImage DirectXCommon::LoadTexture(const std::string& filePath)
 {
