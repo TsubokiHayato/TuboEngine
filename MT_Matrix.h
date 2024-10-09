@@ -1,21 +1,9 @@
 #include<cmath>
+#include"Vector3.h"
+#include"Matrix4x4.h"
+#include"Matrix3x3.h"
 
-struct Matrix4x4 final {
-	float m[4][4];
-};
-
-struct Matrix3x3 final {
-	float m[3][3];
-};
-
-struct Vector3
-{
-	float x;
-	float y;
-	float z;
-
-};
-Matrix4x4 MakeRotateXMatrix(float radian) {
+inline Matrix4x4 MakeRotateXMatrix(float radian) {
 	Matrix4x4 result = {};
 
 	result.m[0][0] = 1;
@@ -29,7 +17,7 @@ Matrix4x4 MakeRotateXMatrix(float radian) {
 
 }
 
-Matrix4x4 MakeRotateYMatrix(float radian) {
+inline Matrix4x4 MakeRotateYMatrix(float radian) {
 	Matrix4x4 result = {};
 
 	result.m[0][0] = std::cos(radian);
@@ -42,7 +30,7 @@ Matrix4x4 MakeRotateYMatrix(float radian) {
 	return result;
 }
 
-Matrix4x4 MakeRotateZMatrix(float radian) {
+inline Matrix4x4 MakeRotateZMatrix(float radian) {
 	Matrix4x4 result = {};
 
 	result.m[0][0] = std::cos(radian);
@@ -58,7 +46,7 @@ Matrix4x4 MakeRotateZMatrix(float radian) {
 }
 
 
-Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
+inline Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 	Matrix4x4 m3;
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -70,7 +58,7 @@ Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 }
 
 // 平行移動ベクトルから平行移動行列を作成する関数
-Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
+inline Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
 	Matrix4x4 translateMatrix = {};
 
 	// 単位行列に初期化し、平行移動成分を設定
@@ -88,7 +76,7 @@ Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
 
 
 // スケールベクトルからスケール行列を作成する関数
-Matrix4x4 MakeScaleMatrix(const Vector3& scale) {
+inline Matrix4x4 MakeScaleMatrix(const Vector3& scale) {
 	Matrix4x4 scaleMatrix = {};
 
 	// スケール行列を作成
@@ -100,7 +88,7 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale) {
 	return scaleMatrix;
 }
 
-Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
+inline Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 
 
 	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
@@ -131,7 +119,7 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 	return result;
 }
 //透視投影行列
-Matrix4x4 MakePerspectiveMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
+inline Matrix4x4 MakePerspectiveMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
 	Matrix4x4 result = {};
 
 	float tanHalfFovY = std::tan(fovY / 2);
@@ -145,7 +133,7 @@ Matrix4x4 MakePerspectiveMatrix(float fovY, float aspectRatio, float nearClip, f
 }
 
 
-Matrix4x4 Inverse(const Matrix4x4& m) {
+inline Matrix4x4 Inverse(const Matrix4x4& m) {
 	float A;
 	A = m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3] + m.m[0][0] * m.m[1][2] * m.m[2][3] * m.m[3][1] + m.m[0][0] * m.m[1][3] * m.m[2][1] * m.m[3][2]
 		- m.m[0][0] * m.m[1][3] * m.m[2][2] * m.m[3][1] - m.m[0][0] * m.m[1][2] * m.m[2][1] * m.m[3][3] - m.m[0][0] * m.m[1][1] * m.m[2][3] * m.m[3][2]
@@ -218,7 +206,7 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 }
 
 
-Matrix4x4 MakeIdentity4x4() {
+inline Matrix4x4 MakeIdentity4x4() {
 
 	Matrix4x4 m = {};
 	m.m[0][0] = 1;
@@ -247,7 +235,7 @@ Matrix4x4 MakeIdentity4x4() {
 
 
 //正射影行列
-Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
+inline Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
 	Matrix4x4 result = {};
 	result.m[0][0] = 2 / (right - left);
 
