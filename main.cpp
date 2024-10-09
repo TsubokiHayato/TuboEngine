@@ -1,25 +1,25 @@
 
+#include"DirectXcommon.h"
+
+#include"D3DResourceLeakChecker.h"
+
+
+#include"SpriteCommon.h"
+#include "Input.h"
+#include"Sprite.h"
+
+#include"MT_Matrix.h"
+#include <fstream>
+#include<sstream>
+
 
 #pragma comment(lib,"dxguid.lib")
 
 #pragma comment(lib,"dxcompiler.lib")
 
-#include"MT_Matrix.h"
-
-
-#include"vector"
-
-
-#include <fstream>
-#include<sstream>
 
 
 
-
-#include "Input.h"
-
-#include"DirectXcommon.h"
-#include"D3DResourceLeakChecker.h"
 
 # define PI 3.14159265359f
 
@@ -81,25 +81,6 @@ struct ModelData {
 };
 
 
-
-
-
-
-//CPUのDescriptorHandleを取得する関数
-D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index) {
-
-	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	handleCPU.ptr += (descriptorSize * index);
-	return handleCPU;
-}
-
-//GPUのDescriptorHandleを取得する関数
-D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index) {
-
-	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	handleGPU.ptr += (descriptorSize * index);
-	return handleGPU;
-}
 
 
 
@@ -264,56 +245,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	winApp->Initialize();
 
-	//D3DResourceLeakChecker leakChecker;
+	D3DResourceLeakChecker leakChecker;
 
 	DirectXCommon* dxCommon = nullptr;
 	dxCommon = new DirectXCommon();
 
 	dxCommon->Initialize(winApp);
 
+
+
 	HRESULT hr = dxCommon->GetHr();
+
 	Microsoft::WRL::ComPtr <ID3D12Device> device = dxCommon->GetDevice();
-	Microsoft::WRL::ComPtr <IDXGIFactory7> dxgiFactory = dxCommon->GetDxgiFactory();
-
-	Microsoft::WRL::ComPtr <ID3D12CommandAllocator> commandAllocator = dxCommon->GetCommandAllocator();
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList = dxCommon->GetCommandList();
-	Microsoft::WRL::ComPtr <ID3D12CommandQueue> commandQueue = dxCommon->GetCommandQueue();
-
-	//swapChain
-	Microsoft::WRL::ComPtr <IDXGISwapChain4> swapChain = dxCommon->GetSwapChain();
-	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = dxCommon->GetSwapChainDesc();
-
-
-	uint32_t descriptorSizeSRV = dxCommon->GetDescriptorSizeSRV();
-	uint32_t descriptorSizeRTV = dxCommon->GetDescriptorSizeRTV();
-	uint32_t descriptorSizeDSV = dxCommon->GetDescriptorSizeDSV();
-
-
-	//RTVディスクイリプタヒープの生成
-	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> rtvDescriptorHeap = dxCommon->GetRtvDescriptorHeap();
-
-	//SRVディスクイリプタヒープの生成
-	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> srvDescriptorHeap = dxCommon->GetSrvDescriptorHeap();
-	//DSVディスクイリプタヒープの生成
-	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> dsvDescriptorHeap = dxCommon->GetDsvDescriptorHeap();
-
-
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = dxCommon->GetRtvDesc();
-
-	Microsoft::WRL::ComPtr<ID3D12Fence> fence = dxCommon->GetFence();
-	uint64_t fenceValue = dxCommon->GetFenceValue();
-	HANDLE fenceEvent = dxCommon->GetFenceEvent();
-
-	//ビューポート
-	D3D12_VIEWPORT viewport = dxCommon->GetViewport();
-	//シザー矩形
-	D3D12_RECT scissorRect = dxCommon->GetScissorRect();
-
-
-
-
-
-
 
 
 
@@ -732,8 +676,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 	//SRVを作成するDescriptorHeapの場所を決める
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 1);
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 1);
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = dxCommon->GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), 1);
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = dxCommon->GetGPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), 1);
 	//先頭はImGuiを使っているのでその次をつかう
 	textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -743,8 +687,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 	//SRVを作成するDescriptorHeapの場所を決める(2枚目)
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = dxCommon->GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), 2);
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = dxCommon->GetGPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), 2);
 	//先頭はImGuiを使っているのでその次をつかう(2枚目)
 	textureSrvHandleCPU2.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	textureSrvHandleGPU2.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -765,7 +709,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	input->Initialize(winApp);
 
 
+	SpriteCommon* spriteCommon = nullptr;
+	//スプライト共通部分の初期化
+	spriteCommon = new SpriteCommon;
+	spriteCommon->Initialize();
 
+	//スプライトの初期化
+	Sprite* sprite = new Sprite();
+	sprite->Initialize();
 
 	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
@@ -931,22 +882,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 	//リソースリークチェック
-	delete input;
-
+	
+	//WindowsAppの削除
 	winApp->Finalize();
-
 	delete winApp;
 	winApp = nullptr;
 
-	CloseHandle(fenceEvent);
-
+	//DirectX共通部分の削除
+	CloseHandle(dxCommon->GetFenceEvent());
 	delete dxCommon;
 
+	//入力の削除
+	delete input;
 
-
-
-
-
+	//スプライト共通部分の削除
+	delete spriteCommon;
+	delete sprite;
 
 	//ImGui
 	ImGui_ImplDX12_Shutdown();
