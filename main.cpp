@@ -437,7 +437,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-	
+
 
 #pragma region DirectionalLightData
 	//平行光源用用のリソースを作る。今回はColor1つ分のサイズを用意する
@@ -566,15 +566,39 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	spriteCommon = new SpriteCommon;
 	spriteCommon->Initialize(dxCommon);
 
-	//スプライトの初期化
-	Sprite* sprite = new Sprite();
-	sprite->Initialize(spriteCommon,winApp,dxCommon);
+	////スプライトの初期化
+	//Sprite* sprite = new Sprite();
+	//sprite->Initialize(spriteCommon,winApp,dxCommon);
+
+
+
+
+	// 初期化処理
+	std::vector<Sprite*> sprites;
+	for (uint32_t i = 0; i < 12; ++i) {
+		Sprite* sprite = new Sprite();
+		sprite->Initialize(spriteCommon, winApp, dxCommon);
+
+		// 各スプライトに異なる位置やプロパティを設定する
+		Vector2 spritePosition = { i * -100.0f, 0.0f }; // スプライトごとに異なる位置
+		float spriteRotation = 0.0f;                 // 回転は任意
+		Vector4 spriteColor = { 1.0f, 1.0f, 1.0f, 1.0f }; // 色は白（RGBA）
+		Vector2 size = { 50.0f, 50.0f };             // 任意のサイズ
+
+		sprite->SetPosition(spritePosition);
+		sprite->SetRotation(spriteRotation);
+		sprite->SetColor(spriteColor);
+		sprite->SetSize(size);
+
+		sprites.push_back(sprite);
+	}
+
 
 	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
 	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(winApp->kClientWidth) / float(winApp->kClientHeight), 0.1f, 100.0f);
 
-	
+
 
 
 	bool useMonsterBall = true;
@@ -640,10 +664,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			cameraTransform.rotate.x -= 0.01f;
 		}
 
+		/*spritePosition += Vector2{ 0.1f,0.1f };
+			spriteRotation += 0.1f;
+			spriteColor.z += 0.01f;
+			if (spriteColor.z > 1.0f) {
+				spriteColor.z -= 1.0f;
+			}
 
-		/*-------------------
-		　　　シーンの更新
-	　　-------------------*/
+
+
+			size.x = 0.1f;
+			size.y = 0.1f;*/
+
+
+			/*-------------------
+			　　　シーンの更新
+		　　-------------------*/
 		Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 		Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -655,7 +691,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		wvpData->World = worldMatrix;
 
 
-		sprite->Update();
+		
+
+		// 更新処理
+		for (Sprite* sprite : sprites) {
+			if (sprite) {
+				// ここでは各スプライトの位置や回転を更新する処理を行う
+				// 例: X軸方向に少しずつ移動させる
+				Vector2 currentPosition = sprite->GetPosition();
+				currentPosition.x += 1.0f; // 毎フレーム少しずつ右に動かす
+				sprite->SetPosition(currentPosition);
+
+				sprite->Update();
+			}
+		}
+
 		/*-----
 		描画処理
 		------*/
@@ -694,8 +744,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 
 
-		sprite->Draw(textureSrvHandleGPU);
+
 		
+	// 描画処理
+		for (Sprite* sprite : sprites) {
+			if (sprite) {
+				sprite->Draw(textureSrvHandleGPU);
+			}
+		}
 
 #pragma endregion
 		/*-------------------
@@ -725,7 +781,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//スプライト共通部分の削除
 	delete spriteCommon;
-	delete sprite;
+
+
+	for (Sprite* sprite : sprites) {
+		if (sprite) {
+			delete sprite; // メモリを解放
+		}
+	}
+	sprites.clear(); // ポインタをクリア
+
 
 	//ImGui
 	ImGui_ImplDX12_Shutdown();
