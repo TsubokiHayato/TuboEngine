@@ -7,14 +7,14 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommo
 	this->spriteCommon = spriteCommon;
 	dxCommon_ = dxCommon;
 	winApp_ = winApp;
-	
+
 
 #pragma region SpriteResource
 
 	vertexResource = dxCommon->CreateBufferResource(sizeof(VertexData) * 6);
 
 	//頂点バッファビューを作成する
-	
+
 	//リソースの先頭のアドレスから使う
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点6つ分のサイズ
@@ -22,7 +22,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommo
 	//1頂点あたりのサイズ
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
-	
+
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
 	//三角形を2つ使って、四角形の作る
@@ -72,17 +72,17 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommo
 #pragma region indexResourceSprite
 
 	//WVP用のリソースを作る
-	indexResource =dxCommon->CreateBufferResource(sizeof(uint32_t) * 6);
+	indexResource = dxCommon->CreateBufferResource(sizeof(uint32_t) * 6);
 
 
-	
+
 
 	indexBufferView.BufferLocation = indexResource->GetGPUVirtualAddress();
 
 	indexBufferView.SizeInBytes = sizeof(uint32_t) * 6;
 	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 
-	
+
 	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 
 	indexData[0] = 0;    indexData[1] = 1;   indexData[2] = 2;
@@ -113,16 +113,39 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommo
 
 void Sprite::Update()
 {
+	transform.translate = { position.x,position.y,0.0f };
+	transform.rotate = { 0.0f,0.0f,rotation };
+
+	vertexData[0].position = {0.0f,1.0f,0.0f,1.0f};
+	vertexData[0].texcoord = {0.0f,1.0f};
+	vertexData[0].normal = {0.0f,0.0f,-1.0f};
+
+	vertexData[1].position = { 0.0f,0.0f,0.0f,1.0f };
+	vertexData[1].texcoord = { 0.0f,0.0f };
+	vertexData[1].normal = { 0.0f,0.0f,-1.0f };
+
+	vertexData[2].position = { 1.0f,1.0f,0.0f,1.0f };
+	vertexData[2].texcoord = { 1.0f,1.0f };
+	vertexData[2].normal = { 0.0f,0.0f,-1.0f };
+
+	vertexData[3].position = { 1.0f,0.0f,0.0f,1.0f };
+	vertexData[3].texcoord = { 1.0f,0.0f };
+	vertexData[3].normal = { 0.0f,0.0f,-1.0f };
+
+	transform.scale = { size.x,size.y,1.0f };
+
 	Matrix4x4 uvTransformMatrix = MakeAffineMatrix(uvTransFormMatrix.scale, uvTransFormMatrix.rotate, uvTransFormMatrix.translate);
 
 	materialData->uvTransform = uvTransformMatrix;
 
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transformMatrix.scale, transformMatrix.rotate, transformMatrix.translate);
+	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 viewMatrix = MakeIdentity4x4();
 	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(winApp_->kClientWidth), float(winApp_->kClientHeight), 0.0f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData->WVP = worldViewProjectionMatrix;
 	transformationMatrixData->World = worldMatrix;
+
+
 
 	commandList = dxCommon_->GetCommandList();
 }
