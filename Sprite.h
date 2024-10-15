@@ -56,6 +56,32 @@ public:
 	///　描画処理
 	/// </summary>
 	void Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU);
+
+
+	//getter_Pos
+	const Vector2& GetPosition()const { return position; }
+	//setter_Pos
+	void SetPosition(const Vector2& position) { this->position = position; }
+
+
+	//getter_Rotation
+	const float& GetRotation()const { return rotation; }
+	//setter_Rotation
+	void SetRotation(const float& rotation) { this->rotation = rotation; }
+
+	//getter_Color
+	const Vector4& GetColor()const { return materialData->color;}
+	//setter_Color
+	void SetColor(const Vector4& color) { materialData->color = color; }
+
+
+	//getter_Size
+	const Vector2& GetSize()const { return size; }
+	//setter_Size
+	void SetSize(const Vector2& size) { this->size = size; }
+
+
+
 private:
 	SpriteCommon* spriteCommon = nullptr;
 	DirectXCommon* dxCommon_ = nullptr;
@@ -89,8 +115,15 @@ private:
 		{0.0f,0.0f,0.0f},
 		{0.0f,0.0f,0.0f},
 	};
-	Transform transformMatrix{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
+
+
+	Vector2 position = {};
+	float rotation = {};
+	Vector2 size = { 640.0f,360.0f };
+
+
 };
 
