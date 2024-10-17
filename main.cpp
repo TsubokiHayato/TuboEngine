@@ -320,6 +320,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
+
 	/*------------
 	  BlendState
 	------------*/
@@ -575,7 +576,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// 初期化処理
 	std::vector<Sprite*> sprites;
-	for (uint32_t i = 0; i < 12; ++i) {
+	for (uint32_t i = 0; i < 14; ++i) {
 		Sprite* sprite = new Sprite();
 		sprite->Initialize(spriteCommon, winApp, dxCommon);
 
@@ -619,6 +620,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/*-------------------
 			 入力の更新
 		-------------------*/
+		if (input->PushKey(DIK_A)) {
+			cameraTransform.rotate.y += 0.01f;
+		}
+		if (input->PushKey(DIK_D)) {
+			cameraTransform.rotate.y -= 0.01f;
+		}
+		if (input->PushKey(DIK_SPACE) && input->TriggerKey(DIK_SPACE)) {
+			cameraTransform.rotate.x -= 0.01f;
+		}
 
 		/*-------
 		  ImGui
@@ -654,32 +664,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		---------*/
 
 		input->Update();
-		if (input->PushKey(DIK_A)) {
-			cameraTransform.rotate.y += 0.01f;
-		}
-		if (input->PushKey(DIK_D)) {
-			cameraTransform.rotate.y -= 0.01f;
-		}
-		if (input->PushKey(DIK_SPACE) && input->TriggerKey(DIK_SPACE)) {
-			cameraTransform.rotate.x -= 0.01f;
-		}
 
-		/*spritePosition += Vector2{ 0.1f,0.1f };
-			spriteRotation += 0.1f;
-			spriteColor.z += 0.01f;
-			if (spriteColor.z > 1.0f) {
-				spriteColor.z -= 1.0f;
+			// 更新処理
+		for (Sprite* sprite : sprites) {
+			if (sprite) {
+				// ここでは各スプライトの位置や回転を更新する処理を行う
+				// 例: X軸方向に少しずつ移動させる
+				Vector2 currentPosition = sprite->GetPosition();
+				currentPosition.x += 1.0f; // 毎フレーム少しずつ右に動かす
+				float currentRotation = sprite->GetRotation();
+
+				sprite->SetPosition(currentPosition);
+				sprite->SetRotation(currentRotation);
+
+				sprite->Update();
 			}
+		}
 
-
-
-			size.x = 0.1f;
-			size.y = 0.1f;*/
-
-
-			/*-------------------
-			　　　シーンの更新
-		　　-------------------*/
+		/*-------------------
+		　　　シーンの更新
+	　　-------------------*/
 		Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 		Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -691,20 +695,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		wvpData->World = worldMatrix;
 
 
-		
 
-		// 更新処理
-		for (Sprite* sprite : sprites) {
-			if (sprite) {
-				// ここでは各スプライトの位置や回転を更新する処理を行う
-				// 例: X軸方向に少しずつ移動させる
-				Vector2 currentPosition = sprite->GetPosition();
-				currentPosition.x += 1.0f; // 毎フレーム少しずつ右に動かす
-				sprite->SetPosition(currentPosition);
-
-				sprite->Update();
-			}
-		}
 
 		/*-----
 		描画処理
@@ -745,8 +736,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-		
-	// 描画処理
+
+		// 描画処理
 		for (Sprite* sprite : sprites) {
 			if (sprite) {
 				sprite->Draw(textureSrvHandleGPU);
