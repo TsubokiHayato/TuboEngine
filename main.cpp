@@ -711,7 +711,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		　　シーンの描画
 	　　-------------------*/
 
-#pragma region Command//Triangle
+#pragma region Command//3D
 
 	  //RootSignatureを設定。
 		spriteCommon->DrawSettingsCommon();
