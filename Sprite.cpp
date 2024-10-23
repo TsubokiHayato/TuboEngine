@@ -1,12 +1,14 @@
 #include "Sprite.h"
 #include"SpriteCommon.h"
 #include"MT_Matrix.h"
-
-void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommon* dxCommon)
+#include"TextureManager.h"
+void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommon* dxCommon,std::string textureFilePath)
 {
 	this->spriteCommon = spriteCommon;
 	dxCommon_ = dxCommon;
 	winApp_ = winApp;
+
+	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 
 
 #pragma region SpriteResource
@@ -162,7 +164,7 @@ void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU)
 	//TransformationMatrixCBufferの設定
 	commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResource->GetGPUVirtualAddress());
 
-	commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+	commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex));
 	//描画
 	commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
