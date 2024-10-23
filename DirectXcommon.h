@@ -195,6 +195,8 @@ public:
 	//関数が成功したかどうかSUCCEEDEDマクロで判断出来る
 	HRESULT hr;
 
+	//最大SRV数(最大テクスチャ枚数)
+	static const uint32_t kMaxSRVCount;
 
 private:
 
