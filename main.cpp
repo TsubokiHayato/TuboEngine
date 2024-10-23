@@ -7,6 +7,7 @@
 #include"SpriteCommon.h"
 #include "Input.h"
 #include"Sprite.h"
+#include"TextureManager.h"
 
 #include <fstream>
 #include<sstream>
@@ -567,12 +568,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	spriteCommon = new SpriteCommon;
 	spriteCommon->Initialize(dxCommon);
 
-	////スプライトの初期化
-	//Sprite* sprite = new Sprite();
-	//sprite->Initialize(spriteCommon,winApp,dxCommon);
-
-
-
 
 	// 初期化処理
 	std::vector<Sprite*> sprites;
@@ -594,6 +589,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		sprites.push_back(sprite);
 	}
 
+	TextureManager::GetInstance()->Initialize();
+	TextureManager::GetInstance()->Finalize();
 
 	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
