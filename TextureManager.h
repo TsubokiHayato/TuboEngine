@@ -39,5 +39,21 @@ public:
 	void Initialize();
 
 	void LoadTexture(const std::string& filePath);
+
+	DirectXCommon* dxCommon;
+
+	//SRVインデックスの開始番号
+	static uint32_t kSRVIndexTop;
+
+	/// <summary>
+	/// SRVインデックスの開始番号
+	/// </summary>
+	uint32_t GetTextureIndexByFilePath(const std::string& filePath);
+
+	/// <summary>
+	/// テクスチャ番号からGPUハンドルを取得
+	/// </summary>
+	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(uint32_t textureIndex);
+
 };
 
