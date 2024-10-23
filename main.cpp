@@ -540,6 +540,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
+
 	//SRVを作成するDescriptorHeapの場所を決める(2枚目)
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = dxCommon->GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), 2);
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = dxCommon->GetGPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), 2);
@@ -569,11 +570,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	spriteCommon->Initialize(dxCommon);
 
 
+	TextureManager::GetInstance()->Initialize();
+
+
+
 	// 初期化処理
 	std::vector<Sprite*> sprites;
 	for (uint32_t i = 0; i < 14; ++i) {
 		Sprite* sprite = new Sprite();
-		sprite->Initialize(spriteCommon, winApp, dxCommon);
+		sprite->Initialize(spriteCommon, winApp, dxCommon, "Resources/uvChecker.png");
 
 		// 各スプライトに異なる位置やプロパティを設定する
 		Vector2 spritePosition = { i * -100.0f, 0.0f }; // スプライトごとに異なる位置
@@ -589,8 +594,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		sprites.push_back(sprite);
 	}
 
-	TextureManager::GetInstance()->Initialize();
-	TextureManager::GetInstance()->Finalize();
+
 
 	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
@@ -662,7 +666,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		input->Update();
 
-			// 更新処理
+		// 更新処理
 		for (Sprite* sprite : sprites) {
 			if (sprite) {
 				// ここでは各スプライトの位置や回転を更新する処理を行う
@@ -742,10 +746,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 
 #pragma endregion
+
+		TextureManager::GetInstance()->Finalize();
 		/*-------------------
 		　　DirectX描画終了
 	  　　-------------------*/
+
 		dxCommon->PostDraw();
+
 
 	}
 
