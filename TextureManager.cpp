@@ -45,6 +45,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	textureData.metadata = mipImages.GetMetadata();
 	textureData.resource = dxCommon_->CreateTextureResource(textureData.metadata);
 
+
 	//テクスチャデータの要素番号をSRVのインデックスとする
 	uint32_t srvIndex = static_cast<uint32_t>(textureDatas.size() - 1) + kSRVIndexTop;
 
@@ -67,6 +68,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	
 	dxCommon_->CommandExecution();
 
+	
 }
 
 uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
@@ -77,6 +79,7 @@ uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
 		textureDatas.end(),
 		[&](TextureData& textureData) {return textureData.filePath == filePath; }
 	);
+
 	if (it != textureDatas.end()) {
 		//読み込み済みなら要素番号を渡す
 		uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureDatas.begin(), it));
@@ -93,7 +96,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(uint32_t textureInde
 	Microsoft::WRL::ComPtr <ID3D12Device> device = dxCommon_->GetDevice();
 
 
-	TextureData& textureData = textureDatas.back();
+	TextureData& textureData = textureDatas[textureIndex];
 
 	return textureData.srvHandleGPU;
 }
