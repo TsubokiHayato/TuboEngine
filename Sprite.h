@@ -55,7 +55,7 @@ public:
 	/// <summary>
 	///　描画処理
 	/// </summary>
-	void Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU);
+	void Draw();
 
 
 	//getter_Pos
