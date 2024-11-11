@@ -109,11 +109,12 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommo
 	materialData->enableLighting = false;
 	materialData->uvTransform = MakeIdentity4x4();
 
+
 #pragma endregion
 
 	
-	
 	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
+	
 
 }
 
@@ -155,6 +156,7 @@ void Sprite::Update()
 
 	commandList = dxCommon_->GetCommandList();
 }
+
 
 void Sprite::Draw()
 {
