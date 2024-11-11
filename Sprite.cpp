@@ -7,13 +7,13 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommo
 	this->spriteCommon = spriteCommon;
 	dxCommon_ = dxCommon;
 	winApp_ = winApp;
-
-	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
+	
+	
 
 
 #pragma region SpriteResource
 
-	vertexResource = dxCommon->CreateBufferResource(sizeof(VertexData) * 6);
+	vertexResource = dxCommon_->CreateBufferResource(sizeof(VertexData) * 6);
 
 	//頂点バッファビューを作成する
 
@@ -58,7 +58,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommo
 	vertexData[3].normal = { 0.0f,0.0f,1.0f };
 
 
-	transformationMatrixResource = dxCommon->CreateBufferResource(sizeof(TransformationMatrix));
+	transformationMatrixResource = dxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
 	//データを書き込む
 	transformationMatrixData = nullptr;
 
@@ -68,13 +68,14 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommo
 	transformationMatrixData->WVP = MakeIdentity4x4();
 	transformationMatrixData->World = MakeIdentity4x4();
 
+
 #pragma endregion
 
 
 #pragma region indexResourceSprite
 
 	//WVP用のリソースを作る
-	indexResource = dxCommon->CreateBufferResource(sizeof(uint32_t) * 6);
+	indexResource = dxCommon_->CreateBufferResource(sizeof(uint32_t) * 6);
 
 
 
@@ -99,7 +100,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommo
 #pragma region Material_Resource_Sprite
 	//マテリアル用のリソースを作る。今回はColor1つ分のサイズを用意する
 	materialResource =
-		dxCommon->CreateBufferResource(sizeof(Material));
+		dxCommon_->CreateBufferResource(sizeof(Material));
 	//マテリアルにデータを書き込む
 	//書き込むためのアドレスを取得
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
@@ -110,6 +111,9 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommo
 
 #pragma endregion
 
+	
+	
+	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 
 }
 
@@ -152,7 +156,7 @@ void Sprite::Update()
 	commandList = dxCommon_->GetCommandList();
 }
 
-void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU)
+void Sprite::Draw()
 {
 
 	//Spriteの描画

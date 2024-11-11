@@ -215,10 +215,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	dxCommon->Initialize(winApp);
 
-	Microsoft::WRL::ComPtr <ID3D12Device> device = dxCommon->GetDevice();
+	
+
+
+	TextureManager::GetInstance()->Initialize(dxCommon);
+	TextureManager::GetInstance()->LoadTexture( "Resources/uvChecker.png");
+
+Microsoft::WRL::ComPtr <ID3D12Device> device = dxCommon->GetDevice();
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList = dxCommon->GetCommandList();
-
-
 
 #pragma region PSO(Pipeline_State_Object)//
 	/*------------
@@ -570,13 +574,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	spriteCommon->Initialize(dxCommon);
 
 
-	TextureManager::GetInstance()->Initialize();
-
-
-
 	// 初期化処理
 	std::vector<Sprite*> sprites;
 	for (uint32_t i = 0; i < 14; ++i) {
+
 		Sprite* sprite = new Sprite();
 		sprite->Initialize(spriteCommon, winApp, dxCommon, "Resources/uvChecker.png");
 
@@ -714,40 +715,39 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma region Command//3D
 
-	  //RootSignatureを設定。
-		spriteCommon->DrawSettingsCommon();
+	   //RootSignatureを設定。
+		 spriteCommon->DrawSettingsCommon();
 
-		commandList->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
-		//マテリアルCBufferの場所を設定_02_01
-		commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-
-
-		//wvp用のCBufferの場所を設定_02_02
-		commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-
-		//SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
-		commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
-
-		commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+		 //commandList->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
+		 ////マテリアルCBufferの場所を設定_02_01
+		 //commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 
 
-		//描画
+		 ////wvp用のCBufferの場所を設定_02_02
+		 //commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
 
-		commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+		 ////SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
+		 //commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
+
+		 //commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+
+
+		 ////描画
+
+		 //commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 
 
 
 
-		// 描画処理
+		 // 描画処理
 		for (Sprite* sprite : sprites) {
 			if (sprite) {
-				sprite->Draw(textureSrvHandleGPU);
+				sprite->Draw();
 			}
 		}
 
 #pragma endregion
 
-		TextureManager::GetInstance()->Finalize();
 		/*-------------------
 		　　DirectX描画終了
 	  　　-------------------*/
@@ -786,6 +786,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 	sprites.clear(); // ポインタをクリア
 
+	//テクスチャマネージャの終了
+	TextureManager::GetInstance()->Finalize();
 
 	//ImGui
 	ImGui_ImplDX12_Shutdown();
