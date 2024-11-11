@@ -63,6 +63,7 @@ public:
 	//描画後処理 End
 	void PostDraw();
 
+	void CommandExecution();
 
 
 
