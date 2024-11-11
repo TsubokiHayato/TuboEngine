@@ -603,6 +603,66 @@ void DirectXCommon::PostDraw()
 
 }
 
+void DirectXCommon::CommandExecution()
+{
+
+#pragma endregion
+
+	/*グラフィックスコマンドをクローズ*/
+
+	//コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
+	hr = commandList->Close();
+	assert(SUCCEEDED(hr));
+
+
+	/*GPUコマンドの実行*/
+
+	//GPUにコマンドリストの実行行わせる
+	ID3D12CommandList* commandLists[] = { commandList.Get() };
+	commandQueue->ExecuteCommandLists(1, commandLists);
+
+
+	/*GPU画面の交換を通知*/
+
+
+	/*Fenceの値を更新*/
+
+	fenceValue++;
+
+
+	/*コマンドキューにシグナルを送る*/
+
+	//GPUがここまでたどり着いた時に、Fenceの値を指定した値に代入するようにSignalをおくる
+	commandQueue->Signal(fence.Get(), fenceValue);
+
+
+	/*コマンド完了待ち*/
+
+	if (fence->GetCompletedValue() < fenceValue) {
+		//
+		fence->SetEventOnCompletion(fenceValue, fenceEvent);
+		//イベント待つ
+		WaitForSingleObject(fenceEvent, INFINITE);
+	}
+
+	//FPS固定更新
+	//UpdateFixFPS();
+
+	/*コマンドアロケーターのリセット*/
+
+	//次のフレーム用のコマンドリストを準備
+	hr = commandAllocator->Reset();
+	assert(SUCCEEDED(hr));
+
+
+	/*コマンドリストのリセット*/
+
+	hr = commandList->Reset(commandAllocator.Get(), nullptr);
+	assert(SUCCEEDED(hr));
+
+
+}
+
 
 
 
