@@ -2,6 +2,7 @@
 #include<string>
 #include"externals/DirectXTex/DirectXTex.h"
 #include"DirectXcommon.h"
+#include<vector>
 class TextureManager
 {
 private:
@@ -28,6 +29,8 @@ private:
 	//テクスチャデータ
 	std::vector<TextureData>textureDatas;
 
+	
+
 public:
 	//シングルトンインスタンスの取得
 	static TextureManager* GetInstance();
@@ -36,11 +39,11 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize();
+	void Initialize(DirectXCommon* dxCommon);
 
 	void LoadTexture(const std::string& filePath);
 
-	DirectXCommon* dxCommon;
+	DirectXCommon* dxCommon_;
 
 	//SRVインデックスの開始番号
 	static uint32_t kSRVIndexTop;
