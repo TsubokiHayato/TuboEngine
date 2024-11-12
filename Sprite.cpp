@@ -2,13 +2,17 @@
 #include"SpriteCommon.h"
 #include"MT_Matrix.h"
 #include"TextureManager.h"
-void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommon* dxCommon,std::string textureFilePath)
+#include "externals/imgui/imgui.h"
+#include "externals/imgui/imgui_impl_win32.h"
+#include "externals/imgui/imgui_impl_dx12.h"
+
+void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommon* dxCommon, std::string textureFilePath)
 {
 	this->spriteCommon = spriteCommon;
 	dxCommon_ = dxCommon;
 	winApp_ = winApp;
-	
-	
+
+
 
 
 #pragma region SpriteResource
@@ -112,31 +116,66 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommo
 
 #pragma endregion
 
-	
+
 	textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
-	
+
 
 }
 
 void Sprite::Update()
 {
+
+
+	float left = 0.0f - anchorPoint.x;
+	float right = 1.0f - anchorPoint.x;
+	float top = 0.0f - anchorPoint.y;
+	float bottom = 1.0f - anchorPoint.y;
+
+	// 左右反転
+	if (isFlipX_) {
+		left = 1.0f - anchorPoint.x;
+		right = 0.0f - anchorPoint.x;
+	}
+	else {
+		left = 0.0f - anchorPoint.x;
+		right = 1.0f - anchorPoint.x;
+	}
+	//上下反転
+	if (isFlipY_) {
+		top = 1.0f - anchorPoint.x;
+		bottom = 0.0f - anchorPoint.x;
+	}
+	else {
+		top = 0.0f - anchorPoint.x;
+		bottom = 1.0f - anchorPoint.x;
+	}
+
+	const DirectX::TexMetadata& metadata =
+		TextureManager::GetInstance()->GetMetaData(textureIndex);
+	float tex_left = textureLeftTop_.x / metadata.width;
+	float tex_right = (textureLeftTop_.x + textureSize_.x) / metadata.width;
+	float tex_top = textureLeftTop_.y / metadata.height;
+	float tex_bottom = (textureLeftTop_.y + textureSize_.y) / metadata.height;
+	
+	AdjustTextureSize();
+
 	transform.translate = { position.x,position.y,0.0f };
 	transform.rotate = { 0.0f,0.0f,rotation };
 
-	vertexData[0].position = {0.0f,1.0f,0.0f,1.0f};
-	vertexData[0].texcoord = {0.0f,1.0f};
-	vertexData[0].normal = {0.0f,0.0f,-1.0f};
+	vertexData[0].position = { left,bottom,0.0f,1.0f };
+	vertexData[0].texcoord = { tex_left,tex_bottom };
+	vertexData[0].normal = { 0.0f,0.0f,-1.0f };
 
-	vertexData[1].position = { 0.0f,0.0f,0.0f,1.0f };
-	vertexData[1].texcoord = { 0.0f,0.0f };
+	vertexData[1].position = { left,top,0.0f,1.0f };
+	vertexData[1].texcoord = { tex_left,tex_top };
 	vertexData[1].normal = { 0.0f,0.0f,-1.0f };
 
-	vertexData[2].position = { 1.0f,1.0f,0.0f,1.0f };
-	vertexData[2].texcoord = { 1.0f,1.0f };
+	vertexData[2].position = { right,bottom,0.0f,1.0f };
+	vertexData[2].texcoord = { tex_right,tex_bottom };
 	vertexData[2].normal = { 0.0f,0.0f,-1.0f };
 
-	vertexData[3].position = { 1.0f,0.0f,0.0f,1.0f };
-	vertexData[3].texcoord = { 1.0f,0.0f };
+	vertexData[3].position = { right,top,0.0f,1.0f };
+	vertexData[3].texcoord = { tex_right,tex_top };
 	vertexData[3].normal = { 0.0f,0.0f,-1.0f };
 
 	transform.scale = { size.x,size.y,1.0f };
@@ -155,6 +194,10 @@ void Sprite::Update()
 
 
 	commandList = dxCommon_->GetCommandList();
+
+
+
+
 }
 
 
@@ -174,4 +217,15 @@ void Sprite::Draw()
 	//描画
 	commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
+}
+
+void Sprite::AdjustTextureSize()
+{
+
+	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureIndex);
+
+	textureSize_.x = static_cast<float>(metadata.width);
+	textureSize_.y = static_cast<float>(metadata.height);
+	
+	size = textureSize_;
 }
