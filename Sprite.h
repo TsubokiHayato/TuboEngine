@@ -80,7 +80,22 @@ public:
 	//setter_Size
 	void SetSize(const Vector2& size) { this->size = size; }
 
+	const Vector2& GetAnchorPoint()const { return anchorPoint; }
+	void SetAnchorPoint(const Vector2& anchorPoint) { this->anchorPoint = anchorPoint; }
 
+	const bool& GetFlipX_()const { return isFlipX_; }
+	void SetFlipX(const bool& isFlipX) { this->isFlipX_ = isFlipX; }
+
+	const bool& GetFlipY_()const { return isFlipY_; }
+	void SetFlipY(const bool& isFlipY) { this->isFlipY_ = isFlipY; }
+
+	const Vector2& GetTextureLeftTop()const { return textureLeftTop_; }
+	void SetTextureLeftTop(const Vector2& textureLeftTop) { this->textureLeftTop_ = textureLeftTop; }
+
+	const Vector2& GetTextureSize()const { return textureSize_; }
+	void SetTextureSize(const Vector2& textureSize) { this->textureSize_ = textureSize; }
+
+	void AdjustTextureSize();
 
 private:
 	SpriteCommon* spriteCommon = nullptr;
@@ -126,5 +141,21 @@ private:
 
 	//テクスチャ番号
 	uint32_t textureIndex = 0;
+
+
+	/*----------
+	　　拡張機能
+	-----------*/
+	//アンカーポイント
+	Vector2 anchorPoint = {};
+	//左右フリップ
+	bool isFlipX_ = false;
+	//上下フリップ
+	bool isFlipY_ = false;
+	//テクスチャ左上座標
+	Vector2 textureLeftTop_ = {};
+	//テクスチャ切り出しサイズ
+	Vector2 textureSize_ = { 100.0f,100.0f };
+
 };
 

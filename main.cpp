@@ -581,6 +581,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	spriteCommon->Initialize(dxCommon);
 
 
+
+	bool isFlipX_;
+	bool isFlipY_;
+	Vector2 anchorPoint;
+
+
 	// 初期化処理
 	std::vector<Sprite*> sprites;
 	for (uint32_t i = 0; i < 3; ++i) {
@@ -603,6 +609,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		float spriteRotation = 0.0f;                 // 回転は任意
 		Vector4 spriteColor = { 1.0f, 1.0f, 1.0f, 1.0f }; // 色は白（RGBA）
 		Vector2 size = { 50.0f, 50.0f };             // 任意のサイズ
+
+		isFlipX_ = sprite->GetFlipX_();
+		isFlipY_ = sprite->GetFlipY_();
+		anchorPoint = sprite->GetAnchorPoint();
 
 		sprite->SetPosition(spritePosition);
 		sprite->SetRotation(spriteRotation);
@@ -656,7 +666,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-
+		for (Sprite* sprite : sprites) {
+			if (sprite) {
+				ImGui::Begin("Sprite");
+				ImGui::Checkbox("isFlipX", &isFlipX_);
+				ImGui::Checkbox("isFlipY", &isFlipY_);
+				ImGui::DragFloat2("anchorPoint", &anchorPoint.x);
+				ImGui::End();
+			}
+		}
 		ImGui::Text("Material");
 		ImGui::Checkbox("useMonsterBall", &useMonsterBall);
 		ImGui::DragFloat3("Translate", &transform.translate.x, 0.01f, -10.0f, 10.0f);
@@ -695,7 +713,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 				sprite->SetPosition(currentPosition);
 				sprite->SetRotation(currentRotation);
-
+				sprite->SetAnchorPoint(anchorPoint);
+				sprite->SetFlipX(isFlipX_);
+				sprite->SetFlipY(isFlipY_);
 				sprite->Update();
 			}
 		}
