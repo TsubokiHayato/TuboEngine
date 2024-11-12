@@ -58,5 +58,12 @@ public:
 	/// </summary>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(uint32_t textureIndex);
 
+	/// <summary>
+	/// メタデータを取得
+	/// </summary>
+	/// <param name="textureIndex"></param>
+	/// <returns></returns>
+	const DirectX::TexMetadata& GetMetaData(uint32_t textureIndex);
+
 };
 
