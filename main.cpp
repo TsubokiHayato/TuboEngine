@@ -584,12 +584,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	bool isFlipX_;
 	bool isFlipY_;
-	Vector2 anchorPoint;
-
+	Vector2 textureLeftTop;
+	bool isAdjustTextureSize;
 
 	// 初期化処理
 	std::vector<Sprite*> sprites;
-	for (uint32_t i = 0; i < 3; ++i) {
+	for (uint32_t i = 0; i < 9; ++i) {
 
 		Sprite* sprite = new Sprite();
 
@@ -605,19 +605,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 		// 各スプライトに異なる位置やプロパティを設定する
-		Vector2 spritePosition = { i * -100.0f, 0.0f }; // スプライトごとに異なる位置
+		Vector2 spritePosition = { i * -1280.0f, 0.0f }; // スプライトごとに異なる位置
 		float spriteRotation = 0.0f;                 // 回転は任意
 		Vector4 spriteColor = { 1.0f, 1.0f, 1.0f, 1.0f }; // 色は白（RGBA）
 		Vector2 size = { 50.0f, 50.0f };             // 任意のサイズ
 
-		isFlipX_ = sprite->GetFlipX_();
-		isFlipY_ = sprite->GetFlipY_();
-		anchorPoint = sprite->GetAnchorPoint();
+		isFlipX_ = sprite->GetFlipX();
+		isFlipY_ = sprite->GetFlipY();
+		textureLeftTop = sprite->GetTextureLeftTop();
+		isAdjustTextureSize = sprite->GetIsAdjustTextureSize();
+
 
 		sprite->SetPosition(spritePosition);
 		sprite->SetRotation(spriteRotation);
 		sprite->SetColor(spriteColor);
 		sprite->SetSize(size);
+		sprite->SetTextureLeftTop(textureLeftTop);
+		sprite->SetGetIsAdjustTextureSize(isAdjustTextureSize);
 
 		sprites.push_back(sprite);
 	}
@@ -669,9 +673,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		for (Sprite* sprite : sprites) {
 			if (sprite) {
 				ImGui::Begin("Sprite");
+
 				ImGui::Checkbox("isFlipX", &isFlipX_);
 				ImGui::Checkbox("isFlipY", &isFlipY_);
-				ImGui::DragFloat2("anchorPoint", &anchorPoint.x);
+				ImGui::Checkbox("isAdjustTextureSize", &isAdjustTextureSize);
+				ImGui::DragFloat2("textureLeftTop", &textureLeftTop.x);
 				ImGui::End();
 			}
 		}
@@ -708,14 +714,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				// ここでは各スプライトの位置や回転を更新する処理を行う
 				// 例: X軸方向に少しずつ移動させる
 				Vector2 currentPosition = sprite->GetPosition();
-				currentPosition.x += 1.0f; // 毎フレーム少しずつ右に動かす
+				currentPosition.x += 4.0f; // 毎フレーム少しずつ右に動かす
 				float currentRotation = sprite->GetRotation();
 
 				sprite->SetPosition(currentPosition);
 				sprite->SetRotation(currentRotation);
-				sprite->SetAnchorPoint(anchorPoint);
+				sprite->SetTextureLeftTop(textureLeftTop);
 				sprite->SetFlipX(isFlipX_);
 				sprite->SetFlipY(isFlipY_);
+				sprite->SetGetIsAdjustTextureSize(isAdjustTextureSize);
+
 				sprite->Update();
 			}
 		}
