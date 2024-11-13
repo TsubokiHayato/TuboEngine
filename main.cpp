@@ -199,6 +199,12 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
+
+	/*-----------------------------------------------------------------------------------------------------------
+	|																											|
+	|												初期化処理													|
+	|																											|
+	-----------------------------------------------------------------------------------------------------------*/
 #pragma region 基盤システムの初期化
 
 	WinApp* winApp = nullptr;
@@ -212,14 +218,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	dxCommon = new DirectXCommon();
 	dxCommon->Initialize(winApp);
 
+	//スプライト共通部分
 	SpriteCommon* spriteCommon = nullptr;
-	//スプライト共通部分の初期化
 	spriteCommon = new SpriteCommon;
 	spriteCommon->Initialize(dxCommon);
 
 	Object3dCommon* object3dCommon = nullptr;
 	object3dCommon = new Object3dCommon();
-	object3dCommon->Initialize();
+	object3dCommon->Initialize(dxCommon);
 
 
 #pragma endregion 基盤システムの初期化
@@ -624,7 +630,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Object3d* object3d = new Object3d();
 	object3d->Initialize();
 
-	
+
 	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
 	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(winApp->kClientWidth) / float(winApp->kClientHeight), 0.1f, 100.0f);
@@ -632,7 +638,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-	
+
 
 
 
@@ -646,6 +652,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 
 		//ウィンドウにメッセージが来てたら最優先で処理させる
+
+
+		/*-----------------------------------------------------------------------------------------------------------
+		|																											|
+		|												更新処理														|
+		|																											|
+		-----------------------------------------------------------------------------------------------------------*/
 
 		/*-------------------
 			 入力の更新
@@ -679,7 +692,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 		}
 		ImGui::Text("Material");
-		
+
 		ImGui::DragFloat3("Translate", &transform.translate.x, 0.01f, -10.0f, 10.0f);
 		ImGui::DragFloat3("Scale", &transform.scale.x, 0.01f, -10.0f, 10.0f);
 		ImGui::DragFloat3("Rotate", &transform.rotate.x, 0.01f, -10.0f, 10.0f);
@@ -741,9 +754,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-		/*-----
-		描画処理
-		------*/
+		/*-----------------------------------------------------------------------------------------------------------
+		|																											|
+		|												描画処理														|
+		|																											|
+		-----------------------------------------------------------------------------------------------------------*/
 
 
 		/*-------------------
@@ -756,8 +771,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	　　-------------------*/
 
 #pragma region Command//3D
+	  //3Dオブジェクトの描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
+		object3dCommon->DrawSettingsCommon();
 
-	  //RootSignatureを設定。
+		//2Dオブジェクトの描画準備。2Dオブジェクトの描画に共通のグラフィックスコマンドを積む
 		spriteCommon->DrawSettingsCommon();
 
 		//commandList->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
