@@ -1,24 +1,20 @@
 
 #include"DirectXcommon.h"
-
 #include"D3DResourceLeakChecker.h"
-
+#include"MT_Matrix.h"
+#include "Input.h"
+#include <fstream>
+#include<sstream>
 
 #include"SpriteCommon.h"
-#include "Input.h"
 #include"Sprite.h"
 #include"TextureManager.h"
 
-#include <fstream>
-#include<sstream>
-#include"MT_Matrix.h"
+#include"Object3dCommon.h"
+#include"Object3d.h"
 
 #pragma comment(lib,"dxguid.lib")
-
 #pragma comment(lib,"dxcompiler.lib")
-
-
-
 
 
 # define PI 3.14159265359f
@@ -203,6 +199,8 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
+#pragma region 基盤システムの初期化
+
 	WinApp* winApp = nullptr;
 	winApp = new WinApp();
 
@@ -212,21 +210,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	DirectXCommon* dxCommon = nullptr;
 	dxCommon = new DirectXCommon();
-
 	dxCommon->Initialize(winApp);
 
+	SpriteCommon* spriteCommon = nullptr;
+	//スプライト共通部分の初期化
+	spriteCommon = new SpriteCommon;
+	spriteCommon->Initialize(dxCommon);
+
+	Object3dCommon* object3dCommon = nullptr;
+	object3dCommon = new Object3dCommon();
+	object3dCommon->Initialize();
 
 
+#pragma endregion 基盤システムの初期化
 
 	TextureManager::GetInstance()->Initialize(dxCommon);
-
 	std::string uvCheckerTextureHandle = "Resources/uvChecker.png";
 	std::string monsterBallTextureHandle = "Resources/monsterBall.png";
 
-
 	TextureManager::GetInstance()->LoadTexture(uvCheckerTextureHandle);
 	TextureManager::GetInstance()->LoadTexture(monsterBallTextureHandle);
-
 
 	Microsoft::WRL::ComPtr <ID3D12Device> device = dxCommon->GetDevice();
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList = dxCommon->GetCommandList();
@@ -574,14 +577,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	input = new Input();
 	input->Initialize(winApp);
 
-
-	SpriteCommon* spriteCommon = nullptr;
-	//スプライト共通部分の初期化
-	spriteCommon = new SpriteCommon;
-	spriteCommon->Initialize(dxCommon);
-
-
-
 	bool isFlipX_;
 	bool isFlipY_;
 	Vector2 textureLeftTop;
@@ -626,8 +621,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		sprites.push_back(sprite);
 	}
 
+	Object3d* object3d = new Object3d();
+	object3d->Initialize();
 
-
+	
 	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
 	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(winApp->kClientWidth) / float(winApp->kClientHeight), 0.1f, 100.0f);
@@ -635,7 +632,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-	bool useMonsterBall = true;
+	
 
 
 
@@ -682,7 +679,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 		}
 		ImGui::Text("Material");
-		ImGui::Checkbox("useMonsterBall", &useMonsterBall);
+		
 		ImGui::DragFloat3("Translate", &transform.translate.x, 0.01f, -10.0f, 10.0f);
 		ImGui::DragFloat3("Scale", &transform.scale.x, 0.01f, -10.0f, 10.0f);
 		ImGui::DragFloat3("Rotate", &transform.rotate.x, 0.01f, -10.0f, 10.0f);
@@ -829,6 +826,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			delete sprite; // メモリを解放
 		}
 	}
+
+	delete object3dCommon;
+	delete object3d;
+
 	sprites.clear(); // ポインタをクリア
 
 	//テクスチャマネージャの終了
