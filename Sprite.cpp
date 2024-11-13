@@ -125,11 +125,12 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommo
 void Sprite::Update()
 {
 
-
+	//textureの位置
 	float left = 0.0f - anchorPoint.x;
 	float right = 1.0f - anchorPoint.x;
 	float top = 0.0f - anchorPoint.y;
 	float bottom = 1.0f - anchorPoint.y;
+
 
 	// 左右反転
 	if (isFlipX_) {
@@ -150,14 +151,26 @@ void Sprite::Update()
 		bottom = 1.0f - anchorPoint.x;
 	}
 
+
+	//テクスチャのメタデータを取得
 	const DirectX::TexMetadata& metadata =
 		TextureManager::GetInstance()->GetMetaData(textureIndex);
+
+	//テクスチャの初期サイズ時の座標
 	float tex_left = textureLeftTop_.x / metadata.width;
 	float tex_right = (textureLeftTop_.x + textureSize_.x) / metadata.width;
 	float tex_top = textureLeftTop_.y / metadata.height;
 	float tex_bottom = (textureLeftTop_.y + textureSize_.y) / metadata.height;
 	
-	AdjustTextureSize();
+	//テクスチャの初期サイズを呼び出す関数
+	if (isAdjustTextureSize) {
+		AdjustTextureSize();
+	}
+
+
+	/*---------------------------------------
+	テクスチャの位置、画像位置, 法線ベクトル, 大きさ
+	---------------------------------------*/
 
 	transform.translate = { position.x,position.y,0.0f };
 	transform.rotate = { 0.0f,0.0f,rotation };
@@ -180,6 +193,10 @@ void Sprite::Update()
 
 	transform.scale = { size.x,size.y,1.0f };
 
+
+	/*---------
+	行列更新処理
+	---------*/
 	Matrix4x4 uvTransformMatrix = MakeAffineMatrix(uvTransFormMatrix.scale, uvTransFormMatrix.rotate, uvTransFormMatrix.translate);
 
 	materialData->uvTransform = uvTransformMatrix;
@@ -204,7 +221,8 @@ void Sprite::Update()
 void Sprite::Draw()
 {
 
-	//Spriteの描画
+	
+
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 	commandList->IASetIndexBuffer(&indexBufferView);
 
