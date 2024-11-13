@@ -83,10 +83,10 @@ public:
 	const Vector2& GetAnchorPoint()const { return anchorPoint; }
 	void SetAnchorPoint(const Vector2& anchorPoint) { this->anchorPoint = anchorPoint; }
 
-	const bool& GetFlipX_()const { return isFlipX_; }
+	const bool& GetFlipX()const { return isFlipX_; }
 	void SetFlipX(const bool& isFlipX) { this->isFlipX_ = isFlipX; }
 
-	const bool& GetFlipY_()const { return isFlipY_; }
+	const bool& GetFlipY()const { return isFlipY_; }
 	void SetFlipY(const bool& isFlipY) { this->isFlipY_ = isFlipY; }
 
 	const Vector2& GetTextureLeftTop()const { return textureLeftTop_; }
@@ -95,6 +95,12 @@ public:
 	const Vector2& GetTextureSize()const { return textureSize_; }
 	void SetTextureSize(const Vector2& textureSize) { this->textureSize_ = textureSize; }
 
+	const bool& GetIsAdjustTextureSize()const { return isAdjustTextureSize; }
+	void SetGetIsAdjustTextureSize(const bool& isAdjustTextureSize) { this->isAdjustTextureSize = isAdjustTextureSize; }
+	
+	/// <summary>
+	/// テクスチャから初期サイズを得る
+	/// </summary>
 	void AdjustTextureSize();
 
 private:
@@ -156,6 +162,7 @@ private:
 	Vector2 textureLeftTop_ = {};
 	//テクスチャ切り出しサイズ
 	Vector2 textureSize_ = { 100.0f,100.0f };
-
+	//初期サイズにするフラグ
+	bool isAdjustTextureSize;
 };
 
