@@ -3,12 +3,12 @@
 void SpriteCommon::Initialize(DirectXCommon* dxCommon)
 {
 	dxCommon_ = dxCommon;
-	device = dxCommon->GetDevice();
-	commandList = dxCommon->GetCommandList();
+	device = dxCommon_->GetDevice();
+	commandList = dxCommon_->GetCommandList();
 
 
 	//グラフィックスパイプラインの作成
-	graphicPipeline_Create();
+	CreateGraphicPipeline();
 }
 
 void SpriteCommon::DrawSettingsCommon()
@@ -30,7 +30,7 @@ void SpriteCommon::DrawSettingsCommon()
 
 }
 
-void SpriteCommon::RootSignature_Create()
+void SpriteCommon::CreateRootSignature()
 {
 	
 
@@ -105,10 +105,10 @@ void SpriteCommon::RootSignature_Create()
 
 }
 
-void SpriteCommon::graphicPipeline_Create()
+void SpriteCommon::CreateGraphicPipeline()
 {
 	//ルートシグネイチャ」の作成
-	RootSignature_Create();
+	CreateRootSignature();
 
 
 

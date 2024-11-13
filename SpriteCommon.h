@@ -29,12 +29,12 @@ private:
 	/// <summary>
 	/// ルートシグネイチャの作成
 	/// </summary>
-	void RootSignature_Create();
+	void CreateRootSignature();
 
 	/// <summary>
 	/// グラフィックスパイプラインの作成
 	/// </summary>
-	void graphicPipeline_Create();
+	void CreateGraphicPipeline();
 
 
 
