@@ -9,8 +9,8 @@
 void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommon* dxCommon, std::string textureFilePath)
 {
 	this->spriteCommon = spriteCommon;
-	dxCommon_ = dxCommon;
-	winApp_ = winApp;
+	this->dxCommon_ = dxCommon;
+	this->winApp_ = winApp;
 
 
 
@@ -166,7 +166,10 @@ void Sprite::Update()
 	if (isAdjustTextureSize) {
 		AdjustTextureSize();
 	}
-
+	else {
+		textureSize_ = { 100.0f,100.0f };
+		size = textureSize_;
+	}
 
 	/*---------------------------------------
 	テクスチャの位置、画像位置, 法線ベクトル, 大きさ
@@ -218,8 +221,7 @@ void Sprite::Update()
 }
 
 
-void Sprite::Draw()
-{
+void Sprite::Draw(){
 
 	
 
