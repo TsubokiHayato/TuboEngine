@@ -2,6 +2,7 @@
 
 void Object3dCommon::Initialize(DirectXCommon* dxCommon)
 {
+	assert(dxCommon);
 	dxCommon_ = dxCommon;
 	device = dxCommon_->GetDevice();
 	commandList = dxCommon_->GetCommandList();
