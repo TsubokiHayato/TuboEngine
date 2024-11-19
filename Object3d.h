@@ -32,7 +32,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="object3dCommon"></param>
-	void Initialize(Object3dCommon* object3dCommon,WinApp* winApp, DirectXCommon* dxCommon);
+	void Initialize(Object3dCommon* object3dCommon, WinApp* winApp, DirectXCommon* dxCommon);
 
 	/// <summary>
 	/// 更新処理
@@ -45,10 +45,21 @@ public:
 	void Draw();
 
 
+
+	//Setter
+	void SetScale(const Vector3& scale) { transform.scale = scale; }
+	void SetRotation(const Vector3& rotation) { transform.rotate = rotation; }
+	void SetPosition(const Vector3& position) { transform.translate = position; }
+	//モデルのセット
 	void SetModel(Model* model) {
 		assert(model);
 		this->model_ = model;
 	}
+	//Getter
+	Vector3 GetScale() const { return transform.scale; }
+	Vector3 GetRotation() const { return transform.rotate; }
+	Vector3 GetPosition() const { return transform.translate; }
+
 
 private:
 
