@@ -85,7 +85,7 @@ public:
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> GetCommandList()const { return commandList; }
 	Microsoft::WRL::ComPtr <ID3D12CommandQueue> GetCommandQueue()const { return commandQueue; }
 
-	//swapChain
+
 	//swapChain
 	Microsoft::WRL::ComPtr <IDXGISwapChain4> GetSwapChain()const { return swapChain; }
 	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc()const { return swapChainDesc; }

@@ -44,24 +44,9 @@ public:
 	/// </summary>
 	void Draw();
 
-	/// <summary>
-	/// マテリアルテンプレートファイルを読み込む
-	/// </summary>
-	/// <param name="directoryPath">ディレクトリパス</param>
-	/// <param name="filePath">ファイルパス</param>
-	/// <returns>マテリアルデータ</returns>
-	static MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filePath);
-
-
-	/// <summary>
-	/// OBJファイルを読み込む
-	/// </summary>
-	/// <param name="directoryPath">ディレクトリパス</param>
-	/// <param name="filename">ファイル名</param>
-	/// <returns>モデルデータ</returns>
-	static ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 
 	void SetModel(Model* model) {
+		assert(model);
 		this->model_ = model;
 	}
 
