@@ -54,6 +54,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	spriteCommon = new SpriteCommon;
 	spriteCommon->Initialize(dxCommon);
 
+
+
 	//オブジェクト3Dの共通部分
 	Object3dCommon* object3dCommon = nullptr;
 	object3dCommon = new Object3dCommon();
@@ -67,6 +69,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion 基盤システムの初期化
 
+
+#pragma region TextureManegerの初期化
 	//テクスチャマネージャーの初期化
 	TextureManager::GetInstance()->Initialize(dxCommon);
 
@@ -78,11 +82,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	TextureManager::GetInstance()->LoadTexture(uvCheckerTextureHandle);
 	TextureManager::GetInstance()->LoadTexture(monsterBallTextureHandle);
 
-
-	//今必要だが今後消すもの
-	Microsoft::WRL::ComPtr <ID3D12Device> device = dxCommon->GetDevice();
-	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList = dxCommon->GetCommandList();
-
+#pragma endregion TextureManegerの初期化
 
 
 	//入力初期化
@@ -93,7 +93,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	/*---------------
 		スプライト
 	---------------*/
-
+#pragma region スプライトの初期化
 	//左右反転フラグ
 	bool isFlipX_;
 	//上下反転フラグ
@@ -143,20 +143,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		sprites.push_back(sprite);
 	}
+#pragma endregion スプライトの初期化
 
-
+	//オブジェクト3D
+	Object3d* object3d;
+	object3d = new Object3d();
+	object3d->Initialize(object3dCommon, winApp, dxCommon);
 
 	//モデル
 	Model* model = nullptr;
 	model = new Model();
 	model->Initialize(modelCommon);
 
-	//オブジェクト3D
-	Object3d* object3d;
-	object3d = new Object3d();
 	object3d->SetModel(model);
-	object3d->Initialize(object3dCommon,winApp,dxCommon);
-
 
 
 
@@ -185,7 +184,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/*-------------------
 			 入力の更新
 		-------------------*/
-		
+
 
 
 		/*-------
@@ -195,6 +194,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
+		//スプライトのImGui
 		for (Sprite* sprite : sprites) {
 			if (sprite) {
 				ImGui::Begin("Sprite");
@@ -206,25 +206,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				ImGui::End();
 			}
 		}
-		
 
-		
+
+
 
 		ImGui::ShowDemoWindow();
 		ImGui::Render();
 
 
-		
+
 		/*--------------
 		   ゲームの処理
 		--------------*/
 		//入力の更新
 		input->Update();
 
+		
 		//オブジェクト3Dの更新
 		object3d->Update();
 
-		// 更新処理
+
+		//スプライトの更新
 		for (Sprite* sprite : sprites) {
 			if (sprite) {
 				// ここでは各スプライトの位置や回転を更新する処理を行う
@@ -244,7 +246,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 		}
 
-		
+
 
 
 
@@ -271,10 +273,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		object3dCommon->DrawSettingsCommon();
 
 		//オブジェクト3Dの描画
-		object3d->Draw();
-#pragma region Draw3D
-		
 
+#pragma region Draw3D
+
+		object3d->Draw();
 
 #pragma endregion Draw3D
 
@@ -334,6 +336,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	delete object3dCommon;
 	delete object3d;
+
+	delete modelCommon;
+	delete model;
 
 	sprites.clear(); // ポインタをクリア
 
