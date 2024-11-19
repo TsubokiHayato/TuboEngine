@@ -44,6 +44,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//リークチェッカー
 	D3DResourceLeakChecker leakChecker;
 
+
 	//DirectX共通部分
 	DirectXCommon* dxCommon = nullptr;
 	dxCommon = new DirectXCommon();
@@ -150,12 +151,38 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	object3d = new Object3d();
 	object3d->Initialize(object3dCommon, winApp, dxCommon);
 
+	Vector3 modelPosition = { -1.0f,0.0f,0.0f };
+	Vector3 modelRotation = { 0.0f,0.0f,0.0f };
+	Vector3 modelScale = { 1.0f,1.0f,1.0f };
+
+
 	//モデル
 	Model* model = nullptr;
 	model = new Model();
 	model->Initialize(modelCommon);
 
 	object3d->SetModel(model);
+
+
+
+	//オブジェクト3D
+	Object3d* object3d2;
+	object3d2 = new Object3d();
+	object3d2->Initialize(object3dCommon, winApp, dxCommon);
+
+	Vector3 modelPosition2 = { 1.0f,0.0f,0.0f };
+	Vector3 modelRotation2 = { 0.0f,0.0f,0.0f };
+	Vector3 modelScale2 = { 1.0f,1.0f,1.0f };
+
+
+	//モデル
+	Model* model2 = nullptr;
+	model2 = new Model();
+	model2->Initialize(modelCommon);
+
+	object3d2->SetModel(model2);
+
+
 
 
 
@@ -206,6 +233,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				ImGui::End();
 			}
 		}
+		ImGui::Begin("Object3D");
+		ImGui::DragFloat3("Position", &modelPosition.x);
+		ImGui::DragFloat3("Rotation", &modelRotation.x);
+		ImGui::DragFloat3("Scale", &modelScale.x);
+		ImGui::End();
+		ImGui::Begin("Object3D2");
+		ImGui::DragFloat3("Position", &modelPosition2.x);
+		ImGui::DragFloat3("Rotation", &modelRotation2.x);
+		ImGui::DragFloat3("Scale", &modelScale2.x);
+		ImGui::End();
+
 
 
 
@@ -221,9 +259,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//入力の更新
 		input->Update();
 
-		
+		modelRotation.y += 0.01f;
+		modelRotation2.x -= 0.01f;
+
 		//オブジェクト3Dの更新
 		object3d->Update();
+
+		object3d->SetPosition(modelPosition);
+		object3d->SetRotation(modelRotation);
+		object3d->SetScale(modelScale);
+
+		object3d2->Update();
+
+		object3d2->SetPosition(modelPosition2);
+		object3d2->SetRotation(modelRotation2);
+		object3d2->SetScale(modelScale2);
 
 
 		//スプライトの更新
@@ -245,8 +295,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				sprite->Update();
 			}
 		}
-
-
 
 
 
@@ -277,6 +325,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma region Draw3D
 
 		object3d->Draw();
+		object3d2->Draw();
 
 #pragma endregion Draw3D
 
@@ -340,6 +389,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	delete modelCommon;
 	delete model;
 
+
+	delete model2;
+	delete object3d2;
 	sprites.clear(); // ポインタをクリア
 
 	//テクスチャマネージャの終了
