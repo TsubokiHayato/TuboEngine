@@ -44,6 +44,8 @@ public:
 	/// <returns>モデルデータ</returns>
 	static ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 
+
+	
 private:
 	//共通部分
 	ModelCommon* modelCommon_ = nullptr;
