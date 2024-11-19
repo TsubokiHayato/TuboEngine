@@ -24,8 +24,27 @@ public:
 	/// 描画処理
 	/// </summary>
 	void Draw();
+
+
+
+	/// <summary>
+	/// マテリアルテンプレートファイルを読み込む
+	/// </summary>
+	/// <param name="directoryPath">ディレクトリパス</param>
+	/// <param name="filePath">ファイルパス</param>
+	/// <returns>マテリアルデータ</returns>
+	static MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filePath);
+
+
+	/// <summary>
+	/// OBJファイルを読み込む
+	/// </summary>
+	/// <param name="directoryPath">ディレクトリパス</param>
+	/// <param name="filename">ファイル名</param>
+	/// <returns>モデルデータ</returns>
+	static ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
+
 private:
-	DirectXCommon* dxCommon_ = nullptr;
 	//共通部分
 	ModelCommon* modelCommon_ = nullptr;
 
@@ -43,6 +62,10 @@ private:
 	Microsoft::WRL::ComPtr <ID3D12Resource> materialResource;
 	//マテリアルのバッファリソース内のデータを指すポインタ
 	Material* materialData = nullptr;
+
+	//コマンドリスト
+	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
+
 
 };
 
