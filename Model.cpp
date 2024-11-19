@@ -72,8 +72,6 @@ void Model::Draw()
 
 	//SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
 	commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData.material.textureIndex));
-
-
 	//描画
 	commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 
