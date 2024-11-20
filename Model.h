@@ -18,7 +18,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="modelCommon">モデル共通部分</param>
-	void Initialize(ModelCommon* modelCommon);
+	void Initialize(ModelCommon* modelCommon,const std::string& directoryPath,const std::string& filename);
 	
 	/// <summary>
 	/// 描画処理
