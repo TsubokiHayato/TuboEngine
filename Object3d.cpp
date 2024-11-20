@@ -4,7 +4,7 @@
 #include"ModelCommon.h"
 #include"Model.h"
 #include"TextureManager.h"
-
+#include"ModelManager.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_win32.h"
@@ -102,5 +102,10 @@ void Object3d::Draw()
 	}
 
 
+}
+
+void Object3d::SetModel(const std::string& filePath)
+{
+	model_ = ModelManager::GetInstance()->FindModel(filePath);
 }
 

@@ -9,7 +9,7 @@
 #include <fstream>
 #include<sstream>
 
-void Model::Initialize(ModelCommon* modelCommon)
+void Model::Initialize(ModelCommon* modelCommon, const std::string& directoryPath, const std::string& filename)
 {
 
 	//引数で受け取ってメンバ変数に記録する
@@ -21,7 +21,7 @@ void Model::Initialize(ModelCommon* modelCommon)
 
 #pragma region ModelData
 	//モデル読み込み
-	modelData = LoadObjFile("Resources", "plane.obj");
+	modelData = LoadObjFile(directoryPath, filename);
 	//頂点リソースを作る
 	vertexResource = modelCommon_->GetDxCommon()->CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
 	//頂点バッファビューを作成する
