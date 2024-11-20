@@ -1,4 +1,3 @@
-
 #include"DirectXcommon.h"
 #include"D3DResourceLeakChecker.h"
 #include"MT_Matrix.h"
@@ -10,10 +9,9 @@
 
 #include"Object3dCommon.h"
 #include"Object3d.h"
-
 #include"ModelCommon.h"
 #include"Model.h"
-
+#include"ModelManager.h"
 
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
@@ -85,7 +83,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion TextureManegerの初期化
 
+#pragma region ModelManagerの初期化
+	//モデルマネージャーの初期化
+	ModelManager::GetInstance()->initialize(dxCommon);
+	ModelManager::GetInstance()->LoadModel("plane.obj");
+	ModelManager::GetInstance()->LoadModel("axis.obj");
 
+#pragma endregion ModelManagerの初期化
 	//入力初期化
 	Input* input = nullptr;
 	input = new Input();
@@ -146,6 +150,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 #pragma endregion スプライトの初期化
 
+	/*---------------
+	  オブジェクト3D
+	---------------*/
+#pragma region 3Dモデルの初期化
 	//オブジェクト3D
 	Object3d* object3d;
 	object3d = new Object3d();
@@ -155,15 +163,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 modelRotation = { 0.0f,0.0f,0.0f };
 	Vector3 modelScale = { 1.0f,1.0f,1.0f };
 
-
+	//モデルディレクトリパス
+	const std::string modelDirectoryPath = "Resources";
+	//モデルファイルパス
+	const std::string modelFileNamePath = "plane.obj";
 	//モデル
 	Model* model = nullptr;
 	model = new Model();
-	model->Initialize(modelCommon);
+	model->Initialize(modelCommon,modelDirectoryPath,modelFileNamePath);
 
 	object3d->SetModel(model);
+	object3d->SetModel("plane.obj");
 
-
+	////////////////////////////////////////////////////////////////////////
 
 	//オブジェクト3D
 	Object3d* object3d2;
@@ -178,12 +190,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//モデル
 	Model* model2 = nullptr;
 	model2 = new Model();
-	model2->Initialize(modelCommon);
+	model2->Initialize(modelCommon,modelDirectoryPath, modelFileNamePath);
 
 	object3d2->SetModel(model2);
+	object3d2->SetModel("axis.obj");
 
-
-
+#pragma endregion 3Dモデルの初期化
 
 
 
@@ -396,6 +408,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//テクスチャマネージャの終了
 	TextureManager::GetInstance()->Finalize();
+	//モデルマネージャーの終了
+	ModelManager::GetInstance()->Finalize();
 
 	//ImGui
 	ImGui_ImplDX12_Shutdown();
@@ -405,9 +419,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//警告時に止まる
 	//infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
 
-#pragma endregion 描画処理
-
-
+#pragma endregion AllRelease
 
 
 	return 0;
