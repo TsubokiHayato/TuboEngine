@@ -55,10 +55,18 @@ public:
 		assert(model);
 		this->model_ = model;
 	}
+
+	/// <summary>
+	/// 3Dオブジェクトとモデルを紐づける関数
+	/// </summary>
+	/// <param name="filePath"></param>
+	void SetModel(const std::string& filePath);
+
 	//Getter
 	Vector3 GetScale() const { return transform.scale; }
 	Vector3 GetRotation() const { return transform.rotate; }
 	Vector3 GetPosition() const { return transform.translate; }
+
 
 
 private:
