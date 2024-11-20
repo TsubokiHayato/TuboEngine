@@ -86,8 +86,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma region ModelManagerの初期化
 	//モデルマネージャーの初期化
 	ModelManager::GetInstance()->initialize(dxCommon);
-	ModelManager::GetInstance()->LoadModel("plane.obj");
-	ModelManager::GetInstance()->LoadModel("axis.obj");
+
+	//モデルディレクトリパス
+	const std::string modelDirectoryPath = "Resources";
+	//モデルファイルパス
+	const std::string modelFileNamePath = "plane.obj";
+	//モデルファイルパス2
+	const std::string modelFileNamePath2 = "barrier.obj";
+
+	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
+	ModelManager::GetInstance()->LoadModel(modelFileNamePath2);
 
 #pragma endregion ModelManagerの初期化
 	//入力初期化
@@ -163,10 +171,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 modelRotation = { 0.0f,0.0f,0.0f };
 	Vector3 modelScale = { 1.0f,1.0f,1.0f };
 
-	//モデルディレクトリパス
-	const std::string modelDirectoryPath = "Resources";
-	//モデルファイルパス
-	const std::string modelFileNamePath = "plane.obj";
+	
 	//モデル
 	Model* model = nullptr;
 	model = new Model();
@@ -176,6 +181,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	object3d->SetModel("plane.obj");
 
 	////////////////////////////////////////////////////////////////////////
+
+	
 
 	//オブジェクト3D
 	Object3d* object3d2;
@@ -190,10 +197,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//モデル
 	Model* model2 = nullptr;
 	model2 = new Model();
-	model2->Initialize(modelCommon,modelDirectoryPath, modelFileNamePath);
+	model2->Initialize(modelCommon,modelDirectoryPath, modelFileNamePath2);
 
 	object3d2->SetModel(model2);
-	object3d2->SetModel("axis.obj");
+	object3d2->SetModel(modelFileNamePath2);
 
 #pragma endregion 3Dモデルの初期化
 
