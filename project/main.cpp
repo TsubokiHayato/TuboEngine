@@ -281,7 +281,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		modelRotation.y += 0.01f;
 
 		modelRotation2.x -= 0.01f;
+<<<<<<< HEAD
 		//modelRotation2.y -= 0.01f;
+=======
+>>>>>>> parent of 80a7502 (kanryou)
 		modelRotation2.z -= 0.01f;
 
 		//オブジェクト3Dの更新
