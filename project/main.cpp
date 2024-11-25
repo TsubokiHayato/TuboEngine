@@ -381,6 +381,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion Draw2D
 
+
 		/*-------------------
 		　　DirectX描画終了
 	  　　-------------------*/
