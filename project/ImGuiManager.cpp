@@ -15,4 +15,5 @@ void ImGuiManager::Initialize(WinApp* winApp)
 	ImGui::StyleColorsDark();
 	//ImGuiのDirectX12の初期化
 	ImGui_ImplWin32_Init(this->winApp->GetHWND());
+
 }
