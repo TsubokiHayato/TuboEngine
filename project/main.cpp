@@ -279,8 +279,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		input->Update();
 
 		modelRotation.y += 0.01f;
+
 		modelRotation2.x -= 0.01f;
-		modelRotation2.y -= 0.01f;
+		//modelRotation2.y -= 0.01f;
 		modelRotation2.z -= 0.01f;
 
 		//オブジェクト3Dの更新
