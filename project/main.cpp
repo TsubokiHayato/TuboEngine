@@ -13,6 +13,8 @@
 #include"Model.h"
 #include"ModelManager.h"
 
+#include"ImGuiManager.h"
+
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
 
@@ -98,10 +100,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ModelManager::GetInstance()->LoadModel(modelFileNamePath2);
 
 #pragma endregion ModelManagerの初期化
+
+#pragma region ImGuiManagerの初期化
+	//ImGuiの初期化
+	ImGuiManager* imguiManager = nullptr;
+	imguiManager = new ImGuiManager();
+	imguiManager->Initialize(winApp);
+
+#pragma endregion ImGuiManagerの初期化
+
+#pragma region Inputの初期化
 	//入力初期化
 	Input* input = nullptr;
 	input = new Input();
 	input->Initialize(winApp);
+#pragma endregion Inputの初期化
 
 	/*---------------
 		スプライト

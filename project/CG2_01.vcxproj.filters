@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="imgui">
-      <UniqueIdentifier>{d33484b0-76b7-4a29-900a-d80167fd27ee}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ヘッダー ファイル\math">
       <UniqueIdentifier>{bcb69a2f-d42c-4749-bf24-9ba0cc470660}</UniqueIdentifier>
     </Filter>
@@ -60,27 +57,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="externals\imgui\imgui.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_demo.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_draw.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_tables.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_widgets.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
     <ClCompile Include="engine\graphic\2d\Sprite.cpp">
       <Filter>ソース ファイル\graphic\2d</Filter>
     </ClCompile>
@@ -129,32 +105,11 @@
     <ClCompile Include="engine\leakChecker\D3DResourceLeakChecker.cpp">
       <Filter>ソース ファイル\leakChecker</Filter>
     </ClCompile>
+    <ClCompile Include="ImGuiManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="externals\imgui\imconfig.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_dx12.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_win32.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_internal.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_rectpack.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_textedit.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_truetype.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
     <ClInclude Include="engine\math\Matrix3x3.h">
       <Filter>ヘッダー ファイル\math</Filter>
     </ClInclude>
@@ -233,11 +188,9 @@
     <ClInclude Include="engine\graphic\VertexData.h">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="externals\imgui\LICENSE.txt">
-      <Filter>imgui</Filter>
-    </Text>
+    <ClInclude Include="ImGuiManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc">
