@@ -76,7 +76,7 @@ public:
 	//(/ ￣∪
 	// 
 	//Device
-	
+
 	Microsoft::WRL::ComPtr <IDXGIFactory7> GetDxgiFactory()const { return dxgiFactory; }
 	Microsoft::WRL::ComPtr <ID3D12Device> GetDevice()const { return device; }
 
@@ -158,6 +158,8 @@ public:
 	IDxcIncludeHandler* GetIncludeHandler() { return includeHandler; }
 
 
+	size_t GetBackBufferCount()const { return backBuffers.size(); }
+
 	//シェーダーのコンパイル
 	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
 		const std::wstring& filePath,
@@ -220,7 +222,7 @@ private:
 	//DXGIファクトリーの設置
 	Microsoft::WRL::ComPtr <IDXGIFactory7> dxgiFactory = nullptr;
 
-	
+
 
 	Microsoft::WRL::ComPtr <ID3D12Device> device = nullptr;
 

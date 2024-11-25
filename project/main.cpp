@@ -424,6 +424,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	delete modelCommon;
 	delete model;
 
+	delete imguiManager;
 
 	delete model2;
 	delete object3d2;
