@@ -47,10 +47,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\generated\outputs\$(Configuation)\</OutDir>
     <IntDir>$(SolutionDir)..\generated\obj\$(ProjectName)\$(Configuation)\</IntDir>
+    <IncludePath>$(SolutionDir)DirectXTex;$(SolutionDir)imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\generated\outputs\$(Configuation)\</OutDir>
     <IntDir>$(SolutionDir)..\generated\obj\$(ProjectName)\$(Configuation)\</IntDir>
+    <IncludePath>$(SolutionDir)DirectXTex;$(SolutionDir)imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -90,6 +92,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>MinSpace</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -169,6 +172,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <Text Include="externals\imgui\LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\imgui\imgui.vcxproj">
+      <Project>{b8989013-4f56-47aa-9ab2-d93264b30e12}</Project>
+    </ProjectReference>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
       <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
     </ProjectReference>
