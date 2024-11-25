@@ -4,9 +4,9 @@ on:
     branches:
       - master
 env:
-  #リポジトリのルートディレクトリを基点としたソリューションファイルのパス
+  # リポジトリのルートディレクトリを基点としたソリューションファイルのパス
    SOLUTION_FILE_PATH: C:\GameEngine3\CG2_01\project\CG2_01.sln
-  #Visual Studio の構成(Debug / Release)
+  # Visual Studio の構成(Debug / Release)
   CONFIGURATION: Debug
 jobs:
   build:
