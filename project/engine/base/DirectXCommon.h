@@ -13,14 +13,10 @@
 
 #include <dxcapi.h>
 
-#ifdef DEBUG
-
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_win32.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 
-
-#endif // DEBUG
 
 #include "externals/DirectXTex/d3dx12.h"
 #include "externals/DirectXTex/DirectXTex.h"
