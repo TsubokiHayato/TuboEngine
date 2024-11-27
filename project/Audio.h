@@ -42,10 +42,25 @@ class Audio
 {
 
 public:
-
+	/// <summary>
+	/// 初期化
+	/// </summary>
 	void Initialize();
+	/// <summary>
+	///音声データの読み込み
+	/// </summary>
 	SoundData SoundLoadWave(const char* fileName);
+	/// <summary>
+	///	終了処理
+	/// </summary>
+	void SoundUnload(SoundData* soundData);
 
+	/// <summary>
+	/// サウンドの再生
+	/// </summary>
+	/// <param name="xAudio2"></param>
+	/// <param name="soundData"></param>
+	void SoundPlayWave(IXAudio2* xAudio2,const SoundData& soundData);
 private:
 
 	
