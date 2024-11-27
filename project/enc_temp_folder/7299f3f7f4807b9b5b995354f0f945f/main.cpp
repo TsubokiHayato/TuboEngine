@@ -271,7 +271,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				ImGui::SetWindowSize({500,100});
 
 				Vector2 spritePosition = sprite->GetPosition();
-				ImGui::SliderFloat2("Position", &spritePosition.x, 0.0f, 1920.0f, "%.1f");
+				ImGui::SliderFloat2("Position", &spritePosition.x, 0.0f, 1920.0f, "%.4f");
 				sprite->SetPosition(spritePosition);
 
 			/*	ImGui::Checkbox("isFlipX", &isFlipX_);
