@@ -44,8 +44,6 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	Scissor_Initialize();
 	//DXCコンパイラの生成
 	dxcCompiler_Create();
-	//ImGuiの初期化
-	ImGui_Initialize();
 }
 
 
@@ -425,29 +423,6 @@ void DirectXCommon::dxcCompiler_Create()
 
 }
 
-void DirectXCommon::ImGui_Initialize()
-{
-
-
-#pragma region ImGui_Initialize
-
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(winApp->GetHWND());
-	ImGui_ImplDX12_Init(device.Get(),
-		swapChainDesc.BufferCount,
-		rtvDesc.Format,
-		srvDescriptorHeap,
-		GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 0),
-		GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 0));
-
-#pragma endregion
-
-
-
-}
-
 
 
 
@@ -521,10 +496,6 @@ void DirectXCommon::PostDraw()
 {
 	/*バックバッファの番号取得*/
 	UINT bbIndex = swapChain->GetCurrentBackBufferIndex();
-
-
-
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
 
 
 
