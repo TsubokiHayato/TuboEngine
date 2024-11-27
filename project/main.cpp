@@ -18,9 +18,12 @@
 
 
 # define PI 3.14159265359f
+#ifdef DEBUG
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+
+#endif // DEBUG
 
 
 
@@ -236,6 +239,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/*-------
 		  ImGui
 		-------*/
+#ifdef DEBUG
+
+
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
@@ -272,6 +278,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
+#endif // DEBUG
 		/*--------------
 		   ゲームの処理
 		--------------*/
@@ -421,11 +428,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	TextureManager::GetInstance()->Finalize();
 	//モデルマネージャーの終了
 	ModelManager::GetInstance()->Finalize();
+#ifdef DEBUG
 
 	//ImGui
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+
+#endif // DEBUG
 
 	//警告時に止まる
 	//infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
