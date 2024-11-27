@@ -12,16 +12,22 @@
 #include"ModelCommon.h"
 #include"Model.h"
 #include"ModelManager.h"
+#ifdef DEBUG
 
 #include"ImGuiManager.h"
+
+#endif // DEBUG
 
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
 
 
 # define PI 3.14159265359f
+#ifdef DEBUG
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+#endif // DEBUG
 
 
 
@@ -102,10 +108,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma endregion ModelManagerの初期化
 
 #pragma region ImGuiManagerの初期化
+#ifdef DEBUG
+
 	//ImGuiの初期化
-	ImGuiManager* imguiManager = nullptr;
-	imguiManager = new ImGuiManager();
-	imguiManager->Initialize(winApp);
+	ImGuiManager* imGuiManager = nullptr;
+	imGuiManager = new ImGuiManager();
+	imGuiManager->Initialize(winApp,dxCommon);
+
+#endif // DEBUG
 
 #pragma endregion ImGuiManagerの初期化
 
@@ -249,10 +259,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/*-------
 		  ImGui
 		-------*/
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
+#ifdef DEBUG
 
+		imGuiManager->Begin();
 		//スプライトのImGui
 		for (Sprite* sprite : sprites) {
 			if (sprite) {
@@ -278,12 +287,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
+		imGuiManager->End();
 
 
-		ImGui::ShowDemoWindow();
-		ImGui::Render();
-
-
+#endif // DEBUG
 
 		/*--------------
 		   ゲームの処理
@@ -382,6 +389,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma endregion Draw2D
 
 
+#ifdef DEBUG
+
+		imGuiManager->Draw();
+#endif // DEBUG
+
 		/*-------------------
 		　　DirectX描画終了
 	  　　-------------------*/
@@ -424,8 +436,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	delete modelCommon;
 	delete model;
+#ifdef DEBUG
 
-	delete imguiManager;
+	delete imGuiManager;
+
+#endif // DEBUG
 
 	delete model2;
 	delete object3d2;
@@ -435,11 +450,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	TextureManager::GetInstance()->Finalize();
 	//モデルマネージャーの終了
 	ModelManager::GetInstance()->Finalize();
+#ifdef DEBUG
+	imGuiManager->Finalize();
+#endif // DEBUG
 
-	//ImGui
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
 
 	//警告時に止まる
 	//infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
