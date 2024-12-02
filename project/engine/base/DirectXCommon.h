@@ -13,10 +13,7 @@
 
 #include <dxcapi.h>
 
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_win32.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-
+                           
 
 #include "externals/DirectXTex/d3dx12.h"
 #include "externals/DirectXTex/DirectXTex.h"
@@ -54,8 +51,6 @@ public:
 	void Scissor_Initialize();
 	//DXCコンパイラの生成
 	void dxcCompiler_Create();
-	//ImGuiの初期化
-	void ImGui_Initialize();
 
 	//描画前処理 Begin
 	void PreDraw();
@@ -75,7 +70,7 @@ public:
 	//(/ ￣∪
 	// 
 	//Device
-	
+
 	Microsoft::WRL::ComPtr <IDXGIFactory7> GetDxgiFactory()const { return dxgiFactory; }
 	Microsoft::WRL::ComPtr <ID3D12Device> GetDevice()const { return device; }
 
@@ -156,6 +151,7 @@ public:
 	IDxcCompiler3* GetDxcCompiler() { return dxcCompiler; }
 	IDxcIncludeHandler* GetIncludeHandler() { return includeHandler; }
 
+size_t GetBackBufferCount()const { return swapChainDesc.BufferCount; }
 
 	//シェーダーのコンパイル
 	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
@@ -219,7 +215,7 @@ private:
 	//DXGIファクトリーの設置
 	Microsoft::WRL::ComPtr <IDXGIFactory7> dxgiFactory = nullptr;
 
-	
+
 
 	Microsoft::WRL::ComPtr <ID3D12Device> device = nullptr;
 
@@ -274,6 +270,10 @@ private:
 
 	//記録時間(FPS固定用)
 	std::chrono::steady_clock::time_point reference_;
+
+
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> backBuffers; // Add this line to define backBuffers
+
 
 };
 

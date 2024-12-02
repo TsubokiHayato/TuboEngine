@@ -2,6 +2,7 @@
 #include"D3DResourceLeakChecker.h"
 #include"MT_Matrix.h"
 #include "Input.h"
+#include"Audio.h"
 
 #include"SpriteCommon.h"
 #include"Sprite.h"
@@ -12,15 +13,27 @@
 #include"ModelCommon.h"
 #include"Model.h"
 #include"ModelManager.h"
+#ifdef _DEBUG
+
+#include"ImGuiManager.h"
+
+#endif // DEBUG
+
+#include <iostream>
+#include <algorithm>
+#undef min
 
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
 
 
 # define PI 3.14159265359f
-
+#ifdef _DEBUG
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+#endif // DEBUG
+
 
 
 
@@ -98,11 +111,43 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ModelManager::GetInstance()->LoadModel(modelFileNamePath2);
 
 #pragma endregion ModelManagerの初期化
+
+#pragma region ImGuiManagerの初期化
+#ifdef _DEBUG
+
+	//ImGuiの初期化
+	ImGuiManager* imGuiManager = nullptr;
+	imGuiManager = new ImGuiManager();
+	imGuiManager->Initialize(winApp, dxCommon);
+
+#endif // DEBUG
+
+#pragma endregion ImGuiManagerの初期化
+
+#pragma region AudioCommonの初期化
+	//オーディオ共通部
+	AudioCommon::GetInstance()->Initialize();
+	const std::string audioFileName = "game.wav";
+	const std::string audioDirectoryPath = "Resources/Audio/";
+
+#pragma endregion AudioCommonの初期化
+#pragma region Inputの初期化
 	//入力初期化
 	Input* input = nullptr;
 	input = new Input();
 	input->Initialize(winApp);
+#pragma endregion Inputの初期化
 
+#pragma region Audioの初期化
+
+	
+
+	std::unique_ptr<Audio> audio = nullptr;
+	audio = std::make_unique<Audio>();
+	audio->Initialize(audioFileName, audioDirectoryPath);
+	audio->Play(true);
+
+#pragma endregion Audioの初期化
 	/*---------------
 		スプライト
 	---------------*/
@@ -119,7 +164,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// スプライト初期化
 	std::vector<Sprite*> sprites;
-	for (uint32_t i = 0; i < 9; ++i) {
+	for (uint32_t i = 0; i < 1; ++i) {
 
 		Sprite* sprite = new Sprite();
 
@@ -135,7 +180,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 		// 各スプライトに異なる位置やプロパティを設定する
-		Vector2 spritePosition = { i * -1280.0f, 0.0f }; // スプライトごとに異なる位置
+		//Vector2 spritePosition = { i * -1280.0f, 0.0f }; // スプライトごとに異なる位置
+		Vector2 spritePosition = { 100.0f, 100.0f }; // スプライトごとに異なる位置
 		float spriteRotation = 0.0f;                 // 回転は任意
 		Vector4 spriteColor = { 1.0f, 1.0f, 1.0f, 1.0f }; // 色は白（RGBA）
 		Vector2 size = { 50.0f, 50.0f };             // 任意のサイズ
@@ -171,18 +217,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 modelRotation = { 0.0f,0.0f,0.0f };
 	Vector3 modelScale = { 1.0f,1.0f,1.0f };
 
-	
+
 	//モデル
 	Model* model = nullptr;
 	model = new Model();
-	model->Initialize(modelCommon,modelDirectoryPath,modelFileNamePath);
+	model->Initialize(modelCommon, modelDirectoryPath, modelFileNamePath);
 
 	object3d->SetModel(model);
 	object3d->SetModel("plane.obj");
 
 	////////////////////////////////////////////////////////////////////////
 
-	
+
 
 	//オブジェクト3D
 	Object3d* object3d2;
@@ -197,15 +243,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//モデル
 	Model* model2 = nullptr;
 	model2 = new Model();
-	model2->Initialize(modelCommon,modelDirectoryPath, modelFileNamePath2);
+	model2->Initialize(modelCommon, modelDirectoryPath, modelFileNamePath2);
 
 	object3d2->SetModel(model2);
 	object3d2->SetModel(modelFileNamePath2);
 
 #pragma endregion 3Dモデルの初期化
-
-
-
 
 
 
@@ -231,27 +274,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			 入力の更新
 		-------------------*/
 
-
-
 		/*-------
 		  ImGui
 		-------*/
-#ifdef DEBUG
+#ifdef _DEBUG
 
-
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-
+		imGuiManager->Begin();
 		//スプライトのImGui
+		 //スプライトのImGui
 		for (Sprite* sprite : sprites) {
 			if (sprite) {
 				ImGui::Begin("Sprite");
+				ImGui::SetWindowSize({ 500,100 });
 
-				ImGui::Checkbox("isFlipX", &isFlipX_);
-				ImGui::Checkbox("isFlipY", &isFlipY_);
-				ImGui::Checkbox("isAdjustTextureSize", &isAdjustTextureSize);
-				ImGui::DragFloat2("textureLeftTop", &textureLeftTop.x);
+				Vector2 spritePosition = sprite->GetPosition();
+				ImGui::SliderFloat2("Position", &spritePosition.x, 0.0f, 1920.0f, "%.1f");
+				sprite->SetPosition(spritePosition);
+
+				/*	ImGui::Checkbox("isFlipX", &isFlipX_);
+					ImGui::Checkbox("isFlipY", &isFlipY_);
+					ImGui::Checkbox("isAdjustTextureSize", &isAdjustTextureSize);
+					ImGui::DragFloat2("textureLeftTop", &textureLeftTop.x);*/
 				ImGui::End();
 			}
 		}
@@ -267,25 +310,62 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::End();
 
 
+		static float scratchPosition = 0.0f;
+		static bool isScratching = false;
+		static float lastScratchPosition = 0.0f;
+		//再生時間
+		float duration = audio->GetSoundDuration();
 
 
+		ImGui::Begin("Audio Control");
+
+		if (ImGui::Button("Play")) {
+			audio->Play(true);
+		}
+		if (ImGui::Button("Stop")) {
+			audio->Stop();
+		}
+		if (ImGui::Button("Pause")) {
+			audio->Pause();
+		}
+		if (ImGui::Button("Resume")) {
+			audio->Resume();
+		}
+		//volume
+		static float volume = 1.0f;
+		ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f);
+		audio->SetVolume(volume);
+
+		// 再生バー
+		static float playbackPosition = 0.0f;
+		//再生位置の取得
+		playbackPosition = audio->GetPlaybackPosition();
+		//再生位置の視認
+		ImGui::SliderFloat("Playback Position", &playbackPosition, 0.0f, duration);
+		//audio->SetPlaybackPosition(playbackPosition);
+
+		//speed
+		static float speed = 1.0f;
+		ImGui::SliderFloat("Speed", &speed, 0.0f, 2.0f);
+		audio->SetPlaybackSpeed(speed);
+
+		ImGui::End();
 
 		ImGui::ShowDemoWindow();
-		ImGui::Render();
-
-
-
+		imGuiManager->End();
 #endif // DEBUG
+
 		/*--------------
 		   ゲームの処理
 		--------------*/
+
+
 		//入力の更新
 		input->Update();
 
 		modelRotation.y += 0.01f;
 
 		modelRotation2.x -= 0.01f;
-
 		//modelRotation2.y -= 0.01f;
 		modelRotation2.z -= 0.01f;
 
@@ -309,7 +389,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				// ここでは各スプライトの位置や回転を更新する処理を行う
 				// 例: X軸方向に少しずつ移動させる
 				Vector2 currentPosition = sprite->GetPosition();
-				currentPosition.x += 4.0f; // 毎フレーム少しずつ右に動かす
+				/*currentPosition.x = 100.0f;
+				currentPosition.y = 100.0f;*/
 				float currentRotation = sprite->GetRotation();
 
 				sprite->SetPosition(currentPosition);
@@ -323,6 +404,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 		}
 
+
+		
 
 
 
@@ -373,6 +456,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion Draw2D
 
+
+#ifdef _DEBUG
+
+		imGuiManager->Draw();
+#endif // DEBUG
+
 		/*-------------------
 		　　DirectX描画終了
 	  　　-------------------*/
@@ -397,8 +486,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	CloseHandle(dxCommon->GetFenceEvent());
 	delete dxCommon;
 
+	AudioCommon::GetInstance()->Finalize();
 	//入力の削除
 	delete input;
+	
 
 	//スプライト共通部分の削除
 	delete spriteCommon;
@@ -415,7 +506,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	delete modelCommon;
 	delete model;
+#ifdef _DEBUG
 
+	delete imGuiManager;
+
+#endif // DEBUG
 
 	delete model2;
 	delete object3d2;
@@ -425,14 +520,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	TextureManager::GetInstance()->Finalize();
 	//モデルマネージャーの終了
 	ModelManager::GetInstance()->Finalize();
-#ifdef DEBUG
-
-	//ImGui
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
-
+#ifdef _DEBUG
+	imGuiManager->Finalize();
 #endif // DEBUG
+
 
 	//警告時に止まる
 	//infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
