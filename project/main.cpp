@@ -127,7 +127,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma region AudioCommonの初期化
 	//オーディオ共通部
 	AudioCommon::GetInstance()->Initialize();
-	const std::string audioFileName = "title.wav";
+	const std::string audioFileName = "game.wav";
 	const std::string audioDirectoryPath = "Resources/Audio/";
 
 #pragma endregion AudioCommonの初期化
