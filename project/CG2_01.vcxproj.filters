@@ -105,7 +105,7 @@
     <ClCompile Include="engine\leakChecker\D3DResourceLeakChecker.cpp">
       <Filter>ソース ファイル\leakChecker</Filter>
     </ClCompile>
-    <ClCompile Include="ImGuiManager.cpp">
+    <ClCompile Include="engine\imgui\ImGuiManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -129,10 +129,13 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Audio.cpp">
+    <ClCompile Include="engine\audio\Audio.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="AudioCommon.cpp">
+    <ClCompile Include="engine\audio\AudioCommon.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\camera\Camera.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -215,7 +218,7 @@
     <ClInclude Include="engine\graphic\VertexData.h">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
-    <ClInclude Include="ImGuiManager.h">
+    <ClInclude Include="engine\imgui\ImGuiManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -242,10 +245,13 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Audio.h">
+    <ClInclude Include="engine\audio\Audio.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="AudioCommon.h">
+    <ClInclude Include="engine\audio\AudioCommon.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\camera\Camera.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
