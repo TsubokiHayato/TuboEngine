@@ -1,129 +1,120 @@
 #include "Audio.h"
-#include <fstream>
-#include<cassert>
-void Audio::Initialize()
+#include <iostream>
+#include <algorithm>
+#undef min
+
+Audio::~Audio()
 {
-	//DirectX‚Ì‰Šú‰»ˆ—‚Ì––”ö‚É’Ç‰Á
-	//XAudio2‚Ì‰Šú‰»
-	HRESULT result = XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
-
-	//ƒ}ƒXƒ^[ƒ{ƒCƒX‚Ì¶¬
-	result = xAudio2->CreateMasteringVoice(&masterVoice);
-
+    // ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã§åœæ­¢ã—ã¦ãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾
+    Stop();
 }
 
-SoundData Audio::SoundLoadWave(const char* fileName)
+void Audio::Initialize(const std::string& filename, const std::string& directoryPath)
 {
-	//ƒtƒ@ƒCƒ‹–¼‚ªnullptr‚Å‚È‚¢‚±‚Æ‚ðŠm”F
-	assert(fileName != nullptr);
+    // ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªãƒ‘ã‚¹ã®ã‚³ãƒ”ãƒ¼
+    directoryPath_ = directoryPath;
 
-	HRESULT result;
-
-	/*-------------
-	‡@ƒtƒ@ƒCƒ‹‚ðŠJ‚­
-	-------------*/
-
-	//ƒtƒ@ƒCƒ‹“ü—ÍƒXƒgƒŠ[ƒ€‚ÌƒCƒ“ƒXƒ^ƒ“ƒX
-	std::ifstream file;
-	//.wavƒtƒ@ƒCƒ‹‚ðƒoƒCƒiƒŠƒ‚[ƒh‚ÅŠJ‚­
-	file.open(fileName, std::ios_base::binary);
-	//ƒtƒ@ƒCƒ‹‚ªŠJ‚¯‚È‚©‚Á‚½ê‡
-	assert(file.is_open() && "ƒtƒ@ƒCƒ‹‚ªŠJ‚¯‚Ü‚¹‚ñ‚Å‚µ‚½");
-
-	/*-----------------
-	‡A.wavƒf[ƒ^‚Ì“Ç‚Ýž‚Ý
-	------------------*/
-
-	//RIFFƒ`ƒƒƒ“ƒNƒwƒbƒ_[‚Ì“Ç‚Ýž‚Ý
-	RiffChunkHeader riffChunkHeader = {};
-	file.read((char*)&riffChunkHeader, sizeof(riffChunkHeader));
-	//ƒtƒ@ƒCƒ‹‚ªRIFFŒ`Ž®‚Å‚È‚¢ê‡
-	if (strncmp(riffChunkHeader.chunk.id, "RIFF", 4) != 0) {
-		assert(0 && "RIFFŒ`Ž®‚Å‚Í‚ ‚è‚Ü‚¹‚ñ");
-	}
-	//ƒtƒ@ƒCƒ‹‚ªWAVEŒ`Ž®‚Å‚È‚¢ê‡
-	if (strncmp(riffChunkHeader.type, "WAVE", 4) != 0) {
-		assert(0 && "WAVEŒ`Ž®‚Å‚Í‚ ‚è‚Ü‚¹‚ñ");
-	}
-	//ƒtƒH[ƒ}ƒbƒgƒ`ƒƒƒ“ƒN‚Ì“Ç‚Ýž‚Ý
-	FormatChunk formatChunk = {};
-	//ƒ`ƒƒƒ“ƒNƒwƒbƒ_[‚ÌŠm”F
-	file.read((char*)&formatChunk, sizeof(formatChunk));
-	if (strncmp(formatChunk.chunk.id, "fmt ", 4) != 0) {
-		assert(0 && "fmtŒ`Ž®‚Å‚Í‚ ‚è‚Ü‚¹‚ñ");
-	}
-
-	//ƒ`ƒƒƒ“ƒN–{‘Ì‚Ì“Ç‚Ýž‚Ý
-	assert(formatChunk.chunk.size == sizeof(formatChunk.format));
-	file.read((char*)&formatChunk.format, formatChunk.chunk.size);
-
-	//ƒf[ƒ^ƒ`ƒƒƒ“ƒN‚Ì“Ç‚Ýž‚Ý
-	ChunkHeader dataChunkHeader = {};
-	file.read((char*)&dataChunkHeader, sizeof(dataChunkHeader));
-	if (strncmp(dataChunkHeader.id, "data", 4) != 0) {
-		assert(0 && "dataŒ`Ž®‚Å‚Í‚ ‚è‚Ü‚¹‚ñ");
-	}
-	if (strncmp(dataChunkHeader.id, "data", 4) == 0) {
-		//“Ç‚ÝŽæ‚èˆÊ’u‚ðJunkƒ`ƒƒƒ“ƒN‚ÌI‚í‚è‚Ü‚Åi‚ß‚é
-		file.seekg(dataChunkHeader.size, std::ios_base::cur);
-		//Ä“Ç‚Ýž‚Ý
-		file.read((char*)&dataChunkHeader, sizeof(dataChunkHeader));
-	}
-
-
-	if (strncmp(dataChunkHeader.id, "data", 4) != 0) {
-		assert(0 && "dataŒ`Ž®‚Å‚Í‚ ‚è‚Ü‚¹‚ñ");
-	}
-
-	//Dataƒ`ƒƒƒ“ƒN‚Ìƒf[ƒ^(”gŒ`ƒf[ƒ^)‚ð“Ç‚Ýž‚Þ
-	char* pBuffer = new char[dataChunkHeader.size];
-	file.read(pBuffer, dataChunkHeader.size);
-
-	//‡Bƒtƒ@ƒCƒ‹ƒNƒ[ƒY
-	file.close();
-
-	//‡C“Ç‚Ýž‚ñ‚¾‰¹ºƒf[ƒ^‚ð•Ô‚·
-
-	//return‚·‚éˆ×‚Ì‰¹ºƒf[ƒ^
-	SoundData soundData = {};
-
-	//WAVEFORMATEX‚ÌÝ’è
-	soundData.wfex = formatChunk.format;
-	//”gŒ`ƒf[ƒ^‚ÌÝ’è
-	soundData.pBuffer = (BYTE*)pBuffer;
-	//”gŒ`ƒf[ƒ^‚ÌƒTƒCƒY‚ÌÝ’è
-	soundData.bufferSize = dataChunkHeader.size;
-
-	return soundData;
+    // WAVãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã¿
+    soundDataHandle_ = AudioCommon::GetInstance()->SoundLoadWave(directoryPath_ + filename);
 }
 
-void Audio::SoundUnload(SoundData* soundData)
+void Audio::Play(bool loop, float valume)
 {
-	//ƒoƒbƒtƒ@ƒƒ‚ƒŠ‚ðŠJ•ú
-	delete[] soundData->pBuffer;
-
-	soundData->pBuffer = nullptr;
-	soundData->bufferSize = 0;
-	soundData->wfex = {};
+    // å†ç”Ÿ
+    voiceDataHandle_ = AudioCommon::GetInstance()->SoundPlayWave(soundDataHandle_, loop, valume);
 }
 
-void Audio::SoundPlayWave(IXAudio2* xAudio2, const SoundData& soundData)
+void Audio::Stop()
 {
+	// åœæ­¢
+    if (voiceDataHandle_ != 0u) {
+		// ãƒãƒ³ãƒ‰ãƒ«ãŒæœ‰åŠ¹ãªå ´åˆã®ã¿åœæ­¢
+        AudioCommon::GetInstance()->SoundStop(voiceDataHandle_);
+        voiceDataHandle_ = 0u; // ãƒãƒ³ãƒ‰ãƒ«ã‚’ç„¡åŠ¹åŒ–
+    }
+}
 
-	HRESULT result;
+void Audio::Pause()
+{
+	// ä¸€æ™‚åœæ­¢
+    if (voiceDataHandle_ != 0u) {
+		// ãƒãƒ³ãƒ‰ãƒ«ãŒæœ‰åŠ¹ãªå ´åˆã®ã¿ä¸€æ™‚åœæ­¢
+        AudioCommon::GetInstance()->SoundPause(voiceDataHandle_);
+    }
+}
 
-	//”gŒ`ƒtƒH[ƒ}ƒbƒg‚ðæ‚ÉSourceVoice‚Ì¶¬
-	IXAudio2SourceVoice* pSourceVoice=nullptr;
-	result = xAudio2->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
-	assert(SUCCEEDED(result));
+void Audio::Resume()
+{
+	// å†é–‹
+    if (voiceDataHandle_ != 0u) {
+		// ãƒãƒ³ãƒ‰ãƒ«ãŒæœ‰åŠ¹ãªå ´åˆã®ã¿å†é–‹
+        AudioCommon::GetInstance()->SoundResume(voiceDataHandle_);
+    }
+}
 
-	//Ä¶‚·‚é”gŒ`ƒf[ƒ^‚ÌÝ’è
-	XAUDIO2_BUFFER buffer = {};
-	buffer.pAudioData = soundData.pBuffer;
-	buffer.AudioBytes = soundData.bufferSize;
-	buffer.Flags = XAUDIO2_END_OF_STREAM;
+void Audio::SetVolume(float volume)
+{
+	// éŸ³é‡è¨­å®š
+    if (voiceDataHandle_ != 0u) {
+		// ãƒãƒ³ãƒ‰ãƒ«ãŒæœ‰åŠ¹ãªå ´åˆã®ã¿éŸ³é‡è¨­å®š
+        AudioCommon::GetInstance()->SetVolume(voiceDataHandle_, volume);
+    }
+}
 
-	//Ä¶
-	result = pSourceVoice->SubmitSourceBuffer(&buffer);
-	result = pSourceVoice->Start(0);
+void Audio::SetPlaybackPosition(float position)
+{
+    playbackPosition_ = position;
+    // å†ç”Ÿä½ç½®ã‚’è¨­å®šã™ã‚‹ãŸã‚ã®ã‚³ãƒ¼ãƒ‰ã‚’è¿½åŠ 
+    if (voiceDataHandle_ != 0u) {
+        AudioCommon::GetInstance()->SetPlaybackPosition(voiceDataHandle_, (playbackPosition_));
+    }
+}
+
+void Audio::SetPlaybackSpeed(float speed)
+{
+    playbackSpeed_ = speed;
+    // å†ç”Ÿé€Ÿåº¦ã‚’è¨­å®šã™ã‚‹ãŸã‚ã®ã‚³ãƒ¼ãƒ‰ã‚’è¿½åŠ 
+    if (voiceDataHandle_ != 0u) {
+        AudioCommon::GetInstance()->SetPlaybackSpeed(voiceDataHandle_, playbackSpeed_);
+    }
+}
+//
+//void Audio::StartScratch() {
+//    isScratching_ = true;
+//    scratchThread_ = std::thread(&Audio::ScratchLoop, this);
+//}
+//void Audio::UpdateScratch(float position) {
+//    float duration = GetSoundDuration();
+//    scratchPosition_ = std::min(position, duration);
+//}
+//
+//void Audio::StopScratch() {
+//    isScratching_ = false;
+//    if (scratchThread_.joinable()) {
+//        scratchThread_.join();
+//    }
+//}
+//
+//void Audio::ScratchLoop() {
+//    while (isScratching_) {
+//        SetPlaybackPosition(scratchPosition_);
+//        std::this_thread::sleep_for(std::chrono::milliseconds(10)); // é©åˆ‡ãªé–“éš”ã§æ›´æ–°
+//    }
+//}
+//
+
+float Audio::GetPlaybackPosition()
+{
+    if (soundDataHandle_ != 0u) {
+        return AudioCommon::GetInstance()->GetPlaybackPosition(soundDataHandle_);
+    }
+    return 0.0f;
+}
+
+float Audio::GetSoundDuration() const
+{
+    if (soundDataHandle_ != 0u) {
+        return AudioCommon::GetInstance()->GetSoundDuration(soundDataHandle_);
+    }
+    return 0.0f;
 }

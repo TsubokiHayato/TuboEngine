@@ -1,71 +1,109 @@
 #pragma once
-#include<xaudio2.h>
-#include <wrl/client.h>
-#include <cstdint>
-#pragma comment(lib,"xaudio2.lib")
-using Microsoft::WRL::ComPtr;
-
-//ƒ`ƒƒƒ“ƒNƒwƒbƒ_[
-struct ChunkHeader
-{
-	char id[4];//ƒ`ƒƒƒ“ƒNID
-	int32_t size;//ƒ`ƒƒƒ“ƒNƒTƒCƒY
-};
-
-//RIFFƒ`ƒƒƒ“ƒNƒwƒbƒ_[
-struct RiffChunkHeader
-{
-	ChunkHeader chunk;//ƒ`ƒƒƒ“ƒNƒwƒbƒ_[
-	char type[4];//\WAVE
-};
-
-//FMTƒ`ƒƒƒ“ƒNƒwƒbƒ_[
-struct FormatChunk
-{
-
-	ChunkHeader chunk;//"fmt "ƒ`ƒƒƒ“ƒNƒwƒbƒ_[
-	WAVEFORMATEX format;//”gŒ`ƒtƒH[ƒ}ƒbƒg
-
-};
-
-//‰¹ºƒf[ƒ^
-struct SoundData {
-	//”gŒ`ƒtƒH[ƒ}ƒbƒg
-	WAVEFORMATEX wfex;//WaveFormatex
-	//ƒoƒbƒtƒ@‚Ì‚¢æ“ªƒAƒhƒŒƒX
-	BYTE* pBuffer;
-	//ƒoƒbƒtƒ@‚ÌƒTƒCƒY
-	unsigned int bufferSize;
-};
+#include <string>
+#include "AudioCommon.h"
+#include <thread>
 
 class Audio
 {
-
 public:
 	/// <summary>
-	/// ‰Šú‰»
+	/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	/// </summary>
-	void Initialize();
-	/// <summary>
-	///‰¹ºƒf[ƒ^‚Ì“Ç‚İ‚İ
-	/// </summary>
-	SoundData SoundLoadWave(const char* fileName);
-	/// <summary>
-	///	I—¹ˆ—
-	/// </summary>
-	void SoundUnload(SoundData* soundData);
+	~Audio();
 
 	/// <summary>
-	/// ƒTƒEƒ“ƒh‚ÌÄ¶
+	/// åˆæœŸåŒ–
 	/// </summary>
-	/// <param name="xAudio2"></param>
-	/// <param name="soundData"></param>
-	void SoundPlayWave(IXAudio2* xAudio2,const SoundData& soundData);
-private:
+	/// <param name="filename">Resources/ã¯ã‚«ãƒƒãƒˆã—ã¦</param>
+	/// <param name="directoryPath">ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªãƒ‘ã‚¹ (ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ: "Resources/audios/")</param>
+	void Initialize(const std::string& filename, const std::string& directoryPath = "Resources/audios/");
 
-	
-	
-	ComPtr<IXAudio2> xAudio2;
-	
-	IXAudio2MasteringVoice* masterVoice;
+	/// <summary>
+	/// å†ç”Ÿ
+	/// </summary>
+	void Play(bool loop, float valume = 0.5f);
+
+	/// <summary>
+	/// åœæ­¢
+	/// </summary>
+	void Stop();
+
+	/// <summary>
+	/// ä¸€æ™‚åœæ­¢
+	/// </summary>
+	void Pause();
+
+	/// <summary>
+	/// å†é–‹
+	/// </summary>
+	void Resume();
+
+	/// <summary>
+	/// éŸ³é‡è¨­å®š
+	/// </summary>
+	/// <param name="volume">0.0fã€œ1.0fã®ç¯„å›²ã§è¨­å®š</param>
+	void SetVolume(float volume);
+
+	/// <summary>
+	/// å†ç”Ÿä½ç½®è¨­å®š
+	/// </summary>
+	/// <param name="position">å†ç”Ÿä½ç½®(ãƒŸãƒªç§’)</param>
+	void SetPlaybackPosition(float position);
+
+	/// <summary>
+	/// å†ç”Ÿé€Ÿåº¦è¨­å®š
+	/// </summary>
+	/// <param name="speed">å†ç”Ÿé€Ÿåº¦(1.0fãŒæ¨™æº–)</param>
+	void SetPlaybackSpeed(float speed);
+
+	/// <summary>
+		/// å†ç”Ÿä½ç½®å–å¾—
+		/// </summary>
+		/// <returns></returns>
+	float GetPlaybackPosition();
+
+
+	/// <summary>
+	/// ã‚µã‚¦ãƒ³ãƒ‰ã®é•·ã•å–å¾—
+	/// </summary>
+	/// <returns></returns>
+	float GetSoundDuration() const;
+
+	/*---------------
+		ã‚¹ã‚¯ãƒ©ãƒƒãƒ
+	---------------*/
+	///// <summary>
+	///// ã‚¹ã‚¯ãƒ©ãƒƒãƒé–‹å§‹
+	///// </summary>
+	//void StartScratch();
+
+	///// <summary>
+	///// ã‚¹ã‚¯ãƒ©ãƒƒãƒæ›´æ–°
+	///// </summary>
+	///// <param name="position">å†ç”Ÿä½ç½®</param>
+	//void UpdateScratch(float position);
+
+	///// <summary>
+	///// ã‚¹ã‚¯ãƒ©ãƒƒãƒåœæ­¢
+	///// </summary>
+	//void StopScratch();
+
+
+
+private: // ãƒ¡ãƒ³ãƒå¤‰æ•°
+	std::string directoryPath_;  // ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªãƒ‘ã‚¹
+	uint32_t soundDataHandle_ = 0u;  // ã‚µã‚¦ãƒ³ãƒ‰ãƒ‡ãƒ¼ã‚¿ãƒãƒ³ãƒ‰ãƒ«
+	uint32_t voiceDataHandle_ = 0u;  // ãƒœã‚¤ã‚¹ãƒ‡ãƒ¼ã‚¿ãƒãƒ³ãƒ‰ãƒ«
+
+	float playbackPosition_ = 0.0f;// å†ç”Ÿä½ç½®
+	float playbackSpeed_ = 1.0f;// å†ç”Ÿé€Ÿåº¦
+
+	//// ã‚¹ã‚¯ãƒ©ãƒƒãƒé–¢é€£
+	//std::thread scratchThread_;
+	//std::atomic<bool> isScratching_;
+	//std::atomic<float> scratchPosition_;
+	///// <summary>
+	///// ã‚¹ã‚¯ãƒ©ãƒƒãƒãƒ«ãƒ¼ãƒ—
+	///// </summary>
+	////void ScratchLoop();
 };
