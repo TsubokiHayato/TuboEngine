@@ -127,7 +127,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma region AudioCommonの初期化
 	//オーディオ共通部
 	AudioCommon::GetInstance()->Initialize();
-	const std::string audioFileName = "game.wav";
+	const std::string audioFileName = "fanfare.wav";
 	const std::string audioDirectoryPath = "Resources/Audio/";
 
 #pragma endregion AudioCommonの初期化
@@ -145,7 +145,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	std::unique_ptr<Audio> audio = nullptr;
 	audio = std::make_unique<Audio>();
 	audio->Initialize(audioFileName, audioDirectoryPath);
-	audio->Play(true);
+	audio->Play(false);
 
 #pragma endregion Audioの初期化
 	/*---------------
@@ -303,6 +303,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("Rotation", &modelRotation.x);
 		ImGui::DragFloat3("Scale", &modelScale.x);
 		ImGui::End();
+
 		ImGui::Begin("Object3D2");
 		ImGui::DragFloat3("Position", &modelPosition2.x);
 		ImGui::DragFloat3("Rotation", &modelRotation2.x);
@@ -320,7 +321,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Begin("Audio Control");
 
 		if (ImGui::Button("Play")) {
-			audio->Play(true);
+			audio->Play(false);
 		}
 		if (ImGui::Button("Stop")) {
 			audio->Stop();
