@@ -304,12 +304,12 @@ void DirectXCommon::DescriptorHeap_Create()
 
 #pragma region DescriptorHeap
 
-
+	
 	//RTVディスクイリプタヒープの生成
 	rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
 	//SRVディスクイリプタヒープの生成
-	srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
+	srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,kMaxSRVCount, true);
 
 	//DSVディスクイリプタヒープの生成
 	dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
@@ -425,32 +425,6 @@ void DirectXCommon::dxcCompiler_Create()
 
 }
 
-void DirectXCommon::ImGui_Initialize()
-{
-
-
-#pragma region ImGui_Initialize
-#ifdef DEBUG
-
-
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(winApp->GetHWND());
-	ImGui_ImplDX12_Init(device.Get(),
-		swapChainDesc.BufferCount,
-		rtvDesc.Format,
-		srvDescriptorHeap,
-		GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 0),
-		GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 0));
-
-#endif // DEBUG
-#pragma endregion
-
-
-
-}
-
 
 
 
@@ -483,7 +457,7 @@ void DirectXCommon::PreDraw()
 	//TransitionBarrierを張る
 	commandList->ResourceBarrier(1, &barrier);
 
-
+	
 
 
 	/* 描画先のRTVとDSVを指定する*/
@@ -525,13 +499,6 @@ void DirectXCommon::PostDraw()
 	/*バックバッファの番号取得*/
 	UINT bbIndex = swapChain->GetCurrentBackBufferIndex();
 
-
-#ifdef DEBUG
-
-
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
-
-#endif // DEBUG
 
 
 	/*リソースバリアで表示状態に変更*/
@@ -849,9 +816,9 @@ UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const D
 	std::vector<D3D12_SUBRESOURCE_DATA> subResources;
 	DirectX::PrepareUpload(device.Get(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subResources);
 	uint64_t intermediateSize = GetRequiredIntermediateSize(texture.Get(), 0, UINT(subResources.size()));
-
+	
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = CreateBufferResource(intermediateSize);
-	UpdateSubresources(commandList.Get(), texture.Get(), intermediateResource.Get(), 0, 0, UINT(subResources.size()), subResources.data());
+	UpdateSubresources(commandList.Get(), texture.Get(), intermediateResource.Get(), 0, 0, UINT(subResources.size()),subResources.data());
 
 	//Textureへの転送後は利用できるよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
 	D3D12_RESOURCE_BARRIER barrier{};
