@@ -517,7 +517,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	AudioCommon::GetInstance()->Finalize();
 	//入力の削除
 	delete input;
-	
+	//カメラの削除
+	delete camera;
 
 	//スプライト共通部分の削除
 	delete spriteCommon;
