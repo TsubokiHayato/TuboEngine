@@ -6,7 +6,7 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon)
 	dxCommon_ = dxCommon;
 	device = dxCommon_->GetDevice();
 	commandList = dxCommon_->GetCommandList();
-
+	
 
 	//グラフィックスパイプラインの作成
 	CreateGraphicPipeline();
