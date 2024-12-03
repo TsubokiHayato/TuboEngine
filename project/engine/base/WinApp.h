@@ -19,8 +19,9 @@ public:
 	HWND GetHWND() const { return hwnd; }
 	HINSTANCE GetHInstance() const { return wc.hInstance; }
 	MSG GetMSG()const { return msg; }
-	const int32_t kClientWidth = 1280;
-	const int32_t kClientHeight = 720;
+
+	static const int32_t kClientWidth = 1280;
+	static const int32_t kClientHeight = 720;
 
 	bool ProcessMessage();
 
