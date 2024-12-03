@@ -21,10 +21,11 @@
 
 #include <iostream>
 #include <algorithm>
-#undef min
+#undef min//minマクロを無効化
+#undef max//maxマクロを無効化
 
-#pragma comment(lib,"dxguid.lib")
-#pragma comment(lib,"dxcompiler.lib")
+#pragma comment(lib,"dxguid.lib")//DirectXのライブラリ
+#pragma comment(lib,"dxcompiler.lib")//DirectXのライブラリ
 
 
 # define PI 3.14159265359f
@@ -145,7 +146,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	std::unique_ptr<Audio> audio = nullptr;
 	audio = std::make_unique<Audio>();
 	audio->Initialize(audioFileName, audioDirectoryPath);
-	audio->Play(false);
+	audio->Play(true);
 
 #pragma endregion Audioの初期化
 	/*---------------
@@ -507,11 +508,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	delete modelCommon;
 	delete model;
-#ifdef _DEBUG
-
-	delete imGuiManager;
-
-#endif // DEBUG
 
 	delete model2;
 	delete object3d2;

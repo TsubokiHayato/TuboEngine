@@ -65,7 +65,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\audio;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -91,7 +91,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
     </ClCompile>
     <Link>
