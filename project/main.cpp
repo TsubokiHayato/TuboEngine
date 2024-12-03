@@ -53,9 +53,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	WinApp* winApp = nullptr;
 	winApp = new WinApp();
 	winApp->Initialize();
+#ifdef DEBUG
+//リークチェッカー
+D3DResourceLeakChecker leakChecker;
+#endif // _DEBUG
 
-	//リークチェッカー
-	D3DResourceLeakChecker leakChecker;
+	
 
 
 	//DirectX共通部分
