@@ -13,6 +13,7 @@
 class Object3dCommon;
 class ModelCommon;
 class Model;
+class Camera;
 
 //平行光源
 struct DirectionalLight {
@@ -61,6 +62,7 @@ public:
 	/// </summary>
 	/// <param name="filePath"></param>
 	void SetModel(const std::string& filePath);
+	void SetCamera(Camera* camera) { this->camera = camera; }
 
 	//Getter
 	Vector3 GetScale() const { return transform.scale; }
@@ -100,6 +102,8 @@ private:
 	Transform transform;
 	//カメラ座標
 	Transform cameraTransform;
+
+	Camera* camera;
 
 };
 
