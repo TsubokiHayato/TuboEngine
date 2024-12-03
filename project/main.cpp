@@ -3,7 +3,6 @@
 #include"MT_Matrix.h"
 #include "Input.h"
 #include"Audio.h"
-#include"Camera.h"
 
 #include"SpriteCommon.h"
 #include"Sprite.h"
@@ -118,8 +117,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #ifdef _DEBUG
 
 	//ImGuiの初期化
-	std::unique_ptr< ImGuiManager> imGuiManager = nullptr;
-	imGuiManager = std::make_unique<ImGuiManager>();
+	ImGuiManager* imGuiManager = nullptr;
+	imGuiManager = new ImGuiManager();
 	imGuiManager->Initialize(winApp, dxCommon);
 
 #endif // DEBUG
@@ -252,21 +251,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion 3Dモデルの初期化
 
-#pragma region cameraの初期化
-	//カメラ
-	Camera* camera = nullptr;
-	camera = new Camera();
-	Vector3 cameraPosition = { 0.0f,0.0f,-15.0f };
-	Vector3 cameraRotation = { 0.0f,0.0f,0.0f };
-	Vector3 cameraScale = { 1.0f,1.0f,1.0f };
-	camera->SetTranslate(cameraPosition);
-	camera->setRotation(cameraRotation);
-	camera->setScale(cameraScale);
-	object3dCommon->SetDefaultCamera(camera);
-	object3d->SetCamera(camera);
-	object3d2->SetCamera(camera);
-
-	
 
 
 	//ウィンドウの×ボタンんが押されるまでループ
@@ -297,13 +281,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #ifdef _DEBUG
 
 		imGuiManager->Begin();
-
-		ImGui::Begin("camera");
-		ImGui::DragFloat3("Position", &cameraPosition.x);
-		ImGui::DragFloat3("Rotation", &cameraRotation.x);
-		ImGui::DragFloat3("Scale", &cameraScale.x);
-		ImGui::End();
-		
 		//スプライトのImGui
 		 //スプライトのImGui
 		for (Sprite* sprite : sprites) {
@@ -357,7 +334,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			audio->Resume();
 		}
 		//volume
-		static float volume = 0.1f;
+		static float volume = 1.0f;
 		ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f);
 		audio->SetVolume(volume);
 
@@ -383,10 +360,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/*--------------
 		   ゲームの処理
 		--------------*/
-		camera->SetTranslate(cameraPosition);
-		camera->setRotation(cameraRotation);
-		camera->setScale(cameraScale);
-		camera->Update();
+
 
 		//入力の更新
 		input->Update();
