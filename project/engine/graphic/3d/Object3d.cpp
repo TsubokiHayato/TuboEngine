@@ -1,11 +1,10 @@
 #include "Object3d.h"
+#include"MT_Matrix.h"
 #include"Object3dCommon.h"
 #include"ModelCommon.h"
 #include"Model.h"
 #include"TextureManager.h"
 #include"ModelManager.h"
-#include"Camera.h"
-#include"MT_Matrix.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_win32.h"
@@ -18,8 +17,8 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, WinApp* winApp, Direct
 	this->object3dCommon = object3dCommon;
 	this->dxCommon_ = dxCommon;
 	this->winApp_ = winApp;
-	this->camera = object3dCommon->GetDefaultCamera();
-#pragma region TransformMatrixResourced
+	
+#pragma region TransformMatrixResource
 
 	//WVP用のリソースを作る
 	transformMatrixResource = dxCommon->CreateBufferResource(sizeof(TransformationMatrix));
@@ -81,14 +80,6 @@ void Object3d::Update()
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(winApp_->kClientWidth) / float(winApp_->kClientHeight), 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-	
-	if (camera) {
-		const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
-		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
-	}
-	else {
-		worldViewProjectionMatrix = worldMatrix;
-	}
 	//行列を更新する
 	transformMatrixData->WVP = worldViewProjectionMatrix;
 	transformMatrixData->World = worldMatrix;

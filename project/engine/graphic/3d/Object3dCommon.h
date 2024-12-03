@@ -1,6 +1,5 @@
 #pragma once
 #include"DirectXCommon.h"
-class Camera;
 class Object3dCommon
 {
 
@@ -20,9 +19,6 @@ public:
 			GETTER & SETTER
 	---------------------------------------------------*/
 	DirectXCommon* GetDxCommon()const { return dxCommon_; }
-
-	void SetDefaultCamera(Camera* camera) { defaultCamera = camera; }
-	Camera* GetDefaultCamera()const { return defaultCamera; }
 
 private:
 	/*---------------------------------------------------
@@ -95,7 +91,6 @@ private:
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
 
 
-	Camera* defaultCamera = nullptr;//デフォルトカメラ
 
 };
 
