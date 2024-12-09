@@ -12,7 +12,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommo
 	this->dxCommon_ = dxCommon;
 	this->winApp_ = winApp;
 
-
+	textureFilePath_ = textureFilePath;
 
 
 #pragma region SpriteResource
@@ -154,7 +154,7 @@ void Sprite::Update()
 
 	//テクスチャのメタデータを取得
 	const DirectX::TexMetadata& metadata =
-		TextureManager::GetInstance()->GetMetaData(textureIndex);
+		TextureManager::GetInstance()->GetMetaData(textureFilePath_);
 
 	//テクスチャの初期サイズ時の座標
 	float tex_left = textureLeftTop_.x / metadata.width;
@@ -233,7 +233,7 @@ void Sprite::Draw(){
 	//TransformationMatrixCBufferの設定
 	commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResource->GetGPUVirtualAddress());
 
-	commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex));
+	commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureFilePath_));
 	//描画
 	commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
@@ -242,7 +242,7 @@ void Sprite::Draw(){
 void Sprite::AdjustTextureSize()
 {
 
-	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureIndex);
+	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureFilePath_);
 
 	textureSize_.x = static_cast<float>(metadata.width);
 	textureSize_.y = static_cast<float>(metadata.height);

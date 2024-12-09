@@ -123,6 +123,7 @@ private:
 	//テクスチャ番号
 	uint32_t textureIndex = 0;
 
+	std::string textureFilePath_;
 
 	/*----------
 	　　拡張機能
