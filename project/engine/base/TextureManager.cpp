@@ -63,25 +63,6 @@ void TextureManager::LoadTexture(const std::string& filePath)
 
 	
 }
-//
-//uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
-//{
-//	//読み込み済みテクスチャを検索
-//	auto it = std::find_if(
-//		textureDatas.begin(),
-//		textureDatas.end(),
-//		[&](TextureData& textureData) {return textureData.filePath == filePath; }
-//	);
-//
-//	if (it != textureDatas.end()) {
-//		//読み込み済みなら要素番号を渡す
-//		uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureDatas.begin(), it));
-//		return textureIndex;
-//
-//	}
-//	assert(0);
-//	return 0;
-//}
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& filePath)
 {
