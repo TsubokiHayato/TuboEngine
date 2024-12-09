@@ -458,7 +458,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		　　DirectX描画開始
 		　-------------------*/
 		dxCommon->PreDraw();
-
+		srvManager->PreDraw();
 		/*-------------------
 		　　シーンの描画
 	　　-------------------*/
