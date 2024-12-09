@@ -14,6 +14,8 @@
 #include"ModelCommon.h"
 #include"Model.h"
 #include"ModelManager.h"
+#include <SrvManager.cpp>
+
 #ifdef _DEBUG
 
 #include"ImGuiManager.h"
@@ -82,6 +84,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	modelCommon = new ModelCommon();
 	modelCommon->Initialize(dxCommon);
 
+
+	SrvManager* srvManager = nullptr;
+	srvManager = new SrvManager();
+	srvManager->Initialize(dxCommon);
 
 #pragma endregion 基盤システムの初期化
 
@@ -268,7 +274,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	object3d->SetCamera(camera);
 	object3d2->SetCamera(camera);
 
-	
+#pragma endregion cameraの初期化
+
+
 
 
 	//ウィンドウの×ボタンんが押されるまでループ
@@ -541,13 +549,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	delete object3d2;
 	sprites.clear(); // ポインタをクリア
 
+
 	//テクスチャマネージャの終了
 	TextureManager::GetInstance()->Finalize();
 	//モデルマネージャーの終了
 	ModelManager::GetInstance()->Finalize();
+
 #ifdef _DEBUG
 	imGuiManager->Finalize();
 #endif // DEBUG
+
+	delete srvManager;
 
 
 	//警告時に止まる
