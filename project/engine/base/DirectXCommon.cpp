@@ -52,6 +52,7 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	Scissor_Initialize();
 	//DXCコンパイラの生成
 	dxcCompiler_Create();
+	
 }
 
 

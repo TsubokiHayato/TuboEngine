@@ -55,10 +55,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	WinApp* winApp = nullptr;
 	winApp = new WinApp();
 	winApp->Initialize();
+#ifdef DEBUG
+//リークチェッカー
+D3DResourceLeakChecker leakChecker;
+#endif // _DEBUG
+
 
 #ifdef DEBUG
 	//リークチェッカー
 	D3DResourceLeakChecker leakChecker;
+
 
 #endif // DEBUG
 
@@ -527,7 +533,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	AudioCommon::GetInstance()->Finalize();
 	//入力の削除
 	delete input;
-	
+	//カメラの削除
+	delete camera;
 
 	//スプライト共通部分の削除
 	delete spriteCommon;
