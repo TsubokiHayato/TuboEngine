@@ -53,24 +53,24 @@ public:
 	/// <param name="index">ディスクリプタヒープのインデックス</param>
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);
 
-
+	ID3D12DescriptorHeap* GetDescriptorHeap()const { return descriptorHeap.Get(); }
 	/// <summary>
 	/// ディスクリプタヒープのGPUハンドルを取得
 	/// </summary>
 	/// <param name="index">ディスクリプタヒープのインデックス</param>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
 
-
 	void SetGraphicsRootDescriptorTable(uint32_t rootParameterIndex, uint32_t srvIndex) {
-		dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(rootParameterIndex, GetGPUDescriptorHandle(srvIndex));
+		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(rootParameterIndex, GetGPUDescriptorHandle(srvIndex));
 	}
 
 	//最大SRV数(最大テクスチャ枚数)
 	static const uint32_t kMaxSRVCount;
 
 private:
+
 	//DirectX共通部分
-	DirectXCommon* dxCommon = nullptr;
+	DirectXCommon* dxCommon_ = nullptr;
 
 
 
