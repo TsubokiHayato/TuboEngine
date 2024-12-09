@@ -54,11 +54,7 @@ public:
 	//SRVインデックスの開始番号
 	static uint32_t kSRVIndexTop;
 
-	/// <summary>
-	/// SRVインデックスの開始番号
-	/// </summary>
-	//uint32_t GetTextureIndexByFilePath(const std::string& filePath);
-
+	
 	
 	/// <summary>
 	/// メタデータを取得
