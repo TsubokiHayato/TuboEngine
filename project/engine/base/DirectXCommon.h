@@ -25,7 +25,22 @@
 
 class DirectXCommon
 {
+
+private:
+	/*static DirectXCommon* instance;
+	
+	DirectXCommon() = default;
+	~DirectXCommon() = default;
+	DirectXCommon(DirectXCommon&) = delete;
+	DirectXCommon& operator=(DirectXCommon&) = delete;*/
+
+
+
 public:
+
+	//static DirectXCommon* GetInstance();
+
+
 	void Initialize(WinApp* winApp);
 
 	//デバイスの初期化
@@ -59,6 +74,11 @@ public:
 
 	void CommandExecution();
 
+
+
+	//DescriptorHeapのさくせいかんすう
+	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> CreateDescriptorHeap(
+		D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
 
 
@@ -182,7 +202,7 @@ size_t GetBackBufferCount()const { return swapChainDesc.BufferCount; }
 	///<summary>
 	///テクスチャファイルの読み込み
 	///</summary>
-	/// <param name="filePath>テクスチャファイルのパス</parqam>
+	/// <param name="filePath>テクスチャファイルのパス</param>
 	/// <returns>画像イメージデータ</returns>
 	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
@@ -191,9 +211,7 @@ size_t GetBackBufferCount()const { return swapChainDesc.BufferCount; }
 	//関数が成功したかどうかSUCCEEDEDマクロで判断出来る
 	HRESULT hr;
 
-	//最大SRV数(最大テクスチャ枚数)
-	static const uint32_t kMaxSRVCount;
-
+	
 private:
 
 	//FPS固定初期化
@@ -202,11 +220,6 @@ private:
 	void UpdateFixFPS();
 
 
-
-
-	//DescriptorHeapのさくせいかんすう
-	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> CreateDescriptorHeap(
-		Microsoft::WRL::ComPtr <ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
 
 
