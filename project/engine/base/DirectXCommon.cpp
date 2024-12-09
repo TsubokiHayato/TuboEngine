@@ -3,12 +3,22 @@
 
 #include<cassert>
 #include <thread>
-
+#include<SrvManager.h>
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 
 
 using namespace Microsoft::WRL;
+//
+//DirectXCommon* DirectXCommon::GetInstance()
+//{
+//
+//	if (instance == nullptr) {
+//		instance = new DirectXCommon;
+//	}
+//	return instance;
+//
+//}
 
 void DirectXCommon::Initialize(WinApp* winApp)
 {
@@ -305,7 +315,7 @@ void DirectXCommon::DescriptorHeap_Create()
 	rtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
 	//SRVディスクイリプタヒープの生成
-	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,kMaxSRVCount, true);
+	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,SrvManager::kMaxSRVCount, true);
 
 	//DSVディスクイリプタヒープの生成
 	dsvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
