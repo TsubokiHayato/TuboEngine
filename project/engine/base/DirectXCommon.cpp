@@ -3,14 +3,22 @@
 
 #include<cassert>
 #include <thread>
-
+#include<SrvManager.h>
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 
 
 using namespace Microsoft::WRL;
-
-const uint32_t DirectXCommon::kMaxSRVCount = 512;
+//
+//DirectXCommon* DirectXCommon::GetInstance()
+//{
+//
+//	if (instance == nullptr) {
+//		instance = new DirectXCommon;
+//	}
+//	return instance;
+//
+//}
 
 void DirectXCommon::Initialize(WinApp* winApp)
 {
@@ -305,13 +313,13 @@ void DirectXCommon::DescriptorHeap_Create()
 
 	
 	//RTVディスクイリプタヒープの生成
-	rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	rtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
 	//SRVディスクイリプタヒープの生成
-	srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,kMaxSRVCount, true);
+	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,SrvManager::kMaxSRVCount, true);
 
 	//DSVディスクイリプタヒープの生成
-	dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	dsvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 #pragma endregion
 
 
@@ -890,7 +898,7 @@ void DirectXCommon::UpdateFixFPS()
 
 
 
-Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
+Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap( D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
 {
 
 	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> descriptorHeap = nullptr;

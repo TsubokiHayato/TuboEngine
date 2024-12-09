@@ -14,6 +14,8 @@
 #include"ModelCommon.h"
 #include"Model.h"
 #include"ModelManager.h"
+#include <SrvManager.h>
+
 #ifdef _DEBUG
 
 #include"ImGuiManager.h"
@@ -58,8 +60,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 D3DResourceLeakChecker leakChecker;
 #endif // _DEBUG
 
-	
 
+#ifdef DEBUG
+	//リークチェッカー
+	D3DResourceLeakChecker leakChecker;
+
+
+#endif // DEBUG
 
 	//DirectX共通部分
 	DirectXCommon* dxCommon = nullptr;
@@ -84,12 +91,16 @@ D3DResourceLeakChecker leakChecker;
 	modelCommon->Initialize(dxCommon);
 
 
+	SrvManager* srvManager = nullptr;
+	srvManager = new SrvManager();
+	srvManager->Initialize(dxCommon);
+
 #pragma endregion 基盤システムの初期化
 
 
 #pragma region TextureManegerの初期化
 	//テクスチャマネージャーの初期化
-	TextureManager::GetInstance()->Initialize(dxCommon);
+	TextureManager::GetInstance()->Initialize(dxCommon,srvManager);
 
 	//テクスチャマネージャに追加する画像ハンドル
 	std::string uvCheckerTextureHandle = "Resources/uvChecker.png";
@@ -269,7 +280,9 @@ D3DResourceLeakChecker leakChecker;
 	object3d->SetCamera(camera);
 	object3d2->SetCamera(camera);
 
-	
+#pragma endregion cameraの初期化
+
+
 
 
 	//ウィンドウの×ボタンんが押されるまでループ
@@ -451,7 +464,7 @@ D3DResourceLeakChecker leakChecker;
 		　　DirectX描画開始
 		　-------------------*/
 		dxCommon->PreDraw();
-
+		srvManager->PreDraw();
 		/*-------------------
 		　　シーンの描画
 	　　-------------------*/
@@ -543,13 +556,17 @@ D3DResourceLeakChecker leakChecker;
 	delete object3d2;
 	sprites.clear(); // ポインタをクリア
 
+
 	//テクスチャマネージャの終了
 	TextureManager::GetInstance()->Finalize();
 	//モデルマネージャーの終了
 	ModelManager::GetInstance()->Finalize();
+
 #ifdef _DEBUG
 	imGuiManager->Finalize();
 #endif // DEBUG
+
+	delete srvManager;
 
 
 	//警告時に止まる
