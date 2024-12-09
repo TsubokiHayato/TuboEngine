@@ -64,6 +64,17 @@ void SrvManager::PreDraw()
 	dxCommon->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
 }
 
+bool SrvManager::CheckTextureCount(uint32_t count)
+{
+	//テクスチャ枚数が上限を超えていないかチェック
+	if (useSrvIndex + count > kMaxSRVCount) {
+		//上限を超えていたらfalseを返す
+		return false;
+	}
+	//上限を超えていなかったらtrueを返す
+	return true;
+}
+
 D3D12_CPU_DESCRIPTOR_HANDLE SrvManager::GetCPUDescriptorHandle(uint32_t index)
 {
 	//CPUハンドルを取得

@@ -41,6 +41,11 @@ public:
 	void PreDraw();
 
 
+	/// <summary>
+	///テクスチャ枚数上限チェック
+	/// </summary>
+	bool CheckTextureCount(uint32_t count);
+
 	//-------------------Getter & Setter-------------------//
 	/// <summary>
 	/// ディスクリプタヒープのCPUハンドルを取得
@@ -60,12 +65,15 @@ public:
 		dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(rootParameterIndex, GetGPUDescriptorHandle(srvIndex));
 	}
 
+	//最大SRV数(最大テクスチャ枚数)
+	static const uint32_t kMaxSRVCount;
+
 private:
 	//DirectX共通部分
 	DirectXCommon* dxCommon = nullptr;
 
-	//最大SRV数(最大テクスチャ枚数)
-	static const uint32_t kMaxSRVCount;
+
+
 	//SRV用のディスクリプタサイズ
 	uint32_t descriptorSize;
 	//SRVヒープ

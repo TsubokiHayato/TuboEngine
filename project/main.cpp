@@ -94,7 +94,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma region TextureManegerの初期化
 	//テクスチャマネージャーの初期化
-	TextureManager::GetInstance()->Initialize(dxCommon);
+	TextureManager::GetInstance()->Initialize(dxCommon,srvManager);
 
 	//テクスチャマネージャに追加する画像ハンドル
 	std::string uvCheckerTextureHandle = "Resources/uvChecker.png";
