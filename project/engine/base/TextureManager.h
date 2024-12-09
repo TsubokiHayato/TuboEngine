@@ -57,7 +57,7 @@ public:
 	/// <summary>
 	/// SRVインデックスの開始番号
 	/// </summary>
-	uint32_t GetTextureIndexByFilePath(const std::string& filePath);
+	//uint32_t GetTextureIndexByFilePath(const std::string& filePath);
 
 	
 	/// <summary>
@@ -74,8 +74,6 @@ public:
 	/// <returns></returns>
 	uint32_t GetSrvIndex(const std::string& filePath);
 
-	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(const std::string& filePath) {
-		return textureDatas[filePath].srvHandleGPU;
-	}
+	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(const std::string& filePath);
 };
 

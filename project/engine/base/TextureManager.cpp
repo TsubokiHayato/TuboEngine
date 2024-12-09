@@ -17,7 +17,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 		return;
 	}
 	
-	assert(srvManager_->CheckTextureCount(textureDatas.size() + kSRVIndexTop));
+	assert(textureDatas.size() < SrvManager::kMaxSRVCount);
 
 	//テクスチャファイルを読んでプログラムで扱えるようにする
 	DirectX::ScratchImage image{};
@@ -63,33 +63,34 @@ void TextureManager::LoadTexture(const std::string& filePath)
 
 	
 }
-
-uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
-{
-	//読み込み済みテクスチャを検索
-	auto it = std::find_if(
-		textureDatas.begin(),
-		textureDatas.end(),
-		[&](TextureData& textureData) {return textureData.filePath == filePath; }
-	);
-
-	if (it != textureDatas.end()) {
-		//読み込み済みなら要素番号を渡す
-		uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureDatas.begin(), it));
-		return textureIndex;
-
-	}
-	assert(0);
-	return 0;
-}
+//
+//uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
+//{
+//	//読み込み済みテクスチャを検索
+//	auto it = std::find_if(
+//		textureDatas.begin(),
+//		textureDatas.end(),
+//		[&](TextureData& textureData) {return textureData.filePath == filePath; }
+//	);
+//
+//	if (it != textureDatas.end()) {
+//		//読み込み済みなら要素番号を渡す
+//		uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureDatas.begin(), it));
+//		return textureIndex;
+//
+//	}
+//	assert(0);
+//	return 0;
+//}
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& filePath)
 {
-	
-	assert(textureDatas.contains(filePath));
-	TextureData& textureData = textureDatas[filePath];
-
+	auto it = textureDatas.find(filePath);
+	assert(it != textureDatas.end());
+	TextureData& textureData = it->second;
 	return textureData.srvHandleGPU;
+
+
 }
 
 const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filePath)
