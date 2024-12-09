@@ -14,7 +14,7 @@
 #include"ModelCommon.h"
 #include"Model.h"
 #include"ModelManager.h"
-#include <SrvManager.cpp>
+#include <SrvManager.h>
 
 #ifdef _DEBUG
 
