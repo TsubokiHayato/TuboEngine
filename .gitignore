@@ -18,8 +18,7 @@
 # Build results
 #generated/
 
-git commit -m "Stop ignoring generated directory"
-
+git rm -r --cached generated/
 git commit -m "Stop ignoring generated directory"
 
 # Visual Studio 2015/2017 cache/options directory
