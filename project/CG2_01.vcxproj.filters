@@ -157,7 +157,7 @@
       <Filter>ソース ファイル\camera</Filter>
     </ClCompile>
     <ClCompile Include="SrvManager.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\graphic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
