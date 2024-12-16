@@ -159,6 +159,12 @@
     <ClCompile Include="SrvManager.cpp">
       <Filter>ソース ファイル\graphic</Filter>
     </ClCompile>
+    <ClCompile Include="PSO.cpp">
+      <Filter>ソース ファイル\graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>ソース ファイル\graphic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\math\Matrix3x3.h">
@@ -276,6 +282,12 @@
       <Filter>ヘッダー ファイル\camera</Filter>
     </ClInclude>
     <ClInclude Include="SrvManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="PSO.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

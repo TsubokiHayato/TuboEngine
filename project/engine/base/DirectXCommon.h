@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include<d3d12.h>
 #include<dxgi1_6.h>
@@ -27,18 +27,9 @@ class DirectXCommon
 {
 
 private:
-	/*static DirectXCommon* instance;
 	
-	DirectXCommon() = default;
-	~DirectXCommon() = default;
-	DirectXCommon(DirectXCommon&) = delete;
-	DirectXCommon& operator=(DirectXCommon&) = delete;*/
-
-
 
 public:
-
-	//static DirectXCommon* GetInstance();
 
 
 	void Initialize(WinApp* winApp);
