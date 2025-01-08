@@ -26,11 +26,11 @@
 
 #include <iostream>
 #include <algorithm>
-#undef min//minƒ}ƒNƒ‚ğ–³Œø‰»
-#undef max//maxƒ}ƒNƒ‚ğ–³Œø‰»
+#undef min//minãƒã‚¯ãƒ­ã‚’ç„¡åŠ¹åŒ–
+#undef max//maxãƒã‚¯ãƒ­ã‚’ç„¡åŠ¹åŒ–
 
-#pragma comment(lib,"dxguid.lib")//DirectX‚Ìƒ‰ƒCƒuƒ‰ƒŠ
-#pragma comment(lib,"dxcompiler.lib")//DirectX‚Ìƒ‰ƒCƒuƒ‰ƒŠ
+#pragma comment(lib,"dxguid.lib")//DirectXã®ãƒ©ã‚¤ãƒ–ãƒ©ãƒª
+#pragma comment(lib,"dxcompiler.lib")//DirectXã®ãƒ©ã‚¤ãƒ–ãƒ©ãƒª
 
 
 # define PI 3.14159265359f
@@ -62,19 +62,23 @@ private:
 	Object3dCommon* object3dCommon = nullptr;
 	ModelCommon* modelCommon = nullptr;
 	SrvManager* srvManager = nullptr;
-	std::unique_ptr< ImGuiManager> imGuiManager = nullptr;
+
+#ifdef _DEBUG
+	std::unique_ptr<ImGuiManager> imGuiManager = nullptr;
+#endif // DEBUG
+
 	Input* input = nullptr;
 	std::unique_ptr<Audio> audio = nullptr;
 
 	///Sprite///
 	
-	//¶‰E”½“]ƒtƒ‰ƒO
+	//å·¦å³åè»¢ãƒ•ãƒ©ã‚°
 	bool isFlipX_;
-	//ã‰º”½“]ƒtƒ‰ƒO
+	//ä¸Šä¸‹åè»¢ãƒ•ãƒ©ã‚°
 	bool isFlipY_;
-	//ƒeƒNƒXƒ`ƒƒ‚Ì¶ãÀ•W
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å·¦ä¸Šåº§æ¨™
 	Vector2 textureLeftTop;
-	//ƒeƒNƒXƒ`ƒƒ‚©‚ç‰ŠúƒTƒCƒY‚ğ“¾‚éƒtƒ‰ƒO
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‹ã‚‰åˆæœŸã‚µã‚¤ã‚ºã‚’å¾—ã‚‹ãƒ•ãƒ©ã‚°
 	bool isAdjustTextureSize;
 
 	std::vector<Sprite*> sprites;

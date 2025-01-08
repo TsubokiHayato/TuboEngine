@@ -71,9 +71,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, WinApp* winApp, Direct
 void Object3d::Update()
 {
 
-
-	//回転させる
-	transform.rotate.y += 0.01f;
+	
 
 	//行列を更新する
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
@@ -109,7 +107,6 @@ void Object3d::Draw()
 	if (model_) {
 		model_->Draw();
 	}
-
 
 }
 
