@@ -159,16 +159,13 @@
     <ClCompile Include="SrvManager.cpp">
       <Filter>ソース ファイル\graphic</Filter>
     </ClCompile>
-    <ClCompile Include="PSO.cpp">
-      <Filter>ソース ファイル\graphic</Filter>
-    </ClCompile>
-    <ClCompile Include="Particle.cpp">
-      <Filter>ソース ファイル\graphic</Filter>
-    </ClCompile>
     <ClCompile Include="MyGame.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Framework.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="PSO.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -290,12 +287,14 @@
     <ClInclude Include="SrvManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-
     <ClInclude Include="MyGame.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Framework.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="PSO.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
