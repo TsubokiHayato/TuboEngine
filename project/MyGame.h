@@ -1,31 +1,16 @@
 #pragma once
+#include"Framework.h"
 
-#include"DirectXcommon.h"
-#include"D3DResourceLeakChecker.h"
 #include"MT_Matrix.h"
 #include "Input.h"
 #include"Audio.h"
 #include"Camera.h"
-
-#include"SpriteCommon.h"
 #include"Sprite.h"
-#include"TextureManager.h"
-
-#include"Object3dCommon.h"
 #include"Object3d.h"
-#include"ModelCommon.h"
 #include"Model.h"
-#include"ModelManager.h"
-#include <SrvManager.h>
-
-#ifdef _DEBUG
-
-#include"ImGuiManager.h"
-
-#endif // DEBUG
-
 #include <iostream>
 #include <algorithm>
+
 #undef min//minマクロを無効化
 #undef max//maxマクロを無効化
 
@@ -43,36 +28,24 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 
 
-class MyGame
+class MyGame : public Framework
 {
 public:
-	void Initialize();
+	void Initialize()override;
 
-	void Update();
+	void Update()override;
 
-	void Finalize();
+	void Finalize()override;
 
-	void Draw();
+	void Draw()override;
 
-	bool IsEndRequest() {return endRequest; }
 
 private:
 
-	WinApp* winApp = nullptr;
-	DirectXCommon* dxCommon = nullptr;
-	SpriteCommon* spriteCommon = nullptr;
-	Object3dCommon* object3dCommon = nullptr;
-	ModelCommon* modelCommon = nullptr;
-	SrvManager* srvManager = nullptr;
+	std::unique_ptr<Audio> audio = nullptr;
 
 	bool endRequest = false;
 
-#ifdef _DEBUG
-	std::unique_ptr<ImGuiManager> imGuiManager = nullptr;
-#endif // DEBUG
-
-	Input* input = nullptr;
-	std::unique_ptr<Audio> audio = nullptr;
 
 	///Sprite///
 	
