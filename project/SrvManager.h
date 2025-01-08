@@ -1,6 +1,5 @@
 #pragma once
 #include "DirectXCommon.h"
-#include <set>
 
 class SrvManager
 {
@@ -17,14 +16,6 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	uint32_t Allocate();
-
-
-	/// <summary>
-	/// SRVの解放
-	/// </summary>
-	/// <param name="index">解放するSRVのインデックス</param>
-	void Free(uint32_t index);
-
 
 	/// <summary>
 	/// ディスクリプタヒープのCPUハンドルを取得
@@ -90,11 +81,6 @@ private:
 
 	//次に使用するSRVのインデックス
 	uint32_t useSrvIndex = 0;
-
-
-	std::vector<uint32_t> freeIndices; // 空きインデックスのリスト
-	std::set<uint32_t> allocatedIndices; // 確保済みインデックスのセット
-
 
 };
 
