@@ -2,58 +2,7 @@
 
 void MyGame::Initialize()
 {
-#pragma region 基盤システムの初期化
-
-	//ウィンドウズアプリケーション
-	
-	winApp = new WinApp();
-	winApp->Initialize();
-#ifdef DEBUG
-	//リークチェッカー
-	D3DResourceLeakChecker leakChecker;
-#endif // _DEBUG
-
-
-#ifdef DEBUG
-	//リークチェッカー
-	D3DResourceLeakChecker leakChecker;
-
-
-#endif // DEBUG
-
-	//DirectX共通部分
-	
-	dxCommon = new DirectXCommon();
-	dxCommon->Initialize(winApp);
-
-	//スプライト共通部分
-	
-	spriteCommon = new SpriteCommon;
-	spriteCommon->Initialize(dxCommon);
-
-
-
-	//オブジェクト3Dの共通部分
-	
-	object3dCommon = new Object3dCommon();
-	object3dCommon->Initialize(dxCommon);
-
-	//モデル共通部分
-	
-	modelCommon = new ModelCommon();
-	modelCommon->Initialize(dxCommon);
-
-
-	
-	srvManager = new SrvManager();
-	srvManager->Initialize(dxCommon);
-
-#pragma endregion 基盤システムの初期化
-
-
-#pragma region TextureManegerの初期化
-	//テクスチャマネージャーの初期化
-	TextureManager::GetInstance()->Initialize(dxCommon, srvManager);
+	Framework::Initialize();
 
 	//テクスチャマネージャに追加する画像ハンドル
 	std::string uvCheckerTextureHandle = "Resources/uvChecker.png";
@@ -62,12 +11,6 @@ void MyGame::Initialize()
 	//画像ハンドルをテクスチャマネージャに挿入する
 	TextureManager::GetInstance()->LoadTexture(uvCheckerTextureHandle);
 	TextureManager::GetInstance()->LoadTexture(monsterBallTextureHandle);
-
-#pragma endregion TextureManegerの初期化
-
-#pragma region ModelManagerの初期化
-	//モデルマネージャーの初期化
-	ModelManager::GetInstance()->initialize(dxCommon);
 
 	//モデルディレクトリパス
 	const std::string modelDirectoryPath = "Resources";
@@ -79,37 +22,11 @@ void MyGame::Initialize()
 	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
 	ModelManager::GetInstance()->LoadModel(modelFileNamePath2);
 
-#pragma endregion ModelManagerの初期化
-
-#pragma region ImGuiManagerの初期化
-#ifdef _DEBUG
-
-	//ImGuiの初期化
-	
-	imGuiManager = std::make_unique<ImGuiManager>();
-	imGuiManager->Initialize(winApp, dxCommon);
-
-#endif // DEBUG
-
-#pragma endregion ImGuiManagerの初期化
-
-#pragma region AudioCommonの初期化
-	//オーディオ共通部
-	AudioCommon::GetInstance()->Initialize();
 	const std::string audioFileName = "fanfare.wav";
 	const std::string audioDirectoryPath = "Resources/Audio/";
 
-#pragma endregion AudioCommonの初期化
-#pragma region Inputの初期化
-	//入力初期化
-	
-	input = new Input();
-	input->Initialize(winApp);
-#pragma endregion Inputの初期化
 
 #pragma region Audioの初期化
-
-	
 	audio = std::make_unique<Audio>();
 	audio->Initialize(audioFileName, audioDirectoryPath);
 	audio->Play(true);
@@ -225,12 +142,7 @@ void MyGame::Initialize()
 void MyGame::Update()
 {
 
-	/*-------------------
-	 Windowsメッセージ処理
-	-------------------*/
-	if (winApp->ProcessMessage()) {
-		endRequest = true;
-	}
+	Framework::Update();
 
 
 	/*-------------------
@@ -334,9 +246,6 @@ void MyGame::Update()
 	camera->setScale(cameraScale);
 	camera->Update();
 
-	//入力の更新
-	input->Update();
-
 	modelRotation.y += 0.01f;
 
 	modelRotation2.x -= 0.01f;
@@ -395,23 +304,12 @@ void MyGame::Finalize()
 
 	//リソースリークチェック
 
-	//WindowsAppの削除
-	winApp->Finalize();
-	delete winApp;
-	winApp = nullptr;
-
-	//DirectX共通部分の削除
-	CloseHandle(dxCommon->GetFenceEvent());
-	delete dxCommon;
-
-	AudioCommon::GetInstance()->Finalize();
-	//入力の削除
-	delete input;
+	
+	
 	//カメラの削除
 	delete camera;
 
-	//スプライト共通部分の削除
-	delete spriteCommon;
+	
 
 
 	for (Sprite* sprite : sprites) {
@@ -420,10 +318,10 @@ void MyGame::Finalize()
 		}
 	}
 
-	delete object3dCommon;
+	
 	delete object3d;
 
-	delete modelCommon;
+	
 	delete model;
 
 	delete model2;
@@ -436,17 +334,11 @@ void MyGame::Finalize()
 	//モデルマネージャーの終了
 	ModelManager::GetInstance()->Finalize();
 
-#ifdef _DEBUG
-	imGuiManager->Finalize();
-#endif // DEBUG
 
-	delete srvManager;
-
-
-	//警告時に止まる
-	//infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
-
+	Framework::Finalize();
 #pragma endregion AllRelease
+
+
 
 }
 

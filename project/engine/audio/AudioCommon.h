@@ -1,6 +1,9 @@
 #include<xaudio2.h>
 #include <wrl/client.h>
 #include <cstdint>
+#ifndef AUDIOCOMMON_H
+#define AUDIOCOMMON_H
+
 #include <string>
 #include <set>
 #include <array>
@@ -184,4 +187,5 @@ private://メンバ変数
 
 
 };
-
+ｐ
+#endif // !AUDIOCOMMON_H
