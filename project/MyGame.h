@@ -54,6 +54,8 @@ public:
 
 	void Draw();
 
+	bool IsEndRequest() {return endRequest; }
+
 private:
 
 	WinApp* winApp = nullptr;
@@ -62,6 +64,8 @@ private:
 	Object3dCommon* object3dCommon = nullptr;
 	ModelCommon* modelCommon = nullptr;
 	SrvManager* srvManager = nullptr;
+
+	bool endRequest = false;
 
 #ifdef _DEBUG
 	std::unique_ptr<ImGuiManager> imGuiManager = nullptr;

@@ -229,7 +229,7 @@ void MyGame::Update()
 	 Windowsメッセージ処理
 	-------------------*/
 	if (winApp->ProcessMessage()) {
-		break;
+		endRequest = true;
 	}
 
 
