@@ -187,5 +187,5 @@ private://メンバ変数
 
 
 };
-ｐ
+
 #endif // !AUDIOCOMMON_H
