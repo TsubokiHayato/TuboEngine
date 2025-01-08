@@ -2,43 +2,43 @@
 
 void MyGame::Initialize()
 {
-#pragma region Šî”ÕƒVƒXƒeƒ€‚Ì‰Šú‰»
+#pragma region åŸºç›¤ã‚·ã‚¹ãƒ†ãƒ ã®åˆæœŸåŒ–
 
-	//ƒEƒBƒ“ƒhƒEƒYƒAƒvƒŠƒP[ƒVƒ‡ƒ“
+	//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚ºã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³
 	
 	winApp = new WinApp();
 	winApp->Initialize();
 #ifdef DEBUG
-	//ƒŠ[ƒNƒ`ƒFƒbƒJ[
+	//ãƒªãƒ¼ã‚¯ãƒã‚§ãƒƒã‚«ãƒ¼
 	D3DResourceLeakChecker leakChecker;
 #endif // _DEBUG
 
 
 #ifdef DEBUG
-	//ƒŠ[ƒNƒ`ƒFƒbƒJ[
+	//ãƒªãƒ¼ã‚¯ãƒã‚§ãƒƒã‚«ãƒ¼
 	D3DResourceLeakChecker leakChecker;
 
 
 #endif // DEBUG
 
-	//DirectX‹¤’Ê•”•ª
+	//DirectXå…±é€šéƒ¨åˆ†
 	
 	dxCommon = new DirectXCommon();
 	dxCommon->Initialize(winApp);
 
-	//ƒXƒvƒ‰ƒCƒg‹¤’Ê•”•ª
+	//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå…±é€šéƒ¨åˆ†
 	
 	spriteCommon = new SpriteCommon;
 	spriteCommon->Initialize(dxCommon);
 
 
 
-	//ƒIƒuƒWƒFƒNƒg3D‚Ì‹¤’Ê•”•ª
+	//ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ3Dã®å…±é€šéƒ¨åˆ†
 	
 	object3dCommon = new Object3dCommon();
 	object3dCommon->Initialize(dxCommon);
 
-	//ƒ‚ƒfƒ‹‹¤’Ê•”•ª
+	//ãƒ¢ãƒ‡ãƒ«å…±é€šéƒ¨åˆ†
 	
 	modelCommon = new ModelCommon();
 	modelCommon->Initialize(dxCommon);
@@ -48,102 +48,102 @@ void MyGame::Initialize()
 	srvManager = new SrvManager();
 	srvManager->Initialize(dxCommon);
 
-#pragma endregion Šî”ÕƒVƒXƒeƒ€‚Ì‰Šú‰»
+#pragma endregion åŸºç›¤ã‚·ã‚¹ãƒ†ãƒ ã®åˆæœŸåŒ–
 
 
-#pragma region TextureManeger‚Ì‰Šú‰»
-	//ƒeƒNƒXƒ`ƒƒƒ}ƒl[ƒWƒƒ[‚Ì‰Šú‰»
+#pragma region TextureManegerã®åˆæœŸåŒ–
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã®åˆæœŸåŒ–
 	TextureManager::GetInstance()->Initialize(dxCommon, srvManager);
 
-	//ƒeƒNƒXƒ`ƒƒƒ}ƒl[ƒWƒƒ‚É’Ç‰Á‚·‚é‰æ‘œƒnƒ“ƒhƒ‹
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒãƒãƒ¼ã‚¸ãƒ£ã«è¿½åŠ ã™ã‚‹ç”»åƒãƒãƒ³ãƒ‰ãƒ«
 	std::string uvCheckerTextureHandle = "Resources/uvChecker.png";
 	std::string monsterBallTextureHandle = "Resources/monsterBall.png";
 
-	//‰æ‘œƒnƒ“ƒhƒ‹‚ğƒeƒNƒXƒ`ƒƒƒ}ƒl[ƒWƒƒ‚É‘}“ü‚·‚é
+	//ç”»åƒãƒãƒ³ãƒ‰ãƒ«ã‚’ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒãƒãƒ¼ã‚¸ãƒ£ã«æŒ¿å…¥ã™ã‚‹
 	TextureManager::GetInstance()->LoadTexture(uvCheckerTextureHandle);
 	TextureManager::GetInstance()->LoadTexture(monsterBallTextureHandle);
 
-#pragma endregion TextureManeger‚Ì‰Šú‰»
+#pragma endregion TextureManegerã®åˆæœŸåŒ–
 
-#pragma region ModelManager‚Ì‰Šú‰»
-	//ƒ‚ƒfƒ‹ƒ}ƒl[ƒWƒƒ[‚Ì‰Šú‰»
+#pragma region ModelManagerã®åˆæœŸåŒ–
+	//ãƒ¢ãƒ‡ãƒ«ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã®åˆæœŸåŒ–
 	ModelManager::GetInstance()->initialize(dxCommon);
 
-	//ƒ‚ƒfƒ‹ƒfƒBƒŒƒNƒgƒŠƒpƒX
+	//ãƒ¢ãƒ‡ãƒ«ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªãƒ‘ã‚¹
 	const std::string modelDirectoryPath = "Resources";
-	//ƒ‚ƒfƒ‹ƒtƒ@ƒCƒ‹ƒpƒX
+	//ãƒ¢ãƒ‡ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹
 	const std::string modelFileNamePath = "plane.obj";
-	//ƒ‚ƒfƒ‹ƒtƒ@ƒCƒ‹ƒpƒX2
+	//ãƒ¢ãƒ‡ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹2
 	const std::string modelFileNamePath2 = "barrier.obj";
 
 	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
 	ModelManager::GetInstance()->LoadModel(modelFileNamePath2);
 
-#pragma endregion ModelManager‚Ì‰Šú‰»
+#pragma endregion ModelManagerã®åˆæœŸåŒ–
 
-#pragma region ImGuiManager‚Ì‰Šú‰»
+#pragma region ImGuiManagerã®åˆæœŸåŒ–
 #ifdef _DEBUG
 
-	//ImGui‚Ì‰Šú‰»
+	//ImGuiã®åˆæœŸåŒ–
 	
 	imGuiManager = std::make_unique<ImGuiManager>();
 	imGuiManager->Initialize(winApp, dxCommon);
 
 #endif // DEBUG
 
-#pragma endregion ImGuiManager‚Ì‰Šú‰»
+#pragma endregion ImGuiManagerã®åˆæœŸåŒ–
 
-#pragma region AudioCommon‚Ì‰Šú‰»
-	//ƒI[ƒfƒBƒI‹¤’Ê•”
+#pragma region AudioCommonã®åˆæœŸåŒ–
+	//ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªå…±é€šéƒ¨
 	AudioCommon::GetInstance()->Initialize();
 	const std::string audioFileName = "fanfare.wav";
 	const std::string audioDirectoryPath = "Resources/Audio/";
 
-#pragma endregion AudioCommon‚Ì‰Šú‰»
-#pragma region Input‚Ì‰Šú‰»
-	//“ü—Í‰Šú‰»
+#pragma endregion AudioCommonã®åˆæœŸåŒ–
+#pragma region Inputã®åˆæœŸåŒ–
+	//å…¥åŠ›åˆæœŸåŒ–
 	
 	input = new Input();
 	input->Initialize(winApp);
-#pragma endregion Input‚Ì‰Šú‰»
+#pragma endregion Inputã®åˆæœŸåŒ–
 
-#pragma region Audio‚Ì‰Šú‰»
+#pragma region Audioã®åˆæœŸåŒ–
 
 	
 	audio = std::make_unique<Audio>();
 	audio->Initialize(audioFileName, audioDirectoryPath);
 	audio->Play(true);
 
-#pragma endregion Audio‚Ì‰Šú‰»
+#pragma endregion Audioã®åˆæœŸåŒ–
 	/*---------------
-		ƒXƒvƒ‰ƒCƒg
+		ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 	---------------*/
-#pragma region ƒXƒvƒ‰ƒCƒg‚Ì‰Šú‰»
-	// ƒXƒvƒ‰ƒCƒg‰Šú‰»
+#pragma region ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®åˆæœŸåŒ–
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆåˆæœŸåŒ–
 	
 	for (uint32_t i = 0; i < 1; ++i) {
 
 		Sprite* sprite = new Sprite();
 
-		//‚à‚µfor•¶‚Ìi‚ª‹ô”‚È‚ç
+		//ã‚‚ã—foræ–‡ã®iãŒå¶æ•°ãªã‚‰
 		if (i % 2 == 0) {
-			//ƒ‚ƒ“ƒXƒ^[ƒ{[ƒ‹‚ğ•\¦‚³‚¹‚é
+			//ãƒ¢ãƒ³ã‚¹ã‚¿ãƒ¼ãƒœãƒ¼ãƒ«ã‚’è¡¨ç¤ºã•ã›ã‚‹
 			sprite->Initialize(spriteCommon, winApp, dxCommon, monsterBallTextureHandle);
 		}
 		else {
-			//uvChecker‚ğ•\¦‚³‚¹‚é
+			//uvCheckerã‚’è¡¨ç¤ºã•ã›ã‚‹
 			sprite->Initialize(spriteCommon, winApp, dxCommon, uvCheckerTextureHandle);
 		}
 
 
-		// ŠeƒXƒvƒ‰ƒCƒg‚ÉˆÙ‚È‚éˆÊ’u‚âƒvƒƒpƒeƒB‚ğİ’è‚·‚é
-		//Vector2 spritePosition = { i * -1280.0f, 0.0f }; // ƒXƒvƒ‰ƒCƒg‚²‚Æ‚ÉˆÙ‚È‚éˆÊ’u
-		Vector2 spritePosition = { 100.0f, 100.0f }; // ƒXƒvƒ‰ƒCƒg‚²‚Æ‚ÉˆÙ‚È‚éˆÊ’u
-		float spriteRotation = 0.0f;                 // ‰ñ“]‚Í”CˆÓ
-		Vector4 spriteColor = { 1.0f, 1.0f, 1.0f, 1.0f }; // F‚Í”’iRGBAj
-		Vector2 size = { 50.0f, 50.0f };             // ”CˆÓ‚ÌƒTƒCƒY
+		// å„ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã«ç•°ãªã‚‹ä½ç½®ã‚„ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‚’è¨­å®šã™ã‚‹
+		//Vector2 spritePosition = { i * -1280.0f, 0.0f }; // ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã”ã¨ã«ç•°ãªã‚‹ä½ç½®
+		Vector2 spritePosition = { 100.0f, 100.0f }; // ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã”ã¨ã«ç•°ãªã‚‹ä½ç½®
+		float spriteRotation = 0.0f;                 // å›è»¢ã¯ä»»æ„
+		Vector4 spriteColor = { 1.0f, 1.0f, 1.0f, 1.0f }; // è‰²ã¯ç™½ï¼ˆRGBAï¼‰
+		Vector2 size = { 50.0f, 50.0f };             // ä»»æ„ã®ã‚µã‚¤ã‚º
 
-		//Šeí‹@”\‚ğg‚¦‚é‚æ‚¤‚É‚·‚é
+		//å„ç¨®æ©Ÿèƒ½ã‚’ä½¿ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹
 		isFlipX_ = sprite->GetFlipX();
 		isFlipY_ = sprite->GetFlipY();
 		textureLeftTop = sprite->GetTextureLeftTop();
@@ -159,13 +159,13 @@ void MyGame::Initialize()
 
 		sprites.push_back(sprite);
 	}
-#pragma endregion ƒXƒvƒ‰ƒCƒg‚Ì‰Šú‰»
+#pragma endregion ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®åˆæœŸåŒ–
 
 	/*---------------
-	  ƒIƒuƒWƒFƒNƒg3D
+	  ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ3D
 	---------------*/
-#pragma region 3Dƒ‚ƒfƒ‹‚Ì‰Šú‰»
-	//ƒIƒuƒWƒFƒNƒg3D
+#pragma region 3Dãƒ¢ãƒ‡ãƒ«ã®åˆæœŸåŒ–
+	//ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ3D
 	
 	object3d = new Object3d();
 	object3d->Initialize(object3dCommon, winApp, dxCommon);
@@ -173,7 +173,7 @@ void MyGame::Initialize()
 	
 
 
-	//ƒ‚ƒfƒ‹
+	//ãƒ¢ãƒ‡ãƒ«
 	
 	model = new Model();
 	model->Initialize(modelCommon, modelDirectoryPath, modelFileNamePath);
@@ -185,7 +185,7 @@ void MyGame::Initialize()
 
 
 
-	//ƒIƒuƒWƒFƒNƒg3D
+	//ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ3D
 	
 	object3d2 = new Object3d();
 	object3d2->Initialize(object3dCommon, winApp, dxCommon);
@@ -193,7 +193,7 @@ void MyGame::Initialize()
 
 
 
-	//ƒ‚ƒfƒ‹
+	//ãƒ¢ãƒ‡ãƒ«
 	
 	model2 = new Model();
 	model2->Initialize(modelCommon, modelDirectoryPath, modelFileNamePath2);
@@ -201,10 +201,10 @@ void MyGame::Initialize()
 	object3d2->SetModel(model2);
 	object3d2->SetModel(modelFileNamePath2);
 
-#pragma endregion 3Dƒ‚ƒfƒ‹‚Ì‰Šú‰»
+#pragma endregion 3Dãƒ¢ãƒ‡ãƒ«ã®åˆæœŸåŒ–
 
-#pragma region camera‚Ì‰Šú‰»
-	//ƒJƒƒ‰
+#pragma region cameraã®åˆæœŸåŒ–
+	//ã‚«ãƒ¡ãƒ©
 
 	camera = new Camera();
 	
@@ -215,7 +215,7 @@ void MyGame::Initialize()
 	object3d->SetCamera(camera);
 	object3d2->SetCamera(camera);
 
-#pragma endregion camera‚Ì‰Šú‰»
+#pragma endregion cameraã®åˆæœŸåŒ–
 
 
 
@@ -226,7 +226,7 @@ void MyGame::Update()
 {
 
 	/*-------------------
-	 WindowsƒƒbƒZ[ƒWˆ—
+	 Windowsãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
 	-------------------*/
 	if (winApp->ProcessMessage()) {
 		break;
@@ -234,7 +234,7 @@ void MyGame::Update()
 
 
 	/*-------------------
-		 “ü—Í‚ÌXV
+		 å…¥åŠ›ã®æ›´æ–°
 	-------------------*/
 
 	/*-------
@@ -250,8 +250,8 @@ void MyGame::Update()
 	ImGui::DragFloat3("Scale", &cameraScale.x);
 	ImGui::End();
 
-	//ƒXƒvƒ‰ƒCƒg‚ÌImGui
-	 //ƒXƒvƒ‰ƒCƒg‚ÌImGui
+	//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ImGui
+	 //ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ImGui
 	for (Sprite* sprite : sprites) {
 		if (sprite) {
 			ImGui::Begin("Sprite");
@@ -284,7 +284,7 @@ void MyGame::Update()
 	static float scratchPosition = 0.0f;
 	static bool isScratching = false;
 	static float lastScratchPosition = 0.0f;
-	//Ä¶ŠÔ
+	//å†ç”Ÿæ™‚é–“
 	float duration = audio->GetSoundDuration();
 
 
@@ -307,11 +307,11 @@ void MyGame::Update()
 	ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f);
 	audio->SetVolume(volume);
 
-	// Ä¶ƒo[
+	// å†ç”Ÿãƒãƒ¼
 	static float playbackPosition = 0.0f;
-	//Ä¶ˆÊ’u‚Ìæ“¾
+	//å†ç”Ÿä½ç½®ã®å–å¾—
 	playbackPosition = audio->GetPlaybackPosition();
-	//Ä¶ˆÊ’u‚Ì‹”F
+	//å†ç”Ÿä½ç½®ã®è¦–èª
 	ImGui::SliderFloat("Playback Position", &playbackPosition, 0.0f, duration);
 	//audio->SetPlaybackPosition(playbackPosition);
 
@@ -327,14 +327,14 @@ void MyGame::Update()
 #endif // DEBUG
 
 	/*--------------
-	   ƒQ[ƒ€‚Ìˆ—
+	   ã‚²ãƒ¼ãƒ ã®å‡¦ç†
 	--------------*/
 	camera->SetTranslate(cameraPosition);
 	camera->setRotation(cameraRotation);
 	camera->setScale(cameraScale);
 	camera->Update();
 
-	//“ü—Í‚ÌXV
+	//å…¥åŠ›ã®æ›´æ–°
 	input->Update();
 
 	modelRotation.y += 0.01f;
@@ -343,7 +343,7 @@ void MyGame::Update()
 	//modelRotation2.y -= 0.01f;
 	modelRotation2.z -= 0.01f;
 
-	//ƒIƒuƒWƒFƒNƒg3D‚ÌXV
+	//ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ3Dã®æ›´æ–°
 	object3d->Update();
 
 	object3d->SetPosition(modelPosition);
@@ -357,11 +357,11 @@ void MyGame::Update()
 	object3d2->SetScale(modelScale2);
 
 
-	//ƒXƒvƒ‰ƒCƒg‚ÌXV
+	//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®æ›´æ–°
 	for (Sprite* sprite : sprites) {
 		if (sprite) {
-			// ‚±‚±‚Å‚ÍŠeƒXƒvƒ‰ƒCƒg‚ÌˆÊ’u‚â‰ñ“]‚ğXV‚·‚éˆ—‚ğs‚¤
-			// —á: X²•ûŒü‚É­‚µ‚¸‚ÂˆÚ“®‚³‚¹‚é
+			// ã“ã“ã§ã¯å„ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ä½ç½®ã‚„å›è»¢ã‚’æ›´æ–°ã™ã‚‹å‡¦ç†ã‚’è¡Œã†
+			// ä¾‹: Xè»¸æ–¹å‘ã«å°‘ã—ãšã¤ç§»å‹•ã•ã›ã‚‹
 			Vector2 currentPosition = sprite->GetPosition();
 			/*currentPosition.x = 100.0f;
 			currentPosition.y = 100.0f;*/
@@ -393,30 +393,30 @@ void MyGame::Finalize()
 
 
 
-	//ƒŠƒ\[ƒXƒŠ[ƒNƒ`ƒFƒbƒN
+	//ãƒªã‚½ãƒ¼ã‚¹ãƒªãƒ¼ã‚¯ãƒã‚§ãƒƒã‚¯
 
-	//WindowsApp‚Ìíœ
+	//WindowsAppã®å‰Šé™¤
 	winApp->Finalize();
 	delete winApp;
 	winApp = nullptr;
 
-	//DirectX‹¤’Ê•”•ª‚Ìíœ
+	//DirectXå…±é€šéƒ¨åˆ†ã®å‰Šé™¤
 	CloseHandle(dxCommon->GetFenceEvent());
 	delete dxCommon;
 
 	AudioCommon::GetInstance()->Finalize();
-	//“ü—Í‚Ìíœ
+	//å…¥åŠ›ã®å‰Šé™¤
 	delete input;
-	//ƒJƒƒ‰‚Ìíœ
+	//ã‚«ãƒ¡ãƒ©ã®å‰Šé™¤
 	delete camera;
 
-	//ƒXƒvƒ‰ƒCƒg‹¤’Ê•”•ª‚Ìíœ
+	//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå…±é€šéƒ¨åˆ†ã®å‰Šé™¤
 	delete spriteCommon;
 
 
 	for (Sprite* sprite : sprites) {
 		if (sprite) {
-			delete sprite; // ƒƒ‚ƒŠ‚ğ‰ğ•ú
+			delete sprite; // ãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾
 		}
 	}
 
@@ -428,12 +428,12 @@ void MyGame::Finalize()
 
 	delete model2;
 	delete object3d2;
-	sprites.clear(); // ƒ|ƒCƒ“ƒ^‚ğƒNƒŠƒA
+	sprites.clear(); // ãƒã‚¤ãƒ³ã‚¿ã‚’ã‚¯ãƒªã‚¢
 
 
-	//ƒeƒNƒXƒ`ƒƒƒ}ƒl[ƒWƒƒ‚ÌI—¹
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒãƒãƒ¼ã‚¸ãƒ£ã®çµ‚äº†
 	TextureManager::GetInstance()->Finalize();
-	//ƒ‚ƒfƒ‹ƒ}ƒl[ƒWƒƒ[‚ÌI—¹
+	//ãƒ¢ãƒ‡ãƒ«ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã®çµ‚äº†
 	ModelManager::GetInstance()->Finalize();
 
 #ifdef _DEBUG
@@ -443,7 +443,7 @@ void MyGame::Finalize()
 	delete srvManager;
 
 
-	//Œx‚É~‚Ü‚é
+	//è­¦å‘Šæ™‚ã«æ­¢ã¾ã‚‹
 	//infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
 
 #pragma endregion AllRelease
@@ -455,20 +455,20 @@ void MyGame::Draw()
 
 
 	/*-------------------
-	@@DirectX•`‰æŠJn
-	@-------------------*/
+	ã€€ã€€DirectXæç”»é–‹å§‹
+	ã€€-------------------*/
 	dxCommon->PreDraw();
 	srvManager->PreDraw();
 	/*-------------------
-	@@ƒV[ƒ“‚Ì•`‰æ
-@@-------------------*/
+	ã€€ã€€ã‚·ãƒ¼ãƒ³ã®æç”»
+ã€€ã€€-------------------*/
 
 
 
-  //3DƒIƒuƒWƒFƒNƒg‚Ì•`‰æ€”õB3DƒIƒuƒWƒFƒNƒg‚Ì•`‰æ‚É‹¤’Ê‚ÌƒOƒ‰ƒtƒBƒbƒNƒXƒRƒ}ƒ“ƒh‚ğÏ‚Ş
+  //3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æç”»æº–å‚™ã€‚3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æç”»ã«å…±é€šã®ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ã‚³ãƒãƒ³ãƒ‰ã‚’ç©ã‚€
 	object3dCommon->DrawSettingsCommon();
 
-	//ƒIƒuƒWƒFƒNƒg3D‚Ì•`‰æ
+	//ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ3Dã®æç”»
 
 #pragma region Draw3D
 
@@ -482,10 +482,10 @@ void MyGame::Draw()
 			2D
 	--------------------*/
 
-	//2DƒIƒuƒWƒFƒNƒg‚Ì•`‰æ€”õB2DƒIƒuƒWƒFƒNƒg‚Ì•`‰æ‚É‹¤’Ê‚ÌƒOƒ‰ƒtƒBƒbƒNƒXƒRƒ}ƒ“ƒh‚ğÏ‚Ş
+	//2Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æç”»æº–å‚™ã€‚2Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æç”»ã«å…±é€šã®ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ã‚³ãƒãƒ³ãƒ‰ã‚’ç©ã‚€
 	spriteCommon->DrawSettingsCommon();
 
-	// •`‰æˆ—
+	// æç”»å‡¦ç†
 	for (Sprite* sprite : sprites) {
 		if (sprite) {
 			sprite->Draw();
@@ -501,8 +501,8 @@ void MyGame::Draw()
 #endif // DEBUG
 
 	/*-------------------
-	@@DirectX•`‰æI—¹
-  @@-------------------*/
+	ã€€ã€€DirectXæç”»çµ‚äº†
+  ã€€ã€€-------------------*/
 
 	dxCommon->PostDraw();
 
