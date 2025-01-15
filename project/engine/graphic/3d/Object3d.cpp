@@ -11,18 +11,18 @@
 #include "externals/imgui/imgui_impl_win32.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 
-void Object3d::Initialize(Object3dCommon* object3dCommon, WinApp* winApp, DirectXCommon* dxCommon)
+void Object3d::Initialize(Object3dCommon* object3dCommon)
 {
-	assert(dxCommon);
+	
 	//引数で受け取ってメンバ変数に記録する
 	this->object3dCommon = object3dCommon;
-	this->dxCommon_ = dxCommon;
-	this->winApp_ = winApp;
+	this->dxCommon_ = object3dCommon->GetDxCommon();
+	this->winApp_ = object3dCommon->GetWinApp();
 	this->camera = object3dCommon->GetDefaultCamera();
 #pragma region TransformMatrixResourced
 
 	//WVP用のリソースを作る
-	transformMatrixResource = dxCommon->CreateBufferResource(sizeof(TransformationMatrix));
+	transformMatrixResource = this->dxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
 	//データを書き込む
 	transformMatrixData = nullptr;
 	//書き込むためのアドレスを取得
@@ -38,7 +38,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, WinApp* winApp, Direct
 #pragma region DirectionalLightData
 	//平行光源用用のリソースを作る。今回はColor1つ分のサイズを用意する
 	directionalLightResource =
-		dxCommon->CreateBufferResource(sizeof(DirectionalLight));
+		this->dxCommon_->CreateBufferResource(sizeof(DirectionalLight));
 	//平行光源用にデータを書き込む
 	directionalLightData = nullptr;
 	//書き込むためのアドレスを取得

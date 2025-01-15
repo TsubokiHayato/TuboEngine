@@ -1,7 +1,8 @@
 #include "SpriteCommon.h"
 #include"PSO.h"
-void SpriteCommon::Initialize(DirectXCommon* dxCommon)
+void SpriteCommon::Initialize(WinApp* winApp,DirectXCommon* dxCommon)
 {
+	winApp_ = winApp;
 	dxCommon_ = dxCommon;
 	pso = new PSO();
 	pso->Initialize(dxCommon);

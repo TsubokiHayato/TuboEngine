@@ -37,14 +37,14 @@ void Framework::Initialize()
 	//スプライト共通部分
 
 	spriteCommon = new SpriteCommon;
-	spriteCommon->Initialize(dxCommon);
+	spriteCommon->Initialize(winApp,dxCommon);
 
 
 
 	//オブジェクト3Dの共通部分
 
 	object3dCommon = new Object3dCommon();
-	object3dCommon->Initialize(dxCommon);
+	object3dCommon->Initialize(winApp,dxCommon);
 
 	//モデル共通部分
 
