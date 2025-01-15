@@ -108,6 +108,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ClearScene.cpp" />
+    <ClCompile Include="DebugScene.cpp" />
     <ClCompile Include="engine\audio\Audio.cpp" />
     <ClCompile Include="engine\audio\AudioCommon.cpp" />
     <ClCompile Include="engine\camera\Camera.cpp" />
@@ -125,6 +127,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="engine\imgui\ImGuiManager.cpp" />
     <ClCompile Include="Framework.cpp" />
+    <ClCompile Include="IScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\graphic\3d\Model.cpp" />
     <ClCompile Include="engine\graphic\3d\ModelCommon.cpp" />
@@ -136,11 +139,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\base\StringUtility.cpp" />
     <ClCompile Include="engine\base\TextureManager.cpp" />
     <ClCompile Include="engine\base\WinApp.cpp" />
-    <ClCompile Include="MyGame.cpp" />
+    <ClCompile Include="Order.cpp" />
     <ClCompile Include="PSO.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SrvManager.cpp" />
+    <ClCompile Include="StageScene.cpp" />
+    <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ClearScene.h" />
+    <ClInclude Include="DebugScene.h" />
     <ClInclude Include="engine\audio\Audio.h" />
     <ClInclude Include="engine\audio\AudioCommon.h" />
     <ClInclude Include="engine\camera\Camera.h" />
@@ -180,9 +188,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="engine\imgui\ImGuiManager.h" />
     <ClInclude Include="Framework.h" />
-    <ClInclude Include="MyGame.h" />
+    <ClInclude Include="IScene.h" />
+    <ClInclude Include="Order.h" />
     <ClInclude Include="PSO.h" />
+    <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SrvManager.h" />
+    <ClInclude Include="StageScene.h" />
+    <ClInclude Include="TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\imgui\imgui.vcxproj">
