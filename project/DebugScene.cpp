@@ -51,11 +51,11 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 		//もしfor文のiが偶数なら
 		if (i % 2 == 0) {
 			//モンスターボールを表示させる
-			sprite->Initialize(this->spriteCommon, this->winApp, this->dxCommon, monsterBallTextureHandle);
+			sprite->Initialize(this->spriteCommon, monsterBallTextureHandle);
 		}
 		else {
 			//uvCheckerを表示させる
-			sprite->Initialize(this->spriteCommon, this->winApp, this->dxCommon, uvCheckerTextureHandle);
+			sprite->Initialize(this->spriteCommon, uvCheckerTextureHandle);
 		}
 
 
@@ -91,7 +91,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//オブジェクト3D
 
 	object3d = new Object3d();
-	object3d->Initialize(this->object3dCommon, this->winApp, this->dxCommon);
+	object3d->Initialize(this->object3dCommon);
 
 
 
@@ -106,7 +106,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//オブジェクト3D
 
 	object3d2 = new Object3d();
-	object3d2->Initialize(this->object3dCommon, this->winApp, this->dxCommon);
+	object3d2->Initialize(this->object3dCommon);
 
 	object3d2->SetModel(modelFileNamePath2);
 
