@@ -1,10 +1,11 @@
 #include<Framework.h>
-#include<MyGame.h>
+#include"Order.h"
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
-	Framework* framework = new MyGame();
+	Framework* framework = new Order();
+
 	framework->Run();
 
 	delete framework;
