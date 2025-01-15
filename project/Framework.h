@@ -11,6 +11,7 @@
 #include"AudioCommon.h"
 #ifdef _DEBUG
 #include"ImGuiManager.h"
+#include"SceneManager.h"
 #endif // DEBUG
 
 #include"Input.h"
@@ -33,8 +34,19 @@ public:
 	//描画
 	virtual void Draw() = 0;
 
-	//終了リクエストがあったかどうか
-	virtual bool IsEndRequest() { return endRequest; }
+public:
+
+	void FrameworkPreDraw();
+	void FrameworkPostDraw();
+	void ImguiPreDraw();
+	void ImguiPostDraw();
+	void Object3dCommonDraw();
+	void SpriteCommonDraw();
+
+public:
+	
+		//終了リクエストがあったかどうか
+		virtual bool IsEndRequest() { return endRequest; }
 
 public:
 	void Run();
@@ -42,13 +54,18 @@ public:
 protected:
 	bool endRequest = false;
 
+	//基盤システム
 	WinApp* winApp = nullptr;
+	//DirectX共通部分
 	DirectXCommon* dxCommon = nullptr;
+	//スプライト共通部分
 	SpriteCommon* spriteCommon = nullptr;
+	//オブジェクト3Dの共通部分
 	Object3dCommon* object3dCommon = nullptr;
+	//モデル共通部分
 	ModelCommon* modelCommon = nullptr;
 	SrvManager* srvManager = nullptr;
 	std::unique_ptr<ImGuiManager> imGuiManager = nullptr;
-
+	std::unique_ptr<SceneManager> sceneManager = nullptr;
 };
 

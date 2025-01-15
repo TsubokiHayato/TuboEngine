@@ -1,9 +1,15 @@
-#include "MyGame.h"
-
-void MyGame::Initialize()
+#include "DebugScene.h"
+#include"ImGuiManager.h"
+#include"SceneManager.h"
+#include"ModelManager.h"
+#include"TextureManager.h"
+void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommon* dxCommon)
 {
-	Framework::Initialize();
 
+	this->object3dCommon = object3dCommon;
+	this->spriteCommon = spriteCommon;
+	this->winApp = winApp;
+	this->dxCommon = dxCommon;
 	//テクスチャマネージャに追加する画像ハンドル
 	std::string uvCheckerTextureHandle = "Resources/uvChecker.png";
 	std::string monsterBallTextureHandle = "Resources/monsterBall.png";
@@ -37,7 +43,7 @@ void MyGame::Initialize()
 	---------------*/
 #pragma region スプライトの初期化
 	// スプライト初期化
-	
+
 	for (uint32_t i = 0; i < 1; ++i) {
 
 		Sprite* sprite = new Sprite();
@@ -45,11 +51,11 @@ void MyGame::Initialize()
 		//もしfor文のiが偶数なら
 		if (i % 2 == 0) {
 			//モンスターボールを表示させる
-			sprite->Initialize(spriteCommon, winApp, dxCommon, monsterBallTextureHandle);
+			sprite->Initialize(this->spriteCommon, this->winApp, this->dxCommon, monsterBallTextureHandle);
 		}
 		else {
 			//uvCheckerを表示させる
-			sprite->Initialize(spriteCommon, winApp, dxCommon, uvCheckerTextureHandle);
+			sprite->Initialize(this->spriteCommon, this->winApp, this->dxCommon, uvCheckerTextureHandle);
 		}
 
 
@@ -83,19 +89,14 @@ void MyGame::Initialize()
 	---------------*/
 #pragma region 3Dモデルの初期化
 	//オブジェクト3D
-	
+
 	object3d = new Object3d();
-	object3d->Initialize(object3dCommon, winApp, dxCommon);
+	object3d->Initialize(this->object3dCommon, this->winApp, this->dxCommon);
+
+
+
 
 	
-
-
-	//モデル
-	
-	model = new Model();
-	model->Initialize(modelCommon, modelDirectoryPath, modelFileNamePath);
-
-	object3d->SetModel(model);
 	object3d->SetModel("plane.obj");
 
 	////////////////////////////////////////////////////////////////////////
@@ -103,19 +104,10 @@ void MyGame::Initialize()
 
 
 	//オブジェクト3D
-	
+
 	object3d2 = new Object3d();
-	object3d2->Initialize(object3dCommon, winApp, dxCommon);
+	object3d2->Initialize(this->object3dCommon, this->winApp, this->dxCommon);
 
-
-
-
-	//モデル
-	
-	model2 = new Model();
-	model2->Initialize(modelCommon, modelDirectoryPath, modelFileNamePath2);
-
-	object3d2->SetModel(model2);
 	object3d2->SetModel(modelFileNamePath2);
 
 #pragma endregion 3Dモデルの初期化
@@ -124,7 +116,7 @@ void MyGame::Initialize()
 	//カメラ
 
 	camera = new Camera();
-	
+
 	camera->SetTranslate(cameraPosition);
 	camera->setRotation(cameraRotation);
 	camera->setScale(cameraScale);
@@ -133,28 +125,133 @@ void MyGame::Initialize()
 	object3d2->SetCamera(camera);
 
 #pragma endregion cameraの初期化
+}
+
+void DebugScene::Update()
+{
+	/*--------------
+	   ゲームの処理
+	--------------*/
+	camera->SetTranslate(cameraPosition);
+	camera->setRotation(cameraRotation);
+	camera->setScale(cameraScale);
+	camera->Update();
+
+	modelRotation.y += 0.01f;
+
+	modelRotation2.x -= 0.01f;
+	//modelRotation2.y -= 0.01f;
+	modelRotation2.z -= 0.01f;
+
+	//オブジェクト3Dの更新
+	object3d->Update();
+
+	object3d->SetPosition(modelPosition);
+	object3d->SetRotation(modelRotation);
+	object3d->SetScale(modelScale);
+
+	object3d2->Update();
+
+	object3d2->SetPosition(modelPosition2);
+	object3d2->SetRotation(modelRotation2);
+	object3d2->SetScale(modelScale2);
+
+
+	//スプライトの更新
+	for (Sprite* sprite : sprites) {
+		if (sprite) {
+			// ここでは各スプライトの位置や回転を更新する処理を行う
+			// 例: X軸方向に少しずつ移動させる
+			Vector2 currentPosition = sprite->GetPosition();
+			/*currentPosition.x = 100.0f;
+			currentPosition.y = 100.0f;*/
+			float currentRotation = sprite->GetRotation();
+
+			sprite->SetPosition(currentPosition);
+			sprite->SetRotation(currentRotation);
+			sprite->SetTextureLeftTop(textureLeftTop);
+			sprite->SetFlipX(isFlipX_);
+			sprite->SetFlipY(isFlipY_);
+			sprite->SetGetIsAdjustTextureSize(isAdjustTextureSize);
+
+			sprite->Update();
+		}
+	}
+
+
 
 
 
 
 }
 
-void MyGame::Update()
+void DebugScene::Finalize()
 {
 
-	Framework::Update();
 
 
-	/*-------------------
-		 入力の更新
-	-------------------*/
+#pragma region AllRelease
 
-	/*-------
-	  ImGui
-	-------*/
+
+
+	//リソースリークチェック
+
+
+
+	//カメラの削除
+	delete camera;
+
+
+
+
+	for (Sprite* sprite : sprites) {
+		if (sprite) {
+			delete sprite; // メモリを解放
+		}
+	}
+
+
+	delete object3d;
+
+	delete object3d2;
+	sprites.clear(); // ポインタをクリア
+
+
+	
+
+	
+#pragma endregion AllRelease
+
+
+
+}
+
+void DebugScene::Object3DDraw()
+{
+
+	object3d->Draw();
+	object3d2->Draw();
+}
+
+void DebugScene::SpriteDraw()
+{
+	for (Sprite* sprite : sprites) {
+		if (sprite) {
+			sprite->Draw();
+		}
+	}
+}
+
+void DebugScene::ImGuiDraw()
+{
+	ImGui::Begin("DebugScene");
+	ImGui::Text("Hello, DebugScene!");
+	ImGui::End();
+
+
 #ifdef _DEBUG
 
-	imGuiManager->Begin();
+	
 
 	ImGui::Begin("camera");
 	ImGui::DragFloat3("Position", &cameraPosition.x);
@@ -234,169 +331,7 @@ void MyGame::Update()
 
 	ImGui::End();
 
-	ImGui::ShowDemoWindow();
-	imGuiManager->End();
+	
 #endif // DEBUG
-
-	/*--------------
-	   ゲームの処理
-	--------------*/
-	camera->SetTranslate(cameraPosition);
-	camera->setRotation(cameraRotation);
-	camera->setScale(cameraScale);
-	camera->Update();
-
-	modelRotation.y += 0.01f;
-
-	modelRotation2.x -= 0.01f;
-	//modelRotation2.y -= 0.01f;
-	modelRotation2.z -= 0.01f;
-
-	//オブジェクト3Dの更新
-	object3d->Update();
-
-	object3d->SetPosition(modelPosition);
-	object3d->SetRotation(modelRotation);
-	object3d->SetScale(modelScale);
-
-	object3d2->Update();
-
-	object3d2->SetPosition(modelPosition2);
-	object3d2->SetRotation(modelRotation2);
-	object3d2->SetScale(modelScale2);
-
-
-	//スプライトの更新
-	for (Sprite* sprite : sprites) {
-		if (sprite) {
-			// ここでは各スプライトの位置や回転を更新する処理を行う
-			// 例: X軸方向に少しずつ移動させる
-			Vector2 currentPosition = sprite->GetPosition();
-			/*currentPosition.x = 100.0f;
-			currentPosition.y = 100.0f;*/
-			float currentRotation = sprite->GetRotation();
-
-			sprite->SetPosition(currentPosition);
-			sprite->SetRotation(currentRotation);
-			sprite->SetTextureLeftTop(textureLeftTop);
-			sprite->SetFlipX(isFlipX_);
-			sprite->SetFlipY(isFlipY_);
-			sprite->SetGetIsAdjustTextureSize(isAdjustTextureSize);
-
-			sprite->Update();
-		}
-	}
-
-
-
-
-
-
-}
-
-void MyGame::Finalize()
-{
-
-
-#pragma region AllRelease
-
-
-
-	//リソースリークチェック
-
-	
-	
-	//カメラの削除
-	delete camera;
-
-	
-
-
-	for (Sprite* sprite : sprites) {
-		if (sprite) {
-			delete sprite; // メモリを解放
-		}
-	}
-
-	
-	delete object3d;
-
-	
-	delete model;
-
-	delete model2;
-	delete object3d2;
-	sprites.clear(); // ポインタをクリア
-
-
-	//テクスチャマネージャの終了
-	TextureManager::GetInstance()->Finalize();
-	//モデルマネージャーの終了
-	ModelManager::GetInstance()->Finalize();
-
-
-	Framework::Finalize();
-#pragma endregion AllRelease
-
-
-
-}
-
-void MyGame::Draw()
-{
-
-
-	/*-------------------
-	　　DirectX描画開始
-	　-------------------*/
-	dxCommon->PreDraw();
-	srvManager->PreDraw();
-	/*-------------------
-	　　シーンの描画
-　　-------------------*/
-
-
-
-  //3Dオブジェクトの描画準備。3Dオブジェクトの描画に共通のグラフィックスコマンドを積む
-	object3dCommon->DrawSettingsCommon();
-
-	//オブジェクト3Dの描画
-
-#pragma region Draw3D
-
-	object3d->Draw();
-	object3d2->Draw();
-
-#pragma endregion Draw3D
-
-#pragma region Draw2D
-	/*-------------------
-			2D
-	--------------------*/
-
-	//2Dオブジェクトの描画準備。2Dオブジェクトの描画に共通のグラフィックスコマンドを積む
-	spriteCommon->DrawSettingsCommon();
-
-	// 描画処理
-	for (Sprite* sprite : sprites) {
-		if (sprite) {
-			sprite->Draw();
-		}
-	}
-
-#pragma endregion Draw2D
-
-
-#ifdef _DEBUG
-
-	imGuiManager->Draw();
-#endif // DEBUG
-
-	/*-------------------
-	　　DirectX描画終了
-  　　-------------------*/
-
-	dxCommon->PostDraw();
-
 
 }
