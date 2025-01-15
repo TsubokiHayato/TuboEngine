@@ -27,10 +27,13 @@ private:
 	int currentSceneNo = 0;
 	//前のシーン番号
 	int prevSceneNo = 0;
-
+	//オブジェクト3D共通部
 	Object3dCommon* object3dCommon;
+	//スプライト共通部
 	SpriteCommon* spriteCommon;
+	//ウィンドウズアプリケーション
 	WinApp* winApp;
+	//DirectX共通部
 	DirectXCommon* dxCommon;
 
 };
