@@ -33,7 +33,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="object3dCommon"></param>
-	void Initialize(Object3dCommon* object3dCommon, WinApp* winApp, DirectXCommon* dxCommon);
+	void Initialize(Object3dCommon* object3dCommon);
 
 	/// <summary>
 	/// 更新処理
