@@ -92,11 +92,6 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 	object3d = new Object3d();
 	object3d->Initialize(this->object3dCommon);
-
-
-
-
-	
 	object3d->SetModel("plane.obj");
 
 	////////////////////////////////////////////////////////////////////////
