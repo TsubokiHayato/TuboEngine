@@ -51,7 +51,8 @@ void Framework::Initialize()
 	modelCommon = new ModelCommon();
 	modelCommon->Initialize(dxCommon);
 
-
+	particleCommon = new ParticleCommon();
+	particleCommon->Initialize(winApp, dxCommon,srvManager);
 
 	
 
@@ -93,7 +94,7 @@ void Framework::Initialize()
 
 	//シーンマネージャーの初期化
 	sceneManager = std::make_unique<SceneManager>();
-	sceneManager->Initialize(object3dCommon,spriteCommon,winApp,dxCommon);
+	sceneManager->Initialize(object3dCommon,spriteCommon,particleCommon,winApp,dxCommon);
 
 }
 void Framework::Update()
@@ -133,6 +134,7 @@ void Framework::Finalize()
 	ModelManager::GetInstance()->Finalize();
 
 	delete object3dCommon;
+	delete particleCommon;
 	delete modelCommon;
 	delete srvManager;
 
@@ -206,4 +208,11 @@ void Framework::SpriteCommonDraw()
 	//スプライトの描画
 	spriteCommon->DrawSettingsCommon();
 	sceneManager->SpriteDraw();
+}
+
+void Framework::ParticleCommonDraw()
+{
+	particleCommon->DrawSettingsCommon();
+	//パーティクルの描画
+	sceneManager->ParticleDraw();
 }
