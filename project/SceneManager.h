@@ -6,7 +6,7 @@ class SceneManager
 
 public:
 	//初期化
-	void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommon* dxCommon);
+	void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon,ParticleCommon*particleCommon ,WinApp* winApp, DirectXCommon* dxCommon);
 	//更新
 	void Update();
 	//終了処理
@@ -17,6 +17,8 @@ public:
 	void SpriteDraw();
 	//ImGui描画
 	void ImGuiDraw();
+
+	void ParticleDraw();
 
 private:
 	//現在のシーン
@@ -31,6 +33,8 @@ private:
 	Object3dCommon* object3dCommon;
 	//スプライト共通部
 	SpriteCommon* spriteCommon;
+	//パーティクル共通部
+	ParticleCommon* particleCommon;
 	//ウィンドウズアプリケーション
 	WinApp* winApp;
 	//DirectX共通部
