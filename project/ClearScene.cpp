@@ -1,6 +1,6 @@
 #include "ClearScene.h"
 
-void ClearScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommon* dxCommon)
+void ClearScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon)
 {
 }
 
@@ -21,5 +21,9 @@ void ClearScene::SpriteDraw()
 }
 
 void ClearScene::ImGuiDraw()
+{
+}
+
+void ClearScene::ParticleDraw()
 {
 }

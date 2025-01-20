@@ -6,28 +6,28 @@ class ParticlePSO
 
 public:
 	/// <summary>
-	/// ‰Šú‰»
+	/// åˆæœŸåŒ–
 	/// </summary>
-	/// <param name="dxCommon">DirectX‹¤’Ê•”•ª</param>
+	/// <param name="dxCommon">DirectXå…±é€šéƒ¨åˆ†</param>
 	void Initialize(DirectXCommon* dxCommon);
 
 	/// <summary>
-	/// ‹¤’Ê•`‰æİ’è
+	/// å…±é€šæç”»è¨­å®š
 	/// </summary>
 	void DrawSettingsCommon();
 
 private:
 	/*---------------------------------------------------
-			ŠÖ”
+			é–¢æ•°
 	---------------------------------------------------*/
 
 	/// <summary>
-	/// ƒ‹[ƒgƒVƒOƒlƒCƒ`ƒƒ‚Ìì¬
+	/// ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒã‚¤ãƒãƒ£ã®ä½œæˆ
 	/// </summary>
 	void CreateRootSignature();
 
 	/// <summary>
-	/// ƒOƒ‰ƒtƒBƒbƒNƒXƒpƒCƒvƒ‰ƒCƒ“‚Ìì¬
+	/// ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã®ä½œæˆ
 	/// </summary>
 	void CreateGraphicPipeline();
 
@@ -36,17 +36,17 @@ private:
 	-----------------*/
 	DirectXCommon* dxCommon_;
 
-	//RootSignatureì¬
+	//RootSignatureä½œæˆ
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-	//DescriptorRangeì¬
+	//DescriptorRangeä½œæˆ
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
 	//
 	D3D12_DESCRIPTOR_RANGE descriptorForInstancing[1] = {};
-	//RootParameterì¬B
+	//RootParameterä½œæˆã€‚
 	D3D12_ROOT_PARAMETER rootParameters[3] = {};
-	//Samplerì¬
+	//Samplerä½œæˆ
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
-	//ƒVƒŠƒAƒ‰ƒCƒY‚µ‚ÄƒoƒCƒiƒŠ‚É‚·‚é
+	//ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã—ã¦ãƒã‚¤ãƒŠãƒªã«ã™ã‚‹
 	Microsoft::WRL::ComPtr <ID3DBlob> signatureBlob = nullptr;
 	Microsoft::WRL::ComPtr <ID3DBlob> errorBlob = nullptr;
 	Microsoft::WRL::ComPtr <ID3D12RootSignature> rootSignature = nullptr;
@@ -65,23 +65,23 @@ private:
 	  RasterizerState
 	------------------*/
 
-	//RasterizerState‚Ìİ’è
+	//RasterizerStateã®è¨­å®š
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	/*-------------------
 	  Vertex&Pixel_Shader
 	-------------------*/
 
-	//Shader‚ğƒRƒ“ƒpƒCƒ‹‚·‚é
+	//Shaderã‚’ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã™ã‚‹
 	Microsoft::WRL::ComPtr <IDxcBlob> vertexShaderBlob;
 
 	Microsoft::WRL::ComPtr <IDxcBlob> pixelShaderBlob;
 	/*---------------
-	DepthStencilDesc‚Ìİ’è
+	DepthStencilDescã®è¨­å®š
 	-------------------*/
 
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	/*------------------
-	 @ PSO‚ğ¶¬‚·‚é
+	 ã€€ PSOã‚’ç”Ÿæˆã™ã‚‹
 	------------------*/
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicPipelineStateDesc{};
 	Microsoft::WRL::ComPtr <ID3D12PipelineState> graphicsPipeLineState = nullptr;

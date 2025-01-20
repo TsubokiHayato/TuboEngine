@@ -2,6 +2,7 @@
 #pragma once
 #include"WinApp.h"
 #include"DirectXCommon.h"
+#include"SrvManager.h"
 class ParticlePSO;
 class Camera;
 class ParticleCommon
@@ -9,13 +10,13 @@ class ParticleCommon
 
 public:
 	/// <summary>
-	/// ‰Šú‰»
+	/// åˆæœŸåŒ–
 	/// </summary>
-	/// <param name="dxCommon">DirectX‹¤’Ê•”•ª</param>
-	void Initialize(WinApp* winApp, DirectXCommon* dxCommon);
+	/// <param name="dxCommon">DirectXå…±é€šéƒ¨åˆ†</param>
+	void Initialize(WinApp* winApp, DirectXCommon* dxCommon,SrvManager* srvManager);
 
 	/// <summary>
-	/// ‹¤’Ê•`‰æİ’è
+	/// å…±é€šæç”»è¨­å®š
 	/// </summary>
 	void DrawSettingsCommon();
 
@@ -28,13 +29,15 @@ public:
 	void SetDefaultCamera(Camera* camera) { defaultCamera = camera; }
 	Camera* GetDefaultCamera()const { return defaultCamera; }
 
+	SrvManager* GetSrvManager() const { return srvManager_; }
 private:
 
-	WinApp* winApp_ = nullptr;//ƒEƒBƒ“ƒhƒEƒYƒAƒvƒŠƒP[ƒVƒ‡ƒ“
-	DirectXCommon* dxCommon_ = nullptr;//DirectX‹¤’Ê•”•ª
+	WinApp* winApp_ = nullptr;//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚ºã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³
+	DirectXCommon* dxCommon_ = nullptr;//DirectXå…±é€šéƒ¨åˆ†
 	ParticlePSO* pso = nullptr;//PSO
-	Camera* defaultCamera = nullptr;//ƒfƒtƒHƒ‹ƒgƒJƒƒ‰
+	Camera* defaultCamera = nullptr;//ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚«ãƒ¡ãƒ©
 
+	SrvManager* srvManager_ = nullptr;//SRVå…±é€šéƒ¨åˆ†
 
 };
 

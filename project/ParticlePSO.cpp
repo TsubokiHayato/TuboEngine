@@ -8,26 +8,26 @@ void ParticlePSO::Initialize(DirectXCommon* dxCommon)
 	commandList = dxCommon_->GetCommandList();
 
 
-	//ƒOƒ‰ƒtƒBƒbƒNƒXƒpƒCƒvƒ‰ƒCƒ“‚Ìì¬
+	//ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã®ä½œæˆ
 	CreateGraphicPipeline();
 
 }
 
 void ParticlePSO::DrawSettingsCommon()
 {
-	/*ƒ‹[ƒgƒVƒOƒlƒCƒ`ƒƒ‚ğƒZƒbƒg‚·‚éƒRƒ}ƒ“ƒh*/
-	 //RootSignature‚ğİ’èB
+	/*ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒã‚¤ãƒãƒ£ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã‚³ãƒãƒ³ãƒ‰*/
+	 //RootSignatureã‚’è¨­å®šã€‚
 
 	commandList->SetGraphicsRootSignature(rootSignature.Get());
 
 
-	/*ƒOƒ‰ƒtƒBƒNƒXƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚ğƒZƒbƒg‚·‚éƒRƒ}ƒ“ƒh*/
+	/*ã‚°ãƒ©ãƒ•ã‚£ã‚¯ã‚¹ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã‚³ãƒãƒ³ãƒ‰*/
 
-	commandList->SetPipelineState(graphicsPipeLineState.Get());//PSO‚ğİ’è
+	commandList->SetPipelineState(graphicsPipeLineState.Get());//PSOã‚’è¨­å®š
 
 
-	/*ƒvƒŠƒ~ƒeƒBƒuƒgƒ|ƒƒW[‚ğƒZƒbƒg‚·‚éƒRƒ}ƒ“ƒh*/
-	//Œ`óİ’è
+	/*ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ãƒˆãƒãƒ­ã‚¸ãƒ¼ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã‚³ãƒãƒ³ãƒ‰*/
+	//å½¢çŠ¶è¨­å®š
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 }
@@ -35,55 +35,55 @@ void ParticlePSO::DrawSettingsCommon()
 void ParticlePSO::CreateRootSignature()
 {
 
-	//RootSignatureì¬
+	//RootSignatureä½œæˆ
 	descriptionRootSignature.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-	//DescriptorRangeì¬
+	//DescriptorRangeä½œæˆ
 
-	descriptorRange[0].BaseShaderRegister = 0;//0‚©‚çn‚Ü‚é
-	descriptorRange[0].NumDescriptors = 1;//”‚Í1
-	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRV‚ğ‚Â‚©‚¤
-	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//Offset‚ğ©“®ŒvZ
+	descriptorRange[0].BaseShaderRegister = 0;//0ã‹ã‚‰å§‹ã¾ã‚‹
+	descriptorRange[0].NumDescriptors = 1;//æ•°ã¯1
+	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVã‚’ã¤ã‹ã†
+	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//Offsetã‚’è‡ªå‹•è¨ˆç®—
 
-	descriptorForInstancing[0].BaseShaderRegister = 0;//0‚©‚çn‚Ü‚é
-	descriptorForInstancing[0].NumDescriptors = 1;//”‚Í1
-	descriptorForInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRV‚ğ‚Â‚©‚¤
-	descriptorForInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//Offset‚ğ©“®ŒvZ
+	descriptorForInstancing[0].BaseShaderRegister = 0;//0ã‹ã‚‰å§‹ã¾ã‚‹
+	descriptorForInstancing[0].NumDescriptors = 1;//æ•°ã¯1
+	descriptorForInstancing[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVã‚’ã¤ã‹ã†
+	descriptorForInstancing[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//Offsetã‚’è‡ªå‹•è¨ˆç®—
 
 
 
-	//RootParameterì¬B02_01’Ç‰Á//02_03XV
+	//RootParameterä½œæˆã€‚02_01è¿½åŠ //02_03æ›´æ–°
 
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBV‚ğg‚¤
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShader‚Å‚Â‚©‚¤
-	rootParameters[0].Descriptor.ShaderRegister = 0;//ƒŒƒWƒXƒ^”Ô†0‚ÆƒoƒCƒ“ƒh
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVã‚’ä½¿ã†
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderã§ã¤ã‹ã†
+	rootParameters[0].Descriptor.ShaderRegister = 0;//ãƒ¬ã‚¸ã‚¹ã‚¿ç•ªå·0ã¨ãƒã‚¤ãƒ³ãƒ‰
 
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorForInstancing;
 	rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorForInstancing);
 
-	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DESCRIPTOR_TABLE‚ğg‚¤
-	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShader‚Å‚Â‚©‚¤
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DESCRIPTOR_TABLEã‚’ä½¿ã†
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderã§ã¤ã‹ã†
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
 
-	descriptionRootSignature.pParameters = rootParameters;//ƒ‹[ƒgƒpƒ‰ƒ[ƒ^”z—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-	descriptionRootSignature.NumParameters = _countof(rootParameters);//”z—ñ‚Ì’·‚³
+	descriptionRootSignature.pParameters = rootParameters;//ãƒ«ãƒ¼ãƒˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿é…åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+	descriptionRootSignature.NumParameters = _countof(rootParameters);//é…åˆ—ã®é•·ã•
 
 
 #pragma region Sampler_03_00//
 
 
-	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;//ƒoƒCƒAƒjƒAƒtƒBƒ‹ƒ^
+	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;//ãƒã‚¤ã‚¢ãƒ‹ã‚¢ãƒ•ã‚£ãƒ«ã‚¿
 	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;//”äŠr‚µ‚È‚¢	
-	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;//‚ ‚è‚Á‚½‚¯‚ÌMipMap‚ğ‚Â‚©‚¤
-	staticSamplers[0].ShaderRegister = 0;//ƒŒƒWƒXƒ^”Ô†0‚ğ‚Â‚©‚¤
-	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShader‚Å‚Â‚©‚¤
+	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;//æ¯”è¼ƒã—ãªã„	
+	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;//ã‚ã‚Šã£ãŸã‘ã®MipMapã‚’ã¤ã‹ã†
+	staticSamplers[0].ShaderRegister = 0;//ãƒ¬ã‚¸ã‚¹ã‚¿ç•ªå·0ã‚’ã¤ã‹ã†
+	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderã§ã¤ã‹ã†
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
@@ -101,7 +101,7 @@ void ParticlePSO::CreateRootSignature()
 		Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
-	//ƒoƒCƒiƒŠ‚ğŒ³‚Éì¬
+	//ãƒã‚¤ãƒŠãƒªã‚’å…ƒã«ä½œæˆ
 
 	dxCommon_->hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
 		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
@@ -112,7 +112,7 @@ void ParticlePSO::CreateRootSignature()
 
 void ParticlePSO::CreateGraphicPipeline()
 {
-	//ƒ‹[ƒgƒVƒOƒlƒCƒ`ƒƒv‚Ìì¬
+	//ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒã‚¤ãƒãƒ£ã€ã®ä½œæˆ
 	CreateRootSignature();
 
 
@@ -152,7 +152,7 @@ void ParticlePSO::CreateGraphicPipeline()
 	------------*/
 
 
-	//‚·‚×‚Ä‚ÌF—v‘f‚ğ‘‚«‚Ş
+	//ã™ã¹ã¦ã®è‰²è¦ç´ ã‚’æ›¸ãè¾¼ã‚€
 	blendDesc.RenderTarget[0].RenderTargetWriteMask =
 		D3D12_COLOR_WRITE_ENABLE_ALL;
 	blendDesc.RenderTarget[0].BlendEnable = TRUE;
@@ -168,16 +168,16 @@ void ParticlePSO::CreateGraphicPipeline()
 	  RasterizerState
 	------------------*/
 
-	//— –Ê•\¦
+	//è£é¢è¡¨ç¤º
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-	//OŠpŒ`‚Ì’†‚ğ“h‚è‚Â‚Ô‚·
+	//ä¸‰è§’å½¢ã®ä¸­ã‚’å¡—ã‚Šã¤ã¶ã™
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	/*-------------------
 	  Vertex&Pixel_Shader
 	-------------------*/
 
-	//Shader‚ğƒRƒ“ƒpƒCƒ‹‚·‚é
+	//Shaderã‚’ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã™ã‚‹
 	vertexShaderBlob = dxCommon_->CompileShader(L"Resources/Shaders/Particle.VS.hlsl",
 		L"vs_6_0");
 	assert(vertexShaderBlob != nullptr);
@@ -188,19 +188,19 @@ void ParticlePSO::CreateGraphicPipeline()
 
 
 	/*---------------
-	DepthStencilDesc‚Ìİ’è
+	DepthStencilDescã®è¨­å®š
 	-------------------*/
 
-	//Depth‚Ì‹@”\‚ğ—LŒø‰»
+	//Depthã®æ©Ÿèƒ½ã‚’æœ‰åŠ¹åŒ–
 	depthStencilDesc.DepthEnable = true;
-	//‘‚«‚İ‚µ‚Ü‚·
+	//æ›¸ãè¾¼ã¿ã—ã¾ã™
 	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-	//”äŠrŠÖ”‚ÍLessEqual
+	//æ¯”è¼ƒé–¢æ•°ã¯LessEqual
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 
 	/*------------------
-	 @ PSO‚ğ¶¬‚·‚é
+	 ã€€ PSOã‚’ç”Ÿæˆã™ã‚‹
 	------------------*/
 
 
@@ -216,15 +216,15 @@ void ParticlePSO::CreateGraphicPipeline()
 	graphicPipelineStateDesc.BlendState = blendDesc;//BlendState
 	graphicPipelineStateDesc.RasterizerState = rasterizerDesc;//RasterizerState
 
-	//‘‚«‚ŞRTV‚Ìî•ñ
+	//æ›¸ãè¾¼ã‚€RTVã®æƒ…å ±
 	graphicPipelineStateDesc.NumRenderTargets = 1;
 	graphicPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
-	//—˜—p‚·‚éƒgƒ|ƒƒW(Œ`ó)‚Ìƒ^ƒCƒvBOŠpŒ`
+	//åˆ©ç”¨ã™ã‚‹ãƒˆãƒãƒ­ã‚¸(å½¢çŠ¶)ã®ã‚¿ã‚¤ãƒ—ã€‚ä¸‰è§’å½¢
 	graphicPipelineStateDesc.PrimitiveTopologyType =
 		D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-	//‚Ç‚Ì‚æ‚¤‚É‰æ–Ê‚É‘‚«‚Ş‚Ì‚©‚Ìİ’è
+	//ã©ã®ã‚ˆã†ã«ç”»é¢ã«æ›¸ãè¾¼ã‚€ã®ã‹ã®è¨­å®š
 	graphicPipelineStateDesc.SampleDesc.Count = 1;
 	graphicPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
@@ -233,7 +233,7 @@ void ParticlePSO::CreateGraphicPipeline()
 	graphicPipelineStateDesc.DepthStencilState = depthStencilDesc;
 	graphicPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-	//ÀÛ‚É¶¬
+	//å®Ÿéš›ã«ç”Ÿæˆ
 	dxCommon_->hr = device->CreateGraphicsPipelineState(&graphicPipelineStateDesc,
 		IID_PPV_ARGS(&graphicsPipeLineState));
 	assert(SUCCEEDED(dxCommon_->hr));

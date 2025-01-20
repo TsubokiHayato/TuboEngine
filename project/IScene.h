@@ -3,6 +3,7 @@
 #include"DirectXCommon.h"
 #include"Object3dCommon.h"
 #include"SpriteCommon.h"
+#include"ParticleCommon.h"
 #include"ImGuiManager.h"
 //シーン番号
 enum SCENE{DEBUG,TITLE,STAGE,CLEAR};
@@ -16,7 +17,7 @@ protected:
 public:
 
 	//初期化
-	virtual void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommon* dxCommon) = 0;
+	virtual void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon,ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon) = 0;
 	//更新
 	virtual void Update() = 0;
 	//終了処理
@@ -27,6 +28,8 @@ public:
 	virtual void SpriteDraw() = 0;
 	//ImGui描画
 	virtual void ImGuiDraw() = 0;
+
+	virtual void ParticleDraw() = 0;
 	
 	//デストラクタ
 	virtual ~IScene() = 0;
