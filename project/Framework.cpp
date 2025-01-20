@@ -136,7 +136,7 @@ void Framework::Finalize()
 	delete object3dCommon;
 	delete particleCommon;
 	delete modelCommon;
-	delete srvManager;
+	//delete srvManager;
 
 	//DirectX共通部分の削除
 	CloseHandle(dxCommon->GetFenceEvent());
@@ -172,17 +172,22 @@ void Framework::FrameworkPreDraw()
 
 void Framework::FrameworkPostDraw()
 {
-	//ImGuiの描画
+#ifdef _DEBUG
+//ImGuiの描画
 	imGuiManager->Draw();
+#endif // _DEBUG
+
+	
 	//描画
 	dxCommon->PostDraw();
 }
 
 void Framework::ImguiPreDraw()
 {
+#ifdef _DEBUG
 	//ImGuiの受付開始
 	imGuiManager->Begin();
-#ifdef _DEBUG
+
 	sceneManager->ImGuiDraw();
 #endif // _DEBUG
 
@@ -192,7 +197,11 @@ void Framework::ImguiPostDraw()
 {
 	//ImGuiの受付終了
 	ImGui::ShowDemoWindow();
+#ifdef _DEBUG
+
 	imGuiManager->End();
+#endif // _DEBUG
+
 
 }
 
