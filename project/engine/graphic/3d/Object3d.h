@@ -45,7 +45,7 @@ public:
 	/// </summary>
 	void Draw();
 
-
+public:
 
 	//Setter
 	void SetScale(const Vector3& scale) { transform.scale = scale; }

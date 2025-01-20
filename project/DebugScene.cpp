@@ -3,7 +3,7 @@
 #include"SceneManager.h"
 #include"ModelManager.h"
 #include"TextureManager.h"
-void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommon* dxCommon)
+void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon)
 {
 
 	this->object3dCommon = object3dCommon;
@@ -329,4 +329,8 @@ void DebugScene::ImGuiDraw()
 	
 #endif // DEBUG
 
+}
+
+void DebugScene::ParticleDraw()
+{
 }

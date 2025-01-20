@@ -4,15 +4,16 @@
 #include"TitleScene.h"
 #include"StageScene.h"
 #include"ClearScene.h"
-void SceneManager::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommon* dxCommon)
+void SceneManager::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon)
 {
 	this->object3dCommon = object3dCommon;
 	this->spriteCommon = spriteCommon;
 	this->winApp = winApp;
 	this->dxCommon = dxCommon;
+	this->particleCommon = particleCommon;
 
 	currentScene = std::make_unique<DebugScene>();
-	currentScene->Initialize(this->object3dCommon,this->spriteCommon,this->winApp,this->dxCommon);
+	currentScene->Initialize(this->object3dCommon,this->spriteCommon,this->particleCommon,this->winApp,this->dxCommon);
 
 	currentSceneNo = 0;
 	prevSceneNo = -1;
@@ -31,21 +32,21 @@ void SceneManager::Update()
 
 		if (currentSceneNo == DEBUG) {
 			currentScene = std::make_unique<DebugScene>();
-			currentScene->Initialize(object3dCommon, spriteCommon, winApp, dxCommon);
+			currentScene->Initialize(object3dCommon, spriteCommon,particleCommon, winApp, dxCommon);
 		}
 		else if (currentSceneNo == TITLE) {
 			currentScene = std::make_unique<TitleScene>();
-			currentScene->Initialize(object3dCommon, spriteCommon, winApp, dxCommon);
+			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
 		}
 		else if (currentSceneNo == STAGE) {
 			currentScene = std::make_unique<StageScene>();
-			currentScene->Initialize(object3dCommon, spriteCommon, winApp, dxCommon);
+			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
 		}
 		else if (currentSceneNo == CLEAR) {
 			currentScene = std::make_unique<ClearScene>();
-			currentScene->Initialize(object3dCommon, spriteCommon, winApp, dxCommon);
+			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
 		}
-		currentScene->Initialize(object3dCommon, spriteCommon, winApp, dxCommon);
+		currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
 	}
 
 	if (currentScene) {
@@ -96,4 +97,12 @@ void SceneManager::ImGuiDraw()
 	}
 	ImGui::End();
 
+}
+
+void SceneManager::ParticleDraw()
+{
+
+	if (currentScene) {
+		currentScene->ParticleDraw();
+	}
 }
