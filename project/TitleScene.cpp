@@ -24,27 +24,37 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	TextureManager::GetInstance()->LoadTexture(monsterBallTextureHandle);
 	
 	//パーティクル
-	particle = new Particle();
+	particle =std::make_unique<Particle>();
 	particle->Initialize(this->particleCommon);
-	particle->SetScale({ 1.0f,1.0f,1.0f });
-	particle->SetRotation({ 0.0f,0.0f,0.0f });
-	particle->SetPosition({ 0.0f,0.0f,0.0f });
-	particle->SetCamera(camera);
 	particle->CreateParticleGroup("Particle",monsterBallTextureHandle);
+	particleEmitter_ = std::make_unique<ParticleEmitter>(
+		particle.get(), "Particle",
+		Transform{
+			{0.2f, 0.2f, 0.2f},
+			{0.0f, 0.0f, 0.0f},
+			{0.0f, 0.0f, 0.0f}
+		},
+		100, 0.1f, true);
 
 
 }
 
 void TitleScene::Update()
 {
+	camera->SetTranslate(cameraPosition);
+	camera->setRotation(cameraRotation);
+	camera->setScale(cameraScale);
+	camera->Update();
+
 	particle->Update();
+	particleEmitter_->Update();
 
 }
 
 void TitleScene::Finalize()
 {
 	delete camera;
-	delete particle;
+	
 }
 
 void TitleScene::Object3DDraw()
@@ -57,7 +67,12 @@ void TitleScene::SpriteDraw()
 
 void TitleScene::ImGuiDraw()
 {
-
+	
+	ImGui::Begin("camera");
+	ImGui::DragFloat3("Position", &cameraPosition.x);
+	ImGui::DragFloat3("Rotation", &cameraRotation.x);
+	ImGui::DragFloat3("Scale", &cameraScale.x);
+	ImGui::End();
 	
 	
 }
@@ -65,4 +80,5 @@ void TitleScene::ImGuiDraw()
 void TitleScene::ParticleDraw()
 {
 	particle->Draw();
+
 }

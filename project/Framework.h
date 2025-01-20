@@ -11,10 +11,9 @@
 #include"AudioCommon.h"
 #ifdef _DEBUG
 #include"ImGuiManager.h"
+#endif // DEBUG
 #include"SceneManager.h"
 #include"ParticleCommon.h"
-#endif // DEBUG
-
 #include"Input.h"
 
 class Framework
@@ -67,7 +66,11 @@ protected:
 	//モデル共通部分
 	ModelCommon* modelCommon = nullptr;
 	SrvManager* srvManager = nullptr;
-	std::unique_ptr<ImGuiManager> imGuiManager = nullptr;
+#ifdef _DEBUG
+std::unique_ptr<ImGuiManager> imGuiManager = nullptr;
+#endif // _DEBUG
+
+	
 	std::unique_ptr<SceneManager> sceneManager = nullptr;
 
 	//パーティクル共通部分

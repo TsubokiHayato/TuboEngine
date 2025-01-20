@@ -32,16 +32,22 @@ void Particle::Initialize(ParticleCommon* particleSetup) {
 	vertexBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 	//頂点データをリソースにコピー
 	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
+
+	camera_ = new Camera;
+	camera_->SetTranslate({ 0.0f,0.0f,-5.0f });
+	camera_->setRotation({ 0.0f,0.0f,0.0f });
+	camera_->setScale({ 1.0f,1.0f,1.0f });
 }
 
 ///=============================================================================
 ///						更新処理
 void Particle::Update() {
 	//========================================
-	
+
+	camera_->Update();
 	// カメラ行列の取得
-	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera_->GetTranslate(),
-		camera_->GetRotation(), camera_->GetTranslate());
+	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera_->GetScale(),
+		camera_->GetRotation(),camera_->GetTranslate());
 	// ビュー行列の取得
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 	// プロジェクション行列の取得

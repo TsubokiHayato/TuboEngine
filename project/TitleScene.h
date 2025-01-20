@@ -2,6 +2,8 @@
 #include"IScene.h"
 #include"Particle.h"
 #include"Camera.h"
+#include"ParticleEmitter.h"
+
 class TitleScene :public IScene
 {
 public:
@@ -20,8 +22,15 @@ private:
 	WinApp* winApp;
 	DirectXCommon* dxCommon;
 
-	Particle* particle;
+	std::unique_ptr <Particle> particle;
+	std::unique_ptr<ParticleEmitter> particleEmitter_;
+
 	Camera* camera;
+	Vector3 cameraPosition = { 0.0f,0.0f,-5.0f };
+	Vector3 cameraRotation = { 0.0f,0.0f,0.0f };
+	Vector3 cameraScale = { 1.0f,1.0f,1.0f };
+
+
 
 };
 
