@@ -12,6 +12,7 @@
 #ifdef _DEBUG
 #include"ImGuiManager.h"
 #include"SceneManager.h"
+#include"ParticleCommon.h"
 #endif // DEBUG
 
 #include"Input.h"
@@ -42,6 +43,7 @@ public:
 	void ImguiPostDraw();
 	void Object3dCommonDraw();
 	void SpriteCommonDraw();
+	void ParticleCommonDraw();
 
 public:
 	
@@ -67,5 +69,8 @@ protected:
 	SrvManager* srvManager = nullptr;
 	std::unique_ptr<ImGuiManager> imGuiManager = nullptr;
 	std::unique_ptr<SceneManager> sceneManager = nullptr;
+
+	//パーティクル共通部分
+	ParticleCommon* particleCommon = nullptr;
 };
 
