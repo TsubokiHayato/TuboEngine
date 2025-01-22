@@ -1,9 +1,11 @@
 #pragma once
+#pragma once
 #include"WinApp.h"
 #include"DirectXCommon.h"
-class PSO;
+#include"SrvManager.h"
+class ParticlePSO;
 class Camera;
-class Object3dCommon
+class ParticleCommon
 {
 
 public:
@@ -11,7 +13,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="dxCommon">DirectX共通部分</param>
-	void Initialize(WinApp* winApp,DirectXCommon* dxCommon);
+	void Initialize(WinApp* winApp, DirectXCommon* dxCommon,SrvManager* srvManager);
 
 	/// <summary>
 	/// 共通描画設定
@@ -27,13 +29,15 @@ public:
 	void SetDefaultCamera(Camera* camera) { defaultCamera = camera; }
 	Camera* GetDefaultCamera()const { return defaultCamera; }
 
+	SrvManager* GetSrvManager() const { return srvManager_; }
 private:
-	
-	
+
 	WinApp* winApp_ = nullptr;//ウィンドウズアプリケーション
 	DirectXCommon* dxCommon_ = nullptr;//DirectX共通部分
-	PSO* pso = nullptr;//PSO
+	ParticlePSO* pso = nullptr;//PSO
 	Camera* defaultCamera = nullptr;//デフォルトカメラ
+
+	SrvManager* srvManager_ = nullptr;//SRV共通部分
 
 };
 
