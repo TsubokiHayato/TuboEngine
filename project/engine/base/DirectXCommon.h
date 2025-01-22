@@ -13,7 +13,7 @@
 
 #include <dxcapi.h>
 
-                           
+
 
 #include "externals/DirectXTex/d3dx12.h"
 #include "externals/DirectXTex/DirectXTex.h"
@@ -27,11 +27,11 @@ class DirectXCommon
 {
 
 private:
-	
+
 
 public:
 
-
+	//初期化
 	void Initialize(WinApp* winApp);
 
 	//デバイスの初期化
@@ -63,11 +63,12 @@ public:
 	//描画後処理 End
 	void PostDraw();
 
+	//コマンドリストのリセット
 	void CommandExecution();
 
 
 
-	//DescriptorHeapのさくせいかんすう
+	//DescriptorHeapの作成関数
 	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
@@ -81,8 +82,8 @@ public:
 	//(/ ￣∪
 	// 
 	//Device
-
 	Microsoft::WRL::ComPtr <IDXGIFactory7> GetDxgiFactory()const { return dxgiFactory; }
+
 	Microsoft::WRL::ComPtr <ID3D12Device> GetDevice()const { return device; }
 
 	//Command
@@ -121,13 +122,15 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetDSVGPUDescriptorHandle(uint32_t index);
 
 
-
+	//DescriptorSizeの取得
 	uint32_t GetDescriptorSizeSRV() {
 		return descriptorSizeSRV;
 	}
+	//DescriptorSizeの取得
 	uint32_t GetDescriptorSizeRTV() {
 		return descriptorSizeRTV;
 	}
+	//DescriptorSizeの取得
 	uint32_t GetDescriptorSizeDSV() {
 		return descriptorSizeDSV;
 	}
@@ -162,7 +165,7 @@ public:
 	IDxcCompiler3* GetDxcCompiler() { return dxcCompiler; }
 	IDxcIncludeHandler* GetIncludeHandler() { return includeHandler; }
 
-size_t GetBackBufferCount()const { return swapChainDesc.BufferCount; }
+	size_t GetBackBufferCount()const { return swapChainDesc.BufferCount; }
 
 	//シェーダーのコンパイル
 	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
@@ -202,7 +205,7 @@ size_t GetBackBufferCount()const { return swapChainDesc.BufferCount; }
 	//関数が成功したかどうかSUCCEEDEDマクロで判断出来る
 	HRESULT hr;
 
-	
+
 private:
 
 	//FPS固定初期化
@@ -214,7 +217,7 @@ private:
 
 
 
-	WinApp* winApp = nullptr;
+	std::unique_ptr<WinApp> winApp = nullptr;
 
 	//DXGIファクトリーの設置
 	Microsoft::WRL::ComPtr <IDXGIFactory7> dxgiFactory = nullptr;
