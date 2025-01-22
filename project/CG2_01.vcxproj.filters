@@ -96,25 +96,22 @@
     <ClCompile Include="engine\graphic\3d\ModelManager.cpp">
       <Filter>ソース ファイル\graphic\3d</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\DirectXCommon.cpp">
+    <ClCompile Include="engine\base\Common\DirectXCommon.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\Logger.cpp">
+    <ClCompile Include="engine\base\Utilities\Logger.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\TextureManager.cpp">
+    <ClCompile Include="engine\graphic\2d\TextureManager.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\StringUtility.cpp">
+    <ClCompile Include="engine\base\Utilities\StringUtility.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\WinApp.cpp">
-      <Filter>ソース ファイル\base</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\base\ConvertString.cpp">
+    <ClCompile Include="engine\base\Common\WinApp.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
     <ClCompile Include="engine\input\Input.cpp">
@@ -156,16 +153,46 @@
     <ClCompile Include="engine\camera\Camera.cpp">
       <Filter>ソース ファイル\camera</Filter>
     </ClCompile>
-    <ClCompile Include="SrvManager.cpp">
+    <ClCompile Include="engine\base\Common\SrvManager.cpp">
       <Filter>ソース ファイル\graphic</Filter>
     </ClCompile>
-    <ClCompile Include="MyGame.cpp">
+    <ClCompile Include="engine\base\Framework\Framework.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Framework.cpp">
+    <ClCompile Include="engine\graphic\PSO.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="PSO.cpp">
+    <ClCompile Include="engine\scene\IScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\scene\SceneManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\Framework\Order.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\scene\DebugScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\scene\TitleScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\scene\StageScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\scene\ClearScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\graphic\Particle\ParticleCommon.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\graphic\Particle\ParticlePSO.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\graphic\Particle\Particle.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\graphic\Particle\ParticleEmitter.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -203,22 +230,22 @@
     <ClInclude Include="engine\graphic\3d\Object3dCommon.h">
       <Filter>ヘッダー ファイル\graphic\3d</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\Transform.h">
+    <ClInclude Include="engine\graphic\data\Transform.h">
       <Filter>ヘッダー ファイル\math</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\WinApp.h">
+    <ClInclude Include="engine\base\Common\WinApp.h">
       <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\DirectXCommon.h">
+    <ClInclude Include="engine\base\Common\DirectXCommon.h">
       <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\StringUtility.h">
+    <ClInclude Include="engine\base\Utilities\StringUtility.h">
       <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\Logger.h">
+    <ClInclude Include="engine\base\Utilities\Logger.h">
       <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\TextureManager.h">
+    <ClInclude Include="engine\graphic\2d\TextureManager.h">
       <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\input\Input.h">
@@ -233,19 +260,19 @@
     <ClInclude Include="engine\leakChecker\D3DResourceLeakChecker.h">
       <Filter>ヘッダー ファイル\leakChecker</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\Material.h">
+    <ClInclude Include="engine\graphic\data\Material.h">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\MaterialData.h">
+    <ClInclude Include="engine\graphic\data\MaterialData.h">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\ModelData.h">
+    <ClInclude Include="engine\graphic\data\ModelData.h">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\TransformationMatrix.h">
+    <ClInclude Include="engine\graphic\data\TransformationMatrix.h">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\VertexData.h">
+    <ClInclude Include="engine\graphic\data\VertexData.h">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -284,17 +311,47 @@
     <ClInclude Include="engine\camera\Camera.h">
       <Filter>ヘッダー ファイル\camera</Filter>
     </ClInclude>
-    <ClInclude Include="SrvManager.h">
+    <ClInclude Include="engine\base\Common\SrvManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="MyGame.h">
+    <ClInclude Include="engine\base\Framework\Framework.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Framework.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="PSO.h">
+    <ClInclude Include="engine\graphic\PSO.h">
       <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\scene\IScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\scene\SceneManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\base\Framework\Order.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\scene\DebugScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\scene\TitleScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\scene\StageScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\scene\ClearScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\graphic\Particle\ParticleCommon.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\graphic\Particle\Particle.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\graphic\Particle\ParticlePSO.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\graphic\Particle\ParticleEmitter.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -306,6 +363,7 @@
     <None Include="Resources\Shaders\Object3d.hlsli">
       <Filter>シェーダーファイル</Filter>
     </None>
+    <None Include="Resources\Shaders\Particle.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Object3d.PS.hlsl">
@@ -314,6 +372,8 @@
     <FxCompile Include="Resources\Shaders\Object3d.VS.hlsl">
       <Filter>シェーダーファイル</Filter>
     </FxCompile>
+    <FxCompile Include="Resources\Shaders\Particle.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\Particle.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

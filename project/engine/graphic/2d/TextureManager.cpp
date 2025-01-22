@@ -4,7 +4,7 @@ uint32_t TextureManager::kSRVIndexTop = 1;
 void TextureManager::Initialize(DirectXCommon* dxCommon,SrvManager* srvManager)
 {
 	dxCommon_ = dxCommon;
-	srvManager_ = srvManager;
+	srvManager_ = std::make_unique<SrvManager>(*srvManager);
 	textureDatas.reserve(SrvManager::kMaxSRVCount);
 }
 
@@ -103,6 +103,11 @@ TextureManager* TextureManager::GetInstance()
 
 void TextureManager::Finalize()
 {
+	
+	textureDatas.clear();
+
+	textureDatas.clear();
+
 	delete instance;
 	instance = nullptr;
 }
