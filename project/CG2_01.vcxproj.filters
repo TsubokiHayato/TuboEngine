@@ -114,9 +114,6 @@
     <ClCompile Include="engine\base\WinApp.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\ConvertString.cpp">
-      <Filter>ソース ファイル\base</Filter>
-    </ClCompile>
     <ClCompile Include="engine\input\Input.cpp">
       <Filter>ソース ファイル\input</Filter>
     </ClCompile>
