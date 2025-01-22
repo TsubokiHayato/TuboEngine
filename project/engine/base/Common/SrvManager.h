@@ -17,6 +17,7 @@ public:
 	/// <returns></returns>
 	uint32_t Allocate();
 
+
 	/// <summary>
 	/// ディスクリプタヒープのCPUハンドルを取得
 	/// </summary>
@@ -33,18 +34,12 @@ public:
 	/// <param name="pResource">リソース</param>
 	/// <param name="numElements">要素数</param>
 	/// <param name="strideInBytes">バイト数</param>
-	void CreateSRVforStructuredBuffer(uint32_t index, ID3D12Resource* pResource, UINT numElements, UINT strideInBytes);
-
+	void CreateSRVForStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT enelemtQuantity, UINT structureByteStride);
 	/// <summary>
 	/// 描画前処理
 	/// </summary>
 	void PreDraw();
 
-
-	/// <summary>
-	///テクスチャ枚数上限チェック
-	/// </summary>
-	bool CheckTextureCount(uint32_t count);
 
 	//-------------------Getter & Setter-------------------//
 	/// <summary>
@@ -80,7 +75,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap;
 
 	//次に使用するSRVのインデックス
-	uint32_t useSrvIndex = 0;
+	uint32_t useIndex = 0;
+
+
+
 
 };
 
