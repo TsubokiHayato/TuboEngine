@@ -8,42 +8,42 @@ class TitleScene :public IScene
 {
 public:
 	/// <summary>
-	/// ‰Šú‰»
+	/// åˆæœŸåŒ–
 	/// </summary>
-	/// <param name="object3dCommon">3DƒIƒuƒWƒFƒNƒg‹¤’Ê•”•ª</param>
-	/// <param name="spriteCommon">ƒXƒvƒ‰ƒCƒg‹¤’Ê•”•ª</param>
-	/// <param name="particleCommon">ƒp[ƒeƒBƒNƒ‹‹¤’Ê•”•ª</param>
-	/// <param name="winApp">ƒEƒBƒ“ƒhƒEƒAƒvƒŠƒP[ƒVƒ‡ƒ“</param>
-	/// <param name="dxCommon">DirectX‹¤’Ê•”•ª</param>
+	/// <param name="object3dCommon">3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå…±é€šéƒ¨åˆ†</param>
+	/// <param name="spriteCommon">ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå…±é€šéƒ¨åˆ†</param>
+	/// <param name="particleCommon">ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«å…±é€šéƒ¨åˆ†</param>
+	/// <param name="winApp">ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³</param>
+	/// <param name="dxCommon">DirectXå…±é€šéƒ¨åˆ†</param>
 	void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon);
 
 	/// <summary>
-	/// XV
+	/// æ›´æ–°
 	/// </summary>
 	void Update()override;
 
 	/// <summary>
-	/// I—¹ˆ—
+	/// çµ‚äº†å‡¦ç†
 	/// </summary>
 	void Finalize()override;
 
 	/// <summary>
-	/// 3DƒIƒuƒWƒFƒNƒg•`‰æ
+	/// 3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæç”»
 	/// </summary>
 	void Object3DDraw()override;
 
 	/// <summary>
-	/// ƒXƒvƒ‰ƒCƒg•`‰æ
+	/// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»
 	/// </summary>
 	void SpriteDraw()override;
 
 	/// <summary>
-	/// ImGui•`‰æ
+	/// ImGuiæç”»
 	/// </summary>
 	void ImGuiDraw()override;
 
 	/// <summary>
-	/// ƒp[ƒeƒBƒNƒ‹•`‰æ
+	/// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«æç”»
 	/// </summary>
 	void ParticleDraw()override;
 

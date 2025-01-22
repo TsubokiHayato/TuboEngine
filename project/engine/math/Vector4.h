@@ -7,7 +7,7 @@ struct Vector4
 	float z;
 	float w;
 
-	// += ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+	// += æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 	Vector4& operator+=(const Vector4& other) {
 		this->x += other.x;
 		this->y += other.y;
@@ -16,14 +16,14 @@ struct Vector4
 		return *this;
 	}
 
-	// + ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+	// + æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 	friend Vector4 operator+(const Vector4& lhs, const Vector4& rhs) {
 		Vector4 result = lhs;
 		result += rhs;
 		return result;
 	}
 
-	// -= ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+	// -= æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 	Vector4& operator-=(const Vector4& other) {
 		this->x -= other.x;
 		this->y -= other.y;
@@ -32,14 +32,14 @@ struct Vector4
 		return *this;
 	}
 
-	// - ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+	// - æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 	friend Vector4 operator-(const Vector4& lhs, const Vector4& rhs) {
 		Vector4 result = lhs;
 		result -= rhs;
 		return result;
 	}
 
-	// *= ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+	// *= æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 	Vector4& operator*=(float scalar) {
 		this->x *= scalar;
 		this->y *= scalar;
@@ -48,19 +48,19 @@ struct Vector4
 		return *this;
 	}
 
-	// * ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+	// * æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 	friend Vector4 operator*(const Vector4& vec, float scalar) {
 		Vector4 result = vec;
 		result *= scalar;
 		return result;
 	}
 
-	// * ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+	// * æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 	friend Vector4 operator*(float scalar, const Vector4& vec) {
 		return vec * scalar;
 	}
 
-	// /= ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+	// /= æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 	Vector4& operator/=(float scalar) {
 		this->x /= scalar;
 		this->y /= scalar;
@@ -69,59 +69,59 @@ struct Vector4
 		return *this;
 	}
 
-	// / ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+	// / æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 	friend Vector4 operator/(const Vector4& vec, float scalar) {
 		Vector4 result = vec;
 		result /= scalar;
 		return result;
 	}
 
-	// - ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+	// - æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 	Vector4 operator-() const {
 		return *this * -1;
 	}
 
-	// == ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+	// == æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 	bool operator==(const Vector4& other) const {
 		return this->x == other.x && this->y == other.y && this->z == other.z && this->w == other.w;
 	}
 
-	// != ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+	// != æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 	bool operator!=(const Vector4& other) const {
 		return !(*this == other);
 	}
 
-	// ’P€+‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+	// å˜é …+æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 	Vector4 operator+() const {
 		return *this;
 	}
 
-	// ƒxƒNƒgƒ‹‚Ì’·‚³‚ğŒvZ‚·‚éŠÖ”
+	// ãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã‚’è¨ˆç®—ã™ã‚‹é–¢æ•°
 	float Length() const {
 		return std::sqrt(LengthSquared());
 	}
 
-	// ƒxƒNƒgƒ‹‚Ì’·‚³‚Ì2æ‚ğŒvZ‚·‚éŠÖ”
+	// ãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã®2ä¹—ã‚’è¨ˆç®—ã™ã‚‹é–¢æ•°
 	float LengthSquared() const {
 		return x * x + y * y + z * z + w * w;
 	}
 
-	// ƒxƒNƒgƒ‹‚ğ³‹K‰»‚·‚éŠÖ”
+	// ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ­£è¦åŒ–ã™ã‚‹é–¢æ•°
 	void Normalize() {
 		*this /= Length();
 	}
 
-	// ƒxƒNƒgƒ‹‚ğ³‹K‰»‚·‚éŠÖ”
+	// ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ­£è¦åŒ–ã™ã‚‹é–¢æ•°
 	Vector4 Normalized() const {
 		return *this / Length();
 	}
 
-	// ƒxƒNƒgƒ‹‚Ì“àÏ‚ğŒvZ‚·‚éŠÖ”
+	// ãƒ™ã‚¯ãƒˆãƒ«ã®å†…ç©ã‚’è¨ˆç®—ã™ã‚‹é–¢æ•°
 	static float Dot(const Vector4& v1, const Vector4& v2) {
 		return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
 	}
 
-	// ƒxƒNƒgƒ‹‚ÌŠOÏ‚ğŒvZ‚·‚éŠÖ”
+	// ãƒ™ã‚¯ãƒˆãƒ«ã®å¤–ç©ã‚’è¨ˆç®—ã™ã‚‹é–¢æ•°
 	static Vector4 Cross(const Vector4& v1, const Vector4& v2) {
 		Vector4 result;
 		result.x = v1.y * v2.z - v1.z * v2.y;
@@ -131,7 +131,7 @@ struct Vector4
 		return result;
 	}
 
-	// ƒxƒNƒgƒ‹‚ğ³‹K‰»‚·‚éŠÖ”
+	// ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ­£è¦åŒ–ã™ã‚‹é–¢æ•°
 	static Vector4 Normalize(const Vector4& vec) {
 		return vec / vec.Length();
 	}
