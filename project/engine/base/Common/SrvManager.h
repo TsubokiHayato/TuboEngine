@@ -17,15 +17,14 @@ public:
 	/// <returns></returns>
 	uint32_t Allocate();
 
-
 	/// <summary>
 	/// ディスクリプタヒープのCPUハンドルを取得
 	/// </summary>
 	/// <param name="index">ディスクリプタヒープのインデックス</param>
 	/// <param name="pResource">リソース</param>
 	/// <param name="format">フォーマット</param>
-	/// <param name="MipLevls">ミップマップレベル</param>
-	void CreateSRVforTexture2D(uint32_t index, ID3D12Resource* pResource, DXGI_FORMAT format, UINT MipLevls);
+	/// <param name="MipLevels">ミップマップレベル</param>
+	void CreateSRVforTexture2D(uint32_t index, ID3D12Resource* pResource, DXGI_FORMAT format, UINT MipLevels);
 
 	/// <summary>
 	/// ディスクリプタヒープのCPUハンドルを取得
@@ -76,9 +75,6 @@ private:
 
 	//次に使用するSRVのインデックス
 	uint32_t useIndex = 0;
-
-
-
 
 };
 
