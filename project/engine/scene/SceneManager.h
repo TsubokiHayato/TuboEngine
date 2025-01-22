@@ -21,14 +21,7 @@ public:
 	void ParticleDraw();
 
 private:
-	//現在のシーン
-	std::unique_ptr<IScene> currentScene = nullptr;
-	//前のシーン
-	std::unique_ptr<IScene> prevScene = nullptr;
-	//現在のシーン番号
-	int currentSceneNo = 0;
-	//前のシーン番号
-	int prevSceneNo = 0;
+	
 	//オブジェクト3D共通部
 	Object3dCommon* object3dCommon;
 	//スプライト共通部
@@ -40,5 +33,15 @@ private:
 	//DirectX共通部
 	DirectXCommon* dxCommon;
 
+private:
+
+//現在のシーン
+	std::unique_ptr<IScene> currentScene = nullptr;
+	//前のシーン
+	std::unique_ptr<IScene> prevScene = nullptr;
+	//現在のシーン番号
+	int currentSceneNo = 0;
+	//前のシーン番号
+	int prevSceneNo = 0;
 };
 

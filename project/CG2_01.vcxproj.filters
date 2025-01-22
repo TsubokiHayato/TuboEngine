@@ -230,7 +230,7 @@
     <ClInclude Include="engine\graphic\3d\Object3dCommon.h">
       <Filter>ヘッダー ファイル\graphic\3d</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\Transform.h">
+    <ClInclude Include="engine\graphic\data\Transform.h">
       <Filter>ヘッダー ファイル\math</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\Common\WinApp.h">
@@ -260,19 +260,19 @@
     <ClInclude Include="engine\leakChecker\D3DResourceLeakChecker.h">
       <Filter>ヘッダー ファイル\leakChecker</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\Material.h">
+    <ClInclude Include="engine\graphic\data\Material.h">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\MaterialData.h">
+    <ClInclude Include="engine\graphic\data\MaterialData.h">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\ModelData.h">
+    <ClInclude Include="engine\graphic\data\ModelData.h">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\TransformationMatrix.h">
+    <ClInclude Include="engine\graphic\data\TransformationMatrix.h">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\VertexData.h">
+    <ClInclude Include="engine\graphic\data\VertexData.h">
       <Filter>ヘッダー ファイル\graphic</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
