@@ -4,22 +4,14 @@
 #include<dxgi1_6.h>
 #include<wrl.h>
 #include <format>
-
 #include"Logger.h"
 #include"StringUtility.h"
 #include"array"
 #include"WinApp.h"
-
-
 #include <dxcapi.h>
-
-
-
 #include "externals/DirectXTex/d3dx12.h"
 #include "externals/DirectXTex/DirectXTex.h"
-
 #include<vector>
-
 #include<chrono>
 
 
