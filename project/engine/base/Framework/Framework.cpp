@@ -3,13 +3,10 @@
 
 void Framework::Initialize()
 {
-
-#pragma region 基盤システムの初期化
-
 	//ウィンドウズアプリケーション
-
 	winApp = std::make_unique<WinApp>();
 	winApp->Initialize();
+
 #ifdef DEBUG
 	//リークチェッカー
 	D3DResourceLeakChecker leakChecker;
@@ -42,12 +39,10 @@ void Framework::Initialize()
 
 
 	//オブジェクト3Dの共通部分
-
 	object3dCommon = std::make_unique<Object3dCommon>();
 	object3dCommon->Initialize(winApp.get(), dxCommon.get());
 
 	//モデル共通部分
-
 	modelCommon = std::make_unique<ModelCommon>();
 	modelCommon->Initialize(dxCommon.get());
 
@@ -55,39 +50,17 @@ void Framework::Initialize()
 	particleCommon = std::make_unique<ParticleCommon>();
 	particleCommon->Initialize(winApp.get(), dxCommon.get(), srvManager.get());
 
-
-
-#pragma endregion 基盤システムの初期化
-
-
-#pragma region TextureManegerの初期化
 	//テクスチャマネージャーの初期化
 	TextureManager::GetInstance()->Initialize(dxCommon.get(), srvManager.get());
 
-
-
-#pragma endregion TextureManegerの初期化
-
-#pragma region ModelManagerの初期化
 	//モデルマネージャーの初期化
 	ModelManager::GetInstance()->initialize(dxCommon.get());
-#pragma endregion ModelManagerの初期化
 
-
-#pragma endregion ImGuiManagerの初期化
-
-#pragma region AudioCommonの初期化
 	//オーディオ共通部
 	AudioCommon::GetInstance()->Initialize();
 
-
-#pragma endregion AudioCommonの初期化
-
-
-#pragma region Inputの初期化
 	//入力初期化
 	Input::GetInstance()->Initialize(winApp.get());
-#pragma endregion Inputの初期化
 
 
 	//シーンマネージャーの初期化
@@ -178,10 +151,10 @@ void Framework::ImguiPreDraw()
 
 void Framework::ImguiPostDraw()
 {
+#ifdef _DEBUG
 	//ImGuiの受付終了
 	ImGui::ShowDemoWindow();
-#ifdef _DEBUG
-
+	
 	imGuiManager->End();
 #endif // _DEBUG
 
