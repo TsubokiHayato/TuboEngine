@@ -73,6 +73,8 @@ public:
 
 private:
 
+	//-------------------------------------------------------------------
+	//		メンバ変数
 
 	//共通部分
 	Object3dCommon* object3dCommon = nullptr;
@@ -85,6 +87,10 @@ private:
 	ModelCommon* modelCommon_ = nullptr;
 	//モデルデータ
 	Model* model_ = nullptr;
+	//カメラ
+	Camera* camera;
+
+
 
 	//座標のバッファリソース
 	Microsoft::WRL::ComPtr <ID3D12Resource> transformMatrixResource;
@@ -103,7 +109,7 @@ private:
 	//カメラ座標
 	Transform cameraTransform;
 
-	Camera* camera;
+
 
 };
 
