@@ -32,7 +32,7 @@ private:
 	
 
 	//SRVマネージャー
-	SrvManager* srvManager_;
+	std::unique_ptr<SrvManager> srvManager_;
 
 	//テクスチャデータ
 	std::unordered_map<std::string, TextureData> textureDatas;
