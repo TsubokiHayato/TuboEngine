@@ -107,22 +107,33 @@ void Framework::Finalize()
 
 void Framework::Run()
 {
+	//初期化
 	Initialize();
+	//メインループ
 	while (true)
 	{
+		//更新
 		Update();
+
+		//終了リクエストがあったら
 		if (IsEndRequest())
 		{
+			//ループを抜ける
 			break;
 		}
+
+		//描画
 		Draw();
 	}
+	//終了処理
 	Finalize();
 }
 
 void Framework::FrameworkPreDraw()
 {
+	//描画前処理
 	dxCommon->PreDraw();
+	//ImGuiの受付開始
 	srvManager->PreDraw();
 }
 
@@ -154,10 +165,9 @@ void Framework::ImguiPostDraw()
 #ifdef _DEBUG
 	//ImGuiの受付終了
 	ImGui::ShowDemoWindow();
-	
+
 	imGuiManager->End();
 #endif // _DEBUG
-
 
 }
 
@@ -177,7 +187,7 @@ void Framework::SpriteCommonDraw()
 
 void Framework::ParticleCommonDraw()
 {
-	particleCommon->DrawSettingsCommon();
 	//パーティクルの描画
+	particleCommon->DrawSettingsCommon();
 	sceneManager->ParticleDraw();
 }
