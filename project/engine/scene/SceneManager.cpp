@@ -6,78 +6,78 @@
 #include"ClearScene.h"
 void SceneManager::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon)
 {
-	//Še‹¤’Ê•”•ª‚Ìƒ|ƒCƒ“ƒ^‚ğó‚¯æ‚é
+	//å„å…±é€šéƒ¨åˆ†ã®ãƒã‚¤ãƒ³ã‚¿ã‚’å—ã‘å–ã‚‹
 	this->object3dCommon = object3dCommon;
 	this->spriteCommon = spriteCommon;
 	this->winApp = winApp;
 	this->dxCommon = dxCommon;
 	this->particleCommon = particleCommon;
 
-	//‰ŠúƒV[ƒ“‚ğİ’è
+	//åˆæœŸã‚·ãƒ¼ãƒ³ã‚’è¨­å®š
 	currentScene = std::make_unique<DebugScene>();
 	currentScene->Initialize(this->object3dCommon,this->spriteCommon,this->particleCommon,this->winApp,this->dxCommon);
 
-	//ƒV[ƒ“”Ô†‚ğİ’è
+	//ã‚·ãƒ¼ãƒ³ç•ªå·ã‚’è¨­å®š
 	currentSceneNo = 0;
-	//‘O‚ÌƒV[ƒ“”Ô†‚ğİ’è
+	//å‰ã®ã‚·ãƒ¼ãƒ³ç•ªå·ã‚’è¨­å®š
 	prevSceneNo = -1;
 }
 
 void SceneManager::Update()
 {
-	//Œ»İ‚ÌƒV[ƒ“‚ªnullptr‚Å‚È‚¢ê‡
+	//ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³ãŒnullptrã§ãªã„å ´åˆ
 	if (currentScene == nullptr) {
 		return;
 	}
-	//‘O‚ÌƒV[ƒ“”Ô†‚ğİ’è
+	//å‰ã®ã‚·ãƒ¼ãƒ³ç•ªå·ã‚’è¨­å®š
 	prevSceneNo = currentSceneNo;
-	//Œ»İ‚ÌƒV[ƒ“”Ô†‚ğæ“¾
+	//ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³ç•ªå·ã‚’å–å¾—
 	currentSceneNo = currentScene->GetSceneNo();
 
-	//‘O‚ÌƒV[ƒ“”Ô†‚ÆŒ»İ‚ÌƒV[ƒ“”Ô†‚ªˆÙ‚È‚éê‡
+	//å‰ã®ã‚·ãƒ¼ãƒ³ç•ªå·ã¨ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³ç•ªå·ãŒç•°ãªã‚‹å ´åˆ
 	if (prevSceneNo != currentSceneNo) {
-		//Œ»İ‚ÌƒV[ƒ“‚ªnullptr‚Å‚È‚¢ê‡
+		//ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³ãŒnullptrã§ãªã„å ´åˆ
 		if (currentScene != nullptr) {
-			//I—¹ˆ—
+			//çµ‚äº†å‡¦ç†
 			currentScene->Finalize();
 		}
 
-		//ƒV[ƒ“”Ô†‚É‚æ‚Á‚ÄƒV[ƒ“‚ğİ’è
+		//ã‚·ãƒ¼ãƒ³ç•ªå·ã«ã‚ˆã£ã¦ã‚·ãƒ¼ãƒ³ã‚’è¨­å®š
 		if (currentSceneNo == DEBUG) {
-			//ƒfƒoƒbƒOƒV[ƒ“‚ğİ’è
+			//ãƒ‡ãƒãƒƒã‚°ã‚·ãƒ¼ãƒ³ã‚’è¨­å®š
 			currentScene = std::make_unique<DebugScene>();
 			currentScene->Initialize(object3dCommon, spriteCommon,particleCommon, winApp, dxCommon);
 		}
 		else if (currentSceneNo == TITLE) {
-			//ƒ^ƒCƒgƒ‹ƒV[ƒ“‚ğİ’è
+			//ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³ã‚’è¨­å®š
 			currentScene = std::make_unique<TitleScene>();
 			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
 		}
 		else if (currentSceneNo == STAGE) {
-			//ƒXƒe[ƒWƒV[ƒ“‚ğİ’è
+			//ã‚¹ãƒ†ãƒ¼ã‚¸ã‚·ãƒ¼ãƒ³ã‚’è¨­å®š
 			currentScene = std::make_unique<StageScene>();
 			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
 		}
 		else if (currentSceneNo == CLEAR) {
-			//ƒNƒŠƒAƒV[ƒ“‚ğİ’è
+			//ã‚¯ãƒªã‚¢ã‚·ãƒ¼ãƒ³ã‚’è¨­å®š
 			currentScene = std::make_unique<ClearScene>();
 			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
 		}
-		//‰Šú‰»
+		//åˆæœŸåŒ–
 		currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
 	}
-	//Œ»İ‚ÌƒV[ƒ“‚ªnullptr‚Å‚È‚¢ê‡
+	//ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³ãŒnullptrã§ãªã„å ´åˆ
 	if (currentScene) {
-		//XVˆ—
+		//æ›´æ–°å‡¦ç†
 		currentScene->Update();
 	}
 }
 
 void SceneManager::Finalize()
 {
-	//Œ»İ‚ÌƒV[ƒ“‚ªnullptr‚Å‚È‚¢ê‡
+	//ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³ãŒnullptrã§ãªã„å ´åˆ
 	if (currentScene) {
-		//I—¹ˆ—
+		//çµ‚äº†å‡¦ç†
 		currentScene->Finalize();
 	}
 
@@ -85,31 +85,31 @@ void SceneManager::Finalize()
 
 void SceneManager::Object3DDraw()
 {
-	//Œ»İ‚ÌƒV[ƒ“‚ªnullptr‚Å‚È‚¢ê‡
+	//ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³ãŒnullptrã§ãªã„å ´åˆ
 	if (currentScene) {
-		//3DƒIƒuƒWƒFƒNƒg•`‰æ
+		//3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæç”»
 		currentScene->Object3DDraw();
 	}
 }
 
 void SceneManager::SpriteDraw()
 {
-	//Œ»İ‚ÌƒV[ƒ“‚ªnullptr‚Å‚È‚¢ê‡
+	//ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³ãŒnullptrã§ãªã„å ´åˆ
 	if (currentScene) {
-		//ƒXƒvƒ‰ƒCƒg•`‰æ
+		//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»
 		currentScene->SpriteDraw();
 	}
 }
 
 void SceneManager::ImGuiDraw()
 {
-	//Œ»İ‚ÌƒV[ƒ“‚ªnullptr‚Å‚È‚¢ê‡
+	//ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³ãŒnullptrã§ãªã„å ´åˆ
 	if (currentScene) {
-		//ImGui•`‰æ
+		//ImGuiæç”»
 		currentScene->ImGuiDraw();
 	}
 
-	//ƒV[ƒ“‘I‘ğƒEƒBƒ“ƒhƒE
+	//ã‚·ãƒ¼ãƒ³é¸æŠã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
 	ImGui::Begin("Scene");
 	if (ImGui::Button("Debug")) {
 		currentScene->SetSceneNo(DEBUG);
@@ -129,9 +129,9 @@ void SceneManager::ImGuiDraw()
 
 void SceneManager::ParticleDraw()
 {
-	//Œ»İ‚ÌƒV[ƒ“‚ªnullptr‚Å‚È‚¢ê‡
+	//ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³ãŒnullptrã§ãªã„å ´åˆ
 	if (currentScene) {
-		//ƒp[ƒeƒBƒNƒ‹•`‰æ
+		//ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«æç”»
 		currentScene->ParticleDraw();
 	}
 }
