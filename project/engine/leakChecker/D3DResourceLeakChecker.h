@@ -5,7 +5,7 @@ public:
 	///<summary>
 	///デストラクタ
 	///</summary>
-	///
+	//リソースリークチェック
 	~D3DResourceLeakChecker();
 };
 
