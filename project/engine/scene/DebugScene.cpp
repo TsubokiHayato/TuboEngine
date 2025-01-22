@@ -81,6 +81,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 		sprite->SetGetIsAdjustTextureSize(isAdjustTextureSize);
 
 		sprites.push_back(sprite);
+
 	}
 #pragma endregion スプライトの初期化
 
@@ -90,7 +91,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 #pragma region 3Dモデルの初期化
 	//オブジェクト3D
 
-	object3d = new Object3d();
+	object3d = std::make_unique<Object3d>();
 	object3d->Initialize(this->object3dCommon);
 	object3d->SetModel("plane.obj");
 
@@ -100,7 +101,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 	//オブジェクト3D
 
-	object3d2 = new Object3d();
+	object3d2 = std::make_unique<Object3d>();
 	object3d2->Initialize(this->object3dCommon);
 
 	object3d2->SetModel(modelFileNamePath2);
@@ -110,14 +111,14 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 #pragma region cameraの初期化
 	//カメラ
 
-	camera = new Camera();
+	camera = std::make_unique<Camera>();
 
 	camera->SetTranslate(cameraPosition);
 	camera->setRotation(cameraRotation);
 	camera->setScale(cameraScale);
-	object3dCommon->SetDefaultCamera(camera);
-	object3d->SetCamera(camera);
-	object3d2->SetCamera(camera);
+	object3dCommon->SetDefaultCamera(camera.get());
+	object3d->SetCamera(camera.get());
+	object3d2->SetCamera(camera.get());
 
 #pragma endregion cameraの初期化
 }
@@ -183,47 +184,17 @@ void DebugScene::Update()
 void DebugScene::Finalize()
 {
 
-
-
-#pragma region AllRelease
-
-
-
-	//リソースリークチェック
-
-
-
-	//カメラの削除
-	delete camera;
-
-
-
-
 	for (Sprite* sprite : sprites) {
 		if (sprite) {
 			delete sprite; // メモリを解放
 		}
 	}
-
-
-	delete object3d;
-
-	delete object3d2;
 	sprites.clear(); // ポインタをクリア
-
-
-	
-
-	
-#pragma endregion AllRelease
-
-
 
 }
 
 void DebugScene::Object3DDraw()
 {
-
 	object3d->Draw();
 	object3d2->Draw();
 }
@@ -246,7 +217,7 @@ void DebugScene::ImGuiDraw()
 
 #ifdef _DEBUG
 
-	
+
 
 	ImGui::Begin("camera");
 	ImGui::DragFloat3("Position", &cameraPosition.x);
@@ -265,10 +236,11 @@ void DebugScene::ImGuiDraw()
 			ImGui::SliderFloat2("Position", &spritePosition.x, 0.0f, 1920.0f, "%.1f");
 			sprite->SetPosition(spritePosition);
 
-			/*	ImGui::Checkbox("isFlipX", &isFlipX_);
-				ImGui::Checkbox("isFlipY", &isFlipY_);
-				ImGui::Checkbox("isAdjustTextureSize", &isAdjustTextureSize);
-				ImGui::DragFloat2("textureLeftTop", &textureLeftTop.x);*/
+			ImGui::Checkbox("isFlipX", &isFlipX_);
+			ImGui::Checkbox("isFlipY", &isFlipY_);
+			ImGui::Checkbox("isAdjustTextureSize", &isAdjustTextureSize);
+			ImGui::DragFloat2("textureLeftTop", &textureLeftTop.x);
+
 			ImGui::End();
 		}
 	}
@@ -326,11 +298,12 @@ void DebugScene::ImGuiDraw()
 
 	ImGui::End();
 
-	
+
 #endif // DEBUG
 
 }
 
 void DebugScene::ParticleDraw()
 {
+
 }

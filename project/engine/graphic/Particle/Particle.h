@@ -12,95 +12,86 @@
 #include"ModelManager.h"
 #include <random>
 
-
-//Particle情報
+// パーティクル情報
 struct ParticleInfo {
-	//位置、拡大率、回転
-	Transform transform;
-	//速度
-	Vector3 velocity;
-	//カラー
-	Vector4 color;
-	//寿命
-	float lifeTime;
-	//経過時間
-	float currentTime;
+	Transform transform; // 位置、拡大率、回転
+	Vector3 velocity; // 速度
+	Vector4 color; // カラー
+	float lifeTime; // 寿命
+	float currentTime; // 経過時間
 };
 
 struct ParticleForGPU {
-	Matrix4x4 WVP;
-	Matrix4x4 World;
-	Vector4 color;
+	Matrix4x4 WVP; // ワールド・ビュー・プロジェクション行列
+	Matrix4x4 World; // ワールド行列
+	Vector4 color; // カラー
 };
 
-// パーティクルグループ構造体の定義
+// パーティクルグループ構造体
 struct ParticleGroup {
-	// マテリアルデータ
-	std::string materialFilePath;
-	int srvIndex = 0;
-	// パーティクルのリスト (std::list<ParticleStr>型)
-	std::list<ParticleInfo> particleList = {};
-	// インスタンシングデータ用SRVインデックス
-	int instancingSrvIndex = 0;
-	// インスタンシングリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource = nullptr;
-	// インスタンス数
-	UINT instanceCount = 0;
-	// インスタンシングデータを書き込むためのポインタ
-	ParticleForGPU* instancingDataPtr = nullptr;
+	std::string materialFilePath; // マテリアルデータのファイルパス
+	int srvIndex = 0; // シェーダーリソースビューのインデックス
+	std::list<ParticleInfo> particleList = {}; // パーティクルのリスト
+	int instancingSrvIndex = 0; // インスタンシングデータ用SRVインデックス
+	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource = nullptr; // インスタンシングリソース
+	UINT instanceCount = 0; // インスタンス数
+	ParticleForGPU* instancingDataPtr = nullptr; // インスタンシングデータのポインタ
 
-	Vector2 textureLeftTop = { 0.0f, 0.0f }; // テクスチャ左上座標
-	Vector2 textureSize = { 0.0f, 0.0f }; // テクスチャサイズを追加
+	Vector2 textureLeftTop = { 0.0f, 0.0f }; // テクスチャの左上座標
+	Vector2 textureSize = { 0.0f, 0.0f }; // テクスチャのサイズ
 };
 
-//前方宣言
+// 前方宣言
 class ParticleCommon;
 class ModelCommon;
 class Model;
 class Camera;
 
-
 class Particle
 {
 public:
-
-
-	//平行光源
+	// 平行光源
 	struct DirectionalLight {
-		//色
-		Vector4 color;
-		//方向
-		Vector3 direction;
-		//強度
-		float intensity;
+		Vector4 color; // 色
+		Vector3 direction; // 方向
+		float intensity; // 強度
 	};
-
-
-
 
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	/// <param name="particleCommon"></param>
+	/// <param name="particleCommon">パーティクル共通部分</param>
 	void Initialize(ParticleCommon* particleCommon);
+
 	/// <summary>
 	/// 更新処理
 	/// </summary>
 	void Update();
+
 	/// <summary>
 	/// 描画処理
 	/// </summary>
 	void Draw();
 
+	/// <summary>
+	/// パーティクルの生成
+	/// </summary>
+	/// <param name="name">パーティクル名</param>
+	/// <param name="position">生成位置</param>
+	/// <param name="count">生成数</param>
 	void Emit(const std::string name, const Vector3& position, uint32_t count);
 
+	/// <summary>
+	/// パーティクルグループの作成
+	/// </summary>
+	/// <param name="name">グループ名</param>
+	/// <param name="textureFilePath">テクスチャファイルパス</param>
 	void CreateParticleGroup(const std::string& name, const std::string& textureFilePath);
 
 private:
-
 	/// <summary>
-	/// 頂点データ作成
+	/// 頂点データの作成
 	/// </summary>
 	void CreateVertexData();
 
@@ -109,125 +100,98 @@ private:
 	/// </summary>
 	void CreateVertexBufferView();
 
-
+	/// <summary>
+	/// マテリアルデータの作成
+	/// </summary>
 	void CreateMaterialData();
 
 	/// <summary>
-	/// パーティクルの作成
+	/// 新しいパーティクルの作成
 	/// </summary>
-	/// <param name="randomEngine">ランダム</param>
-	/// <param name="position">座標</param>
-	/// <returns></returns>
+	/// <param name="randomEngine">ランダムエンジン</param>
+	/// <param name="position">生成位置</param>
+	/// <returns>新しいパーティクル情報</returns>
 	ParticleInfo CreateNewParticle(std::mt19937& randomEngine, const Vector3& position);
 
-
-
 public:
-	//Setter
+	// Setter
 	void SetScale(const Vector3& scale) { transform.scale = scale; }
 	Vector3 GetScale() { return transform.scale; }
 	void SetRotation(const Vector3& rotation) { transform.rotate = rotation; }
 	Vector3 GetRotation() { return transform.rotate; }
 	void SetPosition(const Vector3& position) { transform.translate = position; }
 	Vector3 GetPosition() { return transform.translate; }
-	//モデルのセット
+
+	/// <summary>
+	/// モデルのセット
+	/// </summary>
+	/// <param name="model">モデルデータ</param>
 	void SetModel(Model* model) {
 		assert(model);
 		this->model_ = model;
 	}
 
-	void SetModel(const std::string& filePath)
-	{
+	/// <summary>
+	/// モデルのセット
+	/// </summary>
+	/// <param name="filePath">モデルファイルパス</param>
+	void SetModel(const std::string& filePath) {
 		model_ = ModelManager::GetInstance()->FindModel(filePath);
 	}
 
 	/// <summary>
 	/// カメラのセット
 	/// </summary>
-	/// <param name="camera"></param>
+	/// <param name="camera">カメラデータ</param>
 	void SetCamera(Camera* camera) {
 		assert(camera);
 		this->camera_ = camera;
 	}
+
 private:
-	//パーティクル共通部分
-	ParticleCommon* particleCommon = nullptr;
-	//DirectX共通部分
-	DirectXCommon* dxCommon_ = nullptr;
-	//ウィンドウズアプリケーション
-	WinApp* winApp_ = nullptr;
+	ParticleCommon* particleCommon = nullptr; // パーティクル共通部分
+	DirectXCommon* dxCommon_ = nullptr; // DirectX共通部分
+	WinApp* winApp_ = nullptr; // ウィンドウズアプリケーション
 
-	//モデル共通部分
-	ModelCommon* modelCommon_ = nullptr;
-	//モデルデータ
-	Model* model_ = nullptr;
+	ModelCommon* modelCommon_ = nullptr; // モデル共通部分
+	Model* model_ = nullptr; // モデルデータ
 
+	DirectionalLight* directionalLightData = nullptr; // 平行光源データ
+	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList; // コマンドリスト
 
-	//バッファリソース内のデータを指すポインタ
-	DirectionalLight* directionalLightData = nullptr;
-	//コマンドリスト
-	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
+	Transform transform; // 3Dオブジェクトの座標
+	Transform cameraTransform; // カメラ座標
+	Camera* camera_ = nullptr; // カメラ
 
-	//3Dオブジェクトの座標
-	Transform transform;
-	//カメラ座標
-	Transform cameraTransform;
-	//カメラ
-	Camera* camera_;
+	std::unordered_map<std::string, ParticleGroup> particleGroups; // パーティクルグループ
 
+	ModelData modelData_; // モデルデータ
 
-	// パーティクルグループ
-	std::unordered_map<std::string, ParticleGroup> particleGroups;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer_; // 頂点バッファリソース
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_; // 頂点バッファビュー
+	VertexData* vertexData_ = nullptr; // 頂点データ
 
-	//---------------------------------------
-	// モデルデータ
-	ModelData modelData_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialBuffer_; // マテリアルバッファリソース
+	Material* materialData_ = nullptr; // マテリアルデータ
 
-	//---------------------------------------
-	// 頂点データ
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer_;
-	// バッファリソースの使い道を指すポインタ
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
-	// バッファリソース内のデータを指すポインタ
-	VertexData* vertexData_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> instancingBuffer_; // インスタンシングバッファ
 
-	//---------------------------------------
-	// マテリアルデータ
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialBuffer_;
-	// バッファリソース内のデータを指すポインタ
-	Material* materialData_ = nullptr;
+	std::random_device seedGenerator_; // 乱数生成器
+	std::mt19937 randomEngine_; // 乱数エンジン
 
-	//---------------------------------------
-	// インスタンシングバッファ
-	Microsoft::WRL::ComPtr<ID3D12Resource> instancingBuffer_;
+	bool isBillBoard = true; // カメラ目線を使用するかどうか
+	static const uint32_t kNumMaxInstance = 128; // 最大インスタンス数
+	const float kDeltaTime = 1.0f / 60.0f; // デルタタイム
 
-	//---------------------------------------
-	// 乱数生成器の初期化
-	std::random_device seedGenerator_;
-	std::mt19937 randomEngine_;
-
-	//---------------------------------------
-	// その他
-	// カメラ目線を使用するかどうか
-	bool isUsedBillboard = true;
-	//最大インスタンス数
-	static const uint32_t kNumMaxInstance = 128;
-	//
-	const float kDeltaTime = 1.0f / 60.0f;
-	// 乱数範囲の調整用
-	struct RangeForRandom {
-		float min;
-		float max;
+	struct RandomRange {
+		float min; // 最小値
+		float max; // 最大値
 	};
 
-	// パーティクルの設定
-	RangeForRandom translateRange_ = { 0.0f, 0.0f };
-	RangeForRandom colorRange_ = { 1.0f, 1.0f };
-	RangeForRandom lifetimeRange_ = { 1.0f, 3.0f };
-	RangeForRandom velocityRange_ = { -1.1f, 1.1f };
+	RandomRange translateRange_ = { 0.0f, 0.0f }; // 位置の乱数範囲
+	RandomRange colorRange_ = { 1.0f, 1.0f }; // カラーの乱数範囲
+	RandomRange lifetimeRange_ = { 1.0f, 3.0f }; // 寿命の乱数範囲
+	RandomRange velocityRange_ = { -1.1f, 1.1f }; // 速度の乱数範囲
 
-
-	//パーティクルのテクスチャサイズ
-	Vector2 customTextureSize = { 100.0f, 100.0f };
+	Vector2 customTextureSize = { 100.0f, 100.0f }; // パーティクルのテクスチャサイズ
 };
-
