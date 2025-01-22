@@ -104,8 +104,7 @@ TextureManager* TextureManager::GetInstance()
 void TextureManager::Finalize()
 {
 	
-	textureDatas.clear();
-
+	
 	textureDatas.clear();
 
 	delete instance;
