@@ -56,16 +56,16 @@ protected:
 	bool endRequest = false;
 
 	//基盤システム
-	WinApp* winApp = nullptr;
+	std::unique_ptr<WinApp> winApp = nullptr;
 	//DirectX共通部分
-	DirectXCommon* dxCommon = nullptr;
+	std::unique_ptr <DirectXCommon> dxCommon = nullptr;
 	//スプライト共通部分
-	SpriteCommon* spriteCommon = nullptr;
+	std::unique_ptr <SpriteCommon> spriteCommon = nullptr;
 	//オブジェクト3Dの共通部分
-	Object3dCommon* object3dCommon = nullptr;
+	std::unique_ptr <Object3dCommon> object3dCommon = nullptr;
 	//モデル共通部分
-	ModelCommon* modelCommon = nullptr;
-	SrvManager* srvManager = nullptr;
+	std::unique_ptr <ModelCommon> modelCommon = nullptr;
+	std::unique_ptr <SrvManager> srvManager = nullptr;
 #ifdef _DEBUG
 std::unique_ptr<ImGuiManager> imGuiManager = nullptr;
 #endif // _DEBUG
@@ -74,6 +74,6 @@ std::unique_ptr<ImGuiManager> imGuiManager = nullptr;
 	std::unique_ptr<SceneManager> sceneManager = nullptr;
 
 	//パーティクル共通部分
-	ParticleCommon* particleCommon = nullptr;
+	std::unique_ptr <ParticleCommon> particleCommon = nullptr;
 };
 

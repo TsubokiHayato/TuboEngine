@@ -103,9 +103,7 @@ TextureManager* TextureManager::GetInstance()
 
 void TextureManager::Finalize()
 {
-	delete srvManager_;
-	srvManager_ = nullptr;
-
+	
 	textureDatas.clear();
 
 	delete instance;
