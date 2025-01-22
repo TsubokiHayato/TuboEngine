@@ -17,7 +17,10 @@ void Framework::Initialize()
 	dxCommon = std::make_unique<DirectXCommon>();
 	dxCommon->Initialize(winApp.get());
 
-
+	// リソースの有効性を確認
+	if (!dxCommon->GetDevice() || !dxCommon->GetCommandList()) {
+		throw std::runtime_error("DirectXリソースの初期化に失敗しました。");
+	}
 
 #ifdef _DEBUG
 
@@ -84,7 +87,7 @@ void Framework::Update()
 
 void Framework::Finalize()
 {
-
+	dxCommon.reset();
 	//ImGuiManagerの終了
 #ifdef _DEBUG
 	imGuiManager->Finalize();
@@ -101,6 +104,7 @@ void Framework::Finalize()
 	CloseHandle(dxCommon->GetFenceEvent());
 	//WindowsAppの削除
 	winApp->Finalize();
+	winApp.reset();
 
 }
 
