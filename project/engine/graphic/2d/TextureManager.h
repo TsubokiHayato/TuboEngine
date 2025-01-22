@@ -29,14 +29,13 @@ private:
 
 
 	};
-	
 
-	//SRVマネージャー
-	std::unique_ptr<SrvManager> srvManager_;
+
+
 
 	//テクスチャデータ
 	std::unordered_map<std::string, TextureData> textureDatas;
-	
+
 public:
 	//シングルトンインスタンスの取得
 	static TextureManager* GetInstance();
@@ -45,17 +44,11 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(DirectXCommon* dxCommon,SrvManager* srvManager);
+	void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager);
 
 	void LoadTexture(const std::string& filePath);
 
-	DirectXCommon* dxCommon_;
 
-	//SRVインデックスの開始番号
-	static uint32_t kSRVIndexTop;
-
-	
-	
 	/// <summary>
 	/// メタデータを取得
 	/// </summary>
@@ -71,5 +64,15 @@ public:
 	uint32_t GetSrvIndex(const std::string& filePath);
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(const std::string& filePath);
+
+	//SRVインデックスの開始番号
+	static uint32_t kSRVIndexTop;
+
+
+private:
+	DirectXCommon* dxCommon_;
+	//SRVマネージャー
+	SrvManager* srvManager_;
+
 };
 

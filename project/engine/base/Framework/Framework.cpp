@@ -87,7 +87,7 @@ void Framework::Update()
 
 void Framework::Finalize()
 {
-	dxCommon.reset();
+
 	//ImGuiManagerの終了
 #ifdef _DEBUG
 	imGuiManager->Finalize();
@@ -102,6 +102,9 @@ void Framework::Finalize()
 	ModelManager::GetInstance()->Finalize();
 	//DirectX共通部分の削除
 	CloseHandle(dxCommon->GetFenceEvent());
+
+	//DirectX共通部分の終了
+	dxCommon.reset();
 	//WindowsAppの削除
 	winApp->Finalize();
 	winApp.reset();
