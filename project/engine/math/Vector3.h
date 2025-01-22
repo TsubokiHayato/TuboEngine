@@ -1,4 +1,10 @@
 #pragma once
+#include <algorithm>
+#include <cmath>
+#undef max
+#undef min
+
+
 struct Vector3
 {
 	float x;
