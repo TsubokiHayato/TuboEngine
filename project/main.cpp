@@ -1,12 +1,15 @@
 #include<Framework.h>
-#include<MyGame.h>
+#include"Order.h"
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
+	//フレームワークのインスタンスを生成
+	Framework* framework = new Order();
 
-	Framework* framework = new MyGame();
+	//フレームワークを実行
 	framework->Run();
 
+	//フレームワークのインスタンスを破棄
 	delete framework;
 	
 	return 0;

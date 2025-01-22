@@ -25,7 +25,7 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	//NULL検出
 	assert(winApp);
 	//メンバ変数に記録
-	this->winApp = winApp;
+	this->winApp = std::make_unique<WinApp>(*winApp);
 
 	//FPS固定初期化
 	InitializeFixFPS();

@@ -33,7 +33,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="object3dCommon"></param>
-	void Initialize(Object3dCommon* object3dCommon, WinApp* winApp, DirectXCommon* dxCommon);
+	void Initialize(Object3dCommon* object3dCommon);
 
 	/// <summary>
 	/// 更新処理
@@ -45,7 +45,7 @@ public:
 	/// </summary>
 	void Draw();
 
-
+public:
 
 	//Setter
 	void SetScale(const Vector3& scale) { transform.scale = scale; }
@@ -73,6 +73,8 @@ public:
 
 private:
 
+	//-------------------------------------------------------------------
+	//		メンバ変数
 
 	//共通部分
 	Object3dCommon* object3dCommon = nullptr;
@@ -85,6 +87,10 @@ private:
 	ModelCommon* modelCommon_ = nullptr;
 	//モデルデータ
 	Model* model_ = nullptr;
+	//カメラ
+	Camera* camera;
+
+
 
 	//座標のバッファリソース
 	Microsoft::WRL::ComPtr <ID3D12Resource> transformMatrixResource;
@@ -103,7 +109,7 @@ private:
 	//カメラ座標
 	Transform cameraTransform;
 
-	Camera* camera;
+
 
 };
 
