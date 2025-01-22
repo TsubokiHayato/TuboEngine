@@ -96,22 +96,22 @@
     <ClCompile Include="engine\graphic\3d\ModelManager.cpp">
       <Filter>ソース ファイル\graphic\3d</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\DirectXCommon.cpp">
+    <ClCompile Include="engine\base\Common\DirectXCommon.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\Logger.cpp">
+    <ClCompile Include="engine\base\Utilities\Logger.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\TextureManager.cpp">
+    <ClCompile Include="engine\graphic\2d\TextureManager.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\StringUtility.cpp">
+    <ClCompile Include="engine\base\Utilities\StringUtility.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\WinApp.cpp">
+    <ClCompile Include="engine\base\Common\WinApp.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
     <ClCompile Include="engine\input\Input.cpp">
@@ -153,7 +153,7 @@
     <ClCompile Include="engine\camera\Camera.cpp">
       <Filter>ソース ファイル\camera</Filter>
     </ClCompile>
-    <ClCompile Include="engine\graphic\SrvManager.cpp">
+    <ClCompile Include="engine\base\Common\SrvManager.cpp">
       <Filter>ソース ファイル\graphic</Filter>
     </ClCompile>
     <ClCompile Include="engine\base\Framework\Framework.cpp">
@@ -233,19 +233,19 @@
     <ClInclude Include="engine\graphic\Transform.h">
       <Filter>ヘッダー ファイル\math</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\WinApp.h">
+    <ClInclude Include="engine\base\Common\WinApp.h">
       <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\DirectXCommon.h">
+    <ClInclude Include="engine\base\Common\DirectXCommon.h">
       <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\StringUtility.h">
+    <ClInclude Include="engine\base\Utilities\StringUtility.h">
       <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\Logger.h">
+    <ClInclude Include="engine\base\Utilities\Logger.h">
       <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\TextureManager.h">
+    <ClInclude Include="engine\graphic\2d\TextureManager.h">
       <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
     <ClInclude Include="engine\input\Input.h">
@@ -311,7 +311,7 @@
     <ClInclude Include="engine\camera\Camera.h">
       <Filter>ヘッダー ファイル\camera</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\SrvManager.h">
+    <ClInclude Include="engine\base\Common\SrvManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\Framework\Framework.h">
