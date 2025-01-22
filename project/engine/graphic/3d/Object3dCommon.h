@@ -29,6 +29,7 @@ public:
 
 private:
 	
+	
 	WinApp* winApp_ = nullptr;//ウィンドウズアプリケーション
 	DirectXCommon* dxCommon_ = nullptr;//DirectX共通部分
 	PSO* pso = nullptr;//PSO
