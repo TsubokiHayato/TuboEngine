@@ -4,8 +4,10 @@
 #pragma comment(lib,"dxguid.lib")
 Input* Input::instance = nullptr;
 
+
 Input* Input::GetInstance()
 {
+	// インスタンスがない場合は作成する
     if (instance == nullptr) {
         instance = new Input;
     }
@@ -14,6 +16,7 @@ Input* Input::GetInstance()
 
 void Input::Finalize()
 {
+	// インスタンスがある場合は削除する
     delete instance;
     instance = nullptr;
 }
@@ -21,8 +24,9 @@ void Input::Finalize()
 
 void Input::Initialize(WinApp* winApp)
 {
-    HRESULT result;
 
+    HRESULT result;
+	//引数のウィンドウアプリケーションを保持
     this->winApp_ = winApp;
 
     // DirectInputのインスタンス生成
@@ -44,15 +48,19 @@ void Input::Initialize(WinApp* winApp)
 }
 void Input::Update()
 {
+	// キーボードの状態を取得
     if (key != nullptr && keyPre != nullptr) {
+		// 前のキーの状態を保存
         memcpy(keyPre, key, sizeof(key));
     }
+	// キーボードの状態を取得
     keyboard->Acquire();
     HRESULT result = keyboard->GetDeviceState(sizeof(key), key);
 
 }
 bool Input::PushKey(BYTE keyNumber)
 {
+	// キーが押されているか
     if (key[keyNumber]) {
         return true;
     }
@@ -60,5 +68,6 @@ bool Input::PushKey(BYTE keyNumber)
 }
 bool Input::TriggerKey(BYTE keyNumber)
 {
+	// キーが押された瞬間か
     return (key[keyNumber] != 0) && (keyPre[keyNumber] == 0);
 }
