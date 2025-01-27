@@ -27,6 +27,8 @@ public:
 	void SetDefaultCamera(Camera* camera) { defaultCamera = camera; }
 	Camera* GetDefaultCamera()const { return defaultCamera; }
 
+
+	
 private:
 	
 	
@@ -34,6 +36,8 @@ private:
 	DirectXCommon* dxCommon_ = nullptr;//DirectX共通部分
 	PSO* pso = nullptr;//PSO
 	Camera* defaultCamera = nullptr;//デフォルトカメラ
+
+	int blenderMode_;//ブレンダーモード
 
 };
 
