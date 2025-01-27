@@ -115,3 +115,13 @@ void Object3d::SetModel(const std::string& filePath)
 	model_ = ModelManager::GetInstance()->FindModel(filePath);
 }
 
+void Object3d::SetModelColor(const Vector4& color)
+{
+	model_->SetModelColor(color);
+}
+
+Vector4 Object3d::GetModelColor()
+{
+	return model_->GetModelColor();
+}
+
