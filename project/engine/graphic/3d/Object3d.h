@@ -9,6 +9,7 @@
 #include"TransformationMatrix.h"
 #include"Transform.h"
 #include"ModelData.h"
+#include"BlendMode.h"
 //前方宣言
 class Object3dCommon;
 class ModelCommon;
@@ -57,6 +58,9 @@ public:
 		this->model_ = model;
 	}
 
+	
+
+
 	/// <summary>
 	/// 3Dオブジェクトとモデルを紐づける関数
 	/// </summary>
@@ -66,12 +70,19 @@ public:
 
 	void SetModelColor(const Vector4& color);
 
+	void SetBlenderMode(int blendMode);
+
 	//Getter
 	Vector3 GetScale() const { return transform.scale; }
 	Vector3 GetRotation() const { return transform.rotate; }
 	Vector3 GetPosition() const { return transform.translate; }
 
 	Vector4 GetModelColor();
+
+	
+
+	
+
 
 
 private:

@@ -3,6 +3,7 @@
 #include"SceneManager.h"
 #include"ModelManager.h"
 #include"TextureManager.h"
+#include"BlendMode.h"
 void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon)
 {
 
@@ -249,6 +250,8 @@ void DebugScene::ImGuiDraw()
     ImGui::DragFloat3("Rotation", &modelRotation.x);
     ImGui::DragFloat3("Scale", &modelScale.x);
 
+
+
     Vector4 color = object3d->GetModelColor();
     ImGui::ColorEdit4("Color", &color.x);
     object3d->SetModelColor(color);
@@ -305,6 +308,7 @@ void DebugScene::ImGuiDraw()
     audio->SetPlaybackSpeed(speed);
 
     ImGui::End();
+
 
 #endif // DEBUG
 

@@ -149,37 +149,37 @@ void PSO::CreateGraphicPipeline()
 	blendDesc.RenderTarget[0].BlendEnable = TRUE;
 	switch (blendMode)
 	{
-	case PSO::kBlendModeNone:
+	case BlendMode::kBlendModeNone:
 		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
 		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
 		break;
-	case PSO::kBlendModeNormal:
+	case BlendMode::kBlendModeNormal:
 		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // provided code
 		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 		break;
-	case PSO::kBlendModeAdd:
+	case BlendMode::kBlendModeAdd:
 		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // provided code
 		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
 		break;
-	case PSO::kBlendModeSubtract:
+	case BlendMode::kBlendModeSubtract:
 		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // provided code
 		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
 		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
 		break;
-	case PSO::kBlendModeMultily:
+	case BlendMode::kBlendModeMultily:
 		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
 		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
 		break;
-	case PSO::kBlendModeScreen:
+	case BlendMode::kBlendModeScreen:
 		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;
 		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
 		break;
-	case PSO::kCountBlendMode:
+	case BlendMode::kCountBlendMode:
 		break;
 	default:
 		break;
