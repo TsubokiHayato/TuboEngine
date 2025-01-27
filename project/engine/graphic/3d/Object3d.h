@@ -64,11 +64,14 @@ public:
 	void SetModel(const std::string& filePath);
 	void SetCamera(Camera* camera) { this->camera = camera; }
 
+	void SetModelColor(const Vector4& color);
+
 	//Getter
 	Vector3 GetScale() const { return transform.scale; }
 	Vector3 GetRotation() const { return transform.rotate; }
 	Vector3 GetPosition() const { return transform.translate; }
 
+	Vector4 GetModelColor();
 
 
 private:
