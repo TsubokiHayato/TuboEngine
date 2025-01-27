@@ -210,94 +210,101 @@ void DebugScene::SpriteDraw()
 
 void DebugScene::ImGuiDraw()
 {
-	ImGui::Begin("DebugScene");
-	ImGui::Text("Hello, DebugScene!");
-	ImGui::End();
-
+    ImGui::Begin("DebugScene");
+    ImGui::Text("Hello, DebugScene!");
+    ImGui::End();
 
 #ifdef _DEBUG
 
+    ImGui::Begin("camera");
+    ImGui::DragFloat3("Position", &cameraPosition.x);
+    ImGui::DragFloat3("Rotation", &cameraRotation.x);
+    ImGui::DragFloat3("Scale", &cameraScale.x);
+    ImGui::End();
 
+    //スプライトのImGui
+    for (Sprite* sprite : sprites) {
+        if (sprite) {
+            ImGui::Begin("Sprite");
+            
 
-	ImGui::Begin("camera");
-	ImGui::DragFloat3("Position", &cameraPosition.x);
-	ImGui::DragFloat3("Rotation", &cameraRotation.x);
-	ImGui::DragFloat3("Scale", &cameraScale.x);
-	ImGui::End();
+            Vector2 spritePosition = sprite->GetPosition();
+            ImGui::SliderFloat2("Position", &spritePosition.x, 0.0f, 1920.0f, "%.1f");
+            sprite->SetPosition(spritePosition);
 
-	//スプライトのImGui
-	 //スプライトのImGui
-	for (Sprite* sprite : sprites) {
-		if (sprite) {
-			ImGui::Begin("Sprite");
-			ImGui::SetWindowSize({ 500,100 });
+            ImGui::Checkbox("isFlipX", &isFlipX_);
+            ImGui::Checkbox("isFlipY", &isFlipY_);
+            ImGui::Checkbox("isAdjustTextureSize", &isAdjustTextureSize);
+            ImGui::DragFloat2("textureLeftTop", &textureLeftTop.x);
+			
+			Vector4 color = sprite->GetColor();
+			ImGui::ColorEdit4("Color", &color.x);
+			sprite->SetColor(color);
 
-			Vector2 spritePosition = sprite->GetPosition();
-			ImGui::SliderFloat2("Position", &spritePosition.x, 0.0f, 1920.0f, "%.1f");
-			sprite->SetPosition(spritePosition);
+            ImGui::End();
+        }
+    }
+    ImGui::Begin("Object3D");
+    ImGui::DragFloat3("Position", &modelPosition.x);
+    ImGui::DragFloat3("Rotation", &modelRotation.x);
+    ImGui::DragFloat3("Scale", &modelScale.x);
 
-			ImGui::Checkbox("isFlipX", &isFlipX_);
-			ImGui::Checkbox("isFlipY", &isFlipY_);
-			ImGui::Checkbox("isAdjustTextureSize", &isAdjustTextureSize);
-			ImGui::DragFloat2("textureLeftTop", &textureLeftTop.x);
+    Vector4 color = object3d->GetModelColor();
+    ImGui::ColorEdit4("Color", &color.x);
+    object3d->SetModelColor(color);
 
-			ImGui::End();
-		}
-	}
-	ImGui::Begin("Object3D");
-	ImGui::DragFloat3("Position", &modelPosition.x);
-	ImGui::DragFloat3("Rotation", &modelRotation.x);
-	ImGui::DragFloat3("Scale", &modelScale.x);
-	ImGui::End();
+    ImGui::End();
 
-	ImGui::Begin("Object3D2");
-	ImGui::DragFloat3("Position", &modelPosition2.x);
-	ImGui::DragFloat3("Rotation", &modelRotation2.x);
-	ImGui::DragFloat3("Scale", &modelScale2.x);
-	ImGui::End();
+    ImGui::Begin("Object3D2");
+    ImGui::DragFloat3("Position", &modelPosition2.x);
+    ImGui::DragFloat3("Rotation", &modelRotation2.x);
+    ImGui::DragFloat3("Scale", &modelScale2.x);
 
+	Vector4 color2 = object3d2->GetModelColor();
+	ImGui::ColorEdit4("Color", &color2.x);
+	object3d2->SetModelColor(color2);
 
-	static float scratchPosition = 0.0f;
-	static bool isScratching = false;
-	static float lastScratchPosition = 0.0f;
-	//再生時間
-	float duration = audio->GetSoundDuration();
+    ImGui::End();
 
+    static float scratchPosition = 0.0f;
+    static bool isScratching = false;
+    static float lastScratchPosition = 0.0f;
+    //再生時間
+    float duration = audio->GetSoundDuration();
 
-	ImGui::Begin("Audio Control");
+    ImGui::Begin("Audio Control");
 
-	if (ImGui::Button("Play")) {
-		audio->Play(false);
-	}
-	if (ImGui::Button("Stop")) {
-		audio->Stop();
-	}
-	if (ImGui::Button("Pause")) {
-		audio->Pause();
-	}
-	if (ImGui::Button("Resume")) {
-		audio->Resume();
-	}
-	//volume
-	static float volume = 0.1f;
-	ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f);
-	audio->SetVolume(volume);
+    if (ImGui::Button("Play")) {
+        audio->Play(false);
+    }
+    if (ImGui::Button("Stop")) {
+        audio->Stop();
+    }
+    if (ImGui::Button("Pause")) {
+        audio->Pause();
+    }
+    if (ImGui::Button("Resume")) {
+        audio->Resume();
+    }
+    //volume
+    static float volume = 0.1f;
+    ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f);
+    audio->SetVolume(volume);
 
-	// 再生バー
-	static float playbackPosition = 0.0f;
-	//再生位置の取得
-	playbackPosition = audio->GetPlaybackPosition();
-	//再生位置の視認
-	ImGui::SliderFloat("Playback Position", &playbackPosition, 0.0f, duration);
-	//audio->SetPlaybackPosition(playbackPosition);
+    // 再生バー
+    static float playbackPosition = 0.0f;
+    //再生位置の取得
+    playbackPosition = audio->GetPlaybackPosition();
+    //再生位置の視認
+    ImGui::SliderFloat("Playback Position", &playbackPosition, 0.0f, duration);
+    //audio->SetPlaybackPosition(playbackPosition);
 
-	//speed
-	static float speed = 1.0f;
-	ImGui::SliderFloat("Speed", &speed, 0.0f, 2.0f);
-	audio->SetPlaybackSpeed(speed);
+    //speed
+    static float speed = 1.0f;
+    ImGui::SliderFloat("Speed", &speed, 0.0f, 2.0f);
+    audio->SetPlaybackSpeed(speed);
 
-	ImGui::End();
-
+    ImGui::End();
 
 #endif // DEBUG
 

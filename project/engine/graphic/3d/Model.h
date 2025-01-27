@@ -45,6 +45,13 @@ public:
 	static ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 
 
+	void SetModelColor(const Vector4& color) {
+		materialData->color = color;
+	}
+
+	Vector4 GetModelColor() {
+		return materialData->color;
+	}
 	
 private:
 	//共通部分
