@@ -11,6 +11,8 @@ void Object3dCommon::Initialize(WinApp* winApp,DirectXCommon* dxCommon)
 	// PSOの初期化
 	pso = new PSO();
 	pso->Initialize(dxCommon_);
+
+	
 	
 }
 
