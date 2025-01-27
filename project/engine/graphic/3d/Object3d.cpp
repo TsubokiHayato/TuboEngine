@@ -120,6 +120,7 @@ void Object3d::SetModelColor(const Vector4& color)
 	model_->SetModelColor(color);
 }
 
+
 Vector4 Object3d::GetModelColor()
 {
 	return model_->GetModelColor();
