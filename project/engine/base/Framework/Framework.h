@@ -53,14 +53,17 @@ public:
 	void Run();
 
 	//BlendModeの設定
-	void SetBlendMode(int mode) { blendModeNum = mode; }
-	int GetBlendMode() { return blendModeNum; }
+	void SetBlendMode(int mode) { objectBlendModeNum = mode; }
+	int GetBlendMode() { return objectBlendModeNum; }
 
 protected:
 	bool endRequest = false;
 
 	//ブレンドモード
-	int blendModeNum = 0;
+	int objectBlendModeNum = 0;
+
+	//スプライトブレンドモード
+	int spriteBlendModeNum = 0;
 
 	//基盤システム
 	std::unique_ptr<WinApp> winApp = nullptr;
