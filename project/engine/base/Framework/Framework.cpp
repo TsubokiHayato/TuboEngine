@@ -182,7 +182,7 @@ void Framework::ImguiPostDraw()
 	ImGui::Text("4: Multiply");
 	ImGui::Text("5: Screen");
 	ImGui::SliderInt("BlendNum", &objectBlendModeNum, 0, 5);
-	
+	ImGui::SliderInt("SpriteBlendNum", &spriteBlendModeNum, 0, 5);
 	ImGui::End();
 
 	
