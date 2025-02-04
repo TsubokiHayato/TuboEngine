@@ -158,6 +158,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\SubtractBlendPSO.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
     <ClInclude Include="engine\graphic\PSO\AddBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\BlendMode.h" />
     <ClInclude Include="engine\scene\ClearScene.h" />
