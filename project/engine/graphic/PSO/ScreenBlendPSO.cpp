@@ -67,6 +67,19 @@ void ScreenBlendPSO::CreateRootSignature()
 	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderでつかう
 	rootParameters[3].Descriptor.ShaderRegister = 1;//レジスタ番号1とバインド
 
+
+	// 新しいルートパラメータを追加
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderでつかう
+	rootParameters[4].Descriptor.ShaderRegister = 2; // レジスタ番号2とバインド
+
+
+	// 新しいルートパラメータを追加
+	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
+	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderでつかう
+	rootParameters[5].Descriptor.ShaderRegister = 3; // レジスタ番号3とバインド
+
+
 	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters);//配列の長さ
 

@@ -251,10 +251,32 @@ void DebugScene::ImGuiDraw()
     ImGui::DragFloat3("Scale", &modelScale.x);
 
 
-
+	//色
     Vector4 color = object3d->GetModelColor();
     ImGui::ColorEdit4("Color", &color.x);
     object3d->SetModelColor(color);
+
+	ImGui::Text("Light");
+	//光沢度
+	float shininess = object3d->GetLightIntensity();
+	ImGui::DragFloat("Shininess", &shininess,0.1f);
+	object3d->SetLightIntensity(shininess);
+
+	//光源の色
+	Vector4 lightColor = object3d->GetLightColor();
+	ImGui::ColorEdit4("LightColor", &lightColor.x);
+	object3d->SetLightColor(lightColor);
+
+	//光源の方向
+	Vector3 lightDirection = object3d->GetLightDirection();
+	ImGui::DragFloat3("LightDirection", &lightDirection.x,0.1f);
+	object3d->SetLightDirection(lightDirection);
+
+	//光源のタイプ
+	int lightType = object3d->GetLightType();
+	ImGui::SliderInt("LightType", &lightType, 0, 2);
+	object3d->SetLightType(lightType);
+
 
     ImGui::End();
 

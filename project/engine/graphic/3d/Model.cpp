@@ -48,6 +48,7 @@ void Model::Initialize(ModelCommon* modelCommon, const std::string& directoryPat
 	materialData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	materialData->enableLighting = true;
 	materialData->uvTransform = MakeIdentity4x4();
+	materialData->shininess = 1.0f;
 
 #pragma endregion Material_Resource
 	
