@@ -35,7 +35,7 @@ private:
 
 private:
 
-//現在のシーン
+	//現在のシーン
 	std::unique_ptr<IScene> currentScene = nullptr;
 	//前のシーン
 	std::unique_ptr<IScene> prevScene = nullptr;
