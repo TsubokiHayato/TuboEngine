@@ -5,6 +5,7 @@ struct Material
     float4 color;
     int enableLighting;
     float4x4 uvTransform;
+    float shininess;
 };
 
 
@@ -16,12 +17,29 @@ struct DirectionalLight
 };
 
 
-//ÉRÉìÉXÉ^ÉìÉgÉoÉbÉtÉ@ÇÃíËã`
-//égópó· : ConstantBuffer<ç\ë¢ëÃ> ïœêîñº : register(b0);
+struct Camera
+{
+    float3 worldPosition;
+};
+
+struct LightType
+{
+    //0 : Âπ≥Ë°åÂÖâÊ∫ê
+	//1 : PhongÂèçÂ∞Ñ„É¢„Éá„É´
+	//2 : Blinn-PhongÂèçÂ∞Ñ„É¢„Éá„É´
+    int type;
+};
+
+
+//„Ç≥„É≥„Çπ„Çø„É≥„Éà„Éê„ÉÉ„Éï„Ç°„ÅÆÂÆöÁæ©
+//‰ΩøÁî®‰æã : ConstantBuffer<ÊßãÈÄ†‰Ωì> Â§âÊï∞Âêç : register(b0);
 ConstantBuffer<Material> gMaterial : register(b0);
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
+
+ConstantBuffer<Camera> gCamera : register(b2);
+ConstantBuffer<LightType> gLightType : register(b3);
 
 struct PixcelShaderOutput
 {
@@ -31,29 +49,46 @@ struct PixcelShaderOutput
 
 PixcelShaderOutput main(VertexShaderOutPut input)
 {
+   
     PixcelShaderOutput output;
-  
-    
-    //float4 textureColor = gTexture.Sample(gSampler, input.texcoord);
     float4 tranceformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float4 textureColor = gTexture.Sample(gSampler, tranceformedUV.xy);
    
-    
+  
     if (gMaterial.enableLighting != 0)
     {
-        float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
-        float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-      
-      // output.color = gMaterial.color * textureColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
-       
-       
+        if(gLightType.type == 0)
+        {
+            float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
+            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
             output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
-        output.color.a = gMaterial.color.a * textureColor.a;
+            output.color.a = gMaterial.color.a * textureColor.a;
+        }
+        else if(gLightType.type == 1)
+        {
+            float NdotL = dot(normalize(input.normal), normalize(-gDirectionalLight.direction));
+            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+            float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
+            float3 reflectLight = reflect(normalize(gDirectionalLight.direction), normalize(input.normal));
+        
+            float RtoE = dot(reflectLight, toEye);
+            float specularPow = pow(saturate(RtoE), gMaterial.shininess);
+        
+            float3 diffuse =
+        gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+        
+            float3 specular =
+        gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
+        
+            output.color.rgb = diffuse + specular;
+            output.color.a = gMaterial.color.a * textureColor.a;
+        }  
+        
+        
         
     }
     else
     {
-        //output.color = gMaterial.color * textureColor;
         output.color = gMaterial.color * textureColor;
     }
     
