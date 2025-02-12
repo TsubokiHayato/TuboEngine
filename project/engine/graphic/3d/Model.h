@@ -52,6 +52,15 @@ public:
 	Vector4 GetModelColor() {
 		return materialData->color;
 	}
+
+	//光沢度
+	float GetModelShininess() {
+		return materialData->shininess;
+	}
+	void SetModelShininess(float shininess) {
+		materialData->shininess = shininess;
+	}
+
 	
 private:
 	//共通部分
