@@ -22,7 +22,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//モデルディレクトリパス
 	const std::string modelDirectoryPath = "Resources";
 	//モデルファイルパス
-	const std::string modelFileNamePath = "plane.obj";
+	const std::string modelFileNamePath = "sphere.obj";
 	//モデルファイルパス2
 	const std::string modelFileNamePath2 = "barrier.obj";
 
@@ -94,7 +94,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 	object3d = std::make_unique<Object3d>();
 	object3d->Initialize(this->object3dCommon);
-	object3d->SetModel("plane.obj");
+	object3d->SetModel(modelFileNamePath);
 
 	////////////////////////////////////////////////////////////////////////
 
@@ -258,9 +258,9 @@ void DebugScene::ImGuiDraw()
 
 	ImGui::Text("Light");
 	//光沢度
-	float shininess = object3d->GetLightIntensity();
+	static float shininess = object3d->GetLightShininess();
 	ImGui::DragFloat("Shininess", &shininess,0.1f);
-	object3d->SetLightIntensity(shininess);
+	object3d->SetLightShininess(shininess);
 
 	//光源の色
 	Vector4 lightColor = object3d->GetLightColor();
@@ -271,6 +271,11 @@ void DebugScene::ImGuiDraw()
 	Vector3 lightDirection = object3d->GetLightDirection();
 	ImGui::DragFloat3("LightDirection", &lightDirection.x,0.1f);
 	object3d->SetLightDirection(lightDirection);
+
+	//光源の強さ
+	float lightIntensity = object3d->GetLightIntensity();
+	ImGui::DragFloat("LightIntensity", &lightIntensity, 0.1f);
+	object3d->SetLightIntensity(lightIntensity);
 
 	//光源のタイプ
 	int lightType = object3d->GetLightType();
