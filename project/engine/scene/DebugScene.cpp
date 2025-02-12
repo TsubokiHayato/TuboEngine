@@ -24,7 +24,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//モデルファイルパス
 	const std::string modelFileNamePath = "sphere.obj";
 	//モデルファイルパス2
-	const std::string modelFileNamePath2 = "barrier.obj";
+	const std::string modelFileNamePath2 = "terrain.obj";
 
 	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
 	ModelManager::GetInstance()->LoadModel(modelFileNamePath2);
@@ -134,11 +134,7 @@ void DebugScene::Update()
 	camera->setScale(cameraScale);
 	camera->Update();
 
-	modelRotation.y += 0.01f;
-
-	modelRotation2.x -= 0.01f;
-	//modelRotation2.y -= 0.01f;
-	modelRotation2.z -= 0.01f;
+	
 
 	//オブジェクト3Dの更新
 	object3d->Update();
@@ -218,9 +214,9 @@ void DebugScene::ImGuiDraw()
 #ifdef _DEBUG
 
     ImGui::Begin("camera");
-    ImGui::DragFloat3("Position", &cameraPosition.x);
-    ImGui::DragFloat3("Rotation", &cameraRotation.x);
-    ImGui::DragFloat3("Scale", &cameraScale.x);
+    ImGui::DragFloat3("Position", &cameraPosition.x,0.1f);
+    ImGui::DragFloat3("Rotation", &cameraRotation.x,0.1f);
+    ImGui::DragFloat3("Scale", &cameraScale.x,0.1f);
     ImGui::End();
 
     //スプライトのImGui
@@ -279,9 +275,11 @@ void DebugScene::ImGuiDraw()
 
 	//光源のタイプ
 	int lightType = object3d->GetLightType();
-	ImGui::SliderInt("LightType", &lightType, 0, 2);
+	ImGui::SliderInt("LightType", &lightType, 0, 3);
 	object3d->SetLightType(lightType);
 
+	ImGui::DragFloat3("SpotLightPosition", &spotLightPosition.x, 0.1f);
+	object3d->SetSpotLightPosition(spotLightPosition);
 
     ImGui::End();
 
@@ -293,6 +291,41 @@ void DebugScene::ImGuiDraw()
 	Vector4 color2 = object3d2->GetModelColor();
 	ImGui::ColorEdit4("Color", &color2.x);
 	object3d2->SetModelColor(color2);
+
+	ImGui::Text("Light");
+	//光沢度
+	static float shininess2 = object3d2->GetLightShininess();
+	ImGui::DragFloat("Shininess", &shininess2, 0.1f);
+	object3d2->SetLightShininess(shininess2);
+
+	//光源の色
+	Vector4 lightColor2 = object3d2->GetLightColor();
+	ImGui::ColorEdit4("LightColor", &lightColor2.x);
+	object3d2->SetLightColor(lightColor2);
+
+	//光源の方向
+	Vector3 lightDirection2 = object3d2->GetLightDirection();
+	ImGui::DragFloat3("LightDirection", &lightDirection2.x, 0.1f);
+	object3d2->SetLightDirection(lightDirection2);
+
+	//光源の強さ
+	float lightIntensity2 = object3d2->GetLightIntensity();
+	ImGui::DragFloat("LightIntensity", &lightIntensity2, 0.1f);
+	object3d2->SetLightIntensity(lightIntensity2);
+
+	//光源のタイプ
+	int lightType2 = object3d2->GetLightType();
+	ImGui::SliderInt("LightType", &lightType2, 0, 3);
+	object3d2->SetLightType(lightType2);
+
+	//SpotLight
+	Vector4 spotLightColor = object3d2->GetSpotLightColor();
+	ImGui::ColorEdit4("SpotLightColor", &spotLightColor.x);
+	object3d2->SetSpotLightColor(spotLightColor);
+
+	
+	ImGui::DragFloat3("SpotLightPosition", &spotLightPosition.x, 0.1f);
+	object3d2->SetSpotLightPosition(spotLightPosition);
 
     ImGui::End();
 

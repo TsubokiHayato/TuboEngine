@@ -51,6 +51,22 @@ void Object3d::Initialize(Object3dCommon* object3dCommon) {
 
 #pragma endregion
 
+#pragma region PointLight
+
+	//ポイントライト用用のリソースを作る。今回はColor1つ分のサイズを用意する
+	pointLightResource =
+		this->dxCommon_->CreateBufferResource(sizeof(PointLight));
+	//平行光源用にデータを書き込む
+	pointLightData = nullptr;
+	//書き込むためのアドレスを取得
+	pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
+	//デフォルト値
+	pointLightData->color = { 1.0f,1.0f,1.0f,1.0f };
+	pointLightData->position = { 0.0f,-1.0f,0.0f };
+	pointLightData->intensity = 70.0f;
+
+#pragma endregion
+
 
 #pragma region cameraWorldPos
 	//平行光源用用のリソースを作る。今回はColor1つ分のサイズを用意する
@@ -64,6 +80,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon) {
 	cameraForGPUData->worldPosition = {};
 #pragma endregion
 
+#pragma region LightType
 	//ライトの種類
 	lightTypeResource =
 		this->dxCommon_->CreateBufferResource(sizeof(LightType));
@@ -75,6 +92,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon) {
 	//デフォルト値
 	lightTypeData->type = 0;
 
+#pragma endregion
 
 	//transform変数を作る
 	transform = {
@@ -124,6 +142,7 @@ void Object3d::Draw() {
 	commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 	commandList->SetGraphicsRootConstantBufferView(4, cameraForGPUResource->GetGPUVirtualAddress());
 	commandList->SetGraphicsRootConstantBufferView(5, lightTypeResource->GetGPUVirtualAddress());
+	commandList->SetGraphicsRootConstantBufferView(6, pointLightResource->GetGPUVirtualAddress());
 
 	//3Dモデルが割り当てられていれば描画
 	if (model_) {
