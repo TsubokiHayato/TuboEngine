@@ -66,6 +66,7 @@ public:
 	void SetLightColor(const Vector4& color) { directionalLightData->color = color; }
 	void SetLightDirection(const Vector3& direction) { directionalLightData->direction = direction; }
 	void SetLightIntensity(float intensity) { directionalLightData->intensity = intensity; }
+	void SetLightShininess(float shininess);
 
 	void SetLightType(int type) {
 		if (type < 0 || type > 2) {
@@ -93,6 +94,7 @@ public:
 	Vector3 GetLightDirection() { return directionalLightData->direction; }
 	float GetLightIntensity() { return directionalLightData->intensity; }
 	int GetLightType() { return lightTypeData->type; }
+	float GetLightShininess();
 
 
 
