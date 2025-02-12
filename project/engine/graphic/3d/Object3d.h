@@ -27,11 +27,23 @@ struct DirectionalLight {
 	float intensity;
 };
 
+//PointLight
+struct PointLight
+{
+	//色
+	Vector4 color;
+	//位置
+	Vector3 position;
+	//輝度
+	float intensity;
+};
+
 struct LightType {
 
 	//0 : 平行光源
 	//1 : Phong反射モデル
 	//2 : Blinn-Phong反射モデル
+	//3 : PointLight
 	int type;
 
 };
@@ -67,9 +79,12 @@ public:
 	void SetLightDirection(const Vector3& direction) { directionalLightData->direction = direction; }
 	void SetLightIntensity(float intensity) { directionalLightData->intensity = intensity; }
 	void SetLightShininess(float shininess);
+	void SetSpotLightColor(const Vector4& color) { pointLightData->color = color; }
+	void SetSpotLightPosition(const Vector3& position) { pointLightData->position = position; }
+
 
 	void SetLightType(int type) {
-		if (type < 0 || type > 2) {
+		if (type < 0 || type > 3) {
 			type = 0;
 		}
 		lightTypeData->type = type;
@@ -95,6 +110,8 @@ public:
 	float GetLightIntensity() { return directionalLightData->intensity; }
 	int GetLightType() { return lightTypeData->type; }
 	float GetLightShininess();
+	Vector4 GetSpotLightColor() { return pointLightData->color; }
+	Vector3 GetSpotLightPosition() { return pointLightData->position; }
 
 
 
@@ -137,6 +154,12 @@ private:
 	Microsoft::WRL::ComPtr <ID3D12Resource> directionalLightResource;
 	//バッファリソース内のデータを指すポインタ
 	DirectionalLight* directionalLightData = nullptr;
+
+	//ポイントライトのバッファリソース
+	Microsoft::WRL::ComPtr <ID3D12Resource> pointLightResource;
+	//バッファリソース内のデータを指すポインタ
+	PointLight* pointLightData = nullptr;
+
 	//コマンドリスト
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
 
@@ -158,6 +181,7 @@ private:
 	Transform cameraTransform;
 
 
+	
 
 };
 

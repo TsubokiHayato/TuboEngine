@@ -16,6 +16,12 @@ struct DirectionalLight
     float intensity;
 };
 
+struct PointLight
+{
+    float4 color;
+    float3 position;
+    float intensity;
+};
 
 struct Camera
 {
@@ -40,6 +46,7 @@ ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 
 ConstantBuffer<Camera> gCamera : register(b2);
 ConstantBuffer<LightType> gLightType : register(b3);
+ConstantBuffer<PointLight> gPointLight : register(b4);
 
 struct PixcelShaderOutput
 {
@@ -57,6 +64,7 @@ PixcelShaderOutput main(VertexShaderOutPut input)
   
     if (gMaterial.enableLighting != 0)
     {
+        //平行光源
         if (gLightType.type == 0)
         {
             float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
@@ -64,6 +72,7 @@ PixcelShaderOutput main(VertexShaderOutPut input)
             output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
             output.color.a = gMaterial.color.a * textureColor.a;
         }
+        //PhongReflection
         else if (gLightType.type == 1)
         {
             float NdotL = dot(normalize(input.normal), normalize(-gDirectionalLight.direction));
@@ -81,8 +90,10 @@ PixcelShaderOutput main(VertexShaderOutPut input)
             output.color.rgb = diffuse + specular;
             output.color.a = gMaterial.color.a * textureColor.a;
         }
+        //BlinnPhong
         else if (gLightType.type == 2)
         {
+            
             float NdotL = dot(normalize(input.normal), normalize(-gDirectionalLight.direction));
             float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
             float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
@@ -99,7 +110,35 @@ PixcelShaderOutput main(VertexShaderOutPut input)
             output.color.a = gMaterial.color.a * textureColor.a;
       
         }
-        
+        //PointLight
+        else if (gLightType.type == 3)
+        {
+    // Directional Light
+            float NdotL = dot(normalize(input.normal), normalize(-gDirectionalLight.direction));
+            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+            float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
+            float3 reflectLight = reflect(normalize(gDirectionalLight.direction), normalize(input.normal));
+            float RtoE = dot(reflectLight, toEye);
+            float specularPow = pow(saturate(RtoE), gMaterial.shininess);
+
+            float3 diffuseDirectionalLight = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+            float3 specularDirectionalLight = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
+
+    // Point Light
+            float3 pointLightDirection = normalize(gPointLight.position - input.worldPosition);
+            float NdotLPoint = dot(normalize(input.normal), pointLightDirection);
+            float cosPoint = pow(NdotLPoint * 0.5f + 0.5f, 2.0f);
+            float3 reflectPointLight = reflect(-pointLightDirection, normalize(input.normal));
+            float RtoEPoint = dot(reflectPointLight, toEye);
+            float specularPowPoint = pow(saturate(RtoEPoint), gMaterial.shininess);
+
+            float3 diffusePointLight = gMaterial.color.rgb * textureColor.rgb * gPointLight.color.rgb * cosPoint * gPointLight.intensity;
+            float3 specularPointLight = gPointLight.color.rgb * gPointLight.intensity * specularPowPoint * float3(1.0f, 1.0f, 1.0f);
+
+    // Combine lights
+            output.color.rgb = diffuseDirectionalLight + specularDirectionalLight + diffusePointLight + specularPointLight;
+            output.color.a = gMaterial.color.a * textureColor.a;
+        }
         
         
     }

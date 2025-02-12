@@ -104,14 +104,14 @@ private:
 	///Model///
 
 	std::unique_ptr<Object3d> object3d;
-	Vector3 modelPosition = { -1.0f,0.0f,0.0f };
+	Vector3 modelPosition = { 0.0f,0.0f,0.0f };
 	Vector3 modelRotation = { 0.0f,0.0f,0.0f };
 	Vector3 modelScale = { 1.0f,1.0f,1.0f };
 
 
 
 	std::unique_ptr <Object3d> object3d2;
-	Vector3 modelPosition2 = { 1.0f,0.0f,0.0f };
+	Vector3 modelPosition2 = { 0.0f,0.0f,0.0f };
 	Vector3 modelRotation2 = { 0.0f,0.0f,0.0f };
 	Vector3 modelScale2 = { 1.0f,1.0f,1.0f };
 
@@ -123,6 +123,6 @@ private:
 	Vector3 cameraRotation = { 0.0f,0.0f,0.0f };
 	Vector3 cameraScale = { 1.0f,1.0f,1.0f };
 
-
+	Vector3 spotLightPosition = { 0.0f,-1.0f,0.0f };
 };
 
