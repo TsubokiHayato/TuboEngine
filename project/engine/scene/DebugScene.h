@@ -123,6 +123,17 @@ private:
 	Vector3 cameraRotation = { 0.0f,0.0f,0.0f };
 	Vector3 cameraScale = { 1.0f,1.0f,1.0f };
 
-	Vector3 spotLightPosition = { 0.0f,-1.0f,0.0f };
+	int lightType = 0;
+	
+	Vector3 lightDirection = { 0.0f,-1.0f,0.0f };
+	Vector4 lightColor = { 1.0f,1.0f,1.0f,1.0f };
+	float intensity = 1.0f;
+	float shininess = 1.0f;
+
+	Vector3 pointLightPosition = { 0.0f,0.0f,0.0f };
+	Vector4 pointLightColor = { 1.0f,1.0f,1.0f,1.0f };
+	float pointLightIntensity = 1.0f;
+
+	
 };
 
