@@ -79,9 +79,10 @@ public:
 	void SetLightDirection(const Vector3& direction) { directionalLightData->direction = direction; }
 	void SetLightIntensity(float intensity) { directionalLightData->intensity = intensity; }
 	void SetLightShininess(float shininess);
-	void SetSpotLightColor(const Vector4& color) { pointLightData->color = color; }
-	void SetSpotLightPosition(const Vector3& position) { pointLightData->position = position; }
-
+	
+	void SetPointLightPosition(const Vector3& position) { pointLightData->position = position; }
+	void SetPointLightColor(const Vector4& color) { pointLightData->color = color; }
+	void SetPointLightIntensity(float intensity) { pointLightData->intensity = intensity; }
 
 	void SetLightType(int type) {
 		if (type < 0 || type > 3) {
@@ -110,9 +111,10 @@ public:
 	float GetLightIntensity() { return directionalLightData->intensity; }
 	int GetLightType() { return lightTypeData->type; }
 	float GetLightShininess();
-	Vector4 GetSpotLightColor() { return pointLightData->color; }
-	Vector3 GetSpotLightPosition() { return pointLightData->position; }
-
+	
+	Vector3 GetPointLightPosition() { return pointLightData->position; }
+	Vector4 GetPointLightColor() { return pointLightData->color; }
+	float GetPointLightIntensity() { return pointLightData->intensity; }
 
 
 

@@ -49,6 +49,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon) {
 	directionalLightData->direction = { 0.0f,-1.0f,0.0f };
 	directionalLightData->intensity = 1.0f;
 
+
 #pragma endregion
 
 #pragma region PointLight
@@ -63,7 +64,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon) {
 	//デフォルト値
 	pointLightData->color = { 1.0f,1.0f,1.0f,1.0f };
 	pointLightData->position = { 0.0f,-1.0f,0.0f };
-	pointLightData->intensity = 70.0f;
+	pointLightData->intensity = 1.0f;
 
 #pragma endregion
 
@@ -141,8 +142,12 @@ void Object3d::Draw() {
 	//平行光源用のCBufferの場所を設定
 	commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 	commandList->SetGraphicsRootConstantBufferView(4, cameraForGPUResource->GetGPUVirtualAddress());
+
+
 	commandList->SetGraphicsRootConstantBufferView(5, lightTypeResource->GetGPUVirtualAddress());
+
 	commandList->SetGraphicsRootConstantBufferView(6, pointLightResource->GetGPUVirtualAddress());
+
 
 	//3Dモデルが割り当てられていれば描画
 	if (model_) {
