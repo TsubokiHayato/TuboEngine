@@ -1,6 +1,4 @@
 #pragma once
-
-
 #include"DirectXcommon.h"
 #include"WinApp.h"
 
@@ -38,12 +36,33 @@ struct PointLight
 	float intensity;
 };
 
+struct SpotLight
+{
+	//色
+	Vector4 color;
+	//位置
+	Vector3 position;
+	//方向
+	Vector3 direction;
+	//輝度
+	float intensity;
+	//ライトの届く最大距離
+	float distance;
+	//減衰率
+	float decay;
+	//スポットライトの余弦
+	float cosAngle;
+	//
+	float padding[2];
+};
+
 struct LightType {
 
 	//0 : 平行光源
 	//1 : Phong反射モデル
 	//2 : Blinn-Phong反射モデル
 	//3 : PointLight
+	//4 : SpotLight
 	int type;
 
 };
@@ -75,17 +94,29 @@ public:
 	void SetRotation(const Vector3& rotation) { transform.rotate = rotation; }
 	void SetPosition(const Vector3& position) { transform.translate = position; }
 
+	///-------------------------------------------------------------------------------------------------
+	/// Light
+	//平行光源
 	void SetLightColor(const Vector4& color) { directionalLightData->color = color; }
 	void SetLightDirection(const Vector3& direction) { directionalLightData->direction = direction; }
 	void SetLightIntensity(float intensity) { directionalLightData->intensity = intensity; }
 	void SetLightShininess(float shininess);
-	
+	//ポイントライト
 	void SetPointLightPosition(const Vector3& position) { pointLightData->position = position; }
 	void SetPointLightColor(const Vector4& color) { pointLightData->color = color; }
 	void SetPointLightIntensity(float intensity) { pointLightData->intensity = intensity; }
+	//スポットライト
+	void SetSpotLightColor(const Vector4& color) { spotLightData->color = color; }
+	void SetSpotLightPosition(const Vector3& position) { spotLightData->position = position; }
+	void SetSpotLightDirection(const Vector3& direction) { spotLightData->direction = direction; }
+	void SetSpotLightIntensity(float intensity) { spotLightData->intensity = intensity; }
+	void SetSpotLightDistance(float distance) { spotLightData->distance = distance; }
+	void SetSpotLightDecay(float decay) { spotLightData->decay = decay; }
+	void SetSpotLightCosAngle(float cosAngle) { spotLightData->cosAngle = cosAngle; }
+
 
 	void SetLightType(int type) {
-		if (type < 0 || type > 3) {
+		if (type < 0 || type > 4) {
 			type = 0;
 		}
 		lightTypeData->type = type;
@@ -104,17 +135,29 @@ public:
 	Vector3 GetScale() const { return transform.scale; }
 	Vector3 GetRotation() const { return transform.rotate; }
 	Vector3 GetPosition() const { return transform.translate; }
-
+	//モデルの色
 	Vector4 GetModelColor();
+
+	///-------------------------------------------------------------------------------------------------
+	/// Light
+	//平行光源
 	Vector4 GetLightColor() { return directionalLightData->color; }
 	Vector3 GetLightDirection() { return directionalLightData->direction; }
 	float GetLightIntensity() { return directionalLightData->intensity; }
 	int GetLightType() { return lightTypeData->type; }
 	float GetLightShininess();
-	
+	//ポイントライト
 	Vector3 GetPointLightPosition() { return pointLightData->position; }
 	Vector4 GetPointLightColor() { return pointLightData->color; }
 	float GetPointLightIntensity() { return pointLightData->intensity; }
+	//スポットライト
+	void GetSpotLightColor(Vector4& color) { color = spotLightData->color; }
+	void GetSpotLightPosition(Vector3& position) { position = spotLightData->position; }
+	void GetSpotLightDirection(Vector3& direction) { direction = spotLightData->direction; }
+	float GetSpotLightIntensity() { return spotLightData->intensity; }
+	float GetSpotLightDistance() { return spotLightData->distance; }
+	float GetSpotLightDecay() { return spotLightData->decay; }
+	float GetSpotLightCosAngle() { return spotLightData->cosAngle; }
 
 
 
@@ -162,6 +205,12 @@ private:
 	//バッファリソース内のデータを指すポインタ
 	PointLight* pointLightData = nullptr;
 
+	//スポットライトのバッファリソース
+	Microsoft::WRL::ComPtr <ID3D12Resource> spotLightResource;
+	//バッファリソース内のデータを指すポインタ
+	SpotLight* spotLightData = nullptr;
+
+
 	//コマンドリスト
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
 
@@ -172,8 +221,7 @@ private:
 	CameraForGPU* cameraForGPUData = nullptr;
 
 	//ライトの種類
-	Microsoft::WRL::ComPtr <ID3D12Resource> lightTypeResource
-		= nullptr;
+	Microsoft::WRL::ComPtr <ID3D12Resource> lightTypeResource= nullptr;
 	//ライトの種類のバッファリソース内のデータを指すポインタ
 	LightType* lightTypeData = nullptr;
 
