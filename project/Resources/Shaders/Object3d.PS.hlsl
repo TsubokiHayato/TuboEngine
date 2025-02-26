@@ -2,25 +2,38 @@
 
 struct Material
 {
-    float4 color;
-    int enableLighting;
-    float4x4 uvTransform;
-    float shininess;
+    float4 color; //マテリアルの色
+    int enableLighting; //ライティングを有効にするかどうか
+    float4x4 uvTransform; //UV変換行列
+    float shininess; //反射の強さ
 };
 
 
 struct DirectionalLight
 {
-    float4 color;
-    float3 direction;
-    float intensity;
+    float4 color; //光の色
+    float3 direction; //光の方向
+    float intensity; //光の強さ
 };
 
 struct PointLight
 {
-    float4 color;
-    float3 position;
-    float intensity;
+    float4 color; //光の色
+    float3 position; //光の位置
+    float intensity; //光の強さ
+};
+
+struct SpotLight
+{
+    float4 color; //光の色
+    float3 position; //光の位置
+    float intensity; //光の強さ
+    float3 direction; //光の方向
+    float distance; //光の影響範囲
+    float decay; //減衰率
+    float cosAngle; //光の角度
+    
+    
 };
 
 struct Camera
@@ -47,6 +60,7 @@ ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 ConstantBuffer<Camera> gCamera : register(b2);
 ConstantBuffer<LightType> gLightType : register(b3);
 ConstantBuffer<PointLight> gPointLight : register(b4);
+ConstantBuffer<SpotLight> gSpotLight : register(b5);
 
 struct PixcelShaderOutput
 {
@@ -127,6 +141,30 @@ PixcelShaderOutput main(VertexShaderOutPut input)
 
     // Combine lights
             output.color.rgb = diffusePointLight + specularPointLight;
+            output.color.a = gMaterial.color.a * textureColor.a;
+        }
+        //SpotLight
+        else if (gLightType.type == 4)
+        {
+            float3 spotLightDirection = normalize(gSpotLight.position - input.worldPosition);
+            float NdotLSpot = dot(normalize(input.normal), -spotLightDirection);
+            float cosSpot = pow(NdotLSpot * 0.5f + 0.5f, 2.0f);
+            float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
+            float3 reflectSpotLight = reflect(spotLightDirection, normalize(input.normal));
+            float RtoESpot = dot(reflectSpotLight, toEye);
+            float specularPowSpot = pow(saturate(RtoESpot), gMaterial.shininess);
+
+            float3 diffuseSpotLight = gMaterial.color.rgb * textureColor.rgb * gSpotLight.color.rgb * cosSpot * gSpotLight.intensity;
+            float3 specularSpotLight = gSpotLight.color.rgb * gSpotLight.intensity * specularPowSpot * float3(1.0f, 1.0f, 1.0f);
+
+            // Calculate spotlight effect
+            float3 lightToPixel = normalize(input.worldPosition - gSpotLight.position);
+            float spotEffect = dot(lightToPixel, normalize(gSpotLight.direction));
+            float spotFactor = saturate((spotEffect - gSpotLight.cosAngle) / (1.0f - gSpotLight.cosAngle));
+            spotFactor = pow(spotFactor, gSpotLight.decay);
+
+            // Combine lights
+            output.color.rgb = (diffuseSpotLight + specularSpotLight) * spotFactor;
             output.color.a = gMaterial.color.a * textureColor.a;
         }
 
