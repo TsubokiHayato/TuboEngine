@@ -84,6 +84,10 @@ void AddBlendPSO::CreateRootSignature()
 	rootParameters[6].Descriptor.ShaderRegister = 4; // レジスタ番号4とバインド
 
 
+	rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
+	rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderでつかう
+	rootParameters[7].Descriptor.ShaderRegister = 5; // レジスタ番号5とバインド
+
 
 
 	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
