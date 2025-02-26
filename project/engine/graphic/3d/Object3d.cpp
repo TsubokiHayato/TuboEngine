@@ -6,6 +6,7 @@
 #include"ModelManager.h"
 #include"Camera.h"
 #include"MT_Matrix.h"
+#include"numbers"
 
 
 #include "externals/imgui/imgui.h"
@@ -65,6 +66,27 @@ void Object3d::Initialize(Object3dCommon* object3dCommon) {
 	pointLightData->color = { 1.0f,1.0f,1.0f,1.0f };
 	pointLightData->position = { 0.0f,-1.0f,0.0f };
 	pointLightData->intensity = 1.0f;
+
+#pragma endregion
+
+#pragma region SpotLight
+
+	//スポットライト用用のリソースを作る。今回はColor1つ分のサイズを用意する
+	spotLightResource =
+		this->dxCommon_->CreateBufferResource(sizeof(SpotLight));
+	//平行光源用にデータを書き込む
+	spotLightData = nullptr;
+	//書き込むためのアドレスを取得
+	spotLightResource->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData));
+	//デフォルト値
+	spotLightData->color = { 1.0f,1.0f,1.0f,1.0f };
+	spotLightData->position = { 2.0f,1.25f,0.0f };
+	spotLightData->direction = Vector3::Normalize({ -1.0f,-1.0f,0.0f });
+	spotLightData->intensity = 4.0f;
+	spotLightData->distance = 7.0f;
+	spotLightData->decay = 2.0f;
+	spotLightData->cosAngle = 
+		std::cos(std::numbers::pi_v<float> / 3.0f);
 
 #pragma endregion
 
@@ -141,17 +163,21 @@ void Object3d::Draw() {
 	commandList->SetGraphicsRootConstantBufferView(1, transformMatrixResource->GetGPUVirtualAddress());
 	//平行光源用のCBufferの場所を設定
 	commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+	//カメラ情報のCBufferの場所を設定
 	commandList->SetGraphicsRootConstantBufferView(4, cameraForGPUResource->GetGPUVirtualAddress());
-
-
+	//ライトの種類のCBufferの場所を設定
 	commandList->SetGraphicsRootConstantBufferView(5, lightTypeResource->GetGPUVirtualAddress());
-
+	//ポイントライトのCBufferの場所を設定
 	commandList->SetGraphicsRootConstantBufferView(6, pointLightResource->GetGPUVirtualAddress());
-
+	//スポットライトのCBufferの場所を設定
+	commandList->SetGraphicsRootConstantBufferView(7, spotLightResource->GetGPUVirtualAddress());
 
 	//3Dモデルが割り当てられていれば描画
 	if (model_) {
 		model_->Draw();
+	} else {
+		//3Dモデルが割り当てられていない場合はブレイクさせる
+		assert(0);
 	}
 
 }
