@@ -132,7 +132,7 @@ PixcelShaderOutput main(VertexShaderOutPut input)
             float NdotLPoint = dot(normalize(-input.normal), pointLightDirection);
             float cosPoint = pow(NdotLPoint * 0.5f + 0.5f, 2.0f);
             float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
-            float3 reflectPointLight = reflect(-pointLightDirection, normalize(input.normal));
+            float3 reflectPointLight = reflect(pointLightDirection, normalize(input.normal));
             float RtoEPoint = dot(reflectPointLight, toEye);
             float specularPowPoint = pow(saturate(RtoEPoint), gMaterial.shininess);
 
@@ -146,25 +146,20 @@ PixcelShaderOutput main(VertexShaderOutPut input)
         //SpotLight
         else if (gLightType.type == 4)
         {
-            float3 spotLightDirection = normalize(gSpotLight.position - input.worldPosition);
-            float NdotLSpot = dot(normalize(input.normal), -spotLightDirection);
-            float cosSpot = pow(NdotLSpot * 0.5f + 0.5f, 2.0f);
+            float3 spotLightDirectionOnSurface = normalize(input.worldPosition - gSpotLight.position);
+            float distance = length(input.worldPosition - gSpotLight.position);
+            float attenuationFactor = 1.0f / (1.0f + gSpotLight.decay * distance * distance);
+            float cosAngle = dot(spotLightDirectionOnSurface, gSpotLight.direction);
+            float falloffFactor = saturate((cosAngle - gSpotLight.cosAngle) / (1.0f - gSpotLight.cosAngle));
+            
+            float3 diffuseSpotLight = gMaterial.color.rgb * textureColor.rgb * gSpotLight.color.rgb * gSpotLight.intensity * attenuationFactor * falloffFactor;
             float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
-            float3 reflectSpotLight = reflect(spotLightDirection, normalize(input.normal));
+            float3 reflectSpotLight = reflect(spotLightDirectionOnSurface, normalize(input.normal));
             float RtoESpot = dot(reflectSpotLight, toEye);
             float specularPowSpot = pow(saturate(RtoESpot), gMaterial.shininess);
+            float3 specularSpotLight = gSpotLight.color.rgb * gSpotLight.intensity * specularPowSpot * float3(1.0f, 1.0f, 1.0f) * attenuationFactor * falloffFactor;
 
-            float3 diffuseSpotLight = gMaterial.color.rgb * textureColor.rgb * gSpotLight.color.rgb * cosSpot * gSpotLight.intensity;
-            float3 specularSpotLight = gSpotLight.color.rgb * gSpotLight.intensity * specularPowSpot * float3(1.0f, 1.0f, 1.0f);
-
-            // Calculate spotlight effect
-            float3 lightToPixel = normalize(input.worldPosition - gSpotLight.position);
-            float spotEffect = dot(lightToPixel, normalize(gSpotLight.direction));
-            float spotFactor = saturate((spotEffect - gSpotLight.cosAngle) / (1.0f - gSpotLight.cosAngle));
-            spotFactor = pow(spotFactor, gSpotLight.decay);
-
-            // Combine lights
-            output.color.rgb = (diffuseSpotLight + specularSpotLight) * spotFactor;
+            output.color.rgb = diffuseSpotLight + specularSpotLight;
             output.color.a = gMaterial.color.a * textureColor.a;
         }
 
