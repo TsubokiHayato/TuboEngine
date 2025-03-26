@@ -46,6 +46,8 @@ struct LightType
     //0 : 平行光源
 	//1 : Phong反射モデル
 	//2 : Blinn-Phong反射モデル
+	//3 : PointLight
+	//4 : SpotLight
     int type;
 };
 
@@ -146,6 +148,7 @@ PixcelShaderOutput main(VertexShaderOutPut input)
         //SpotLight
         else if (gLightType.type == 4)
         {
+            
             float3 spotLightDirectionOnSurface = normalize(input.worldPosition - gSpotLight.position);
             float distance = length(input.worldPosition - gSpotLight.position);
             float attenuationFactor = 1.0f / (1.0f + gSpotLight.decay * distance * distance);
