@@ -42,10 +42,10 @@ struct SpotLight
 	Vector4 color;
 	//位置
 	Vector3 position;
-	//方向
-	Vector3 direction;
 	//輝度
 	float intensity;
+	//方向
+	Vector3 direction;
 	//ライトの届く最大距離
 	float distance;
 	//減衰率
