@@ -185,6 +185,15 @@ void Object3d::Draw() {
 
 }
 
+void Object3d::ShowImGui() {
+
+}
+
+void Object3d::ShowImGuiLight() {
+
+
+}
+
 void Object3d::SetLightShininess(float shininess) { model_->SetModelShininess(shininess); }
 
 void Object3d::SetModel(const std::string& filePath) {
