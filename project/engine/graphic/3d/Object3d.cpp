@@ -64,7 +64,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon) {
 	pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
 	//デフォルト値
 	pointLightData->color = { 1.0f,1.0f,1.0f,1.0f };
-	pointLightData->position = { 0.0f,-1.0f,0.0f };
+	pointLightData->position = { 0.0f,1.0f,0.0f };
 	pointLightData->intensity = 1.0f;
 
 #pragma endregion
