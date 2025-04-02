@@ -8,6 +8,7 @@
 #include<cassert>
 #include <fstream>
 #include<sstream>
+#include<filesystem>
 
 void Model::Initialize(ModelCommon* modelCommon, const std::string& directoryPath, const std::string& filename)
 {
@@ -53,13 +54,12 @@ void Model::Initialize(ModelCommon* modelCommon, const std::string& directoryPat
 #pragma endregion Material_Resource
 	
 
-	//.Objの参照にしているテクスチャファイルを読み込む
-	TextureManager::GetInstance()->LoadTexture(modelData.material.textureFilePath);
-	//読み込んだテクスチャの番号を取得する
-	modelData.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(modelData.material.textureFilePath);
+	// テクスチャファイル名を抽出
+	textureFileName_ = std::filesystem::path(modelData.material.textureFilePath).filename().string();
 
-	
-
+	// テクスチャを読み込む
+	TextureManager::GetInstance()->LoadTexture(textureFileName_);
+	modelData.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFileName_);
 }
 
 void Model::Draw()
@@ -72,7 +72,7 @@ void Model::Draw()
 	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 
 	//SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
-	commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData.material.textureFilePath));
+	commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureFileName_));
 	//描画
 	commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 

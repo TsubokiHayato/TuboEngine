@@ -11,8 +11,8 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	this->winApp = winApp;
 	this->dxCommon = dxCommon;
 	//テクスチャマネージャに追加する画像ハンドル
-	std::string uvCheckerTextureHandle = "Resources/uvChecker.png";
-	std::string monsterBallTextureHandle = "Resources/monsterBall.png";
+	std::string uvCheckerTextureHandle = "uvChecker.png";
+	std::string monsterBallTextureHandle = "monsterBall.png";
 
 	//画像ハンドルをテクスチャマネージャに挿入する
 	TextureManager::GetInstance()->LoadTexture(uvCheckerTextureHandle);
