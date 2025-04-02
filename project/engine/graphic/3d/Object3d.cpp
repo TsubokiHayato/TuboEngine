@@ -185,10 +185,6 @@ void Object3d::Draw() {
 
 }
 
-void Object3d::ShowImGui() {
-
-}
-
 void Object3d::ShowImGuiLight() {
 
 
