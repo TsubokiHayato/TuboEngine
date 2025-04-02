@@ -13,7 +13,7 @@
 #include "externals/imgui/imgui_impl_win32.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 
-void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileNamePath){
+void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileNamePath) {
 	//引数で受け取ってメンバ変数に記録する
 	this->object3dCommon = object3dCommon;
 	this->dxCommon_ = object3dCommon->GetDxCommon();
@@ -88,7 +88,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileN
 	spotLightData->intensity = 4.0f;
 	spotLightData->distance = 7.0f;
 	spotLightData->decay = 2.0f;
-	spotLightData->cosAngle = 
+	spotLightData->cosAngle =
 		std::cos(std::numbers::pi_v<float> / 3.0f);
 
 #pragma endregion
@@ -191,6 +191,73 @@ void Object3d::ShowImGui() {
 
 void Object3d::ShowImGuiLight() {
 
+
+	ImGui::Begin("Light");
+	//光源のタイプ
+
+	ImGui::SliderInt("LightType", &lightTypeData->type, 0, 4);
+	//光沢度
+	float shininess = model_->GetModelShininess();
+	ImGui::DragFloat("Shininess", &shininess);
+	model_->SetModelShininess(shininess);
+
+	//光源の色
+	
+	ImGui::ColorEdit4("LightColor", &directionalLightData->color.x);
+	
+	//光源の方向
+	
+	ImGui::DragFloat3("LightDirection", &directionalLightData->direction.x, 0.1f);
+	
+	//光源の強さ
+	
+	ImGui::DragFloat("LightIntensity", &directionalLightData->intensity, 0.1f);
+
+
+	ImGui::Text("PointLight");
+	//光源の色
+	
+	ImGui::ColorEdit4("PointLightColor", &pointLightData->color.x);
+	
+	//光源の位置
+	ImGui::DragFloat3("PointLightPosition", &pointLightData->position.x, 0.1f);
+	
+	//光源の強さ
+	ImGui::DragFloat("PointLightIntensity", &pointLightData->intensity, 0.1f);
+
+
+	ImGui::Text("SpotLight");
+	//光源の色
+	
+	ImGui::ColorEdit4("SpotLightColor", &spotLightData->color.x);
+	
+	//光源の位置
+	
+	ImGui::DragFloat3("SpotLightPosition", &spotLightData->position.x, 0.1f);
+	
+	//光源の方向
+	
+	ImGui::DragFloat3("SpotLightDirection", &spotLightData->direction.x, 0.1f);
+	
+	//光源の強さ
+	
+	ImGui::DragFloat("SpotLightIntensity", &spotLightData->intensity, 0.1f);
+	
+	//光源の距離
+	ImGui::DragFloat("SpotLightDistance", &spotLightData->distance, 0.1f);
+	
+
+	//光源の減衰
+	
+	ImGui::DragFloat("SpotLightDecay", &spotLightData->decay, 0.1f);
+	
+
+	//光源の角度
+	
+	ImGui::DragFloat("SpotLightCosAngle", &spotLightData->cosAngle, 0.1f);
+	
+
+	ImGui::End();
 
 }
 
