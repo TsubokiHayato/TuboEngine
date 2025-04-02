@@ -113,7 +113,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	camera->setRotation(cameraRotation);
 	camera->setScale(cameraScale);
 
-	//カメラを設定
+	//
 	object3dCommon->SetDefaultCamera(camera.get());
 	object3d->SetCamera(camera.get());
 	object3d2->SetCamera(camera.get());
@@ -246,110 +246,7 @@ void DebugScene::ImGuiDraw() {
 
 	ImGui::End();
 
-	ImGui::Begin("Light");
-	//光源のタイプ
-	lightType = object3d->GetLightType();
-	ImGui::SliderInt("LightType", &lightType, 0, 4);
-	object3d->SetLightType(lightType);
-	object3d2->SetLightType(lightType);
-
-
-	//光沢度
-	shininess = object3d->GetLightShininess();
-	ImGui::DragFloat("Shininess", &shininess);
-	object3d->SetLightShininess(shininess);
-	object3d2->SetLightShininess(shininess);
-
-	//光源の色
-	lightColor = object3d->GetLightColor();
-	ImGui::ColorEdit4("LightColor", &lightColor.x);
-	object3d->SetLightColor(lightColor);
-	object3d2->SetLightColor(lightColor);
-
-	//光源の方向
-	lightDirection = object3d->GetLightDirection();
-	ImGui::DragFloat3("LightDirection", &lightDirection.x, 0.1f);
-	object3d->SetLightDirection(lightDirection);
-	object3d2->SetLightDirection(lightDirection);
-
-	//光源の強さ
-	intensity = object3d->GetLightIntensity();
-	ImGui::DragFloat("LightIntensity", &intensity, 0.1f);
-	object3d->SetLightIntensity(intensity);
-	object3d2->SetLightIntensity(intensity);
-
-
-
-
-	ImGui::Text("PointLight");
-	//光源の色
-	pointLightColor = object3d->GetPointLightColor();
-	ImGui::ColorEdit4("PointLightColor", &pointLightColor.x);
-	object3d->SetPointLightColor(pointLightColor);
-	object3d2->SetPointLightColor(pointLightColor);
-
-	//光源の位置
-	pointLightPosition = object3d->GetPointLightPosition();
-	ImGui::DragFloat3("PointLightPosition", &pointLightPosition.x, 0.1f);
-	object3d->SetPointLightPosition(pointLightPosition);
-	object3d2->SetPointLightPosition(pointLightPosition);
-
-	//光源の強さ
-	pointLightIntensity = object3d->GetPointLightIntensity();
-	ImGui::DragFloat("PointLightIntensity", &pointLightIntensity, 0.1f);
-	object3d->SetPointLightIntensity(pointLightIntensity);
-	object3d2->SetPointLightIntensity(pointLightIntensity);
-	ImGui::End();
-
-	ImGui::Begin("SpotLight");
-	//光源の色
-	Vector4 spotLightColor;
-	object3d->GetSpotLightColor(spotLightColor);
-	ImGui::ColorEdit4("SpotLightColor", &spotLightColor.x);
-	object3d->SetSpotLightColor(spotLightColor);
-	object3d2->SetSpotLightColor(spotLightColor);
-
-	//光源の位置
-	Vector3 spotLightPosition;
-	object3d->GetSpotLightPosition(spotLightPosition);
-	ImGui::DragFloat3("SpotLightPosition", &spotLightPosition.x, 0.1f);
-	object3d->SetSpotLightPosition(spotLightPosition);
-	object3d2->SetSpotLightPosition(spotLightPosition);
-
-	//光源の方向
-	Vector3 spotLightDirection;
-	object3d->GetSpotLightDirection(spotLightDirection);
-	ImGui::DragFloat3("SpotLightDirection", &spotLightDirection.x, 0.1f);
-	object3d->SetSpotLightDirection(spotLightDirection);
-	object3d2->SetSpotLightDirection(spotLightDirection);
-
-	//光源の強さ
-	float spotLightIntensity = object3d->GetSpotLightIntensity();
-	ImGui::DragFloat("SpotLightIntensity", &spotLightIntensity, 0.1f);
-	object3d->SetSpotLightIntensity(spotLightIntensity);
-	object3d2->SetSpotLightIntensity(spotLightIntensity);
-		
-	//光源の距離
-	float spotLightDistance = object3d->GetSpotLightDistance();
-	ImGui::DragFloat("SpotLightDistance", &spotLightDistance, 0.1f);
-	object3d->SetSpotLightDistance(spotLightDistance);
-	object3d2->SetSpotLightDistance(spotLightDistance);
-
-	//光源の減衰
-	float spotLightDecay = object3d->GetSpotLightDecay();
-	ImGui::DragFloat("SpotLightDecay", &spotLightDecay, 0.1f);
-	object3d->SetSpotLightDecay(spotLightDecay);
-	object3d2->SetSpotLightDecay(spotLightDecay);
-
-	//光源の角度
-	float spotLightCosAngle = object3d->GetSpotLightCosAngle();
-	ImGui::DragFloat("SpotLightCosAngle", &spotLightCosAngle, 0.1f);
-	object3d->SetSpotLightCosAngle(spotLightCosAngle);
-	object3d2->SetSpotLightCosAngle(spotLightCosAngle);
-
-	ImGui::End();
-
-
+	object3d->ShowImGuiLight();
 	ImGui::Begin("Object3D2");
 	ImGui::DragFloat3("Position", &modelPosition2.x);
 	ImGui::DragFloat3("Rotation", &modelRotation2.x);
