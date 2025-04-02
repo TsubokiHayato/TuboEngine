@@ -10,6 +10,7 @@
 
 
 
+
 class ModelCommon;
 class Model
 {
@@ -18,8 +19,8 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="modelCommon">モデル共通部分</param>
-	void Initialize(ModelCommon* modelCommon,const std::string& directoryPath,const std::string& filename);
-	
+	void Initialize(ModelCommon* modelCommon, const std::string& directoryPath, const std::string& filename);
+
 	/// <summary>
 	/// 描画処理
 	/// </summary>
@@ -61,7 +62,7 @@ public:
 		materialData->shininess = shininess;
 	}
 
-	
+
 private:
 	//共通部分
 	ModelCommon* modelCommon_ = nullptr;
@@ -84,6 +85,6 @@ private:
 	//コマンドリスト
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
 
-
+	std::string textureFileName_;
 };
 
