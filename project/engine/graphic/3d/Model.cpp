@@ -148,12 +148,16 @@ ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string
 	2 : OBJファイルを読み込む
 	----------------------*/
 
+	//Assimpを使ってOBJファイルを読み込む
+	//現状、objと
+
 	Assimp::Importer importer;
 	std::string filePath = directoryPath + "/" + filename;
-	const aiScene* scene = importer.ReadFile(filePath, aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 	assert(scene->HasMeshes());
 
 
+    
 	/*-----------------------------
 	3 : ファイルを読み、ModelDataを構築
 	-------------------------------*/
