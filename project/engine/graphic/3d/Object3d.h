@@ -75,7 +75,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="object3dCommon"></param>
-	void Initialize(Object3dCommon* object3dCommon);
+	void Initialize(Object3dCommon* object3dCommon, std::string modelFileNamePath);
 
 	/// <summary>
 	/// 更新処理
