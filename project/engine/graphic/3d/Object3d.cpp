@@ -13,12 +13,15 @@
 #include "externals/imgui/imgui_impl_win32.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 
-void Object3d::Initialize(Object3dCommon* object3dCommon) {
+void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileNamePath){
 	//引数で受け取ってメンバ変数に記録する
 	this->object3dCommon = object3dCommon;
 	this->dxCommon_ = object3dCommon->GetDxCommon();
 	this->winApp_ = object3dCommon->GetWinApp();
 	this->camera = object3dCommon->GetDefaultCamera();
+
+	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
+
 
 #pragma region TransformMatrixResourced
 

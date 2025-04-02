@@ -14,20 +14,14 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	std::string uvCheckerTextureHandle = "uvChecker.png";
 	std::string monsterBallTextureHandle = "monsterBall.png";
 
-	//画像ハンドルをテクスチャマネージャに挿入する
-	TextureManager::GetInstance()->LoadTexture(uvCheckerTextureHandle);
-	TextureManager::GetInstance()->LoadTexture(monsterBallTextureHandle);
-
-	//モデルディレクトリパス
-	const std::string modelDirectoryPath = "Resources";
+	
 	//モデルファイルパス
 	const std::string modelFileNamePath = "sphere.obj";
 	//モデルファイルパス2
 	const std::string modelFileNamePath2 = "terrain.obj";
 
-	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
-	ModelManager::GetInstance()->LoadModel(modelFileNamePath2);
 
+	//オーディオ
 	const std::string audioFileName = "fanfare.wav";
 	const std::string audioDirectoryPath = "Resources/Audio/";
 
@@ -66,12 +60,16 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 		Vector2 size = { 50.0f, 50.0f };             // 任意のサイズ
 
 		//各種機能を使えるようにする
+		//左右反転
 		isFlipX_ = sprite->GetFlipX();
+		//上下反転
 		isFlipY_ = sprite->GetFlipY();
+		//テクスチャの左上座標
 		textureLeftTop = sprite->GetTextureLeftTop();
+		//テクスチャから初期サイズを得るフラグ
 		isAdjustTextureSize = sprite->GetIsAdjustTextureSize();
 
-
+		//スプライトの位置や回転を設定
 		sprite->SetPosition(spritePosition);
 		sprite->SetRotation(spriteRotation);
 		sprite->SetColor(spriteColor);
@@ -91,7 +89,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//オブジェクト3D
 
 	object3d = std::make_unique<Object3d>();
-	object3d->Initialize(this->object3dCommon);
+	object3d->Initialize(this->object3dCommon,modelFileNamePath);
 	object3d->SetModel(modelFileNamePath);
 
 	////////////////////////////////////////////////////////////////////////
@@ -101,7 +99,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//オブジェクト3D
 
 	object3d2 = std::make_unique<Object3d>();
-	object3d2->Initialize(this->object3dCommon);
+	object3d2->Initialize(this->object3dCommon,modelFileNamePath2);
 
 	object3d2->SetModel(modelFileNamePath2);
 
