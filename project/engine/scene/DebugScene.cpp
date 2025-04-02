@@ -109,10 +109,11 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//カメラ
 
 	camera = std::make_unique<Camera>();
-
 	camera->SetTranslate(cameraPosition);
 	camera->setRotation(cameraRotation);
 	camera->setScale(cameraScale);
+
+	//カメラを設定
 	object3dCommon->SetDefaultCamera(camera.get());
 	object3d->SetCamera(camera.get());
 	object3d2->SetCamera(camera.get());
