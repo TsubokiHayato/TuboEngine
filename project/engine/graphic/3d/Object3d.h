@@ -87,8 +87,6 @@ public:
 	/// </summary>
 	void Draw();
 
-	void ShowImGui();
-
 	void ShowImGuiLight();
 
 public:
