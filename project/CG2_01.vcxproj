@@ -163,6 +163,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
+    <ClInclude Include="engine\graphic\data\Node.h" />
     <ClInclude Include="engine\graphic\PSO\AddBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\BlendMode.h" />
     <ClInclude Include="engine\scene\ClearScene.h" />
