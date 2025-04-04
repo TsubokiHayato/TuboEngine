@@ -9,5 +9,5 @@ struct Node
 {
 	Matrix4x4 localMatrix;//ローカル行列
 	std::string name;//ノード名
-	std::vector<Node*> children;//子ノード
+	std::vector<Node> children;//子ノード
 };
