@@ -7,8 +7,12 @@
 #include"TransformationMatrix.h"
 #include"Transform.h"
 #include"ModelData.h"
+#include"Node.h"
 
 
+#include<assimp/Importer.hpp>
+#include<assimp/scene.h>
+#include<assimp/postprocess.h>
 
 
 class ModelCommon;
@@ -43,8 +47,14 @@ public:
 	/// <param name="directoryPath">ディレクトリパス</param>
 	/// <param name="filename">ファイル名</param>
 	/// <returns>モデルデータ</returns>
-	static ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
+	static ModelData LoadModelFile(const std::string& directoryPath, const std::string& filename);
 
+	/// <summary>
+	/// ノードを読み込む
+	/// </summary>
+	/// <param name="node">ノード</param>
+	/// <returns></returns>
+	static Node ReadNode(aiNode* node);
 
 	void SetModelColor(const Vector4& color) {
 		materialData->color = color;
@@ -86,5 +96,6 @@ private:
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
 
 	std::string textureFileName_;
+
 };
 

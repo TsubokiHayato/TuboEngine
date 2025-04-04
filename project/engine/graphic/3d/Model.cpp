@@ -10,9 +10,6 @@
 #include<sstream>
 #include<filesystem>
 
-#include<assimp/Importer.hpp>
-#include<assimp/scene.h>
-#include<assimp/postprocess.h>
 
 void Model::Initialize(ModelCommon* modelCommon, const std::string& directoryPath, const std::string& filename)
 {
@@ -26,7 +23,7 @@ void Model::Initialize(ModelCommon* modelCommon, const std::string& directoryPat
 
 #pragma region ModelData
 	//モデル読み込み
-	modelData = LoadObjFile(directoryPath, filename);
+	modelData = LoadModelFile(directoryPath, filename);
 	//頂点リソースを作る
 	vertexResource = modelCommon_->GetDxCommon()->CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
 	//頂点バッファビューを作成する
@@ -96,7 +93,7 @@ MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, c
 
 
 	/*------------------------
-	2 : ファイルを開く
+	2 : ファイルを開く	
 	------------------------*/
 
 	std::ifstream file(directoryPath + "/" + filePath);
@@ -130,7 +127,7 @@ MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, c
 
 
 
-ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string& filename)
+ModelData Model::LoadModelFile(const std::string& directoryPath, const std::string& filename)
 {
 
 
@@ -150,7 +147,6 @@ ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string
 
 	//Assimpを使ってOBJファイルを読み込む
 	//現状、objと
-
 	Assimp::Importer importer;
 	std::string filePath = directoryPath + "/" + filename;
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
@@ -173,7 +169,7 @@ ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string
 		assert(mesh->HasNormals());
 		assert(mesh->HasTextureCoords(0));
 
-
+		modelData.rootNode = ReadNode(scene->mRootNode);//ノードを読み込む
 		/*--------------------------------
 					faceを解析
 		---------------------------------*/
@@ -220,5 +216,25 @@ ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string
 
 	return modelData;
 
+}
+
+Node Model::ReadNode(aiNode* node) {
+
+	Node result;
+	aiMatrix4x4 aiLocalMatrix = node->mTransformation;//ノードのローカル行列を取得
+	aiLocalMatrix.Transpose();//行列を転置
+	result.localMatrix.m[0][0] = aiLocalMatrix[0][0];//他の要素も同じように
+   
+	result.name = node->mName.C_Str();//ノード名を取得
+	result.children.resize(node->mNumChildren);//子ノードの数を取得
+	for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex) {
+		//子ノードを再帰的に読み込む
+		result.children[childIndex] = new Node(ReadNode(node->mChildren[childIndex]));
+
+       
+	}
+
+
+	return result;
 }
 
