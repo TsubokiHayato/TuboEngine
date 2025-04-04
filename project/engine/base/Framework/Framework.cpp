@@ -172,6 +172,20 @@ void Framework::ImguiPostDraw()
 #ifdef _DEBUG
 	//ImGuiの受付終了
 	ImGui::ShowDemoWindow();
+	//BlendMode変更
+	ImGui::Begin("BlendNum");
+	ImGui::Text("BlendMode");
+	ImGui::Text("0: None");
+	ImGui::Text("1: Normal");
+	ImGui::Text("2: Add");
+	ImGui::Text("3: Subtract");
+	ImGui::Text("4: Multiply");
+	ImGui::Text("5: Screen");
+	ImGui::SliderInt("BlendNum", &objectBlendModeNum, 0, 5);
+	ImGui::SliderInt("SpriteBlendNum", &spriteBlendModeNum, 0, 5);
+	ImGui::End();
+
+	
 
 	imGuiManager->End();
 #endif // _DEBUG
@@ -181,14 +195,14 @@ void Framework::ImguiPostDraw()
 void Framework::Object3dCommonDraw()
 {
 	//オブジェクト3Dの描画
-	object3dCommon->DrawSettingsCommon();
+	object3dCommon->DrawSettingsCommon(objectBlendModeNum);
 	sceneManager->Object3DDraw();
 }
 
 void Framework::SpriteCommonDraw()
 {
 	//スプライトの描画
-	spriteCommon->DrawSettingsCommon();
+	spriteCommon->DrawSettingsCommon(spriteBlendModeNum);
 	sceneManager->SpriteDraw();
 }
 

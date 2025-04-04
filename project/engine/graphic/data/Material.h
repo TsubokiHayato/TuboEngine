@@ -13,4 +13,6 @@ struct Material {
 	float padding[3];
 	//UV変換行列
 	Matrix4x4 uvTransform;
+	//光沢度
+	float shininess;
 };
