@@ -8,6 +8,12 @@ class ParticleEmitter {
 public:
 
     // コンストラクタ
+	/// @param particle パーティクルのインスタンス
+	/// @param name パーティクルグループ名
+	/// @param transform エミッターの位置・回転・スケール
+	/// @param count 発生させるパーティクルの数
+	/// @param frequency 発生頻度
+	/// @param repeat 繰り返し発生させるかどうかのフラグ
     ParticleEmitter(Particle* particle, const std::string& name, const Transform& transform, uint32_t count, float frequency, bool repeat = false);
 
 
