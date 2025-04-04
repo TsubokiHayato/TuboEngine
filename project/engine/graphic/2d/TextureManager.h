@@ -74,5 +74,11 @@ private:
 	//SRVマネージャー
 	SrvManager* srvManager_;
 
+	std::string directoryPath_;//ディレクトリパス
+	std::string filePath_;//ファイルパス
+
+	//ディレクトリパスとファイルパスを結合する変数
+	std::string fullPath_;
+
 };
 
