@@ -1,24 +1,24 @@
 #pragma once
-#include"DirectXcommon.h"
-#include"WinApp.h"
+#include "DirectXcommon.h"
+#include "WinApp.h"
 
-#include"VertexData.h"
-#include"Material.h"
-#include"TransformationMatrix.h"
-#include"Transform.h"
-#include"ModelData.h"
-#include"Node.h"
+#include "Material.h"
+#include "ModelData.h"
+#include "Node.h"
+#include "Transform.h"
+#include "TransformationMatrix.h"
+#include "VertexData.h"
 
-
-#include<assimp/Importer.hpp>
-#include<assimp/scene.h>
-#include<assimp/postprocess.h>
-
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 
 class ModelCommon;
-class Model
-{
+class Model {
 public:
+	//------------------------------------
+	// メンバ関数
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -30,8 +30,6 @@ public:
 	/// </summary>
 	void Draw();
 
-
-
 	/// <summary>
 	/// マテリアルテンプレートファイルを読み込む
 	/// </summary>
@@ -39,7 +37,6 @@ public:
 	/// <param name="filePath">ファイルパス</param>
 	/// <returns>マテリアルデータ</returns>
 	static MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filePath);
-
 
 	/// <summary>
 	/// OBJファイルを読み込む
@@ -56,46 +53,45 @@ public:
 	/// <returns></returns>
 	static Node ReadNode(aiNode* node);
 
-	void SetModelColor(const Vector4& color) {
-		materialData->color = color;
-	}
+public:
+	//-----------------------------------------------------------
+	// Setter&Getter
 
-	Vector4 GetModelColor() {
-		return materialData->color;
-	}
+	
+	//モデルのカラー
+	Vector4 GetModelColor() { return materialData->color; }
+	void SetModelColor(const Vector4& color) { materialData->color = color; }
 
-	//光沢度
-	float GetModelShininess() {
-		return materialData->shininess;
-	}
-	void SetModelShininess(float shininess) {
-		materialData->shininess = shininess;
-	}
+	// 光沢度
+	float GetModelShininess() { return materialData->shininess; }
+	void SetModelShininess(float shininess) { materialData->shininess = shininess; }
+
+	// rootNodeLocalMatrix
+	Matrix4x4 GetRootNodeLocalMatrix() { return modelData.rootNode.localMatrix; }
+	void SetRootNodeLocalMatrix(const Matrix4x4& matrix) { modelData.rootNode.localMatrix = matrix; }
 
 
 private:
-	//共通部分
+	// 共通部分
 	ModelCommon* modelCommon_ = nullptr;
 
-	//モデルデータ
+	// モデルデータ
 	ModelData modelData;
 
-	//頂点リソースを作る
-	Microsoft::WRL::ComPtr <ID3D12Resource> vertexResource;
-	//頂点バッファ内リソース内のデータを指すポインタ
+	// 頂点リソースを作る
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
+	// 頂点バッファ内リソース内のデータを指すポインタ
 	VertexData* vertexData = nullptr;
-	//頂点バッファリソースの使い道を補足するバッファビュー
+	// 頂点バッファリソースの使い道を補足するバッファビュー
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 
-	//マテリアルのバッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> materialResource;
-	//マテリアルのバッファリソース内のデータを指すポインタ
+	// マテリアルのバッファリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource;
+	// マテリアルのバッファリソース内のデータを指すポインタ
 	Material* materialData = nullptr;
 
-	//コマンドリスト
-	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
+	// コマンドリスト
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 
 	std::string textureFileName_;
-
 };
-
