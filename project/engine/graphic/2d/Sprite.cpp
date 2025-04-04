@@ -14,6 +14,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 
 	textureFilePath_ = textureFilePath;
 
+	TextureManager::GetInstance()->LoadTexture(textureFilePath);
 
 #pragma region SpriteResource
 

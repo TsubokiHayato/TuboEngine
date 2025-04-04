@@ -3,31 +3,25 @@
 #include"SceneManager.h"
 #include"ModelManager.h"
 #include"TextureManager.h"
-void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon)
-{
+#include"BlendMode.h"
+void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon) {
 
 	this->object3dCommon = object3dCommon;
 	this->spriteCommon = spriteCommon;
 	this->winApp = winApp;
 	this->dxCommon = dxCommon;
 	//テクスチャマネージャに追加する画像ハンドル
-	std::string uvCheckerTextureHandle = "Resources/uvChecker.png";
-	std::string monsterBallTextureHandle = "Resources/monsterBall.png";
+	std::string uvCheckerTextureHandle = "uvChecker.png";
+	std::string monsterBallTextureHandle = "monsterBall.png";
 
-	//画像ハンドルをテクスチャマネージャに挿入する
-	TextureManager::GetInstance()->LoadTexture(uvCheckerTextureHandle);
-	TextureManager::GetInstance()->LoadTexture(monsterBallTextureHandle);
-
-	//モデルディレクトリパス
-	const std::string modelDirectoryPath = "Resources";
+	
 	//モデルファイルパス
-	const std::string modelFileNamePath = "plane.obj";
+	const std::string modelFileNamePath = "plane.gltf";
 	//モデルファイルパス2
-	const std::string modelFileNamePath2 = "barrier.obj";
+	const std::string modelFileNamePath2 = "terrain.obj";
 
-	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
-	ModelManager::GetInstance()->LoadModel(modelFileNamePath2);
 
+	//オーディオ
 	const std::string audioFileName = "fanfare.wav";
 	const std::string audioDirectoryPath = "Resources/Audio/";
 
@@ -52,8 +46,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 		if (i % 2 == 0) {
 			//モンスターボールを表示させる
 			sprite->Initialize(this->spriteCommon, monsterBallTextureHandle);
-		}
-		else {
+		} else {
 			//uvCheckerを表示させる
 			sprite->Initialize(this->spriteCommon, uvCheckerTextureHandle);
 		}
@@ -67,12 +60,16 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 		Vector2 size = { 50.0f, 50.0f };             // 任意のサイズ
 
 		//各種機能を使えるようにする
+		//左右反転
 		isFlipX_ = sprite->GetFlipX();
+		//上下反転
 		isFlipY_ = sprite->GetFlipY();
+		//テクスチャの左上座標
 		textureLeftTop = sprite->GetTextureLeftTop();
+		//テクスチャから初期サイズを得るフラグ
 		isAdjustTextureSize = sprite->GetIsAdjustTextureSize();
 
-
+		//スプライトの位置や回転を設定
 		sprite->SetPosition(spritePosition);
 		sprite->SetRotation(spriteRotation);
 		sprite->SetColor(spriteColor);
@@ -92,8 +89,8 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//オブジェクト3D
 
 	object3d = std::make_unique<Object3d>();
-	object3d->Initialize(this->object3dCommon);
-	object3d->SetModel("plane.obj");
+	object3d->Initialize(this->object3dCommon,modelFileNamePath);
+	object3d->SetModel(modelFileNamePath);
 
 	////////////////////////////////////////////////////////////////////////
 
@@ -102,7 +99,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//オブジェクト3D
 
 	object3d2 = std::make_unique<Object3d>();
-	object3d2->Initialize(this->object3dCommon);
+	object3d2->Initialize(this->object3dCommon,modelFileNamePath2);
 
 	object3d2->SetModel(modelFileNamePath2);
 
@@ -112,10 +109,11 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//カメラ
 
 	camera = std::make_unique<Camera>();
-
 	camera->SetTranslate(cameraPosition);
 	camera->setRotation(cameraRotation);
 	camera->setScale(cameraScale);
+
+	//
 	object3dCommon->SetDefaultCamera(camera.get());
 	object3d->SetCamera(camera.get());
 	object3d2->SetCamera(camera.get());
@@ -123,8 +121,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 #pragma endregion cameraの初期化
 }
 
-void DebugScene::Update()
-{
+void DebugScene::Update() {
 	/*--------------
 	   ゲームの処理
 	--------------*/
@@ -133,11 +130,7 @@ void DebugScene::Update()
 	camera->setScale(cameraScale);
 	camera->Update();
 
-	modelRotation.y += 0.01f;
 
-	modelRotation2.x -= 0.01f;
-	//modelRotation2.y -= 0.01f;
-	modelRotation2.z -= 0.01f;
 
 	//オブジェクト3Dの更新
 	object3d->Update();
@@ -181,8 +174,7 @@ void DebugScene::Update()
 
 }
 
-void DebugScene::Finalize()
-{
+void DebugScene::Finalize() {
 
 	for (Sprite* sprite : sprites) {
 		if (sprite) {
@@ -193,14 +185,12 @@ void DebugScene::Finalize()
 
 }
 
-void DebugScene::Object3DDraw()
-{
+void DebugScene::Object3DDraw() {
 	object3d->Draw();
 	object3d2->Draw();
 }
 
-void DebugScene::SpriteDraw()
-{
+void DebugScene::SpriteDraw() {
 	for (Sprite* sprite : sprites) {
 		if (sprite) {
 			sprite->Draw();
@@ -208,29 +198,24 @@ void DebugScene::SpriteDraw()
 	}
 }
 
-void DebugScene::ImGuiDraw()
-{
+void DebugScene::ImGuiDraw() {
 	ImGui::Begin("DebugScene");
 	ImGui::Text("Hello, DebugScene!");
 	ImGui::End();
 
-
 #ifdef _DEBUG
 
-
-
 	ImGui::Begin("camera");
-	ImGui::DragFloat3("Position", &cameraPosition.x);
-	ImGui::DragFloat3("Rotation", &cameraRotation.x);
-	ImGui::DragFloat3("Scale", &cameraScale.x);
+	ImGui::DragFloat3("Position", &cameraPosition.x, 0.1f);
+	ImGui::DragFloat3("Rotation", &cameraRotation.x, 0.1f);
+	ImGui::DragFloat3("Scale", &cameraScale.x, 0.1f);
 	ImGui::End();
 
 	//スプライトのImGui
-	 //スプライトのImGui
 	for (Sprite* sprite : sprites) {
 		if (sprite) {
 			ImGui::Begin("Sprite");
-			ImGui::SetWindowSize({ 500,100 });
+
 
 			Vector2 spritePosition = sprite->GetPosition();
 			ImGui::SliderFloat2("Position", &spritePosition.x, 0.0f, 1920.0f, "%.1f");
@@ -241,6 +226,10 @@ void DebugScene::ImGuiDraw()
 			ImGui::Checkbox("isAdjustTextureSize", &isAdjustTextureSize);
 			ImGui::DragFloat2("textureLeftTop", &textureLeftTop.x);
 
+			Vector4 color = sprite->GetColor();
+			ImGui::ColorEdit4("Color", &color.x);
+			sprite->SetColor(color);
+
 			ImGui::End();
 		}
 	}
@@ -248,21 +237,30 @@ void DebugScene::ImGuiDraw()
 	ImGui::DragFloat3("Position", &modelPosition.x);
 	ImGui::DragFloat3("Rotation", &modelRotation.x);
 	ImGui::DragFloat3("Scale", &modelScale.x);
+
+
+	//色
+	Vector4 color = object3d->GetModelColor();
+	ImGui::ColorEdit4("Color", &color.x);
+	object3d->SetModelColor(color);
+
 	ImGui::End();
 
+	object3d->ShowImGuiLight();
 	ImGui::Begin("Object3D2");
 	ImGui::DragFloat3("Position", &modelPosition2.x);
 	ImGui::DragFloat3("Rotation", &modelRotation2.x);
 	ImGui::DragFloat3("Scale", &modelScale2.x);
-	ImGui::End();
 
+
+	object3d2->SetModelColor(color);
+	ImGui::End();
 
 	static float scratchPosition = 0.0f;
 	static bool isScratching = false;
 	static float lastScratchPosition = 0.0f;
 	//再生時間
 	float duration = audio->GetSoundDuration();
-
 
 	ImGui::Begin("Audio Control");
 
@@ -303,7 +301,6 @@ void DebugScene::ImGuiDraw()
 
 }
 
-void DebugScene::ParticleDraw()
-{
+void DebugScene::ParticleDraw() {
 
 }
