@@ -16,7 +16,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 	
 	//モデルファイルパス
-	const std::string modelFileNamePath = "sphere.obj";
+	const std::string modelFileNamePath = "plane.gltf";
 	//モデルファイルパス2
 	const std::string modelFileNamePath2 = "terrain.obj";
 

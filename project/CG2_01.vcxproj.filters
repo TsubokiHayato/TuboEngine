@@ -395,6 +395,9 @@
     <ClInclude Include="engine\graphic\data\CameraForGPU.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="engine\graphic\data\Node.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc">
