@@ -63,8 +63,7 @@ void Particle::Update() {
 		billboardMatrix.m[3][0] = 0.0f;
 		billboardMatrix.m[3][1] = 0.0f;
 		billboardMatrix.m[3][2] = 0.0f;
-	}
-	else {
+	} else {
 		billboardMatrix = MakeIdentity4x4();
 	}
 
@@ -85,8 +84,8 @@ void Particle::Update() {
 				continue;
 			}
 			// スケールをテクスチャサイズに基づいて調整
-			particle.transform.scale.x = textureSize.x * scaleMultiplier;
-			particle.transform.scale.y = textureSize.y * scaleMultiplier;
+		/*	particle.transform.scale.x = textureSize.x * scaleMultiplier;
+			particle.transform.scale.y = textureSize.y * scaleMultiplier;*/
 			// 位置の更新
 			particle.transform.translate = particle.transform.translate + (particle.velocity * kDeltaTime);
 
@@ -155,7 +154,7 @@ void Particle::Draw() {
 /// <param name="name">パーティクル名</param>
 /// <param name="position">生成位置</param>
 /// <param name="count">生成数</param>
-void Particle::Emit(const std::string name, const Vector3& position, uint32_t count) {
+void Particle::Emit(const std::string name, const Transform& transform, uint32_t count) {
 	if (particleGroups.find(name) == particleGroups.end()) {
 		// パーティクルグループが存在しない場合はエラーを出力して終了
 		assert("Specified particle group does not exist!");
@@ -171,7 +170,7 @@ void Particle::Emit(const std::string name, const Vector3& position, uint32_t co
 
 	// 指定された数のパーティクルを生成して追加
 	for (uint32_t i = 0; i < count; ++i) {
-		group.particleList.push_back(CreateNewParticle(randomEngine_, position));
+		group.particleList.push_back(CreateNewParticle(randomEngine_, transform));
 	}
 }
 
@@ -210,8 +209,7 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 	// サイズを設定（指定があればそれを使用、なければテクスチャサイズを使用）
 	if (customTextureSize.x > 0.0f && customTextureSize.y > 0.0f) {
 		newGroup.textureSize = customTextureSize;
-	}
-	else {
+	} else {
 		newGroup.textureSize = textureSize;
 	}
 
@@ -285,7 +283,7 @@ void Particle::CreateMaterialData() {
 /// <param name="randomEngine">ランダムエンジン</param>
 /// <param name="position">生成位置</param>
 /// <returns>新しいパーティクル情報</returns>
-ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Vector3& position) {
+ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Transform& transform) {
 	// カラーと寿命のランダム分布
 	std::uniform_real_distribution<float> distColor(colorRange_.min, colorRange_.max);
 	std::uniform_real_distribution<float> distTime(lifetimeRange_.min, lifetimeRange_.max);
@@ -296,32 +294,53 @@ ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Vecto
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
-	particle.transform.scale = { 1.0f, 1.0f, 1.0f };
-	particle.transform.rotate = { 0.0f, 0.0f, 0.0f };
+	//particle.transform.scale = { 1.0f, 1.0f, 1.0f };
+	//particle.transform.rotate = { 0.0f, 0.0f, 0.0f };
 
-	// 初期位置をエミッターの位置に設定
-	particle.transform.translate = position;
+	//// 初期位置をエミッターの位置に設定
+	//particle.transform.translate = position;
 
-	// ランダムな方向ベクトルの生成（球面上のランダムな点）
-	std::uniform_real_distribution<float> distAngle(0.0f, 1.0f);
-	float z = distAngle(randomEngine) * 2.0f - 1.0f; // z ∈ [-1, 1]
-	float theta = distAngle(randomEngine) * 2.0f * std::numbers::pi_v<float>; // θ ∈ [0, 2π]
-	float r = std::sqrt(1.0f - z * z);
-	float x = r * std::cos(theta);
-	float y = r * std::sin(theta);
+	//// ランダムな方向ベクトルの生成（球面上のランダムな点）
+	//std::uniform_real_distribution<float> distAngle(0.0f, 1.0f);
+	//float z = distAngle(randomEngine) * 2.0f - 1.0f; // z ∈ [-1, 1]
+	//float theta = distAngle(randomEngine) * 2.0f * std::numbers::pi_v<float>; // θ ∈ [0, 2π]
+	//float r = std::sqrt(1.0f - z * z);
+	//float x = r * std::cos(theta);
+	//float y = r * std::sin(theta);
 
-	Vector3 direction = { x, y, z }; // 方向ベクトル
+	//Vector3 direction = { x, y, z }; // 方向ベクトル
 
-	// 速度を設定
-	float speed = distSpeed(randomEngine);
+	//// 速度を設定
+	//float speed = distSpeed(randomEngine);
 
-	// 初期速度を設定
-	particle.velocity = speed * direction;
+	//// 初期速度を設定
+	//particle.velocity = speed * direction;
 
-	// カラーと寿命を設定
-	particle.color = { distColor(randomEngine), distColor(randomEngine), distColor(randomEngine), 1.0f };
-	particle.lifeTime = distTime(randomEngine);
+	//// カラーと寿命を設定
+	//particle.color = { distColor(randomEngine), distColor(randomEngine), distColor(randomEngine), 1.0f };
+	//particle.lifeTime = distTime(randomEngine);
+	//particle.currentTime = 0.0f;
+
+	/*particle.transform.translate = transform.translate;
+	particle.transform.rotate = transform.rotate;
+	particle.transform.scale = transform.scale;*/
+
+	std::uniform_real_distribution<float>distRotateZ(rotateRange_.min,rotateRange_.max);
+	std::uniform_real_distribution<float>distScaleY(scaleRange_.min,scaleRange_.max);
+
+
+	particle.transform.translate = {};
+	particle.transform.rotate = {0.0f,0.0f,distRotateZ(randomEngine)};
+	particle.transform.scale = { 0.025f,distScaleY(randomEngine),1.0f};
+
+	///===============================================
+	///早めに修正！
+	//ここはそのうちEmitterから情報を受け取れるようにする
+	particle.velocity = {};
+	particle.color = { 1.0f,1.0f,1.0f,1.0f };
+	particle.lifeTime = 1.0f;
 	particle.currentTime = 0.0f;
+
 
 	return particle;
 }

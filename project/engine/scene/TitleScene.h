@@ -63,7 +63,7 @@ private:
 	Vector3 cameraRotation = { 0.0f,0.0f,0.0f };
 	Vector3 cameraScale = { 1.0f,1.0f,1.0f };
 
-
+	Transform particleTranslate;
 
 };
 
