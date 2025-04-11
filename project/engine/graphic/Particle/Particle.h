@@ -194,9 +194,9 @@ private:
 	};
 
 	RandomRange translateRange_ = { 0.0f, 0.0f }; // 位置の乱数範囲
-	RandomRange rotateXRange_ = { 0.0f,5.0f };//
-	RandomRange rotateYRange_ = { 0.0f,5.0f };
-	RandomRange rotateZRange_ = { 0.0f,5.0f };
+	RandomRange rotateRange_ = { 0.0f,3.14f };//回転の乱数範囲
+	RandomRange scaleRange_ = { 0.4f,1.5f };//拡大の乱数範囲
+
 	RandomRange colorRange_ = { 1.0f, 1.0f }; // カラーの乱数範囲
 	RandomRange lifetimeRange_ = { 1.0f, 3.0f }; // 寿命の乱数範囲
 	RandomRange velocityRange_ = { -1.1f, 1.1f }; // 速度の乱数範囲

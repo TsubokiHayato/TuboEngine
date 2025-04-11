@@ -84,8 +84,8 @@ void Particle::Update() {
 				continue;
 			}
 			// スケールをテクスチャサイズに基づいて調整
-			particle.transform.scale.x = textureSize.x * scaleMultiplier;
-			particle.transform.scale.y = textureSize.y * scaleMultiplier;
+		/*	particle.transform.scale.x = textureSize.x * scaleMultiplier;
+			particle.transform.scale.y = textureSize.y * scaleMultiplier;*/
 			// 位置の更新
 			particle.transform.translate = particle.transform.translate + (particle.velocity * kDeltaTime);
 
@@ -325,11 +325,13 @@ ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Trans
 	particle.transform.rotate = transform.rotate;
 	particle.transform.scale = transform.scale;*/
 
-	std::uniform_real_distribution<float>distRotateZ(rotateZRange_.min,rotateZRange_.max);
+	std::uniform_real_distribution<float>distRotateZ(rotateRange_.min,rotateRange_.max);
+	std::uniform_real_distribution<float>distScaleY(scaleRange_.min,scaleRange_.max);
+
 
 	particle.transform.translate = {};
 	particle.transform.rotate = {0.0f,0.0f,distRotateZ(randomEngine)};
-	particle.transform.scale = { 0.05f,1.0f,1.0f };
+	particle.transform.scale = { 0.025f,distScaleY(randomEngine),1.0f};
 
 	///===============================================
 	///早めに修正！
