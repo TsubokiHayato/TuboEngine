@@ -18,15 +18,17 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//テクスチャマネージャに追加する画像ハンドル
 	std::string uvCheckerTextureHandle = "uvChecker.png";
 	std::string monsterBallTextureHandle = "monsterBall.png";
+	std::string particleTextureHandle = "particle.png";
 
 	//画像ハンドルをテクスチャマネージャに挿入する
 	TextureManager::GetInstance()->LoadTexture(uvCheckerTextureHandle);
 	TextureManager::GetInstance()->LoadTexture(monsterBallTextureHandle);
+	TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
 
 	//パーティクル
 	particle = std::make_unique<Particle>();
 	particle->Initialize(this->particleCommon);
-	particle->CreateParticleGroup("Particle", uvCheckerTextureHandle);
+	particle->CreateParticleGroup("Particle", particleTextureHandle);
 	particleTranslate = {
 		//Scale
 		{0.05f, 0.1f, 0.1f},
