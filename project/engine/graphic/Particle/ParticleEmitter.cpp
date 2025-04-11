@@ -10,7 +10,20 @@
 
 
 ParticleEmitter::ParticleEmitter(Particle* particle, const std::string& name, const Transform& transform, uint32_t count, float frequency, bool repeat)
-    : particle_(particle), name_(name), transform_(transform), count_(count), frequency_(frequency), elapsedTime_(frequency), repeat_(repeat)
+  //パーティクルのインスタンス
+    : particle_(particle), 
+    //パーティクルグループ名
+    name_(name), 
+    // エミッターの位置・回転・スケール
+    transform_(transform), 
+    // 発生させるパーティクルの数
+    count_(count), 
+    // 発生頻度
+    frequency_(frequency),
+    // 発生頻度
+    elapsedTime_(frequency),
+    // 繰り返し発生させるかどうかのフラグ
+    repeat_(repeat)
 {
     Emit(); // 初期化時に即時発生
 }
@@ -36,7 +49,7 @@ void ParticleEmitter::Draw() {
 
 void ParticleEmitter::Emit() {
 	// パーティクルの発生
-    particle_->Emit(name_, transform_.translate, count_);
+    particle_->Emit(name_, transform_, count_);
 }
 
 void ParticleEmitter::SetRepeat(bool repeat) {
