@@ -13,7 +13,8 @@
 #include <random>
 
 // パーティクル情報
-struct ParticleInfo {
+struct ParticleInfo
+{
 	Transform transform; // 位置、拡大率、回転
 	Vector3 velocity; // 速度
 	Vector4 color; // カラー
@@ -21,14 +22,16 @@ struct ParticleInfo {
 	float currentTime; // 経過時間
 };
 
-struct ParticleForGPU {
+struct ParticleForGPU
+{
 	Matrix4x4 WVP; // ワールド・ビュー・プロジェクション行列
 	Matrix4x4 World; // ワールド行列
 	Vector4 color; // カラー
 };
 
 // パーティクルグループ構造体
-struct ParticleGroup {
+struct ParticleGroup
+{
 	std::string materialFilePath; // マテリアルデータのファイルパス
 	int srvIndex = 0; // シェーダーリソースビューのインデックス
 	std::list<ParticleInfo> particleList = {}; // パーティクルのリスト
@@ -51,7 +54,8 @@ class Particle
 {
 public:
 	// 平行光源
-	struct DirectionalLight {
+	struct DirectionalLight
+	{
 		Vector4 color; // 色
 		Vector3 direction; // 方向
 		float intensity; // 強度
@@ -80,7 +84,7 @@ public:
 	/// <param name="name">パーティクル名</param>
 	/// <param name="position">生成位置</param>
 	/// <param name="count">生成数</param>
-	void Emit(const std::string name, const Vector3& position, uint32_t count);
+	void Emit(const std::string name, const Transform& transform, uint32_t count);
 
 	/// <summary>
 	/// パーティクルグループの作成
@@ -111,7 +115,7 @@ private:
 	/// <param name="randomEngine">ランダムエンジン</param>
 	/// <param name="position">生成位置</param>
 	/// <returns>新しいパーティクル情報</returns>
-	ParticleInfo CreateNewParticle(std::mt19937& randomEngine, const Vector3& position);
+	ParticleInfo CreateNewParticle(std::mt19937& randomEngine, const Transform& transform);
 
 public:
 	// Setter
@@ -183,12 +187,16 @@ private:
 	static const uint32_t kNumMaxInstance = 128; // 最大インスタンス数
 	const float kDeltaTime = 1.0f / 60.0f; // デルタタイム
 
-	struct RandomRange {
+	struct RandomRange
+	{
 		float min; // 最小値
 		float max; // 最大値
 	};
 
 	RandomRange translateRange_ = { 0.0f, 0.0f }; // 位置の乱数範囲
+	RandomRange rotateRange_ = { 0.0f,3.14f };//回転の乱数範囲
+	RandomRange scaleRange_ = { 0.4f,1.5f };//拡大の乱数範囲
+
 	RandomRange colorRange_ = { 1.0f, 1.0f }; // カラーの乱数範囲
 	RandomRange lifetimeRange_ = { 1.0f, 3.0f }; // 寿命の乱数範囲
 	RandomRange velocityRange_ = { -1.1f, 1.1f }; // 速度の乱数範囲
