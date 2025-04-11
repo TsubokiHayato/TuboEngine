@@ -1,8 +1,7 @@
 #include "TitleScene.h"
 #include"TextureManager.h"
 #include"ImGuiManager.h"
-void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon)
-{
+void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon) {
 	//各共通部分のポインタを受け取る
 	this->particleCommon = particleCommon;
 	this->dxCommon = dxCommon;
@@ -23,25 +22,41 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//画像ハンドルをテクスチャマネージャに挿入する
 	TextureManager::GetInstance()->LoadTexture(uvCheckerTextureHandle);
 	TextureManager::GetInstance()->LoadTexture(monsterBallTextureHandle);
-	
+
 	//パーティクル
-	particle =std::make_unique<Particle>();
+	particle = std::make_unique<Particle>();
 	particle->Initialize(this->particleCommon);
-	particle->CreateParticleGroup("Particle",uvCheckerTextureHandle);
-	particleEmitter_ = std::make_unique<ParticleEmitter>(
-		particle.get(), "Particle",
-		Transform{
-			{0.1f, 0.1f, 0.1f},
-			{0.0f, 0.0f, 0.0f},
-			{0.0f, 0.0f, 0.0f}
-		},
-		10, 0.1f, true);
+	particle->CreateParticleGroup("Particle", uvCheckerTextureHandle);
+	particleTranslate = {
+		//Scale
+		{0.05f, 0.1f, 0.1f},
+		//Rotate
+		{0.0f, 0.0f, 0.0f},
+		//Translate
+		{0.0f, 0.0f, 0.0f}
+
+	};
+	particleEmitter_ =
+		std::make_unique<ParticleEmitter>(
+			//パーティクルのインスタンス
+			particle.get(),
+			//パーティクルグループ名
+			"Particle",
+			particleTranslate,
+			//発生させるパーティクルの数
+			3,
+			//発生頻度
+			1.0f,
+			//繰り返し発生させるかどうかのフラグ
+			true
+		);
+
+	
 
 
 }
 
-void TitleScene::Update()
-{
+void TitleScene::Update() {
 	//カメラ
 	camera->SetTranslate(cameraPosition);
 	camera->setRotation(cameraRotation);
@@ -54,34 +69,34 @@ void TitleScene::Update()
 
 }
 
-void TitleScene::Finalize()
-{
-	
-	
+void TitleScene::Finalize() {
+
+
 }
 
-void TitleScene::Object3DDraw()
-{
-}
+void TitleScene::Object3DDraw() {}
 
-void TitleScene::SpriteDraw()
-{
-}
+void TitleScene::SpriteDraw() {}
 
-void TitleScene::ImGuiDraw()
-{
+void TitleScene::ImGuiDraw() {
 	//カメラ
 	ImGui::Begin("camera");
 	ImGui::DragFloat3("Position", &cameraPosition.x);
 	ImGui::DragFloat3("Rotation", &cameraRotation.x);
 	ImGui::DragFloat3("Scale", &cameraScale.x);
 	ImGui::End();
-	
-	
+
+
+	ImGui::Begin("Particle");
+	ImGui::DragFloat3("Position", &particleTranslate.translate.x);
+	ImGui::DragFloat3("Rotation", &particleTranslate.rotate.x);
+	ImGui::DragFloat3("Scale", &particleTranslate.scale.x);
+	ImGui::End();
+
+
 }
 
-void TitleScene::ParticleDraw()
-{
+void TitleScene::ParticleDraw() {
 	//パーティクル
 	particle->Draw();
 
