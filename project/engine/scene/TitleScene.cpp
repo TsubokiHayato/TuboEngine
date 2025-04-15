@@ -44,7 +44,16 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 			particle.get(),
 			//パーティクルグループ名
 			"Particle",
+			//エミッターの位置・回転・スケール
 			particleTranslate,
+			//速度
+			particleVelocity,
+			// カラー
+			particleColor,
+			//寿命
+			particleLifeTime,
+			//経過時間
+			0.0f,
 			//発生させるパーティクルの数
 			3,
 			//発生頻度

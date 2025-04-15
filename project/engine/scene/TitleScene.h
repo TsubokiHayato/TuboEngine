@@ -64,6 +64,11 @@ private:
 	Vector3 cameraScale = { 1.0f,1.0f,1.0f };
 
 	Transform particleTranslate;
+	Vector4 particleVelocity = { 0.0f,0.0f,0.0f,1.0f };
+	Vector4 particleColor = { 1.0f,1.0f,1.0f,1.0f };
+	float particleLifeTime = 1.0f;
+	float particleCurrentTime = 0.0f;
+
 
 };
 

@@ -49,7 +49,7 @@ void ParticleEmitter::Draw() {
 
 void ParticleEmitter::Emit() {
 	// パーティクルの発生
-    particle_->Emit(name_, transform_, count_);
+	particle_->Emit(name_, transform_, velocity_, color_, lifeTime_, currentTime_, count_);
 }
 
 void ParticleEmitter::SetRepeat(bool repeat) {
