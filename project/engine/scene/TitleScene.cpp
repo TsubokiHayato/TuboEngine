@@ -38,6 +38,15 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 		{0.0f, 0.0f, 0.0f}
 
 	};
+
+	///===============================================
+	///早めに修正！
+	//ここはそのうちEmitterから情報を受け取れるようにする
+	particleVelocity = {};
+	particleColor = { 1.0f,1.0f,1.0f,1.0f };
+	particleLifeTime = 1.0f;
+	particleCurrentTime= 0.0f;
+
 	particleEmitter_ =
 		std::make_unique<ParticleEmitter>(
 			//パーティクルのインスタンス
@@ -53,7 +62,7 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 			//寿命
 			particleLifeTime,
 			//経過時間
-			0.0f,
+			particleCurrentTime,
 			//発生させるパーティクルの数
 			3,
 			//発生頻度
@@ -98,6 +107,7 @@ void TitleScene::ImGuiDraw() {
 	ImGui::End();
 
 
+	//パーティクル
 	ImGui::Begin("Particle");
 	ImGui::DragFloat3("Position", &particleTranslate.translate.x);
 	ImGui::DragFloat3("Rotation", &particleTranslate.rotate.x);
