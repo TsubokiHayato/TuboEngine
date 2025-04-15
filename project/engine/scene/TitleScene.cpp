@@ -25,13 +25,16 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	TextureManager::GetInstance()->LoadTexture(monsterBallTextureHandle);
 	TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
 
+
+	
+
 	//パーティクル
 	particle = std::make_unique<Particle>();
 	particle->Initialize(this->particleCommon);
 	particle->CreateParticleGroup("Particle", particleTextureHandle);
 	particleTranslate = {
 		//Scale
-		{0.05f, 0.1f, 0.1f},
+		{0.25f, 0.1f, 0.1f},
 		//Rotate
 		{0.0f, 0.0f, 0.0f},
 		//Translate
@@ -39,9 +42,7 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 	};
 
-	///===============================================
-	///早めに修正！
-	//ここはそのうちEmitterから情報を受け取れるようにする
+	
 	particleVelocity = {};
 	particleColor = { 1.0f,1.0f,1.0f,1.0f };
 	particleLifeTime = 1.0f;
@@ -83,7 +84,18 @@ void TitleScene::Update() {
 	camera->setScale(cameraScale);
 	camera->Update();
 
-	//パーティクル
+	
+
+	
+
+	///Particle///
+	///パーティクルで乱数を使いたい場合
+	/// SetDist～～～の関数を使う
+	///基本RangeはScale以外は0.0fなので
+	/// 使いたいものの数値を変換して使ってください
+	particle->SetDistRotateZ(0.0f, 3.14f);
+	particle->SetDistScaleY(0.4f, 1.5f);
+	
 	particle->Update();
 	particleEmitter_->Update();
 
