@@ -71,15 +71,6 @@ private:
 
 	//乱数エンジン
 	std::mt19937 randomEngine_;
-	//乱数の範囲
-	struct RandomRange
-	{
-		float min; // 最小値
-		float max; // 最大値
-	};
-
-	RandomRange rotateRange_ = { 0.0f,3.14f };//回転の乱数範囲
-	RandomRange scaleRange_ = { 0.4f,1.5f };//拡大の乱数範囲
 	
 
 };
