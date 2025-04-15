@@ -154,7 +154,7 @@ void Particle::Draw() {
 /// <param name="name">パーティクル名</param>
 /// <param name="position">生成位置</param>
 /// <param name="count">生成数</param>
-void Particle::Emit(const std::string name, const Transform& transform,Vector4 velocity, Vector4 color,float lifeTime, float currentTime, uint32_t count) {
+void Particle::Emit(const std::string name, const Transform& transform,Vector3 velocity, Vector4 color,float lifeTime, float currentTime, uint32_t count) {
 	if (particleGroups.find(name) == particleGroups.end()) {
 		// パーティクルグループが存在しない場合はエラーを出力して終了
 		assert("Specified particle group does not exist!");
@@ -282,39 +282,37 @@ void Particle::CreateMaterialData() {
 /// </summary>
 /// <param name="randomEngine">ランダムエンジン</param>
 /// <param name="position">生成位置</param>
+/// <param name="velocity">速度</param>
+/// <param name="color">カラー</param>
+/// <param name="lifeTime">寿命</param>
+/// <param name="currentTime">経過時間</param>
 /// <returns>新しいパーティクル情報</returns>
-ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Transform& transform,Vector4 velocity,Vector4 color ,float lifeTime,float currentTime) {
-	// カラーと寿命のランダム分布
-	std::uniform_real_distribution<float> distColor(colorRange_.min, colorRange_.max);
-	std::uniform_real_distribution<float> distTime(lifetimeRange_.min, lifetimeRange_.max);
-
-	// 速度のランダム分布
-	std::uniform_real_distribution<float> distSpeed(velocityRange_.min, velocityRange_.max);
-
+ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Transform& transform,Vector3 velocity,Vector4 color ,float lifeTime,float currentTime) {
+	
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
 	std::uniform_real_distribution<float>distRotateZ(rotateRange_.min,rotateRange_.max);
 	std::uniform_real_distribution<float>distScaleY(scaleRange_.min,scaleRange_.max);
-
-	//particle.transform = transform;
-	//particle.velocity = velocity;
-	//particle.color = color;
-	//particle.lifeTime = lifeTime;
-	//particle.currentTime = currentTime;
+	
+	
 
 	particle.transform.translate = {};
 	particle.transform.rotate = {0.0f,0.0f,distRotateZ(randomEngine)};
 	particle.transform.scale = { 0.025f,distScaleY(randomEngine),1.0f};
 
-	///===============================================
-	///早めに修正！
-	//ここはそのうちEmitterから情報を受け取れるようにする
-	particle.velocity = {};
-	particle.color = { 1.0f,1.0f,1.0f,1.0f };
-	particle.lifeTime = 1.0f;
-	particle.currentTime = 0.0f;
+	
 
+	//拡大縮小、回転、平行移動の設定
+	//particle.transform = transform;
+	//速度の設定
+	particle.velocity = velocity;
+	//色の設定
+	particle.color = color;
+	//寿命の設定
+	particle.lifeTime = lifeTime;
+	//経過時間の設定
+	particle.currentTime = currentTime;
 
 	return particle;
 }

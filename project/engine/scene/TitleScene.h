@@ -3,7 +3,7 @@
 #include"Particle.h"
 #include"Camera.h"
 #include"ParticleEmitter.h"
-
+#include <random>
 class TitleScene :public IScene
 {
 public:
@@ -64,11 +64,23 @@ private:
 	Vector3 cameraScale = { 1.0f,1.0f,1.0f };
 
 	Transform particleTranslate;
-	Vector4 particleVelocity = { 0.0f,0.0f,0.0f,1.0f };
+	Vector3 particleVelocity = { 0.0f,0.0f,0.0f};
 	Vector4 particleColor = { 1.0f,1.0f,1.0f,1.0f };
 	float particleLifeTime = 1.0f;
 	float particleCurrentTime = 0.0f;
 
+	//乱数エンジン
+	std::mt19937 randomEngine_;
+	//乱数の範囲
+	struct RandomRange
+	{
+		float min; // 最小値
+		float max; // 最大値
+	};
+
+	RandomRange rotateRange_ = { 0.0f,3.14f };//回転の乱数範囲
+	RandomRange scaleRange_ = { 0.4f,1.5f };//拡大の乱数範囲
+	
 
 };
 

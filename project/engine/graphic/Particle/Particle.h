@@ -88,7 +88,7 @@ public:
 	/// <param name="lifeTime">寿命</param>
 	/// <param name="currentTime">経過時間</param>
 	/// <param name="count">生成数</param>
-	void Emit(const std::string name, const Transform& transform, Vector4 velocity, Vector4 color, float lifeTime, float currentTime, uint32_t count);
+	void Emit(const std::string name, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime, uint32_t count);
 
 	/// <summary>
 	/// パーティクルグループの作成
@@ -123,7 +123,7 @@ private:
 	/// <param name="lifeTime">寿命</param>
 	/// <param name="currentTime">経過時間</param>
 	/// <returns>新しいパーティクル情報</returns>
-	ParticleInfo CreateNewParticle(std::mt19937& randomEngine, const Transform& transform, Vector4 velocity, Vector4 color, float lifeTime, float currentTime);
+	ParticleInfo CreateNewParticle(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
 
 public:
 	// Setter
