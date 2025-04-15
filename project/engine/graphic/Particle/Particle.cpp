@@ -287,31 +287,51 @@ void Particle::CreateMaterialData() {
 /// <param name="lifeTime">寿命</param>
 /// <param name="currentTime">経過時間</param>
 /// <returns>新しいパーティクル情報</returns>
-ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Transform& transform,Vector3 velocity,Vector4 color ,float lifeTime,float currentTime) {
-	
+ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
-	std::uniform_real_distribution<float>distRotateZ(rotateRange_.min,rotateRange_.max);
-	std::uniform_real_distribution<float>distScaleY(scaleRange_.min,scaleRange_.max);
-	
-	
+
+
+	// 回転範囲の設定
+	std::uniform_real_distribution<float> distRotateX(std::min(rotateRange_.x.min, rotateRange_.x.max), std::max(rotateRange_.x.min, rotateRange_.x.max));
+	std::uniform_real_distribution<float> distRotateY(std::min(rotateRange_.y.min, rotateRange_.y.max), std::max(rotateRange_.y.min, rotateRange_.y.max));
+	std::uniform_real_distribution<float> distRotateZ(std::min(rotateRange_.z.min, rotateRange_.z.max), std::max(rotateRange_.z.min, rotateRange_.z.max));
+	// 拡大縮小範囲の設定
+	std::uniform_real_distribution<float> distScaleX(std::min(scaleRange_.x.min, scaleRange_.x.max), std::max(scaleRange_.x.min, scaleRange_.x.max));
+	std::uniform_real_distribution<float> distScaleY(std::min(scaleRange_.y.min, scaleRange_.y.max), std::max(scaleRange_.y.min, scaleRange_.y.max));
+	std::uniform_real_distribution<float> distScaleZ(std::min(scaleRange_.z.min, scaleRange_.z.max), std::max(scaleRange_.z.min, scaleRange_.z.max));
+	// 平行移動範囲の設定
+	std::uniform_real_distribution<float> distTranslateX(std::min(translateRange_.x.min, translateRange_.x.max), std::max(translateRange_.x.min, translateRange_.x.max));
+	std::uniform_real_distribution<float> distTranslateY(std::min(translateRange_.y.min, translateRange_.y.max), std::max(translateRange_.y.min, translateRange_.y.max));
+	std::uniform_real_distribution<float> distTranslateZ(std::min(translateRange_.z.min, translateRange_.z.max), std::max(translateRange_.z.min, translateRange_.z.max));
+	// 速度範囲の設定
+	std::uniform_real_distribution<float> distVelocityX(std::min(velocityRange_.x.min, velocityRange_.x.max), std::max(velocityRange_.x.min, velocityRange_.x.max));
+	std::uniform_real_distribution<float> distVelocityY(std::min(velocityRange_.y.min, velocityRange_.y.max), std::max(velocityRange_.y.min, velocityRange_.y.max));
+	std::uniform_real_distribution<float> distVelocityZ(std::min(velocityRange_.z.min, velocityRange_.z.max), std::max(velocityRange_.z.min, velocityRange_.z.max));
+	// 色範囲の設定
+	std::uniform_real_distribution<float> distColorR(std::min(colorRange_.x.min, colorRange_.x.max), std::max(colorRange_.x.min, colorRange_.x.max));
+	std::uniform_real_distribution<float> distColorG(std::min(colorRange_.y.min, colorRange_.y.max), std::max(colorRange_.y.min, colorRange_.y.max));
+	std::uniform_real_distribution<float> distColorB(std::min(colorRange_.z.min, colorRange_.z.max), std::max(colorRange_.z.min, colorRange_.z.max));
+	std::uniform_real_distribution<float> distColorA(std::min(colorRange_.w.min, colorRange_.w.max), std::max(colorRange_.w.min, colorRange_.w.max));
+	// 寿命範囲の設定
+	std::uniform_real_distribution<float> distLifeTime(std::min(lifetimeRange_.min, lifetimeRange_.max), std::max(lifetimeRange_.min, lifetimeRange_.max));
+	// 経過時間範囲の設定
+	std::uniform_real_distribution<float> distCurrentTime(std::min(currentTimeRange_.min, currentTimeRange_.max), std::max(currentTimeRange_.min, currentTimeRange_.max));
 
 	particle.transform.translate = {};
-	particle.transform.rotate = {0.0f,0.0f,distRotateZ(randomEngine)};
-	particle.transform.scale = { 0.025f,distScaleY(randomEngine),1.0f};
+	particle.transform.rotate = { 0.0f, 0.0f, distRotateZ(randomEngine) };
+	particle.transform.scale = { 0.025f, distScaleY(randomEngine), 1.0f };
 
-	
-
-	//拡大縮小、回転、平行移動の設定
-	//particle.transform = transform;
-	//速度の設定
+	// 拡大縮小、回転、平行移動の設定
+	// particle.transform = transform;
+	// 速度の設定
 	particle.velocity = velocity;
-	//色の設定
+	// 色の設定
 	particle.color = color;
-	//寿命の設定
+	// 寿命の設定
 	particle.lifeTime = lifeTime;
-	//経過時間の設定
+	// 経過時間の設定
 	particle.currentTime = currentTime;
 
 	return particle;
