@@ -287,6 +287,7 @@ void Particle::CreateMaterialData() {
 /// <param name="lifeTime">寿命</param>
 /// <param name="currentTime">経過時間</param>
 /// <returns>新しいパーティクル情報</returns>
+/// 
 ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
@@ -320,7 +321,7 @@ ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Trans
 	std::uniform_real_distribution<float> distCurrentTime(std::min(currentTimeRange_.min, currentTimeRange_.max), std::max(currentTimeRange_.min, currentTimeRange_.max));
 
 	particle.transform.translate = {};
-	particle.transform.rotate = { 0.0f, 0.0f, distRotateZ(randomEngine) };
+	particle.transform.rotate = { distRotateX(randomEngine),distRotateY(randomEngine),distRotateZ(randomEngine) };
 	particle.transform.scale = { 0.025f, distScaleY(randomEngine), 1.0f };
 
 	// 拡大縮小、回転、平行移動の設定
