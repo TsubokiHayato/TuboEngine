@@ -173,57 +173,57 @@ public:
 
 #pragma endregion 位置
 
-	// 回転の範囲を設定
-	void SetDistRotateX(float min, float max) { rotateRange_.x.min = min; rotateRange_.x.max = max; }
-	void SetDistRotateY(float min, float max) { rotateRange_.y.min = min; rotateRange_.y.max = max; }
-	void SetDistRotateZ(float min, float max) { rotateRange_.z.min = min; rotateRange_.z.max = max; }
+	//// 回転の範囲を設定
+	//void SetDistRotateX(float min, float max) { rotateRange_.x.min = min; rotateRange_.x.max = max; }
+	//void SetDistRotateY(float min, float max) { rotateRange_.y.min = min; rotateRange_.y.max = max; }
+	//void SetDistRotateZ(float min, float max) { rotateRange_.z.min = min; rotateRange_.z.max = max; }
 
-	// 拡大の範囲を設定
-	void SetDistScaleX(float min, float max) { scaleRange_.x.min = min; scaleRange_.x.max = max; }
-	void SetDistScaleY(float min, float max) { scaleRange_.y.min = min; scaleRange_.y.max = max; }
-	void SetDistScaleZ(float min, float max) { scaleRange_.z.min = min; scaleRange_.z.max = max; }
+	//// 拡大の範囲を設定
+	//void SetDistScaleX(float min, float max) { scaleRange_.x.min = min; scaleRange_.x.max = max; }
+	//void SetDistScaleY(float min, float max) { scaleRange_.y.min = min; scaleRange_.y.max = max; }
+	//void SetDistScaleZ(float min, float max) { scaleRange_.z.min = min; scaleRange_.z.max = max; }
 
-	// 速度の範囲を設定
-	void SetDistVelocityX(float min, float max) { velocityRange_.x.min = min; velocityRange_.x.max = max; }
-	void SetDistVelocityY(float min, float max) { velocityRange_.y.min = min; velocityRange_.y.max = max; }
-	void SetDistVelocityZ(float min, float max) { velocityRange_.z.min = min; velocityRange_.z.max = max; }
+	//// 速度の範囲を設定
+	//void SetDistVelocityX(float min, float max) { velocityRange_.x.min = min; velocityRange_.x.max = max; }
+	//void SetDistVelocityY(float min, float max) { velocityRange_.y.min = min; velocityRange_.y.max = max; }
+	//void SetDistVelocityZ(float min, float max) { velocityRange_.z.min = min; velocityRange_.z.max = max; }
 
-	
-	
+	//
+	//
 
-	// 回転の範囲を一括設定
-	void SetDistRotate(float minX, float maxX, float minY, float maxY, float minZ, float maxZ) {
-		rotateRange_.x.min = minX; rotateRange_.x.max = maxX;
-		rotateRange_.y.min = minY; rotateRange_.y.max = maxY;
-		rotateRange_.z.min = minZ; rotateRange_.z.max = maxZ;
-	}
+	//// 回転の範囲を一括設定
+	//void SetDistRotate(float minX, float maxX, float minY, float maxY, float minZ, float maxZ) {
+	//	rotateRange_.x.min = minX; rotateRange_.x.max = maxX;
+	//	rotateRange_.y.min = minY; rotateRange_.y.max = maxY;
+	//	rotateRange_.z.min = minZ; rotateRange_.z.max = maxZ;
+	//}
 
-	// 拡大の範囲を一括設定
-	void SetDistScale(float minX, float maxX, float minY, float maxY, float minZ, float maxZ) {
-		scaleRange_.x.min = minX; scaleRange_.x.max = maxX;
-		scaleRange_.y.min = minY; scaleRange_.y.max = maxY;
-		scaleRange_.z.min = minZ; scaleRange_.z.max = maxZ;
-	}
+	//// 拡大の範囲を一括設定
+	//void SetDistScale(float minX, float maxX, float minY, float maxY, float minZ, float maxZ) {
+	//	scaleRange_.x.min = minX; scaleRange_.x.max = maxX;
+	//	scaleRange_.y.min = minY; scaleRange_.y.max = maxY;
+	//	scaleRange_.z.min = minZ; scaleRange_.z.max = maxZ;
+	//}
 
-	// 速度の範囲を一括設定
-	void SetDistVelocity(float minX, float maxX, float minY, float maxY, float minZ, float maxZ) {
-		velocityRange_.x.min = minX; velocityRange_.x.max = maxX;
-		velocityRange_.y.min = minY; velocityRange_.y.max = maxY;
-		velocityRange_.z.min = minZ; velocityRange_.z.max = maxZ;
-	}
+	//// 速度の範囲を一括設定
+	//void SetDistVelocity(float minX, float maxX, float minY, float maxY, float minZ, float maxZ) {
+	//	velocityRange_.x.min = minX; velocityRange_.x.max = maxX;
+	//	velocityRange_.y.min = minY; velocityRange_.y.max = maxY;
+	//	velocityRange_.z.min = minZ; velocityRange_.z.max = maxZ;
+	//}
 
 
-	void SetDistRed(float min, float max) { colorRange_.x.min = min; colorRange_.x.max = max; }
-	void SetDistGreen(float min, float max) { colorRange_.y.min = min; colorRange_.y.max = max; }
-	void SetDistBlue(float min, float max) { colorRange_.z.min = min; colorRange_.z.max = max; }
-	void SetDistAlpha(float min, float max) { colorRange_.w.min = min; colorRange_.w.max = max; }
+	//void SetDistRed(float min, float max) { colorRange_.x.min = min; colorRange_.x.max = max; }
+	//void SetDistGreen(float min, float max) { colorRange_.y.min = min; colorRange_.y.max = max; }
+	//void SetDistBlue(float min, float max) { colorRange_.z.min = min; colorRange_.z.max = max; }
+	//void SetDistAlpha(float min, float max) { colorRange_.w.min = min; colorRange_.w.max = max; }
 
-	void SetDistColor(float minR, float maxR, float minG, float maxG, float minB, float maxB, float minA, float maxA) {
-		colorRange_.x.min = minR; colorRange_.x.max = maxR;
-		colorRange_.y.min = minG; colorRange_.y.max = maxG;
-		colorRange_.z.min = minB; colorRange_.z.max = maxB;
-		colorRange_.w.min = minA; colorRange_.w.max = maxA;
-	}
+	//void SetDistColor(float minR, float maxR, float minG, float maxG, float minB, float maxB, float minA, float maxA) {
+	//	colorRange_.x.min = minR; colorRange_.x.max = maxR;
+	//	colorRange_.y.min = minG; colorRange_.y.max = maxG;
+	//	colorRange_.z.min = minB; colorRange_.z.max = maxB;
+	//	colorRange_.w.min = minA; colorRange_.w.max = maxA;
+	//}
 
 	// 寿命の範囲を一括設定
 	void SetDistLifeTime(float min, float max) { lifetimeRange_.min = min; lifetimeRange_.max = max; }
@@ -232,10 +232,18 @@ public:
 
 	// ビルボード(常にカメラは目線)を有効化するかどうかを設定
 	void SetIsBillBoard(bool isBillBoard) { this->isBillBoard = isBillBoard; }
+
+	void SetTransform(const Transform& transform) { this->transform = transform; } // トランスフォームを設定
+
+
 #pragma endregion Setter
 	///----------------------------------------------------------------------------------------------------------------------
 	// Getter
 	///----------------------------------------------------------------------------------------------------------------------
+
+	Vector3 GetPosition() { return transform.translate; } // 位置を取得
+	Vector3 GetRotation() { return transform.rotate; } // 回転を取得
+	Vector3 GetScale() { return transform.scale; } // スケールを取得
 
 
 #pragma region Getter
@@ -342,4 +350,11 @@ private:
 	RandomRange currentTimeRange_ = {}; // 経過時間の乱数範囲
 
 	Vector2 customTextureSize = { 100.0f, 100.0f }; // パーティクルのテクスチャサイズ
+
+
+	////------------------
+
+
+	
+
 };
