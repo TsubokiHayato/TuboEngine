@@ -1,6 +1,7 @@
 #include "TitleScene.h"
 #include"TextureManager.h"
 #include"ImGuiManager.h"
+#include"numbers"
 void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon) {
 	//各共通部分のポインタを受け取る
 	this->particleCommon = particleCommon;
@@ -18,7 +19,7 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//テクスチャマネージャに追加する画像ハンドル
 	std::string uvCheckerTextureHandle = "uvChecker.png";
 	std::string monsterBallTextureHandle = "monsterBall.png";
-	std::string particleTextureHandle = "particle.png";
+	std::string particleTextureHandle = "gradationLine.png";
 
 	//画像ハンドルをテクスチャマネージャに挿入する
 	TextureManager::GetInstance()->LoadTexture(uvCheckerTextureHandle);
@@ -34,7 +35,7 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	particle->CreateParticleGroup("Particle", particleTextureHandle);
 	particleTranslate = {
 		//Scale
-		{0.25f, 0.1f, 0.1f},
+		{1.0f, 1.0f, 1.0f},
 		//Rotate
 		{0.0f, 0.0f, 0.0f},
 		//Translate
@@ -85,16 +86,22 @@ void TitleScene::Update() {
 	camera->Update();
 
 	
-
 	
+	const uint32_t kRingDivide = 32;
+	const float kRingRadius = 1.0f;
+	const float kRingHeight = 0.2f;
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
+	
+
 
 	///Particle///
 	///パーティクルで乱数を使いたい場合
 	/// SetDist～～～の関数を使う
 	///基本RangeはScale以外は0.0fなので
 	/// 使いたいものの数値を変換して使ってください
-	particle->SetDistRotateZ(0.0f, 3.14f);
+	/*particle->SetDistRotateZ(0.0f, 3.14f);
 	particle->SetDistScaleY(0.4f, 1.5f);
+	*/
 	
 	particle->Update();
 	particleEmitter_->Update();
@@ -118,6 +125,17 @@ void TitleScene::ImGuiDraw() {
 	ImGui::DragFloat3("Scale", &cameraScale.x);
 	ImGui::End();
 
+
+
+	Vector3 translate = particle->GetPosition();
+	Vector3 scale = particle->GetScale();
+	Vector3 rotate = particle->GetRotation();
+	//エミッター
+	ImGui::Begin("ParticleEmitter");
+	ImGui::DragFloat3("Position", &translate.x);
+	ImGui::DragFloat3("Rotation", &rotate.x);
+	ImGui::DragFloat3("Scale", &scale.x);
+	ImGui::End();
 
 	//パーティクル
 	ImGui::Begin("Particle");
