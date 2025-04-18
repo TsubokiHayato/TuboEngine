@@ -141,7 +141,7 @@ void Particle::Draw() {
 		commandList->SetGraphicsRootDescriptorTable(1, particleCommon->GetSrvManager()->GetGPUDescriptorHandle(group.second.instancingSrvIndex));
 
 		// Draw Call (インスタンシング描画)
-		commandList->DrawInstanced(6, group.second.instanceCount, 0, 0);
+		commandList->DrawInstanced((UINT)modelData_.vertices.size(), group.second.instanceCount, 0, 0);
 
 		// インスタンスカウントをリセット
 		group.second.instanceCount = 0;
@@ -154,7 +154,7 @@ void Particle::Draw() {
 /// <param name="name">パーティクル名</param>
 /// <param name="position">生成位置</param>
 /// <param name="count">生成数</param>
-void Particle::Emit(const std::string name, const Transform& transform,Vector3 velocity, Vector4 color,float lifeTime, float currentTime, uint32_t count) {
+void Particle::Emit(const std::string name, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime, uint32_t count) {
 	if (particleGroups.find(name) == particleGroups.end()) {
 		// パーティクルグループが存在しない場合はエラーを出力して終了
 		assert("Specified particle group does not exist!");
@@ -238,12 +238,36 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 /// 頂点データの作成
 /// </summary>
 void Particle::CreateVertexData() {
-	modelData_.vertices.push_back(VertexData{ .position = {1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f} });
+	/*modelData_.vertices.push_back(VertexData{ .position = {1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f} });
 	modelData_.vertices.push_back(VertexData{ .position = {-1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f} });
 	modelData_.vertices.push_back(VertexData{ .position = {1.0f, -1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 1.0f}, .normal = {0.0f, 0.0f, 1.0f} });
 	modelData_.vertices.push_back(VertexData{ .position = {1.0f, -1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 1.0f}, .normal = {0.0f, 0.0f, 1.0f} });
 	modelData_.vertices.push_back(VertexData{ .position = {-1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f} });
-	modelData_.vertices.push_back(VertexData{ .position = {-1.0f, -1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 1.0f}, .normal = {0.0f, 0.0f, 1.0f} });
+	modelData_.vertices.push_back(VertexData{ .position = {-1.0f, -1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 1.0f}, .normal = {0.0f, 0.0f, 1.0f} });*/
+
+		const uint32_t kRingDivide = 128;
+		const float kOuterRadius = 1.0f;
+		const float kInnerRadius = 0.2f;
+		const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
+
+		for (uint32_t index = 0; index < kRingDivide; ++index) {
+			float sin = std::sin(index * radianPerDivide);
+			float cos = std::cos(index * radianPerDivide);
+			float sinNext = std::sin((index + 1) * radianPerDivide);
+			float cosNext = std::cos((index + 1) * radianPerDivide);
+			float u = float(index) / float(kRingDivide);
+			float uNext = float(index + 1) / float(kRingDivide);
+			// 頂点データを作成
+			modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
+			modelData_.vertices.push_back({ .position = {-sinNext * kInnerRadius,cosNext * kInnerRadius,0.0f,1.0f},.texcoord = {uNext, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周2
+			modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
+			modelData_.vertices.push_back({ .position = {-sin * kOuterRadius,cos * kOuterRadius,0.0f,1.0f},.texcoord = {u, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周1
+			modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
+			modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
+
+		}
+
+
 }
 
 /// <summary>
@@ -292,40 +316,10 @@ ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Trans
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
-
-
-	// 回転範囲の設定
-	std::uniform_real_distribution<float> distRotateX(std::min(rotateRange_.x.min, rotateRange_.x.max), std::max(rotateRange_.x.min, rotateRange_.x.max));
-	std::uniform_real_distribution<float> distRotateY(std::min(rotateRange_.y.min, rotateRange_.y.max), std::max(rotateRange_.y.min, rotateRange_.y.max));
-	std::uniform_real_distribution<float> distRotateZ(std::min(rotateRange_.z.min, rotateRange_.z.max), std::max(rotateRange_.z.min, rotateRange_.z.max));
-	// 拡大縮小範囲の設定
-	std::uniform_real_distribution<float> distScaleX(std::min(scaleRange_.x.min, scaleRange_.x.max), std::max(scaleRange_.x.min, scaleRange_.x.max));
-	std::uniform_real_distribution<float> distScaleY(std::min(scaleRange_.y.min, scaleRange_.y.max), std::max(scaleRange_.y.min, scaleRange_.y.max));
-	std::uniform_real_distribution<float> distScaleZ(std::min(scaleRange_.z.min, scaleRange_.z.max), std::max(scaleRange_.z.min, scaleRange_.z.max));
-	// 平行移動範囲の設定
-	std::uniform_real_distribution<float> distTranslateX(std::min(translateRange_.x.min, translateRange_.x.max), std::max(translateRange_.x.min, translateRange_.x.max));
-	std::uniform_real_distribution<float> distTranslateY(std::min(translateRange_.y.min, translateRange_.y.max), std::max(translateRange_.y.min, translateRange_.y.max));
-	std::uniform_real_distribution<float> distTranslateZ(std::min(translateRange_.z.min, translateRange_.z.max), std::max(translateRange_.z.min, translateRange_.z.max));
-	// 速度範囲の設定
-	std::uniform_real_distribution<float> distVelocityX(std::min(velocityRange_.x.min, velocityRange_.x.max), std::max(velocityRange_.x.min, velocityRange_.x.max));
-	std::uniform_real_distribution<float> distVelocityY(std::min(velocityRange_.y.min, velocityRange_.y.max), std::max(velocityRange_.y.min, velocityRange_.y.max));
-	std::uniform_real_distribution<float> distVelocityZ(std::min(velocityRange_.z.min, velocityRange_.z.max), std::max(velocityRange_.z.min, velocityRange_.z.max));
-	// 色範囲の設定
-	std::uniform_real_distribution<float> distColorR(std::min(colorRange_.x.min, colorRange_.x.max), std::max(colorRange_.x.min, colorRange_.x.max));
-	std::uniform_real_distribution<float> distColorG(std::min(colorRange_.y.min, colorRange_.y.max), std::max(colorRange_.y.min, colorRange_.y.max));
-	std::uniform_real_distribution<float> distColorB(std::min(colorRange_.z.min, colorRange_.z.max), std::max(colorRange_.z.min, colorRange_.z.max));
-	std::uniform_real_distribution<float> distColorA(std::min(colorRange_.w.min, colorRange_.w.max), std::max(colorRange_.w.min, colorRange_.w.max));
-	// 寿命範囲の設定
-	std::uniform_real_distribution<float> distLifeTime(std::min(lifetimeRange_.min, lifetimeRange_.max), std::max(lifetimeRange_.min, lifetimeRange_.max));
-	// 経過時間範囲の設定
-	std::uniform_real_distribution<float> distCurrentTime(std::min(currentTimeRange_.min, currentTimeRange_.max), std::max(currentTimeRange_.min, currentTimeRange_.max));
-
-	particle.transform.translate = {};
-	particle.transform.rotate = { distRotateX(randomEngine),distRotateY(randomEngine),distRotateZ(randomEngine) };
-	particle.transform.scale = { 0.025f, distScaleY(randomEngine), 1.0f };
+	
 
 	// 拡大縮小、回転、平行移動の設定
-	// particle.transform = transform;
+	particle.transform = transform;
 	// 速度の設定
 	particle.velocity = velocity;
 	// 色の設定
