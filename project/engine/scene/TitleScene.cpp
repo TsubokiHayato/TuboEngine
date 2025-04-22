@@ -46,7 +46,7 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	
 	particleVelocity = {};
 	particleColor = { 1.0f,1.0f,1.0f,1.0f };
-	particleLifeTime = 1.0f;
+	particleLifeTime = 100.0f;
 	particleCurrentTime= 0.0f;
 
 	particleEmitter_ =
@@ -103,6 +103,7 @@ void TitleScene::Update() {
 	particle->SetDistScaleY(0.4f, 1.5f);
 	*/
 	
+	particle->SetCamera(camera.get());
 	particle->Update();
 	particleEmitter_->Update();
 
@@ -120,9 +121,9 @@ void TitleScene::SpriteDraw() {}
 void TitleScene::ImGuiDraw() {
 	//カメラ
 	ImGui::Begin("camera");
-	ImGui::DragFloat3("Position", &cameraPosition.x);
-	ImGui::DragFloat3("Rotation", &cameraRotation.x);
-	ImGui::DragFloat3("Scale", &cameraScale.x);
+	ImGui::DragFloat3("Position", &cameraPosition.x,0.01f);
+	ImGui::DragFloat3("Rotation", &cameraRotation.x,0.01f);
+	ImGui::DragFloat3("Scale", &cameraScale.x,0.01f);
 	ImGui::End();
 
 
