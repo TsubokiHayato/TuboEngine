@@ -238,6 +238,8 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 /// 頂点データの作成
 /// </summary>
 void Particle::CreateVertexData() {
+
+	//Texture
 	/*modelData_.vertices.push_back(VertexData{ .position = {1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f} });
 	modelData_.vertices.push_back(VertexData{ .position = {-1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f} });
 	modelData_.vertices.push_back(VertexData{ .position = {1.0f, -1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 1.0f}, .normal = {0.0f, 0.0f, 1.0f} });
@@ -245,10 +247,41 @@ void Particle::CreateVertexData() {
 	modelData_.vertices.push_back(VertexData{ .position = {-1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f} });
 	modelData_.vertices.push_back(VertexData{ .position = {-1.0f, -1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 1.0f}, .normal = {0.0f, 0.0f, 1.0f} });*/
 
-		const uint32_t kRingDivide = 128;
-		const float kOuterRadius = 1.0f;
-		const float kInnerRadius = 0.2f;
-		const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
+
+	//Ring
+		//const uint32_t kRingDivide = 128;
+		//const float kOuterRadius = 1.0f;
+		//const float kInnerRadius = 0.2f;
+		//const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
+
+		//for (uint32_t index = 0; index < kRingDivide; ++index) {
+		//	float sin = std::sin(index * radianPerDivide);
+		//	float cos = std::cos(index * radianPerDivide);
+		//	float sinNext = std::sin((index + 1) * radianPerDivide);
+		//	float cosNext = std::cos((index + 1) * radianPerDivide);
+		//	float u = float(index) / float(kRingDivide);
+		//	float uNext = float(index + 1) / float(kRingDivide);
+		//	// 頂点データを作成
+		//	modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
+		//	modelData_.vertices.push_back({ .position = {-sinNext * kInnerRadius,cosNext * kInnerRadius,0.0f,1.0f},.texcoord = {uNext, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周2
+		//	modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
+		//	modelData_.vertices.push_back({ .position = {-sin * kOuterRadius,cos * kOuterRadius,0.0f,1.0f},.texcoord = {u, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周1
+		//	modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
+		//	modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
+
+		//}
+
+
+	//Cylinder
+
+
+	const uint32_t kRingDivide = 128;
+	const float kOuterRadius = 1.0f;
+	const float kInnerRadius = 0.2f;
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
+
+	
+
 
 		for (uint32_t index = 0; index < kRingDivide; ++index) {
 			float sin = std::sin(index * radianPerDivide);
@@ -257,14 +290,12 @@ void Particle::CreateVertexData() {
 			float cosNext = std::cos((index + 1) * radianPerDivide);
 			float u = float(index) / float(kRingDivide);
 			float uNext = float(index + 1) / float(kRingDivide);
-			// 頂点データを作成
 			modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
 			modelData_.vertices.push_back({ .position = {-sinNext * kInnerRadius,cosNext * kInnerRadius,0.0f,1.0f},.texcoord = {uNext, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周2
 			modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
 			modelData_.vertices.push_back({ .position = {-sin * kOuterRadius,cos * kOuterRadius,0.0f,1.0f},.texcoord = {u, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周1
 			modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
 			modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
-
 		}
 
 
@@ -316,7 +347,7 @@ ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Trans
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
-	
+
 
 	// 拡大縮小、回転、平行移動の設定
 	particle.transform = transform;
