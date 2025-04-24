@@ -235,6 +235,7 @@ public:
 
 	void SetTransform(const Transform& transform) { this->transform = transform; } // トランスフォームを設定
 
+	void SetCamera(Camera* camera) { assert(camera); this->camera_ = camera; } // カメラを設定
 
 #pragma endregion Setter
 	///----------------------------------------------------------------------------------------------------------------------
@@ -276,14 +277,7 @@ private:
 		model_ = ModelManager::GetInstance()->FindModel(filePath);
 	}
 
-	/// <summary>
-	/// カメラのセット
-	/// </summary>
-	/// <param name="camera">カメラデータ</param>
-	void SetCamera(Camera* camera) {
-		assert(camera);
-		this->camera_ = camera;
-	}
+	
 
 private:
 	ParticleCommon* particleCommon = nullptr; // パーティクル共通部分
