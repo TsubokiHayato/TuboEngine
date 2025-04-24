@@ -273,30 +273,60 @@ void Particle::CreateVertexData() {
 
 
 	//Cylinder
+	
+	const uint32_t kCylinderDivide = 32;
+	const float kTopRadius = 1.0f;
+	const float kBottomRadius = 1.0f;
+	const float kHeight = 3.0f;
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kCylinderDivide);
+
+	for (uint32_t index = 0; index < kCylinderDivide; ++index) {
+		float sin = std::sin(index * radianPerDivide);
+		float cos = std::cos(index * radianPerDivide);
+		float sinNext = std::sin((index + 1) * radianPerDivide);
+		float cosNext = std::cos((index + 1) * radianPerDivide);
+		float u = float(index) / float(kCylinderDivide);
+		float uNext = float(index + 1) / float(kCylinderDivide);
 
 
-	const uint32_t kRingDivide = 128;
-	const float kOuterRadius = 1.0f;
-	const float kInnerRadius = 0.2f;
-	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
+		//texcoord
 
+		Vector2 texcoordTop = { u, 0.0f };
+		Vector2 texcoordBottom = { u, 1.0f };
+		Vector2 texcoordTopNext = { uNext, 0.0f };
+		Vector2 texcoordBottomNext = { uNext, 1.0f };
+
+		//vを反転
+
+		texcoordTop.y = 1.0f - texcoordTop.y;
+		texcoordBottom.y = 1.0f - texcoordBottom.y;
+		texcoordTopNext.y = 1.0f - texcoordTopNext.y;
+		texcoordBottomNext.y = 1.0f - texcoordBottomNext.y;
+
+
+
+
+		// position, texcoord, normal
+		modelData_.vertices.push_back(VertexData{ { -sin * kTopRadius, kHeight, cos * kTopRadius, 1.0f }, texcoordTop, { -sin, 0.0f, cos } });
+		modelData_.vertices.push_back(VertexData{ { -sinNext * kTopRadius, kHeight, cosNext * kTopRadius, 1.0f }, texcoordTopNext, { -sinNext, 0.0f, cosNext } });
+		modelData_.vertices.push_back(VertexData{ { -sinNext * kBottomRadius, 0.0f, cosNext * kBottomRadius, 1.0f }, texcoordBottomNext, { -sinNext, 0.0f, cosNext } });
+		modelData_.vertices.push_back(VertexData{ { -sin * kBottomRadius, 0.0f, cos * kBottomRadius, 1.0f },  texcoordBottom , { -sin, 0.0f, cos } });
+		modelData_.vertices.push_back(VertexData{ { -sin * kBottomRadius, 0.0f, cos * kBottomRadius, 1.0f },  texcoordBottom , { -sin, 0.0f, cos } });
+		modelData_.vertices.push_back(VertexData{ { -sinNext * kTopRadius, kHeight, cosNext * kTopRadius, 1.0f }, texcoordTopNext, { -sinNext, 0.0f, cosNext } });
+
+		modelData_.vertices.push_back(VertexData{ { -sin * kTopRadius, kHeight, cos * kTopRadius, 1.0f }, texcoordTop, { -sin, 0.0f, cos } });
+		modelData_.vertices.push_back(VertexData{ { -sinNext * kBottomRadius, 0.0f, cosNext * kBottomRadius, 1.0f }, texcoordBottomNext, { -sinNext, 0.0f, cosNext } });
+		modelData_.vertices.push_back(VertexData{ { -sin * kBottomRadius, 0.0f, cos * kBottomRadius, 1.0f }, texcoordBottom, { -sin, 0.0f, cos } });
+		modelData_.vertices.push_back(VertexData{ { -sinNext * kTopRadius, kHeight, cosNext * kTopRadius, 1.0f }, texcoordTopNext, { -sinNext, 0.0f, cosNext } });
+		modelData_.vertices.push_back(VertexData{ { -sin * kTopRadius, kHeight, cos * kTopRadius, 1.0f }, texcoordTop, { -sin, 0.0f, cos } });
+		modelData_.vertices.push_back(VertexData{ { -sinNext * kBottomRadius, 0.0f, cosNext * kBottomRadius, 1.0f }, texcoordBottomNext, { -sinNext, 0.0f, cosNext } });
+
+
+
+		
+	}
 	
 
-
-		for (uint32_t index = 0; index < kRingDivide; ++index) {
-			float sin = std::sin(index * radianPerDivide);
-			float cos = std::cos(index * radianPerDivide);
-			float sinNext = std::sin((index + 1) * radianPerDivide);
-			float cosNext = std::cos((index + 1) * radianPerDivide);
-			float u = float(index) / float(kRingDivide);
-			float uNext = float(index + 1) / float(kRingDivide);
-			modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
-			modelData_.vertices.push_back({ .position = {-sinNext * kInnerRadius,cosNext * kInnerRadius,0.0f,1.0f},.texcoord = {uNext, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周2
-			modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
-			modelData_.vertices.push_back({ .position = {-sin * kOuterRadius,cos * kOuterRadius,0.0f,1.0f},.texcoord = {u, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周1
-			modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
-			modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
-		}
 
 
 }
@@ -359,6 +389,8 @@ ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Trans
 	particle.lifeTime = lifeTime;
 	// 経過時間の設定
 	particle.currentTime = currentTime;
+
+
 
 	return particle;
 }
