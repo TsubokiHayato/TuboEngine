@@ -9,17 +9,19 @@
 #include <math.h>
 
 // コンストラクタ
-	/// @brief パーティクルエミッターのコンストラクタ
-	/// @param particle パーティクルのインスタンス
-	/// @param name パーティクルグループ名
-	/// @param transform エミッターの位置・回転・スケール
-	/// @param velocity 速度
-	/// @param color カラー
-	/// @param lifeTime 寿命
-	/// @param currentTime 経過時間
-	/// @param count 発生させるパーティクルの数
-	/// @param frequency 発生頻度
-	/// @param repeat 繰り返し発生させるかどうかのフラグ
+	/// <summary>
+	/// パーティクルエミッターのコンストラクタ
+	/// </summary>
+	/// <param name="particle">パーティクルのインスタンス</param>
+	/// <param name="name">パーティクルグループ名</param>
+	/// <param name="transform">エミッターの位置・回転・スケール</param>
+	/// <param name="velocity">速度</param>
+	/// <param name="color">カラー</param>
+	/// <param name="lifeTime">寿命</param>
+	/// 	/// <param name="currentTime">経過時間</param>
+	/// <param name="count">発生させるパーティクルの数</param>
+	/// 	/// <param name="frequency">発生頻度</param>
+	/// 	/// <param name="repeat">繰り返し発生させるかどうかのフラグ</param>
 ParticleEmitter::ParticleEmitter(Particle* particle, const std::string& name,
 	const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime,
 	uint32_t count, float frequency, bool repeat)
