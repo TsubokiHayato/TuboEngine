@@ -28,7 +28,9 @@ void Particle::Initialize(ParticleCommon* particleSetup, ParticleType particleTy
 		CreateVertexDataForRing();
 	} else if (particleType == ParticleType::Cylinder) {
 		CreateVertexDataForCylinder();
-	} else {
+	} else if(particleType==ParticleType::None){
+		CreateVertexData();
+	} else if (particleType == ParticleType::Primitive) {
 		CreateVertexData();
 	}
 	
@@ -409,5 +411,22 @@ ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Trans
 
 
 	return particle;
+}
+
+ParticleInfo Particle::CreateNewParticleForPrimitive(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+
+
+
+
+
+	return ParticleInfo();
+}
+
+ParticleInfo Particle::CreateNewParticleForRing(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+	return ParticleInfo();
+}
+
+ParticleInfo Particle::CreateNewParticleForCylinder(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+	return ParticleInfo();
 }
 
