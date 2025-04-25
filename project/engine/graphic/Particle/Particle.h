@@ -150,6 +150,21 @@ private:
 	/// <returns>新しいパーティクル情報</returns>
 	ParticleInfo CreateNewParticle(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
 
+
+	/// <summary>
+	/// 新しいパーティクルの作成(プリミティブ)
+	/// </summary>
+	/// <param name="randomEngine">ランダムエンジン</param>
+	///<param name="transform">エミッターのトランスフォーム</param>
+	/// <param name="velocity">速度</param>
+	/// <param name="color">カラー</param>
+	/// <param name="lifeTime">寿命</param>
+	/// <param name="currentTime">経過時間</param>
+	/// <returns>新しいパーティクル情報</returns>
+	ParticleInfo CreateNewParticleForPrimitive(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
+
+
+
 	/// <summary>
 	/// 新しいパーティクルの作成(リング)
 	/// </summary>
@@ -173,6 +188,8 @@ private:
 	/// <param name="currentTime">経過時間</param>
 	/// <returns>新しいパーティクル情報</returns>
 	ParticleInfo CreateNewParticleForCylinder(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
+
+
 
 public:
 
