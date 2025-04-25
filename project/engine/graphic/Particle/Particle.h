@@ -12,6 +12,13 @@
 #include"ModelManager.h"
 #include <random>
 
+// 前方宣言
+class ParticleCommon;
+class ModelCommon;
+class Model;
+class Camera;
+
+
 // パーティクル情報
 struct ParticleInfo
 {
@@ -44,11 +51,14 @@ struct ParticleGroup
 	Vector2 textureSize = { 0.0f, 0.0f }; // テクスチャのサイズ
 };
 
-// 前方宣言
-class ParticleCommon;
-class ModelCommon;
-class Model;
-class Camera;
+// パーティクルのタイプ
+	enum class ParticleType
+	{
+		None, // なし
+		Primitive, // プリミティブ
+		Ring, // リング
+		Cylinder, // 円柱
+	};
 
 class Particle
 {
@@ -61,12 +71,14 @@ public:
 		float intensity; // 強度
 	};
 
+	
+
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <param name="particleCommon">パーティクル共通部分</param>
-	void Initialize(ParticleCommon* particleCommon);
+	void Initialize(ParticleCommon* particleCommon, ParticleType particleType);
 
 	/// <summary>
 	/// 更新処理
@@ -103,6 +115,19 @@ private:
 	/// </summary>
 	void CreateVertexData();
 
+
+	/// <summary>
+	/// 頂点データの作成(リング)
+	/// </summary>
+	void CreateVertexDataForRing();
+
+	/// <summary>
+	/// 頂点データの作成(円柱)
+	/// </summary>
+	void CreateVertexDataForCylinder();
+
+
+
 	/// <summary>
 	/// 頂点バッファビューの作成
 	/// </summary>
@@ -124,6 +149,30 @@ private:
 	/// <param name="currentTime">経過時間</param>
 	/// <returns>新しいパーティクル情報</returns>
 	ParticleInfo CreateNewParticle(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
+
+	/// <summary>
+	/// 新しいパーティクルの作成(リング)
+	/// </summary>
+	/// <param name="randomEngine">ランダムエンジン</param>
+	///<param name="transform">エミッターのトランスフォーム</param>
+	/// <param name="velocity">速度</param>
+	/// <param name="color">カラー</param>
+	/// <param name="lifeTime">寿命</param>
+	/// <param name="currentTime">経過時間</param>
+	/// <returns>新しいパーティクル情報</returns>
+	ParticleInfo CreateNewParticleForRing(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
+
+	/// <summary>
+	/// 新しいパーティクルの作成(円柱)
+	/// </summary>
+	/// <param name="randomEngine">ランダムエンジン</param>
+	///<param name="transform">エミッターのトランスフォーム</param>
+	/// <param name="velocity">速度</param>
+	/// <param name="color">カラー</param>
+	/// <param name="lifeTime">寿命</param>
+	/// <param name="currentTime">経過時間</param>
+	/// <returns>新しいパーティクル情報</returns>
+	ParticleInfo CreateNewParticleForCylinder(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
 
 public:
 
