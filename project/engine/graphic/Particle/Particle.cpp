@@ -19,21 +19,23 @@ void Particle::Initialize(ParticleCommon* particleSetup, ParticleType particleTy
 	this->particleCommon = particleSetup;
 	dxCommon_ = particleSetup->GetDxCommon();
 	winApp_ = particleSetup->GetWinApp();
+	// パーティクルのタイプを設定
+	this->particleType_ = particleType;
 
 	// RandomEngineの初期化
 	randomEngine_.seed(std::random_device()());
 
 	// 頂点データの作成
-	if (particleType==ParticleType::Ring) {
+	if (particleType_ == ParticleType::Ring) {
 		CreateVertexDataForRing();
-	} else if (particleType == ParticleType::Cylinder) {
+	} else if (particleType_ == ParticleType::Cylinder) {
 		CreateVertexDataForCylinder();
-	} else if(particleType==ParticleType::None){
+	} else if (particleType_ == ParticleType::None) {
 		CreateVertexData();
-	} else if (particleType == ParticleType::Primitive) {
+	} else if (particleType_ == ParticleType::Primitive) {
 		CreateVertexData();
 	}
-	
+
 
 
 	// 頂点バッファビューの作成
@@ -182,7 +184,24 @@ void Particle::Emit(const std::string name, const Transform& transform, Vector3 
 
 	// 指定された数のパーティクルを生成して追加
 	for (uint32_t i = 0; i < count; ++i) {
-		group.particleList.push_back(CreateNewParticle(randomEngine_, transform, velocity, color, lifeTime, currentTime));
+
+		//リングの場合
+		if (particleType_ == ParticleType::Ring) {
+			group.particleList.push_back(CreateNewParticleForRing(randomEngine_, transform, velocity, color, lifeTime, currentTime));
+
+			//円柱の場合
+		} else if (particleType_ == ParticleType::Cylinder) {
+			group.particleList.push_back(CreateNewParticleForCylinder(randomEngine_, transform, velocity, color, lifeTime, currentTime));
+
+			//プリミティブの場合
+		} else  if (particleType_ == ParticleType::Primitive) {
+			group.particleList.push_back(CreateNewParticleForPrimitive(randomEngine_, transform, velocity, color, lifeTime, currentTime));
+
+			//通常の場合
+		} else if (particleType_ == ParticleType::None) {
+			group.particleList.push_back(CreateNewParticle(randomEngine_, transform, velocity, color, lifeTime, currentTime));
+		}
+		
 	}
 }
 
@@ -265,27 +284,27 @@ void Particle::CreateVertexData() {
 void Particle::CreateVertexDataForRing() {
 
 	//Ring
-		const uint32_t kRingDivide = 128;
-		const float kOuterRadius = 1.0f;
-		const float kInnerRadius = 0.2f;
-		const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
+	const uint32_t kRingDivide = 128;
+	const float kOuterRadius = 1.0f;
+	const float kInnerRadius = 0.2f;
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
 
-		for (uint32_t index = 0; index < kRingDivide; ++index) {
-			float sin = std::sin(index * radianPerDivide);
-			float cos = std::cos(index * radianPerDivide);
-			float sinNext = std::sin((index + 1) * radianPerDivide);
-			float cosNext = std::cos((index + 1) * radianPerDivide);
-			float u = float(index) / float(kRingDivide);
-			float uNext = float(index + 1) / float(kRingDivide);
-			// 頂点データを作成
-			modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
-			modelData_.vertices.push_back({ .position = {-sinNext * kInnerRadius,cosNext * kInnerRadius,0.0f,1.0f},.texcoord = {uNext, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周2
-			modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
-			modelData_.vertices.push_back({ .position = {-sin * kOuterRadius,cos * kOuterRadius,0.0f,1.0f},.texcoord = {u, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周1
-			modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
-			modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
+	for (uint32_t index = 0; index < kRingDivide; ++index) {
+		float sin = std::sin(index * radianPerDivide);
+		float cos = std::cos(index * radianPerDivide);
+		float sinNext = std::sin((index + 1) * radianPerDivide);
+		float cosNext = std::cos((index + 1) * radianPerDivide);
+		float u = float(index) / float(kRingDivide);
+		float uNext = float(index + 1) / float(kRingDivide);
+		// 頂点データを作成
+		modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
+		modelData_.vertices.push_back({ .position = {-sinNext * kInnerRadius,cosNext * kInnerRadius,0.0f,1.0f},.texcoord = {uNext, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周2
+		modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
+		modelData_.vertices.push_back({ .position = {-sin * kOuterRadius,cos * kOuterRadius,0.0f,1.0f},.texcoord = {u, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周1
+		modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
+		modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
 
-		}
+	}
 
 
 
