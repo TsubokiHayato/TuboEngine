@@ -200,97 +200,6 @@ public:
 
 #pragma region Setter
 
-#pragma region 位置
-	/// <summary>
-	/// 位置Xの範囲を設定
-	/// <param name="min">最小値</param>
-	/// <param name="max">最大値</param>
-	/// </summary>
-	void SetDistTranslateX(float min, float max) { translateRange_.x.min = min; translateRange_.x.max = max; }
-
-	/// <summary>
-	/// 位置Yの範囲を設定
-	/// <param name="min">最小値</param>
-	/// <param name="max">最大値</param>
-	/// </summary>
-	void SetDistTranslateY(float min, float max) { translateRange_.y.min = min; translateRange_.y.max = max; }
-
-	/// <summary>
-	/// 位置Zの範囲を設定
-	/// <param name="min">最小値</param>
-	/// <param name="max">最大値</param>
-	/// </summary>
-	void SetDistTranslateZ(float min, float max) { translateRange_.z.min = min; translateRange_.z.max = max; }
-
-	/// <summary>
-	/// 位置の範囲を一括設定
-	/// </summary>
-	/// <param name="minX"> Xの最小値</param>
-	/// <param name="maxX"> 
-	/// <param name="minY"> 
-	/// <param name="maxY"> 
-	/// <param name="minZ"> 
-	/// <param name="maxZ"> 
-	void SetDistTranslate(float minX, float maxX, float minY, float maxY, float minZ, float maxZ) {
-		translateRange_.x.min = minX; translateRange_.x.max = maxX;
-		translateRange_.y.min = minY; translateRange_.y.max = maxY;
-		translateRange_.z.min = minZ; translateRange_.z.max = maxZ;
-	}
-
-#pragma endregion 位置
-
-	//// 回転の範囲を設定
-	//void SetDistRotateX(float min, float max) { rotateRange_.x.min = min; rotateRange_.x.max = max; }
-	//void SetDistRotateY(float min, float max) { rotateRange_.y.min = min; rotateRange_.y.max = max; }
-	//void SetDistRotateZ(float min, float max) { rotateRange_.z.min = min; rotateRange_.z.max = max; }
-
-	//// 拡大の範囲を設定
-	//void SetDistScaleX(float min, float max) { scaleRange_.x.min = min; scaleRange_.x.max = max; }
-	//void SetDistScaleY(float min, float max) { scaleRange_.y.min = min; scaleRange_.y.max = max; }
-	//void SetDistScaleZ(float min, float max) { scaleRange_.z.min = min; scaleRange_.z.max = max; }
-
-	//// 速度の範囲を設定
-	//void SetDistVelocityX(float min, float max) { velocityRange_.x.min = min; velocityRange_.x.max = max; }
-	//void SetDistVelocityY(float min, float max) { velocityRange_.y.min = min; velocityRange_.y.max = max; }
-	//void SetDistVelocityZ(float min, float max) { velocityRange_.z.min = min; velocityRange_.z.max = max; }
-
-	//
-	//
-
-	//// 回転の範囲を一括設定
-	//void SetDistRotate(float minX, float maxX, float minY, float maxY, float minZ, float maxZ) {
-	//	rotateRange_.x.min = minX; rotateRange_.x.max = maxX;
-	//	rotateRange_.y.min = minY; rotateRange_.y.max = maxY;
-	//	rotateRange_.z.min = minZ; rotateRange_.z.max = maxZ;
-	//}
-
-	//// 拡大の範囲を一括設定
-	//void SetDistScale(float minX, float maxX, float minY, float maxY, float minZ, float maxZ) {
-	//	scaleRange_.x.min = minX; scaleRange_.x.max = maxX;
-	//	scaleRange_.y.min = minY; scaleRange_.y.max = maxY;
-	//	scaleRange_.z.min = minZ; scaleRange_.z.max = maxZ;
-	//}
-
-	//// 速度の範囲を一括設定
-	//void SetDistVelocity(float minX, float maxX, float minY, float maxY, float minZ, float maxZ) {
-	//	velocityRange_.x.min = minX; velocityRange_.x.max = maxX;
-	//	velocityRange_.y.min = minY; velocityRange_.y.max = maxY;
-	//	velocityRange_.z.min = minZ; velocityRange_.z.max = maxZ;
-	//}
-
-
-	//void SetDistRed(float min, float max) { colorRange_.x.min = min; colorRange_.x.max = max; }
-	//void SetDistGreen(float min, float max) { colorRange_.y.min = min; colorRange_.y.max = max; }
-	//void SetDistBlue(float min, float max) { colorRange_.z.min = min; colorRange_.z.max = max; }
-	//void SetDistAlpha(float min, float max) { colorRange_.w.min = min; colorRange_.w.max = max; }
-
-	//void SetDistColor(float minR, float maxR, float minG, float maxG, float minB, float maxB, float minA, float maxA) {
-	//	colorRange_.x.min = minR; colorRange_.x.max = maxR;
-	//	colorRange_.y.min = minG; colorRange_.y.max = maxG;
-	//	colorRange_.z.min = minB; colorRange_.z.max = maxB;
-	//	colorRange_.w.min = minA; colorRange_.w.max = maxA;
-	//}
-
 	// 寿命の範囲を一括設定
 	void SetDistLifeTime(float min, float max) { lifetimeRange_.min = min; lifetimeRange_.max = max; }
 	// 経過時間の範囲を一括設定
@@ -386,26 +295,12 @@ private:
 		float max; // 最大値
 	};
 
-	struct RandomRange3D
-	{
-		RandomRange x; // X軸の乱数範囲
-		RandomRange y; // Y軸の乱数範囲
-		RandomRange z; // Z軸の乱数範囲
-	};
-
-	struct RandomRange4D
-	{
-		RandomRange x; // X軸の乱数範囲
-		RandomRange y; // Y軸の乱数範囲
-		RandomRange z; // Z軸の乱数範囲
-		RandomRange w; // W軸の乱数範囲
-	};
-
-	RandomRange3D translateRange_ = {}; // 位置の乱数範囲
-	RandomRange3D rotateRange_ = {}; // 回転の乱数範囲
-	RandomRange3D scaleRange_ = {(1.0f,1.0f),(1.0f,1.0f),(1.0f,1.0f),}; // 拡大の乱数範囲
-	RandomRange3D velocityRange_ = {}; // 速度の乱数範囲
-	RandomRange4D colorRange_ = {}; // カラーの乱数範囲
+	
+	RandomRange translateRange_ = {}; // 位置の乱数範囲
+	RandomRange rotateRange_ = {}; // 回転の乱数範囲
+	RandomRange scaleRange_ = {(1.0f,1.0f)}; // 拡大の乱数範囲
+	RandomRange velocityRange_ = {}; // 速度の乱数範囲
+	RandomRange colorRange_ = {}; // カラーの乱数範囲
 	RandomRange lifetimeRange_ = {}; // 寿命の乱数範囲
 	RandomRange currentTimeRange_ = {}; // 経過時間の乱数範囲
 
