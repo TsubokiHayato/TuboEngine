@@ -434,11 +434,34 @@ ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Trans
 
 ParticleInfo Particle::CreateNewParticleForPrimitive(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
 
+	// 新たなパーティクルの生成
+	ParticleInfo particle = {};
+
+	std::uniform_real_distribution<float>distRotateZ(rotateRange_.min, rotateRange_.max);
+	std::uniform_real_distribution<float>distScaleY(scaleRange_.min, scaleRange_.max);
 
 
 
+	particle.transform.translate = {};
+	particle.transform.rotate = { 0.0f,0.0f,distRotateZ(randomEngine) };
+	particle.transform.scale = { 0.025f,distScaleY(randomEngine),1.0f };
 
-	return ParticleInfo();
+
+
+	//拡大縮小、回転、平行移動の設定
+	//particle.transform = transform;
+	//速度の設定
+	particle.velocity = velocity;
+	//色の設定
+	particle.color = color;
+	//寿命の設定
+	particle.lifeTime = lifeTime;
+	//経過時間の設定
+	particle.currentTime = currentTime;
+
+
+
+	return particle;
 }
 
 ParticleInfo Particle::CreateNewParticleForRing(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
