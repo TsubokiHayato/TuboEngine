@@ -298,7 +298,7 @@ private:
 	
 	RandomRange translateRange_ = {}; // 位置の乱数範囲
 	RandomRange rotateRange_ = {}; // 回転の乱数範囲
-	RandomRange scaleRange_ = {(1.0f,1.0f)}; // 拡大の乱数範囲
+	RandomRange scaleRange_ = {1.0f,1.0f}; // 拡大の乱数範囲
 	RandomRange velocityRange_ = {}; // 速度の乱数範囲
 	RandomRange colorRange_ = {}; // カラーの乱数範囲
 	RandomRange lifetimeRange_ = {}; // 寿命の乱数範囲
