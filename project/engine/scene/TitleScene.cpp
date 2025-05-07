@@ -31,7 +31,7 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 	//パーティクル
 	particle = std::make_unique<Particle>();
-	particle->Initialize(this->particleCommon, ParticleType::Cylinder);
+	particle->Initialize(this->particleCommon, ParticleType::Primitive);
 	particle->CreateParticleGroup("Particle", particleTextureHandle);
 	particleTranslate = {
 		//Scale
