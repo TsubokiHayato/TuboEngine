@@ -413,6 +413,7 @@ private:
 
 
 	////------------------
+	ParticleType particleType_ = ParticleType::None; // パーティクルのタイプ
 
 
 	
