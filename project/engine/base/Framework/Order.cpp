@@ -10,6 +10,7 @@ void Order::Update()
 {
 	//更新
 	Framework::Update();
+
 	//ImGuiの受付開始
 	Framework::ImguiPreDraw();
 	//ImGuiの受付終了
