@@ -31,7 +31,7 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 	//パーティクル
 	particle = std::make_unique<Particle>();
-	particle->Initialize(this->particleCommon, ParticleType::Primitive);
+	particle->Initialize(this->particleCommon, ParticleType::Ring);
 	particle->CreateParticleGroup("Particle", particleTextureHandle);
 	particleTranslate = {
 		//Scale
@@ -46,7 +46,7 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	
 	particleVelocity = {};
 	particleColor = { 1.0f,1.0f,1.0f,1.0f };
-	particleLifeTime = 100.0f;
+	particleLifeTime = 1.0f;
 	particleCurrentTime= 0.0f;
 
 	particleEmitter_ =
