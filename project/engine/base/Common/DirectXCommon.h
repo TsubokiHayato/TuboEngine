@@ -276,5 +276,27 @@ private:
 
 
 
+	///------------------------	
+	///レンダーターターゲット用のリソース
+	/// 
+	
+	Microsoft::WRL::ComPtr<ID3D12Resource> renderTexture_; // RenderTexture
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_; // RTV用のディスクリプタヒープ
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer_;   // 深度バッファ
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_; // DSV用のディスクリプタヒープ
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle_;               // RTVハンドル
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;               // DSVハンドル
+	
+	public:
+
+	/// <summary>  
+   /// レンダーテクスチャの作成  
+   /// </summary>  
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTargetResource(Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, DXGI_FORMAT format, const Vector4& clearColor);
+	/// <summary>  
+	/// レンダーテクスチャのクリア  
+	/// </summary>  
+	void ClearRenderTargetPreDraw(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& commandList, Microsoft::WRL::ComPtr<ID3D12Resource>& renderTarget);
+
 };
 
