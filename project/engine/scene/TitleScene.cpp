@@ -31,7 +31,7 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 	//パーティクル
 	particle = std::make_unique<Particle>();
-	particle->Initialize(this->particleCommon);
+	particle->Initialize(this->particleCommon, ParticleType::Ring);
 	particle->CreateParticleGroup("Particle", particleTextureHandle);
 	particleTranslate = {
 		//Scale
@@ -46,7 +46,7 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	
 	particleVelocity = {};
 	particleColor = { 1.0f,1.0f,1.0f,1.0f };
-	particleLifeTime = 100.0f;
+	particleLifeTime = 1.0f;
 	particleCurrentTime= 0.0f;
 
 	particleEmitter_ =
@@ -95,13 +95,6 @@ void TitleScene::Update() {
 
 
 	///Particle///
-	///パーティクルで乱数を使いたい場合
-	/// SetDist～～～の関数を使う
-	///基本RangeはScale以外は0.0fなので
-	/// 使いたいものの数値を変換して使ってください
-	/*particle->SetDistRotateZ(0.0f, 3.14f);
-	particle->SetDistScaleY(0.4f, 1.5f);
-	*/
 	
 	particle->SetCamera(camera.get());
 	particle->Update();
