@@ -11,10 +11,7 @@ void Order::Update()
 	//更新
 	Framework::Update();
 
-	//ImGuiの受付開始
-	Framework::ImguiPreDraw();
-	//ImGuiの受付終了
-	Framework::ImguiPostDraw();
+	
 }
 
 void Order::Finalize()
@@ -34,6 +31,10 @@ void Order::Draw()
 	Framework::SpriteCommonDraw();
 	//パーティクル描画
 	Framework::ParticleCommonDraw();
+	//ImGuiの受付開始
+	Framework::ImguiPreDraw();
+	//ImGuiの受付終了
+	Framework::ImguiPostDraw();
 	//ループ後処理
 	Framework::FrameworkPostDraw();
 }

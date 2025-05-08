@@ -275,21 +275,6 @@ private:
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> backBuffers; // Add this line to define backBuffers
 
 
-private:
-	// オフスクリーンレンダリング用のリソース
-	
-public:
-	// オフスクリーンレンダリングの初期化
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTargetResource(
-		Microsoft::WRL::ComPtr<ID3D12Device>& device,
-		int32_t width,
-		int32_t height,
-		DXGI_FORMAT format,
-		const Vector4& clearColor);
-
-	void ClearRenderTargetPreDraw(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& commandList, Microsoft::WRL::ComPtr<ID3D12Resource>& renderTarget);
-
-	
 
 };
 

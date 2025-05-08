@@ -160,6 +160,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\NormalBlendPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\ScreenBlendPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\SubtractBlendPSO.cpp" />
+    <ClCompile Include="OffScreenRendering.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
@@ -223,6 +224,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\PSO\NormalBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\ScreenBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\SubtractBlendPSO.h" />
+    <ClInclude Include="OffScreenRendering.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\imgui\imgui.vcxproj">
