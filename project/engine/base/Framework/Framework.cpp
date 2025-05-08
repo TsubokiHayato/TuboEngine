@@ -136,15 +136,14 @@ void Framework::Run()
 	Finalize();
 }
 
-void Framework::FrameworkPreDraw()
+void Framework::FrameworkSwapChainPreDraw()
 {
 	//描画前処理
 	dxCommon->PreDraw();
-	//ImGuiの受付開始
-	srvManager->PreDraw();
+	
 }
 
-void Framework::FrameworkPostDraw()
+void Framework::FrameworkSwapChainPostDraw()
 {
 #ifdef _DEBUG
 	//ImGuiの描画
@@ -154,6 +153,18 @@ void Framework::FrameworkPostDraw()
 
 	//描画
 	dxCommon->PostDraw();
+}
+
+void Framework::FrameWorkRenderTargetPreDraw() {
+
+	dxCommon->ClearRenderTargetPreDraw();
+	//ImGuiの受付開始
+	srvManager->PreDraw();
+
+}
+
+void Framework::FrameWorkRenderTargetPostDraw() {
+
 }
 
 void Framework::ImguiPreDraw()

@@ -36,8 +36,10 @@ public:
 
 public:
 
-	void FrameworkPreDraw();
-	void FrameworkPostDraw();
+	void FrameworkSwapChainPreDraw();
+	void FrameworkSwapChainPostDraw();
+	void FrameWorkRenderTargetPreDraw();
+	void FrameWorkRenderTargetPostDraw();
 	void ImguiPreDraw();
 	void ImguiPostDraw();
 	void Object3dCommonDraw();
