@@ -201,7 +201,7 @@ void Particle::Emit(const std::string name, const Transform& transform, Vector3 
 		} else if (particleType_ == ParticleType::None) {
 			group.particleList.push_back(CreateNewParticle(randomEngine_, transform, velocity, color, lifeTime, currentTime));
 		}
-		
+
 	}
 }
 
@@ -437,26 +437,41 @@ ParticleInfo Particle::CreateNewParticleForPrimitive(std::mt19937& randomEngine,
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
+	rotateRange_ = { 0.0f,3.14f };//回転の乱数範囲
+	scaleRange_ = { 0.4f,1.5f };//拡大の乱数範囲
+
+
+
+
 	std::uniform_real_distribution<float>distRotateZ(rotateRange_.min, rotateRange_.max);
 	std::uniform_real_distribution<float>distScaleY(scaleRange_.min, scaleRange_.max);
 
 
 
-	particle.transform.translate = {};
-	particle.transform.rotate = { 0.0f,0.0f,distRotateZ(randomEngine) };
 	particle.transform.scale = { 0.025f,distScaleY(randomEngine),1.0f };
+	particle.transform.rotate = { 0.0f,0.0f,distRotateZ(randomEngine) };
+	particle.transform.translate = transform.translate;
+	particle.velocity = { 0.0f,0.0f,0.0f };
+	particle.color = { 1.0f,1.0f,1.0f,1.0f };
+	particle.lifeTime = 1.0f;
+	particle.currentTime = 0.0f;
 
+	return particle;
+}
 
+ParticleInfo Particle::CreateNewParticleForRing(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+	// 新たなパーティクルの生成
+	ParticleInfo particle = {};
 
-	//拡大縮小、回転、平行移動の設定
-	//particle.transform = transform;
-	//速度の設定
+	// 拡大縮小、回転、平行移動の設定
+	particle.transform = transform;
+	// 速度の設定
 	particle.velocity = velocity;
-	//色の設定
+	// 色の設定
 	particle.color = color;
-	//寿命の設定
+	// 寿命の設定
 	particle.lifeTime = lifeTime;
-	//経過時間の設定
+	// 経過時間の設定
 	particle.currentTime = currentTime;
 
 
@@ -464,11 +479,23 @@ ParticleInfo Particle::CreateNewParticleForPrimitive(std::mt19937& randomEngine,
 	return particle;
 }
 
-ParticleInfo Particle::CreateNewParticleForRing(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
-	return ParticleInfo();
-}
-
 ParticleInfo Particle::CreateNewParticleForCylinder(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
-	return ParticleInfo();
+	// 新たなパーティクルの生成
+	ParticleInfo particle = {};
+
+	// 拡大縮小、回転、平行移動の設定
+	particle.transform = transform;
+	// 速度の設定
+	particle.velocity = velocity;
+	// 色の設定
+	particle.color = color;
+	// 寿命の設定
+	particle.lifeTime = lifeTime;
+	// 経過時間の設定
+	particle.currentTime = currentTime;
+
+
+
+	return particle;
 }
 
