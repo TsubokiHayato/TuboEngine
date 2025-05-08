@@ -14,17 +14,30 @@
 /// 初期化処理
 /// </summary>
 /// <param name="particleSetup">パーティクル共通部分</param>
-void Particle::Initialize(ParticleCommon* particleSetup) {
+void Particle::Initialize(ParticleCommon* particleSetup, ParticleType particleType) {
 	// 引数からSetupを受け取る
 	this->particleCommon = particleSetup;
 	dxCommon_ = particleSetup->GetDxCommon();
 	winApp_ = particleSetup->GetWinApp();
+	// パーティクルのタイプを設定
+	this->particleType_ = particleType;
 
 	// RandomEngineの初期化
 	randomEngine_.seed(std::random_device()());
 
 	// 頂点データの作成
-	CreateVertexData();
+	if (particleType_ == ParticleType::Ring) {
+		CreateVertexDataForRing();
+	} else if (particleType_ == ParticleType::Cylinder) {
+		CreateVertexDataForCylinder();
+	} else if (particleType_ == ParticleType::None) {
+		CreateVertexData();
+	} else if (particleType_ == ParticleType::Primitive) {
+		CreateVertexData();
+	}
+
+
+
 	// 頂点バッファビューの作成
 	CreateVertexBufferView();
 
@@ -43,6 +56,7 @@ void Particle::Initialize(ParticleCommon* particleSetup) {
 /// 更新処理
 /// </summary>
 void Particle::Update() {
+
 	camera_->Update();
 	// カメラ行列の取得
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera_->GetScale(),
@@ -170,7 +184,24 @@ void Particle::Emit(const std::string name, const Transform& transform, Vector3 
 
 	// 指定された数のパーティクルを生成して追加
 	for (uint32_t i = 0; i < count; ++i) {
-		group.particleList.push_back(CreateNewParticle(randomEngine_, transform, velocity, color, lifeTime, currentTime));
+
+		//リングの場合
+		if (particleType_ == ParticleType::Ring) {
+			group.particleList.push_back(CreateNewParticleForRing(randomEngine_, transform, velocity, color, lifeTime, currentTime));
+
+			//円柱の場合
+		} else if (particleType_ == ParticleType::Cylinder) {
+			group.particleList.push_back(CreateNewParticleForCylinder(randomEngine_, transform, velocity, color, lifeTime, currentTime));
+
+			//プリミティブの場合
+		} else  if (particleType_ == ParticleType::Primitive) {
+			group.particleList.push_back(CreateNewParticleForPrimitive(randomEngine_, transform, velocity, color, lifeTime, currentTime));
+
+			//通常の場合
+		} else if (particleType_ == ParticleType::None) {
+			group.particleList.push_back(CreateNewParticle(randomEngine_, transform, velocity, color, lifeTime, currentTime));
+		}
+
 	}
 }
 
@@ -240,40 +271,49 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 void Particle::CreateVertexData() {
 
 	//Texture
-	/*modelData_.vertices.push_back(VertexData{ .position = {1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f} });
+	modelData_.vertices.push_back(VertexData{ .position = {1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f} });
 	modelData_.vertices.push_back(VertexData{ .position = {-1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f} });
 	modelData_.vertices.push_back(VertexData{ .position = {1.0f, -1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 1.0f}, .normal = {0.0f, 0.0f, 1.0f} });
 	modelData_.vertices.push_back(VertexData{ .position = {1.0f, -1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 1.0f}, .normal = {0.0f, 0.0f, 1.0f} });
 	modelData_.vertices.push_back(VertexData{ .position = {-1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f} });
-	modelData_.vertices.push_back(VertexData{ .position = {-1.0f, -1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 1.0f}, .normal = {0.0f, 0.0f, 1.0f} });*/
+	modelData_.vertices.push_back(VertexData{ .position = {-1.0f, -1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 1.0f}, .normal = {0.0f, 0.0f, 1.0f} });
 
+
+}
+
+void Particle::CreateVertexDataForRing() {
 
 	//Ring
-		//const uint32_t kRingDivide = 128;
-		//const float kOuterRadius = 1.0f;
-		//const float kInnerRadius = 0.2f;
-		//const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
+	const uint32_t kRingDivide = 128;
+	const float kOuterRadius = 1.0f;
+	const float kInnerRadius = 0.2f;
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
 
-		//for (uint32_t index = 0; index < kRingDivide; ++index) {
-		//	float sin = std::sin(index * radianPerDivide);
-		//	float cos = std::cos(index * radianPerDivide);
-		//	float sinNext = std::sin((index + 1) * radianPerDivide);
-		//	float cosNext = std::cos((index + 1) * radianPerDivide);
-		//	float u = float(index) / float(kRingDivide);
-		//	float uNext = float(index + 1) / float(kRingDivide);
-		//	// 頂点データを作成
-		//	modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
-		//	modelData_.vertices.push_back({ .position = {-sinNext * kInnerRadius,cosNext * kInnerRadius,0.0f,1.0f},.texcoord = {uNext, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周2
-		//	modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
-		//	modelData_.vertices.push_back({ .position = {-sin * kOuterRadius,cos * kOuterRadius,0.0f,1.0f},.texcoord = {u, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周1
-		//	modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
-		//	modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
+	for (uint32_t index = 0; index < kRingDivide; ++index) {
+		float sin = std::sin(index * radianPerDivide);
+		float cos = std::cos(index * radianPerDivide);
+		float sinNext = std::sin((index + 1) * radianPerDivide);
+		float cosNext = std::cos((index + 1) * radianPerDivide);
+		float u = float(index) / float(kRingDivide);
+		float uNext = float(index + 1) / float(kRingDivide);
+		// 頂点データを作成
+		modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
+		modelData_.vertices.push_back({ .position = {-sinNext * kInnerRadius,cosNext * kInnerRadius,0.0f,1.0f},.texcoord = {uNext, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周2
+		modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
+		modelData_.vertices.push_back({ .position = {-sin * kOuterRadius,cos * kOuterRadius,0.0f,1.0f},.texcoord = {u, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周1
+		modelData_.vertices.push_back({ .position = {-sin * kInnerRadius,cos * kInnerRadius,0.0f,1.0f},.texcoord = {u, 1.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 内周1
+		modelData_.vertices.push_back({ .position = {-sinNext * kOuterRadius,cosNext * kOuterRadius,0.0f,1.0f},.texcoord = {uNext, 0.0f},.normal = {0.0f, 0.0f, 1.0f} });	// 外周2
 
-		//}
+	}
 
+
+
+}
+
+void Particle::CreateVertexDataForCylinder() {
 
 	//Cylinder
-	
+
 	const uint32_t kCylinderDivide = 32;
 	const float kTopRadius = 1.0f;
 	const float kBottomRadius = 1.0f;
@@ -323,13 +363,12 @@ void Particle::CreateVertexData() {
 
 
 
-		
-	}
-	
 
+	}
 
 
 }
+
 
 /// <summary>
 /// 頂点バッファビューの作成
@@ -377,7 +416,72 @@ ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Trans
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
+	// 拡大縮小、回転、平行移動の設定
+	particle.transform = transform;
+	// 速度の設定
+	particle.velocity = velocity;
+	// 色の設定
+	particle.color = color;
+	// 寿命の設定
+	particle.lifeTime = lifeTime;
+	// 経過時間の設定
+	particle.currentTime = currentTime;
 
+
+
+	return particle;
+}
+
+ParticleInfo Particle::CreateNewParticleForPrimitive(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+
+	// 新たなパーティクルの生成
+	ParticleInfo particle = {};
+
+	rotateRange_ = { 0.0f,3.14f };//回転の乱数範囲
+	scaleRange_ = { 0.4f,1.5f };//拡大の乱数範囲
+
+
+
+
+	std::uniform_real_distribution<float>distRotateZ(rotateRange_.min, rotateRange_.max);
+	std::uniform_real_distribution<float>distScaleY(scaleRange_.min, scaleRange_.max);
+
+
+
+	particle.transform.scale = { 0.025f,distScaleY(randomEngine),1.0f };
+	particle.transform.rotate = { 0.0f,0.0f,distRotateZ(randomEngine) };
+	particle.transform.translate = transform.translate;
+	particle.velocity = { 0.0f,0.0f,0.0f };
+	particle.color = { 1.0f,1.0f,1.0f,1.0f };
+	particle.lifeTime = 1.0f;
+	particle.currentTime = 0.0f;
+
+	return particle;
+}
+
+ParticleInfo Particle::CreateNewParticleForRing(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+	// 新たなパーティクルの生成
+	ParticleInfo particle = {};
+
+	// 拡大縮小、回転、平行移動の設定
+	particle.transform = transform;
+	// 速度の設定
+	particle.velocity = velocity;
+	// 色の設定
+	particle.color = color;
+	// 寿命の設定
+	particle.lifeTime = lifeTime;
+	// 経過時間の設定
+	particle.currentTime = currentTime;
+
+
+
+	return particle;
+}
+
+ParticleInfo Particle::CreateNewParticleForCylinder(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+	// 新たなパーティクルの生成
+	ParticleInfo particle = {};
 
 	// 拡大縮小、回転、平行移動の設定
 	particle.transform = transform;
