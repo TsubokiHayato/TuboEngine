@@ -142,7 +142,7 @@ public:
 
 
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[3];
 
 	Microsoft::WRL::ComPtr<ID3D12Fence> GetFence() { return fence; }
 	uint64_t GetFenceValue() { return fenceValue; }
@@ -279,24 +279,34 @@ private:
 	///------------------------	
 	///レンダーターターゲット用のリソース
 	/// 
-	
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> renderTexture_; // RenderTexture
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_; // RTV用のディスクリプタヒープ
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer_;   // 深度バッファ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_; // DSV用のディスクリプタヒープ
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle_;               // RTVハンドル
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;               // DSVハンドル
-	
-	public:
+	const Vector4 kRenderTargetClearValue = { 1.0f,0.0f,0.0f,1.0f }; // わかりやすいように赤色でクリア
+
+public:
 
 	/// <summary>  
    /// レンダーテクスチャの作成  
    /// </summary>  
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTargetResource(Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, DXGI_FORMAT format, const Vector4& clearColor);
 	/// <summary>  
-	/// レンダーテクスチャのクリア  
-	/// </summary>  
-	void ClearRenderTargetPreDraw(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& commandList, Microsoft::WRL::ComPtr<ID3D12Resource>& renderTarget);
+/// レンダーテクスチャのクリア  
+/// </summary>  
+/// 
+	void ClearRenderTargetPreDraw();
+
+	/// <summary>
+	///  レンダーターゲットの初期化
+	/// </summary>
+	void RenderTargetInitialize();
+
+	// クラスメンバとして保持
+	Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource;
 
 };
 

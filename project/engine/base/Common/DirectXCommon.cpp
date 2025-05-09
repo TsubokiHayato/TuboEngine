@@ -52,6 +52,9 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	Scissor_Initialize();
 	//DXCコンパイラの生成
 	dxcCompiler_Create();
+
+	//レンダーターゲットの初期化
+	RenderTargetInitialize();
 	
 }
 
@@ -351,6 +354,8 @@ void DirectXCommon::RTV_Initialize()
 	//2つ目を作る
 	device->CreateRenderTargetView(swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
 
+
+
 #pragma endregion
 }
 
@@ -464,7 +469,7 @@ void DirectXCommon::PreDraw()
 	/* 描画先のRTVとDSVを指定する*/
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle =
 		GetDSVCPUDescriptorHandle(0);
-	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
+	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
 
 
 	/* 描画全体の色をクリア*/
@@ -476,7 +481,7 @@ void DirectXCommon::PreDraw()
 
 	/* 画面全体の深度をクリア*/
 
-			//depthClear
+	//depthClear
 	//commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 
@@ -495,52 +500,54 @@ void DirectXCommon::PreDraw()
 
 }
 
+void DirectXCommon::ClearRenderTargetPreDraw() {
+	// 描画先のRTVとDSVを指定する
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetDSVCPUDescriptorHandle(0);
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHandles[backBufferIndex];
 
-void DirectXCommon::ClearRenderTargetPreDraw(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& commandList, Microsoft::WRL::ComPtr<ID3D12Resource>& renderTarget) {
+	// ディスクリプタが有効か確認
+	assert(renderTextureResource != nullptr);
+
+	commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
+
+	// 描画全体の色をクリア
+	FLOAT clearColor[4] = { kRenderTargetClearValue.x, kRenderTargetClearValue.y, kRenderTargetClearValue.z, kRenderTargetClearValue.w };
+	commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+
+	// 画面全体の深度をクリア
+	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+	// ビューポート領域の指定
+	commandList->RSSetViewports(1, &viewport);
+	// シザー矩形の設定
+	commandList->RSSetScissorRects(1, &scissorRect);
+}
 
 
+void DirectXCommon::RenderTargetInitialize() {
+	// RTVの作成
+	renderTextureResource = CreateRenderTargetResource(
+		device, winApp->kClientWidth, winApp->kClientHeight,
+		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, kRenderTargetClearValue
+	);
 
-	//RTVの作成
-	const Vector4 kRenderTargetClearValue = { 1.0f,0.0f,0.0f,1.0f }; // わかりやすいように赤色でクリア
-	auto renderTextureResource = CreateRenderTargetResource(device, winApp->kClientWidth, winApp->kClientHeight,
-		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, kRenderTargetClearValue);
-	device->CreateRenderTargetView(renderTextureResource.Get(), nullptr, GetRTVCPUDescriptorHandle(0));
+	// RTVディスクリプタの取得
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = GetRTVCPUDescriptorHandle(0);
+	device->CreateRenderTargetView(renderTextureResource.Get(), nullptr, rtvHandle);
 
+	// RTVハンドルを保存
+	rtvHandles[0] = rtvHandle;
 
-	//SrVの作成
+	// SRVの作成
 	D3D12_SHADER_RESOURCE_VIEW_DESC renderTextureSRVDesc{};
 	renderTextureSRVDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	renderTextureSRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	renderTextureSRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	renderTextureSRVDesc.Texture2D.MipLevels = 1;
 
-	//Srvの生成
+	// SRVの生成
 	device->CreateShaderResourceView(renderTextureResource.Get(), &renderTextureSRVDesc, GetSRVCPUDescriptorHandle(0));
-
-
-	//描画先のRTVとDSVを指定する
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle =
-		GetDSVCPUDescriptorHandle(0);
-	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
-	//描画全体の色をクリア
-	
-    // Convert Vector4 to FLOAT array for compatibility with ClearRenderTargetView  
-    FLOAT clearColor[4] = { kRenderTargetClearValue.x, kRenderTargetClearValue.y, kRenderTargetClearValue.z, kRenderTargetClearValue.w };  
-    commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
-
-	// 画面全体の深度をクリア
-	//depthClear
-	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-	//RSSetViewports
-	// ビューポート領域の指定
-	commandList->RSSetViewports(1, &viewport);//viewPortを設定
-	// シザー矩形の設定
-	commandList->RSSetScissorRects(1, &scissorRect);//Scissorを設定
-
-
 }
-
-
 
 
 
@@ -981,7 +988,6 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateRenderTargetResource
 
 	return renderTargetResource;
 }
-
 
 
 Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap( D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
