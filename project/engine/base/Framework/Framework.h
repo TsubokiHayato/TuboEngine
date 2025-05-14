@@ -47,9 +47,9 @@ public:
 	void ParticleCommonDraw();
 
 public:
-	
-		//終了リクエストがあったかどうか
-		virtual bool IsEndRequest() { return endRequest; }
+
+	//終了リクエストがあったかどうか
+	virtual bool IsEndRequest() { return endRequest; }
 
 public:
 	void Run();
@@ -79,10 +79,10 @@ protected:
 	std::unique_ptr <ModelCommon> modelCommon = nullptr;
 	std::unique_ptr <SrvManager> srvManager = nullptr;
 #ifdef _DEBUG
-std::unique_ptr<ImGuiManager> imGuiManager = nullptr;
+	std::unique_ptr<ImGuiManager> imGuiManager = nullptr;
 #endif // _DEBUG
 
-	
+
 	std::unique_ptr<SceneManager> sceneManager = nullptr;
 
 	//パーティクル共通部分
