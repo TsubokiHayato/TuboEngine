@@ -280,12 +280,10 @@ private:
 	///レンダーターターゲット用のリソース
 	/// 
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> renderTexture_; // RenderTexture
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_; // RTV用のディスクリプタヒープ
-	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer_;   // 深度バッファ
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_; // DSV用のディスクリプタヒープ
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle_;               // RTVハンドル
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;               // DSVハンドル
+	// DirectXCommon.h
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> offscreenRtvDescriptorHeap;
+	D3D12_CPU_DESCRIPTOR_HANDLE offscreenRtvHandle{};
+
 	const Vector4 kRenderTargetClearValue = { 1.0f,0.0f,0.0f,1.0f }; // わかりやすいように赤色でクリア
 
 public:
