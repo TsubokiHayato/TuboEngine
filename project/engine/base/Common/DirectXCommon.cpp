@@ -40,6 +40,11 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	DepthBuffer_Create(winApp->kClientWidth, winApp->kClientHeight);
 	//各種ディスクリプタヒープの生成
 	DescriptorHeap_Create();
+
+
+	//レンダーターゲットの初期化
+	RenderTargetInitialize();
+
 	//レンダーターゲットビューの初期化
 	RTV_Initialize();
 	//深度ステンシルビューの初期化
@@ -53,8 +58,6 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	//DXCコンパイラの生成
 	dxcCompiler_Create();
 
-	//レンダーターゲットの初期化
-	RenderTargetInitialize();
 	
 }
 
@@ -317,6 +320,10 @@ void DirectXCommon::DescriptorHeap_Create()
 	
 	//RTVディスクイリプタヒープの生成
 	rtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	
+	// オフスクリーン用（必要な数だけ。ここでは1つ）
+	offscreenRtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
+
 
 	//SRVディスクイリプタヒープの生成
 	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,SrvManager::kMaxSRVCount, true);
@@ -353,6 +360,11 @@ void DirectXCommon::RTV_Initialize()
 	rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	//2つ目を作る
 	device->CreateRenderTargetView(swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
+
+	// DescriptorHeap_Create で offscreenRtvDescriptorHeap を作成済み
+	offscreenRtvHandle = offscreenRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	device->CreateRenderTargetView(renderTextureResource.Get(), nullptr, offscreenRtvHandle);
+
 
 
 
@@ -501,25 +513,20 @@ void DirectXCommon::PreDraw()
 }
 
 void DirectXCommon::ClearRenderTargetPreDraw() {
-	// 描画先のRTVとDSVを指定する
+	// バリア設定（必要なら）
+   // ...
+
+   // RTV/DSVの設定
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = GetRTVCPUDescriptorHandle(0); // renderTextureResource用
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetDSVCPUDescriptorHandle(0);
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHandles[backBufferIndex];
-
-	// ディスクリプタが有効か確認
-	assert(renderTextureResource != nullptr);
-
-	commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
-
-	// 描画全体の色をクリア
+	commandList->OMSetRenderTargets(1, &offscreenRtvHandle, FALSE, &dsvHandle);
+	// クリア
 	FLOAT clearColor[4] = { kRenderTargetClearValue.x, kRenderTargetClearValue.y, kRenderTargetClearValue.z, kRenderTargetClearValue.w };
-	commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-
-	// 画面全体の深度をクリア
+	commandList->ClearRenderTargetView(offscreenRtvHandle, clearColor, 0, nullptr);
 	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-	// ビューポート領域の指定
+	// ビューポート/シザー設定
 	commandList->RSSetViewports(1, &viewport);
-	// シザー矩形の設定
 	commandList->RSSetScissorRects(1, &scissorRect);
 }
 
@@ -534,6 +541,11 @@ void DirectXCommon::RenderTargetInitialize() {
 	// RTVディスクリプタの取得
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = GetRTVCPUDescriptorHandle(0);
 	device->CreateRenderTargetView(renderTextureResource.Get(), nullptr, rtvHandle);
+
+	// オフスクリーン用RTVディスクリプタの取得
+	offscreenRtvHandle = offscreenRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	device->CreateRenderTargetView(renderTextureResource.Get(), nullptr, offscreenRtvHandle);
+
 
 	// RTVハンドルを保存
 	rtvHandles[0] = rtvHandle;
