@@ -415,6 +415,7 @@
       <Filter>シェーダーファイル</Filter>
     </None>
     <None Include="Resources\Shaders\Particle.hlsli" />
+    <None Include="Resources\Shaders\CopyImage.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Object3d.PS.hlsl">
@@ -425,6 +426,8 @@
     </FxCompile>
     <FxCompile Include="Resources\Shaders\Particle.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Particle.VS.hlsl" />
+    <FxCompile Include="Resources\Shaders\CopyImage.VS.hlsl" />
+    <FxCompile Include="Resources\Shaders\CopyImage.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
