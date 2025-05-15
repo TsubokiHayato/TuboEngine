@@ -14,6 +14,7 @@
 #include<vector>
 #include<chrono>
 #include<Vector4.h>
+#include<OffScreenRenderingPSO.h>
 
 
 class DirectXCommon
@@ -113,6 +114,9 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetDSVCPUDescriptorHandle(uint32_t index);
 	//DSVの指定番号のGPUディスクリプタハンドルを取得する
 	D3D12_GPU_DESCRIPTOR_HANDLE GetDSVGPUDescriptorHandle(uint32_t index);
+
+	//ディスクリプタヒープの取得
+
 
 
 	//DescriptorSizeの取得
@@ -265,6 +269,7 @@ private:
 
 	//TransitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier{};
+	D3D12_RESOURCE_BARRIER renderingBarrier{};
 
 	UINT backBufferIndex;
 
@@ -286,6 +291,10 @@ private:
 
 	const Vector4 kRenderTargetClearValue = { 1.0f,0.0f,0.0f,1.0f }; // わかりやすいように赤色でクリア
 
+
+
+
+
 public:
 
 	/// <summary>  
@@ -304,7 +313,18 @@ public:
 	void RenderTargetInitialize();
 
 	// クラスメンバとして保持
-	Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_;
+	D3D12_RESOURCE_STATES renderTextureState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	OffScreenRenderingPSO* offScreenRenderingPSO;
+	void DrawOffScreenPass();
+
+
+	// コピーの前に張る1のバリア
+	void TransitionRenderTextureToShaderResource();
+
+	// コピーの後に張る2のバリア
+	void TransitionRenderTextureToRenderTarget();
+
 
 };
 

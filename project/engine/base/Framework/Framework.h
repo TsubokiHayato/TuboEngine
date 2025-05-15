@@ -16,6 +16,8 @@
 #include"ParticleCommon.h"
 #include"Input.h"
 
+class OffScreenRenderingPSO;
+
 class Framework
 {
 public:
@@ -40,11 +42,15 @@ public:
 	void FrameworkSwapChainPostDraw();
 	void FrameWorkRenderTargetPreDraw();
 	void FrameWorkRenderTargetPostDraw();
+	
+	
 	void ImguiPreDraw();
 	void ImguiPostDraw();
 	void Object3dCommonDraw();
 	void SpriteCommonDraw();
 	void ParticleCommonDraw();
+	void OffScreenRenderingDraw();
+	
 
 public:
 
@@ -87,5 +93,8 @@ protected:
 
 	//パーティクル共通部分
 	std::unique_ptr <ParticleCommon> particleCommon = nullptr;
+
+
+	
 };
 

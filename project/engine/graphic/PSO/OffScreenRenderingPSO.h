@@ -1,10 +1,16 @@
 #pragma once
 
-
-
 #pragma once
-#include"DirectXCommon.h"
-#include"BlendMode.h"
+
+#include <d3d12.h>
+#include <wrl.h>
+#include <cstdint>
+#include <dxcapi.h>
+
+
+// 前方宣言
+class DirectXCommon;
+
 class OffScreenRenderingPSO
 {
 public:
@@ -37,14 +43,14 @@ private:
 	/*-----------------
 		rootSignature
 	-----------------*/
-	DirectXCommon* dxCommon_;
+	DirectXCommon* dxCommon_=nullptr;
 
 	//RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	//DescriptorRange作成
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
 	//RootParameter作成。
-	D3D12_ROOT_PARAMETER rootParameters[8] = {};
+	D3D12_ROOT_PARAMETER rootParameters[1] = {};
 	//Sampler作成
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
 	//シリアライズしてバイナリにする
@@ -89,8 +95,6 @@ private:
 	Microsoft::WRL::ComPtr <ID3D12Device> device;
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
 
-
-	BlendMode blendMode = kBlendModeNormal;
 
 };
 

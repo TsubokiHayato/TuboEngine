@@ -1,31 +1,28 @@
 #include "Order.h"
 
-void Order::Initialize()
-{
+void Order::Initialize() {
 	//初期化
 	Framework::Initialize();
 }
 
-void Order::Update()
-{
+void Order::Update() {
 	//更新
 	Framework::Update();
 
-	
+
 }
 
-void Order::Finalize()
-{
+void Order::Finalize() {
 	//終了処理
 	Framework::Finalize();
 
 }
 
-void Order::Draw()
-{
+void Order::Draw() {
 
 	//RenderTargetの描画
 	
+	// Renderの設定
 	Framework::FrameWorkRenderTargetPreDraw();
 	//3Dオブジェクト描画
 	Framework::Object3dCommonDraw();
@@ -33,12 +30,19 @@ void Order::Draw()
 	Framework::SpriteCommonDraw();
 	//パーティクル描画
 	Framework::ParticleCommonDraw();
+	// swapChainのバリアを設定
+	Framework::FrameworkSwapChainPreDraw();
+	// OffScreenの描画
+	Framework::OffScreenRenderingDraw();
+
 	Framework::FrameWorkRenderTargetPostDraw();
+
+
 
 	//SwapChainの描画
 
 	//ループ前処理
-	Framework::FrameworkSwapChainPreDraw();
+	
 	//ImGuiの受付開始
 	Framework::ImguiPreDraw();
 	//ImGuiの受付終了
