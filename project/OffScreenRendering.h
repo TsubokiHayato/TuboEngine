@@ -1,54 +1,38 @@
-//#pragma once  
+//#pragma once
+//#include <d3d12.h>
+//#include <wrl.h>
+//#include <memory>
+//#include "DirectXCommon.h"
 //
-//#include <wrl.h>  
-//#include <d3d12.h>  
-//#include "Vector4.h"  
-//#include <memory>  
-//#include <WinApp.h>  
-//#include <dxgi1_6.h>  
-//#include <dxcapi.h>
-//#include <string>
-//#include <format>
-//#include <cassert>
-//#include <array>
-//#include <vector>
-//#include <chrono>
-//#include"Logger.h"
-//
-//
-//class OffScreenRendering
+//class OffscreenRenderering
 //{
 //public:
-//	/// <summary>  
-//	/// コンストラクタ  
-//	/// </summary>  
-//	OffScreenRendering() = default;
-//	/// <summary>  
-//	/// デストラクタ  
-//	/// </summary>  
-//	~OffScreenRendering() = default;
-//	/// <summary>  
-//	/// レンダーテクスチャの作成  
-//	/// </summary>  
-//	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTargetResource(Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, DXGI_FORMAT format, const Vector4& clearColor);
-//	/// <summary>  
-//	/// レンダーテクスチャのクリア  
-//	/// </summary>  
-//	void ClearRenderTargetPreDraw(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& commandList, Microsoft::WRL::ComPtr<ID3D12Resource>& renderTarget);
+//    OffscreenRenderering();
+//    ~OffscreenRenderering();
+//
+//    // 初期化
+//    void Initialize(DirectXCommon* dxCommon, int width, int height);
+//
+//    // オフスクリーン描画開始（RTV/クリア/バリア）
+//    void Begin();
+//
+//    // オフスクリーン描画終了（バリアをSRVへ）
+//    void End();
+//
+//    // 全画面三角形コピー
+//    void DrawCopy(ID3D12PipelineState* pso, ID3D12RootSignature* rootSig, D3D12_GPU_DESCRIPTOR_HANDLE srvHandle);
+//
+//    // オフスクリーンテクスチャのSRVハンドル取得
+//    D3D12_GPU_DESCRIPTOR_HANDLE GetSRVHandle() const;
+//
+//    // オフスクリーンテクスチャリソース取得
+//    ID3D12Resource* GetResource() const;
 //
 //private:
-//	std::unique_ptr<WinApp> winApp = nullptr;
-//	// DXGIファクトリーの設置  
-//	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
-//	Microsoft::WRL::ComPtr<ID3D12Device> device = nullptr;
-//
-//	Microsoft::WRL::ComPtr<ID3D12Resource> renderTexture_; // RenderTexture  
-//	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap_; // RTV用のディスクリプタヒープ  
-//	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer_;   // 深度バッファ  
-//	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_; // DSV用のディスクリプタヒープ  
-//	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle_;               // RTVハンドル  
-//	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;               // DSVハンドル  
-//	Vector4 clearColor_;                                  // クリアカラー  
-//	int width_;                                           // レンダーテクスチャの幅  
-//	int height_;                                          // レンダーテクスチャの高さ  
+//    DirectXCommon* dxCommon_ = nullptr;
+//    Microsoft::WRL::ComPtr<ID3D12Resource> renderTexture_;
+//    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle_{};
+//    D3D12_GPU_DESCRIPTOR_HANDLE srvHandle_{};
+//    int width_ = 0;
+//    int height_ = 0;
 //};
