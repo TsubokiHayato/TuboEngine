@@ -1,38 +1,56 @@
-//#pragma once
-//#include <d3d12.h>
-//#include <wrl.h>
-//#include <memory>
-//#include "DirectXCommon.h"
-//
-//class OffscreenRenderering
-//{
-//public:
-//    OffscreenRenderering();
-//    ~OffscreenRenderering();
-//
-//    // 初期化
-//    void Initialize(DirectXCommon* dxCommon, int width, int height);
-//
-//    // オフスクリーン描画開始（RTV/クリア/バリア）
-//    void Begin();
-//
-//    // オフスクリーン描画終了（バリアをSRVへ）
-//    void End();
-//
-//    // 全画面三角形コピー
-//    void DrawCopy(ID3D12PipelineState* pso, ID3D12RootSignature* rootSig, D3D12_GPU_DESCRIPTOR_HANDLE srvHandle);
-//
-//    // オフスクリーンテクスチャのSRVハンドル取得
-//    D3D12_GPU_DESCRIPTOR_HANDLE GetSRVHandle() const;
-//
-//    // オフスクリーンテクスチャリソース取得
-//    ID3D12Resource* GetResource() const;
-//
-//private:
-//    DirectXCommon* dxCommon_ = nullptr;
-//    Microsoft::WRL::ComPtr<ID3D12Resource> renderTexture_;
-//    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle_{};
-//    D3D12_GPU_DESCRIPTOR_HANDLE srvHandle_{};
-//    int width_ = 0;
-//    int height_ = 0;
-//};
+#pragma once
+#include <d3d12.h>
+#include <wrl.h>
+#include <memory>
+#include "DirectXCommon.h"
+
+//前方宣言
+class WinApp;
+class DirectXCommon;
+class OffScreenRenderingPSO;
+
+class OffScreenRendering
+{
+public:
+
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	/// <param name="dxCommon">DirectX共通部分</param>
+	void Initialize(WinApp* winApp,DirectXCommon* dxCommon);
+	/// <summary>
+	/// 描画設定
+	/// </summary>
+	void PreDraw();
+
+	void TransitionRenderTextureToShaderResource();
+	void TransitionRenderTextureToRenderTarget();
+
+
+
+	/// <summary>
+	/// 描画
+	/// </summary>
+	void Draw();
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTargetResource(Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, DXGI_FORMAT format, const Vector4& clearColor);
+ 
+private:
+	
+	DirectXCommon* dxCommon_ = nullptr; // DirectX共通部分のポインタ
+	WinApp* winApp_ = nullptr; // ウィンドウズアプリケーションのポインタ
+	Microsoft::WRL::ComPtr <ID3D12Device> device; // デバイスのポインタ
+	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList = nullptr;
+
+	OffScreenRenderingPSO* offScreenRenderingPSO = nullptr; // OffScreenRenderingPSOクラスのポインタ
+	
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> offscreenRtvDescriptorHeap;
+	D3D12_CPU_DESCRIPTOR_HANDLE offscreenRtvHandle{};
+
+	const Vector4 kRenderTargetClearValue = { 1.0f,0.0f,0.0f,1.0f }; // わかりやすいように赤色でクリア
+	// クラスメンバとして保持
+	Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_;
+	D3D12_RESOURCE_STATES renderTextureState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	D3D12_RESOURCE_BARRIER renderingBarrier{};
+  
+};

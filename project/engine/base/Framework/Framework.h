@@ -15,6 +15,7 @@
 #include"SceneManager.h"
 #include"ParticleCommon.h"
 #include"Input.h"
+#include"OffScreenRendering.h"
 
 class OffScreenRenderingPSO;
 
@@ -41,7 +42,7 @@ public:
 	void FrameworkSwapChainPreDraw();
 	void FrameworkSwapChainPostDraw();
 	void FrameWorkRenderTargetPreDraw();
-	void FrameWorkRenderTargetPostDraw();
+	
 	
 	
 	void ImguiPreDraw();
@@ -93,6 +94,9 @@ protected:
 
 	//パーティクル共通部分
 	std::unique_ptr <ParticleCommon> particleCommon = nullptr;
+
+	//オフスクリーンレンダリング
+	std::unique_ptr<OffScreenRendering> offScreenRendering = nullptr;
 
 
 	

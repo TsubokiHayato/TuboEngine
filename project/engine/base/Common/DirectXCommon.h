@@ -164,6 +164,11 @@ public:
 
 	size_t GetBackBufferCount()const { return swapChainDesc.BufferCount; }
 
+	//viewportの取得
+	D3D12_VIEWPORT GetViewport()const { return viewport; }
+	//scissorRectの取得
+	D3D12_RECT GetScissorRect()const { return scissorRect; }
+
 	//シェーダーのコンパイル
 	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
 		const std::wstring& filePath,
@@ -269,7 +274,7 @@ private:
 
 	//TransitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier{};
-	D3D12_RESOURCE_BARRIER renderingBarrier{};
+	
 
 	UINT backBufferIndex;
 
@@ -281,49 +286,7 @@ private:
 
 
 
-	///------------------------	
-	///レンダーターターゲット用のリソース
-	/// 
 
-	// DirectXCommon.h
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> offscreenRtvDescriptorHeap;
-	D3D12_CPU_DESCRIPTOR_HANDLE offscreenRtvHandle{};
-
-	const Vector4 kRenderTargetClearValue = { 1.0f,0.0f,0.0f,1.0f }; // わかりやすいように赤色でクリア
-
-
-
-
-
-public:
-
-	/// <summary>  
-   /// レンダーテクスチャの作成  
-   /// </summary>  
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTargetResource(Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, DXGI_FORMAT format, const Vector4& clearColor);
-	/// <summary>  
-/// レンダーテクスチャのクリア  
-/// </summary>  
-/// 
-	void ClearRenderTargetPreDraw();
-
-	/// <summary>
-	///  レンダーターゲットの初期化
-	/// </summary>
-	void RenderTargetInitialize();
-
-	// クラスメンバとして保持
-	Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_;
-	D3D12_RESOURCE_STATES renderTextureState = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	OffScreenRenderingPSO* offScreenRenderingPSO;
-	void DrawOffScreenPass();
-
-
-	// コピーの前に張る1のバリア
-	void TransitionRenderTextureToShaderResource();
-
-	// コピーの後に張る2のバリア
-	void TransitionRenderTextureToRenderTarget();
 
 
 };

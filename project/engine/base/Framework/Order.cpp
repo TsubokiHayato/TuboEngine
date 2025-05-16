@@ -34,9 +34,7 @@ void Order::Draw() {
 	Framework::FrameworkSwapChainPreDraw();
 	// OffScreenの描画
 	Framework::OffScreenRenderingDraw();
-
-	Framework::FrameWorkRenderTargetPostDraw();
-
+	
 
 
 	//SwapChainの描画

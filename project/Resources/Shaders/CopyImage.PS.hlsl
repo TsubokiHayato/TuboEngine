@@ -136,6 +136,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     //const float kBlurWidth = 0.02f; // ぼかしの幅。大きいほど大きい
 
     //// 中心から現在のuvに対しての方向を計算。
+    
     //float2 direction = input.texcoord - kCenter;
     //// 単位方向とはいえ、単位ベクトルだが、ここではあえて正規化せず、遠いほどより遠くをサンプリングする
 
@@ -164,6 +165,8 @@ PixelShaderOutput main(VertexShaderOutput input)
     
     //色にする
     output.color = float4(randam, randam, randam, 1.0f);
+    
+    
     
     return output;
 }

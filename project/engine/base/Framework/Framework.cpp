@@ -4,6 +4,7 @@
 #include <dxcapi.h>
 
 
+
 void Framework::Initialize() {
 	//ウィンドウズアプリケーション
 	winApp = std::make_unique<WinApp>();
@@ -54,6 +55,10 @@ void Framework::Initialize() {
 	//パーティクル共通部分
 	particleCommon = std::make_unique<ParticleCommon>();
 	particleCommon->Initialize(winApp.get(), dxCommon.get(), srvManager.get());
+
+	//オフスクリーンレンダリングの初期化
+	offScreenRendering = std::make_unique<OffScreenRendering>();
+	offScreenRendering->Initialize(winApp.get(), dxCommon.get());
 
 	//テクスチャマネージャーの初期化
 	TextureManager::GetInstance()->Initialize(dxCommon.get(), srvManager.get());
@@ -146,7 +151,7 @@ void Framework::FrameworkSwapChainPostDraw() {
 	imGuiManager->Draw();
 #endif // _DEBUG
 
-
+	offScreenRendering->TransitionRenderTextureToRenderTarget();
 	//描画
 	dxCommon->PostDraw();
 }
@@ -188,15 +193,13 @@ void Framework::ImguiPostDraw() {
 void Framework::FrameWorkRenderTargetPreDraw() {
 
 	//ImGuiの受付開始
-	dxCommon->ClearRenderTargetPreDraw();
+	offScreenRendering->PreDraw();
+
+
 	srvManager->PreDraw();
 
 }
 
-void Framework::FrameWorkRenderTargetPostDraw() {
-	//
-	dxCommon->TransitionRenderTextureToRenderTarget();
-}
 
 
 
@@ -224,9 +227,10 @@ void Framework::ParticleCommonDraw() {
 
 void Framework::OffScreenRenderingDraw() {
 
-	dxCommon->TransitionRenderTextureToShaderResource();
+	
+	offScreenRendering->TransitionRenderTextureToShaderResource();
 
 	//オフスクリーンレンダリングの描画
-	dxCommon->DrawOffScreenPass();
+	offScreenRendering->Draw();
 }
 
