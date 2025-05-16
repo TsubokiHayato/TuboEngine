@@ -3,6 +3,10 @@
 #include"DirectXCommon.h"
 #include"OffScreenRenderingPSO.h"
 
+/// <summary>
+/// オフスクリーンレンダリングの初期化処理
+/// 必要なリソースの生成やディスクリプタの設定、PSOの初期化を行います。
+/// </summary>
 void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 
 	// NULL検出
@@ -13,7 +17,6 @@ void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 	winApp_ = winApp;
 	device = dxCommon_->GetDevice();
 	commandList = dxCommon_->GetCommandList();
-
 
 	// RTVの作成
 	renderTextureResource_ = CreateRenderTargetResource(
@@ -28,7 +31,6 @@ void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 	offscreenRtvHandle = offscreenRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	device->CreateRenderTargetView(renderTextureResource_.Get(), nullptr, offscreenRtvHandle);
 
-
 	// SRVの作成
 	D3D12_SHADER_RESOURCE_VIEW_DESC renderTextureSRVDesc{};
 	renderTextureSRVDesc.Format = renderTextureResource_->GetDesc().Format;
@@ -39,16 +41,15 @@ void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 	// SRVの生成
 	device->CreateShaderResourceView(renderTextureResource_.Get(), &renderTextureSRVDesc, dxCommon->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 
-
-	/*---------------------------------------
-		PSOの初期化
-	---------------------------------------*/
+	// PSOの初期化
 	offScreenRenderingPSO = new OffScreenRenderingPSO();
 	offScreenRenderingPSO->Initialize(dxCommon_);
-
-
 }
 
+/// <summary>
+/// 描画前の設定処理
+/// レンダーターゲットや深度ステンシルのセット、クリア、ビューポート・シザーの設定を行います。
+/// </summary>
 void OffScreenRendering::PreDraw() {
 
 	//ばりあ
@@ -74,12 +75,11 @@ void OffScreenRendering::PreDraw() {
 	// ビューポート/シザー設定
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
-
-
-
-
 }
 
+/// <summary>
+/// レンダーテクスチャをシェーダリソース用にバリア遷移します。
+/// </summary>
 void OffScreenRendering::TransitionRenderTextureToShaderResource() {
 
 	renderingBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -87,17 +87,22 @@ void OffScreenRendering::TransitionRenderTextureToShaderResource() {
 	renderingBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 
 	commandList->ResourceBarrier(1, &renderingBarrier);
-
 }
 
+/// <summary>
+/// レンダーテクスチャをレンダーターゲット用にバリア遷移します。
+/// </summary>
 void OffScreenRendering::TransitionRenderTextureToRenderTarget() {
 	renderingBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	renderingBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	// Render
 	commandList->ResourceBarrier(1, &renderingBarrier);
-
 }
 
+/// <summary>
+/// オフスクリーンテクスチャの描画処理
+/// 全画面三角形を描画します。
+/// </summary>
 void OffScreenRendering::Draw() {
 
 	// 4. SRV用ディスクリプタヒープをセット
@@ -112,10 +117,18 @@ void OffScreenRendering::Draw() {
 
 	// 7. 全画面三角形を描画
 	commandList->DrawInstanced(3, 1, 0, 0); // 全画面三角形
-
-
 }
 
+/// <summary>
+/// レンダーターゲットリソースの作成
+/// 指定されたサイズ・フォーマット・クリアカラーでリソースを生成します。
+/// </summary>
+/// <param name="device">D3D12デバイス</param>
+/// <param name="width">幅</param>
+/// <param name="height">高さ</param>
+/// <param name="format">フォーマット</param>
+/// <param name="clearColor">クリアカラー</param>
+/// <returns>作成されたリソース</returns>
 Microsoft::WRL::ComPtr<ID3D12Resource> OffScreenRendering::CreateRenderTargetResource(Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, DXGI_FORMAT format, const Vector4& clearColor) {
 	// リソースの設定
 	D3D12_RESOURCE_DESC resourceDesc = {};
