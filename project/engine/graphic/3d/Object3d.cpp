@@ -20,6 +20,8 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileN
 	this->camera = object3dCommon->GetDefaultCamera();
 
 	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
+	// モデルを取得
+	model_ = ModelManager::GetInstance()->FindModel(modelFileNamePath);
 
 #pragma region TransformMatrixResourced
 
