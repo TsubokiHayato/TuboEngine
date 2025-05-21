@@ -57,6 +57,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     //float value = dot(output.color.rgb, float3(0.2125f, 0.7154, 0.0721f));
     //output.color.rgb = float3(value, value, value);
     
+
     /*Vignette*/
     //output.color = gTexture.Sample(gSampler, input.texcoord);
     ////周辺を0に、中心になるほど明るくなるように計算で調整
