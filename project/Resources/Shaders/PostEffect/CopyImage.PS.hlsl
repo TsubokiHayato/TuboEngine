@@ -51,12 +51,6 @@ PixelShaderOutput main(VertexShaderOutput input)
     
     /*Normal*/
     //output.color = gTexture.Sample(gSampler, input.texcoord);
-    
-    /*Grayscale*/
-    //output.color = gTexture.Sample(gSampler, input.texcoord);
-    //float value = dot(output.color.rgb, float3(0.2125f, 0.7154, 0.0721f));
-    //output.color.rgb = float3(value, value, value);
-    
 
     /*Vignette*/
     //output.color = gTexture.Sample(gSampler, input.texcoord);
@@ -70,6 +64,8 @@ PixelShaderOutput main(VertexShaderOutput input)
     //output.color.rgb *= vignette;
     
     ////16.0fや8.0fは調整できるようにする
+    
+    
     
     /*Smoothing*/
     //uint width, height; // 1. uvStepSizeの算出
