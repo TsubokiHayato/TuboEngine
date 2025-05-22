@@ -93,7 +93,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio;$(ProjectDir)engine\graphic\Particle;$(ProjectDir)engine\scene;$(ProjectDir)engine\base\Framework;$(ProjectDir)engine\base\Utilities;$(ProjectDir)engine\base\Common;$(ProjectDir)engine\graphic\data;$(ProjectDir)engine\graphic\PSO;$(ProjectDir)externals\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio;$(ProjectDir)engine\graphic\Particle;$(ProjectDir)engine\scene;$(ProjectDir)engine\base\Framework;$(ProjectDir)engine\base\Utilities;$(ProjectDir)engine\base\Common;$(ProjectDir)engine\graphic\data;$(ProjectDir)engine\graphic\PSO;$(ProjectDir)externals\assimp\include;$(ProjectDir)engine\graphic\PSO\Blend;$(ProjectDir)engine\graphic\PSO\PostEffect</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
     </ClCompile>
     <Link>
@@ -134,6 +134,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ClCompile Include="engine\scene\IScene.cpp" />
+    <ClCompile Include="GrayScalePSO.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\graphic\3d\Model.cpp" />
     <ClCompile Include="engine\graphic\3d\ModelCommon.cpp" />
@@ -162,6 +163,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\SubtractBlendPSO.cpp" />
     <ClCompile Include="OffScreenRendering.cpp" />
     <ClCompile Include="engine\graphic\PSO\OffScreenRenderingPSO.cpp" />
+    <ClCompile Include="PostEffectPSOBase.cpp" />
+    <ClCompile Include="VignettePSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
@@ -225,8 +228,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\PSO\NormalBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\ScreenBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\SubtractBlendPSO.h" />
+    <ClInclude Include="GrayScalePSO.h" />
     <ClInclude Include="OffScreenRendering.h" />
     <ClInclude Include="engine\graphic\PSO\OffScreenRenderingPSO.h" />
+    <ClInclude Include="PostEffectPSOBase.h" />
+    <ClInclude Include="VignettePSO.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\imgui\imgui.vcxproj">
