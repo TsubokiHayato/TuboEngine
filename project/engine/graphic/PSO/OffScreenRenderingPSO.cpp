@@ -124,11 +124,11 @@ void OffScreenRenderingPSO::CreateGraphicPipeline() {
 	-------------------*/
 
 	//Shaderをコンパイルする
-	vertexShaderBlob = dxCommon_->CompileShader(L"Resources/Shaders/CopyImage.VS.hlsl",
+	vertexShaderBlob = dxCommon_->CompileShader(L"Resources/Shaders/PostEffect/CopyImage.VS.hlsl",
 		L"vs_6_0");
 	assert(vertexShaderBlob != nullptr);
 
-	pixelShaderBlob = dxCommon_->CompileShader(L"Resources/Shaders/CopyImage.PS.hlsl",
+	pixelShaderBlob = dxCommon_->CompileShader(L"Resources/Shaders/PostEffect/CopyImage.PS.hlsl",
 		L"ps_6_0");
 	assert(pixelShaderBlob != nullptr);
 

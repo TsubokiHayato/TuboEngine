@@ -162,6 +162,8 @@ void Framework::ImguiPreDraw() {
 	imGuiManager->Begin();
 
 	sceneManager->ImGuiDraw();
+
+	offScreenRendering->DrawImGui();
 #endif // _DEBUG
 
 }
