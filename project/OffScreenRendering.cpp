@@ -5,6 +5,9 @@
 #include"OffScreenRenderingPSO.h"
 #include"GrayScalePSO.h"
 #include"VignettePSO.h"
+#include <GrayScaleEffect.h>
+#include"VignetteEffect.h"
+#include"SepiaEffect.h"
 
 /// <summary>
 /// オフスクリーンレンダリングの初期化処理
@@ -44,38 +47,14 @@ void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 	// SRVの生成
 	device->CreateShaderResourceView(renderTextureResource_.Get(), &renderTextureSRVDesc, dxCommon->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 
-	///-------------------------------------------------
-	/// PSOの初期化
-	///-------------------------------------------------
+	///---------------------------------------------------------------------
+	///					PostEffectManagerの初期化
+	///---------------------------------------------------------------------
 
-	// PSOの初期化
-	offScreenRenderingPSO = new OffScreenRenderingPSO();
-	offScreenRenderingPSO->Initialize(dxCommon_);
-
-	// グレースケール用PSOの初期化
-	grayScalePSO = new GrayScalePSO();
-	grayScalePSO->Initialize(dxCommon_);
-
-	// ヴィネット用PSOの初期化
-	vignettePSO = new VignettePSO();
-	vignettePSO->Initialize(dxCommon_);
-
-	///------------------------------------------------
-	/// リソースの初期化
-	///------------------------------------------------
-
-	// ポイントライト用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	vignetteResource = this->dxCommon_->CreateBufferResource(sizeof(VignetteParams));
-	// 平行光源用にデータを書き込む
-	vignetteData = nullptr;
-	// 書き込むためのアドレスを取得
-	vignetteResource->Map(0, nullptr, reinterpret_cast<void**>(&vignetteData));
-	// デフォルト値
-	vignetteData->vignettePower = 0.8f;
-	vignetteData->vignetteScale = 16.0f;
-	vignetteData->pad[0] = 0.0f;
-	vignetteData->pad[1] = 0.0f;
-
+	postEffectManager.AddEffect(std::make_unique<GrayScaleEffect>());
+	postEffectManager.AddEffect(std::make_unique<VignetteEffect>());
+	postEffectManager.AddEffect(std::make_unique<SepiaEffect>());
+	postEffectManager.InitializeAll(dxCommon);
 
 }
 
@@ -143,15 +122,11 @@ void OffScreenRendering::Draw() {
 	commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
 	// 5. PSO・ルートシグネチャ設定
-	//offScreenRenderingPSO->DrawSettingsCommon();
-	//grayScalePSO->DrawSettingsCommon();
-	vignettePSO->DrawSettingsCommon();
+	postEffectManager.DrawCurrent(commandList.Get());
 
 	// 6. SRV（オフスクリーンテクスチャ）をルートパラメータにセット
 	// ※ルートシグネチャのSRVインデックスに合わせて変更（例: 0番なら0）
 	commandList->SetGraphicsRootDescriptorTable(0, dxCommon_->GetSRVGPUDescriptorHandle(0));
-	// 6. ヴィネットパラメータをルートパラメータにセット
-	commandList->SetGraphicsRootConstantBufferView(1, vignetteResource->GetGPUVirtualAddress());
 
 
 	// 7. 全画面三角形を描画
@@ -160,9 +135,17 @@ void OffScreenRendering::Draw() {
 
 void OffScreenRendering::DrawImGui() {
 
-	ImGui::Begin("Vignette");
-	ImGui::DragFloat("VignettePower", &vignetteData->vignettePower, 0.01f);
-	ImGui::DragFloat("VignetteScale", &vignetteData->vignetteScale, 0.01f);
+	postEffectManager.DrawImGui();
+
+	ImGui::Begin("PostEffect");
+
+	static const char* effectNames[] = { "GrayScale", "Vignette","Sepia"};
+	int effectIndex = static_cast<int>(postEffectManager.GetCurrentIndex());
+
+	if (ImGui::Combo("Effect", &effectIndex, effectNames, IM_ARRAYSIZE(effectNames))) {
+		postEffectManager.SetCurrentEffect(effectIndex);
+	}
+
 	ImGui::End();
 
 }

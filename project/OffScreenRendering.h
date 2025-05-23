@@ -3,6 +3,7 @@
 #include <wrl.h>
 #include <memory>
 #include "DirectXCommon.h"
+#include "PostEffectManager.h"
 
 // 前方宣言
 class WinApp;
@@ -10,14 +11,6 @@ class DirectXCommon;
 class OffScreenRenderingPSO;
 class GrayScalePSO;
 class VignettePSO;
-
-struct VignetteParams
-{
-	float vignetteScale;
-	float vignettePower;
-	float pad[2]; // 16バイトアライメント
-};
-
 
 // オフスクリーンレンダリングを管理するクラス
 // レンダーテクスチャへの描画やリソースバリアの制御などを担当します。
@@ -33,6 +26,11 @@ public:
 	/// 必要なリソースの生成や各種設定を行います。
 	/// </summary>
 	void Initialize(WinApp* winApp, DirectXCommon* dxCommon);
+
+	/// <summary>
+	/// 更新処理
+	/// </summary>
+	void Update();
 
 	/// <summary>
 	/// 描画前設定
@@ -121,8 +119,7 @@ private:
 
 	// オフスクリーン用PSOクラス
 	OffScreenRenderingPSO* offScreenRenderingPSO = nullptr;
-	// グレースケール用PSOクラス
-	GrayScalePSO* grayScalePSO = nullptr;
+	
 	// ヴィネット用PSOクラス
 	VignettePSO* vignettePSO = nullptr;
 	///-----------------------------------------------------------------------
@@ -130,7 +127,11 @@ private:
 	///------------------------------------------------------------------------
 	
 	Microsoft::WRL::ComPtr <ID3D12Resource> vignetteResource;
-	VignetteParams* vignetteData = nullptr;
+	//VignetteParams* vignetteData = nullptr;
 
+	///-----------------------------------------------------------------------
+	///                             PostEffectManager
+	///-----------------------------------------------------------------------
 
+	PostEffectManager postEffectManager;
 };
