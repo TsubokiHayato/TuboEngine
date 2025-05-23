@@ -1,16 +1,15 @@
 #include "CopyImage.hlsli"
 
+cbuffer GaussianParams : register(b0)
+{
+    float sigma;
+    float pad[3]; // 16-byte alignment
+}
+
 Texture2D<float4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
 
 static const float PI = 3.14159265358979323846f;
-
-static const float2 kIndex3x3[3][3] =
-{
-    { { -1.0f, -1.0f }, { 0.0f, -1.0f }, { 1.0f, -1.0f } },
-    { { -1.0f, 0.0f }, { 0.0f, 0.0f }, { 1.0f, 0.0f } },
-    { { -1.0f, 1.0f }, { 0.0f, 1.0f }, { 1.0f, 1.0f } },
-};
 
 float gauss(float x, float y, float sigma)
 {
@@ -32,15 +31,17 @@ PixelShaderOutput main(VertexShaderOutput input)
     gTexture.GetDimensions(width, height);
     float2 uvStepSize = float2(1.0f / width, 1.0f / height);
 
-    float sigma = 1.0f;
     float weightSum = 0.0f;
     float3 sum = float3(0.0f, 0.0f, 0.0f);
 
-    for (int x = 0; x < 3; ++x)
+    // 5x5カーネル: -2～+2
+    [unroll]
+    for (int x = -2; x <= 2; ++x)
     {
-        for (int y = 0; y < 3; ++y)
+        [unroll]
+        for (int y = -2; y <= 2; ++y)
         {
-            float2 offset = kIndex3x3[x][y];
+            float2 offset = float2(x, y);
             float2 texcoord = input.texcoord + offset * uvStepSize;
             float weight = gauss(offset.x, offset.y, sigma);
             float3 color = gTexture.Sample(gSampler, texcoord).rgb;
