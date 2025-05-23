@@ -13,10 +13,10 @@ PixelShaderOutput main(VertexShaderOutput input)
     PixelShaderOutput output;
     float4 color = gTexture.Sample(gSampler, input.texcoord);
 
-    float r = dot(color.rgb, float3(0.393f, 0.769f, 0.189f));
-    float g = dot(color.rgb, float3(0.349f, 0.686f, 0.168f));
-    float b = dot(color.rgb, float3(0.272f, 0.534f, 0.131f));
-
-    output.color = float4(r, g, b, color.a);
+    float value = dot(color.rgb, float3(0.21125f, 0.7154f, 0.0721f));
+    
+    output.color.rgb = value * float3(1.0f, 74.0f / 107.0f, 43.0f / 107.0f);
+    output.color.a = color.a;
     return output;
 }
+
