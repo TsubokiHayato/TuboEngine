@@ -2,12 +2,11 @@
 #include"WinApp.h"
 #include"DirectXCommon.h"
 #include"ImGuiManager.h"
-#include"OffScreenRenderingPSO.h"
-#include"GrayScalePSO.h"
-#include"VignettePSO.h"
 #include <GrayScaleEffect.h>
 #include"VignetteEffect.h"
 #include"SepiaEffect.h"
+#include"SmoothingEffect.h"
+#include"GaussianBlurEffect.h"
 
 /// <summary>
 /// オフスクリーンレンダリングの初期化処理
@@ -54,6 +53,8 @@ void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 	postEffectManager.AddEffect(std::make_unique<GrayScaleEffect>());
 	postEffectManager.AddEffect(std::make_unique<VignetteEffect>());
 	postEffectManager.AddEffect(std::make_unique<SepiaEffect>());
+	postEffectManager.AddEffect(std::make_unique<SmoothingEffect>());
+	postEffectManager.AddEffect(std::make_unique<GaussianBlurEffect>());
 	postEffectManager.InitializeAll(dxCommon);
 
 }
@@ -139,7 +140,7 @@ void OffScreenRendering::DrawImGui() {
 
 	ImGui::Begin("PostEffect");
 
-	static const char* effectNames[] = { "GrayScale", "Vignette","Sepia"};
+	static const char* effectNames[] = { "GrayScale", "Sepia", "Vignette", "Smoothing" , "GaussianBlur" };
 	int effectIndex = static_cast<int>(postEffectManager.GetCurrentIndex());
 
 	if (ImGui::Combo("Effect", &effectIndex, effectNames, IM_ARRAYSIZE(effectNames))) {
