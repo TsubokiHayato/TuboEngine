@@ -51,6 +51,7 @@ PixelShaderOutput main(VertexShaderOutput input)
 
 
 /*5x5カーネルの平滑化フィルタ*/
+ｃ
 /*
 static const int KERNEL_RADIUS = 2; // 5x5カーネル
 
