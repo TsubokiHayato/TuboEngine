@@ -134,7 +134,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ClCompile Include="engine\scene\IScene.cpp" />
-    <ClCompile Include="GrayScalePSO.cpp" />
+    <ClCompile Include="GrayScaleEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\GrayScalePSO.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\graphic\3d\Model.cpp" />
     <ClCompile Include="engine\graphic\3d\ModelCommon.cpp" />
@@ -163,8 +164,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\SubtractBlendPSO.cpp" />
     <ClCompile Include="OffScreenRendering.cpp" />
     <ClCompile Include="engine\graphic\PSO\OffScreenRenderingPSO.cpp" />
-    <ClCompile Include="PostEffectPSOBase.cpp" />
-    <ClCompile Include="VignettePSO.cpp" />
+    <ClCompile Include="PostEffectBase.cpp" />
+    <ClCompile Include="PostEffectManager.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffectPSOBase.cpp" />
+    <ClCompile Include="engine\graphic\PSO\SepiaPSO.cpp" />
+    <ClCompile Include="SepiaEffect.cpp" />
+    <ClCompile Include="VignetteEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\VignettePSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
@@ -228,11 +234,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\PSO\NormalBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\ScreenBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\SubtractBlendPSO.h" />
-    <ClInclude Include="GrayScalePSO.h" />
+    <ClInclude Include="GrayScaleEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\GrayScalePSO.h" />
     <ClInclude Include="OffScreenRendering.h" />
     <ClInclude Include="engine\graphic\PSO\OffScreenRenderingPSO.h" />
-    <ClInclude Include="PostEffectPSOBase.h" />
-    <ClInclude Include="VignettePSO.h" />
+    <ClInclude Include="PostEffectBase.h" />
+    <ClInclude Include="PostEffectManager.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffectPSOBase.h" />
+    <ClInclude Include="engine\graphic\PSO\SepiaPSO.h" />
+    <ClInclude Include="SepiaEffect.h" />
+    <ClInclude Include="VignetteEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\VignettePSO.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\imgui\imgui.vcxproj">
