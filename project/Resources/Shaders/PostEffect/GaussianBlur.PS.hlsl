@@ -18,6 +18,10 @@ float gauss(float x, float y, float sigma)
     return exp(exponent) / denominator;
 }
 
+// 5x5カーネルのガウシアンブラー
+
+//3x3では効果が薄いので5x5に変更
+//重いので注意
 struct PixelShaderOutput
 {
     float4 color : SV_TARGET0;
