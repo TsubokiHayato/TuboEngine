@@ -112,6 +112,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DissolveEffect.cpp" />
+    <ClCompile Include="DissolvePSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\AddBlendPSO.cpp" />
     <ClCompile Include="engine\scene\ClearScene.cpp" />
     <ClCompile Include="engine\scene\DebugScene.cpp" />
@@ -135,7 +137,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClCompile>
     <ClCompile Include="engine\scene\IScene.cpp" />
     <ClCompile Include="GaussianBlurEffect.cpp" />
-    <ClCompile Include="GaussianBlurPSO.cpp" />
+    <ClCompile Include="engine\graphic\PSO\GaussianBlurPSO.cpp" />
     <ClCompile Include="GrayScaleEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\GrayScalePSO.cpp" />
     <ClCompile Include="main.cpp" />
@@ -170,13 +172,19 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="PostEffectManager.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffectPSOBase.cpp" />
     <ClCompile Include="engine\graphic\PSO\SepiaPSO.cpp" />
+    <ClCompile Include="RadialBlurEffect.cpp" />
+    <ClCompile Include="RadialBlurPSO.cpp" />
+    <ClCompile Include="randomEffect.cpp" />
+    <ClCompile Include="randomPSO.cpp" />
     <ClCompile Include="SepiaEffect.cpp" />
     <ClCompile Include="SmoothingEffect.cpp" />
-    <ClCompile Include="SmoothingPSO.cpp" />
+    <ClCompile Include="engine\graphic\PSO\SmoothingPSO.cpp" />
     <ClCompile Include="VignetteEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\VignettePSO.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DissolveEffect.h" />
+    <ClInclude Include="DissolvePSO.h" />
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
     <ClInclude Include="engine\graphic\data\Node.h" />
     <ClInclude Include="engine\graphic\PSO\AddBlendPSO.h" />
@@ -239,7 +247,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\PSO\ScreenBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\SubtractBlendPSO.h" />
     <ClInclude Include="GaussianBlurEffect.h" />
-    <ClInclude Include="GaussianBlurPSO.h" />
+    <ClInclude Include="engine\graphic\PSO\GaussianBlurPSO.h" />
     <ClInclude Include="GrayScaleEffect.h" />
     <ClInclude Include="engine\graphic\PSO\GrayScalePSO.h" />
     <ClInclude Include="OffScreenRendering.h" />
@@ -248,6 +256,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="PostEffectManager.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffectPSOBase.h" />
     <ClInclude Include="engine\graphic\PSO\SepiaPSO.h" />
+    <ClInclude Include="RadialBlurEffect.h" />
+    <ClInclude Include="RadialBlurPSO.h" />
+    <ClInclude Include="randomEffect.h" />
+    <ClInclude Include="randomPSO.h" />
     <ClInclude Include="SepiaEffect.h" />
     <ClInclude Include="SmoothingEffect.h" />
     <ClInclude Include="engine\graphic\PSO\SmoothingPSO.h" />
