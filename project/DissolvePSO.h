@@ -1,7 +1,7 @@
 #pragma once
 #include "PostEffectPSOBase.h"
 
-class VignettePSO : public PostEffectPSOBase
+class DissolvePSO : public PostEffectPSOBase
 {
 public:
     // 初期化
@@ -9,6 +9,8 @@ public:
 
     // グラフィックスパイプラインの作成
     void CreateGraphicPipeline();
-	// 描画設定
+    // 描画設定
     void CreateRootSignature() override;
 };
+
+
