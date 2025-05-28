@@ -25,22 +25,15 @@ void randomEffect::Initialize(DirectXCommon* dxCommon) {
     std::uniform_real_distribution<float> dist(0.0f, 1.0f);
    
     params_->time = 0.0f; // timeはUpdateで進める
-	params_->randomValue = dist(randomEngine); // 初期値を設定
-	params_->padding[0] = 0.0f; // 16バイトアライメントのためのパディング
-	params_->padding[1] = 0.0f; // 16バイトアライメントのためのパディング
 }
 
 
 void randomEffect::Update() {
-    static auto start = std::chrono::steady_clock::now();
+    // 例: std::chrono を使った経過時間の取得
+    static auto startTime = std::chrono::steady_clock::now();
     auto now = std::chrono::steady_clock::now();
-    float elapsed = std::chrono::duration<float>(now - start).count();
-    params_->time = elapsed;
-
-    // 乱数生成
-    static std::mt19937 engine{ std::random_device{}() };
-    static std::uniform_real_distribution<float> dist(0.0f, 1.0f);
-    params_->randomValue = dist(engine);
+    float time = std::chrono::duration<float>(now - startTime).count();
+    params_->time = time;
 }
 
 
@@ -56,5 +49,5 @@ void randomEffect::Draw(ID3D12GraphicsCommandList* commandList) {
     // PSO・ルートシグネチャ設定
     pso_->DrawSettingsCommon();
     // CBVをバインド
-    //commandList->SetGraphicsRootConstantBufferView(1, cbResource_->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(1, cbResource_->GetGPUVirtualAddress());
 }

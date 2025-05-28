@@ -69,6 +69,13 @@ void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 
 }
 
+void OffScreenRendering::Update() {
+
+	//　PostEffectManagerの更新
+	postEffectManager.UpdateAll();
+
+}
+
 /// <summary>
 /// 描画前の設定処理
 /// レンダーターゲットや深度ステンシルのセット、クリア、ビューポート・シザーの設定を行います。

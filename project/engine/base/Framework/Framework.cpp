@@ -88,6 +88,8 @@ void Framework::Update() {
 	Input::GetInstance()->Update();
 	//シーンマネージャーの更新
 	sceneManager->Update();
+	//オフスクリーンレンダリングの更新
+	offScreenRendering->Update();
 
 
 }
