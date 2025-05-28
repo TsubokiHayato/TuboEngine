@@ -1,13 +1,14 @@
 #pragma once
 #include "PostEffectBase.h"
 #include"randomPSO.h"
+#include <memory>
+#include <wrl.h>
+#include<chrono>
 
 // randomEffect.h など
 struct RandomParams
 {
 	float time;
-	float randomValue; // 追加
-	float padding[2];  // 16バイトアライメント
 };
 
 class randomEffect : public PostEffectBase
@@ -28,6 +29,8 @@ private:
 	std::unique_ptr<randomPSO> pso_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> cbResource_;
 	RandomParams* params_ = nullptr;
+
+	
 
 };
 
