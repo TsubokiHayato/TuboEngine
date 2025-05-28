@@ -8,7 +8,7 @@ public:
 	// グラフィックスパイプラインの作成
 	void CreateGraphicPipeline();
 	// 描画設定
-	//void CreateRootSignature() override;
+	void CreateRootSignature() override;
 
 };
 
