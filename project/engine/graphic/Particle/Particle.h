@@ -58,6 +58,7 @@ struct ParticleGroup
 		Primitive, // プリミティブ
 		Ring, // リング
 		Cylinder, // 円柱
+		Original, // オリジナル
 	};
 
 class Particle
@@ -126,6 +127,12 @@ private:
 	/// </summary>
 	void CreateVertexDataForCylinder();
 
+	///<summary>
+	/// 頂点データの作成(オリジナル)
+	/// </summary>
+	void CreateVertexDataForOriginal();
+
+	
 
 
 	/// <summary>
@@ -189,6 +196,19 @@ private:
 	/// <returns>新しいパーティクル情報</returns>
 	ParticleInfo CreateNewParticleForCylinder(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
 
+
+
+	/// <summary>
+	/// 新しいパーティクルの作成(オリジナル)
+	/// </summary>
+	/// <param name="randomEngine">ランダムエンジン</param>
+	/// <param name="transform">エミッターのトランスフォーム</param>
+	/// <param name="velocity">速度</param>
+	/// <param name="color">カラー</param>
+	/// <param name="lifeTime">寿命</param>
+	/// <param name="currentTime">経過時間</param>
+	/// /// <returns>新しいパーティクル情報</returns>
+	ParticleInfo CreateNewParticleForOriginal(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
 
 
 public:

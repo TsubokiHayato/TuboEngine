@@ -369,6 +369,19 @@ void Particle::CreateVertexDataForCylinder() {
 
 }
 
+void Particle::CreateVertexDataForOriginal() {
+
+
+
+
+
+
+
+
+
+
+}
+
 
 /// <summary>
 /// 頂点バッファビューの作成
@@ -497,5 +510,9 @@ ParticleInfo Particle::CreateNewParticleForCylinder(std::mt19937& randomEngine, 
 
 
 	return particle;
+}
+
+ParticleInfo Particle::CreateNewParticleForOriginal(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+	return ParticleInfo();
 }
 
