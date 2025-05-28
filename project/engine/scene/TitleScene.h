@@ -58,8 +58,16 @@ private:
 	std::unique_ptr <Particle> particle;
 	std::unique_ptr<ParticleEmitter> particleEmitter_;
 
+	std::unique_ptr<Particle> particleRing;
+	std::unique_ptr<Particle> particlePrimitive;
+	std::unique_ptr<ParticleEmitter> particleEmitterRing;
+	std::unique_ptr<ParticleEmitter> particleEmitterPrimitive;
+	Transform particleTranslateRing;
+	Transform particleTranslatePrimitive;
+
+
 	std::unique_ptr <Camera>camera;
-	Vector3 cameraPosition = { 0.0f,0.0f,-5.0f };
+	Vector3 cameraPosition = { 0.0f,0.0f,-10.0f };
 	Vector3 cameraRotation = { 0.0f,0.0f,0.0f };
 	Vector3 cameraScale = { 1.0f,1.0f,1.0f };
 

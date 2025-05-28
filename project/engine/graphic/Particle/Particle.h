@@ -27,6 +27,8 @@ struct ParticleInfo
 	Vector4 color; // カラー
 	float lifeTime; // 寿命
 	float currentTime; // 経過時間
+	float angularVelocityZ = 0.0f; // Z軸回転速度（ラジアン/秒）
+
 };
 
 struct ParticleForGPU

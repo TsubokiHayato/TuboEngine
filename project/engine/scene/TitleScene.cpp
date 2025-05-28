@@ -12,14 +12,14 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 	//カメラ
 	camera = std::make_unique<Camera>();
-	camera->SetTranslate({ 0.0f,0.0f,-5.0f });
+	camera->SetTranslate({ 0.0f,0.0f,-10.0f });
 	camera->setRotation({ 0.0f,0.0f,0.0f });
 	camera->setScale({ 1.0f,1.0f,1.0f });
 
 	//テクスチャマネージャに追加する画像ハンドル
 	std::string uvCheckerTextureHandle = "uvChecker.png";
 	std::string monsterBallTextureHandle = "monsterBall.png";
-	std::string particleTextureHandle = "gradationLine.png";
+	std::string particleTextureHandle = "YellowConcentrationLine.png";
 
 	//画像ハンドルをテクスチャマネージャに挿入する
 	TextureManager::GetInstance()->LoadTexture(uvCheckerTextureHandle);
@@ -29,49 +29,22 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 	
 
-	//パーティクル
+
+	// Original
 	particle = std::make_unique<Particle>();
-	particle->Initialize(this->particleCommon, ParticleType::Ring);
+	particle->Initialize(this->particleCommon, ParticleType::Original);
 	particle->CreateParticleGroup("Particle", particleTextureHandle);
 	particleTranslate = {
-		//Scale
 		{1.0f, 1.0f, 1.0f},
-		//Rotate
 		{0.0f, 0.0f, 0.0f},
-		//Translate
-		{0.0f, 0.0f, 0.0f}
-
+		{0.0f, 0.3f, 0.0f}
 	};
 
-	
-	particleVelocity = {};
-	particleColor = { 1.0f,1.0f,1.0f,1.0f };
-	particleLifeTime = 1.0f;
-	particleCurrentTime= 0.0f;
+	particleEmitter_ = std::make_unique<ParticleEmitter>(
+		particle.get(), "Particle", particleTranslate, particleVelocity, particleColor,
+		particleLifeTime, particleCurrentTime, 8, 1.0f, true
+	);
 
-	particleEmitter_ =
-		std::make_unique<ParticleEmitter>(
-			//パーティクルのインスタンス
-			particle.get(),
-			//パーティクルグループ名
-			"Particle",
-			//エミッターの位置・回転・スケール
-			particleTranslate,
-			//速度
-			particleVelocity,
-			// カラー
-			particleColor,
-			//寿命
-			particleLifeTime,
-			//経過時間
-			particleCurrentTime,
-			//発生させるパーティクルの数
-			3,
-			//発生頻度
-			1.0f,
-			//繰り返し発生させるかどうかのフラグ
-			true
-		);
 
 	
 
@@ -86,20 +59,15 @@ void TitleScene::Update() {
 	camera->Update();
 
 	
-	
-	const uint32_t kRingDivide = 32;
-	const float kRingRadius = 1.0f;
-	const float kRingHeight = 0.2f;
-	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
-	
 
 
 	///Particle///
-	
+	// Original
 	particle->SetCamera(camera.get());
 	particle->Update();
 	particleEmitter_->Update();
 
+	
 }
 
 void TitleScene::Finalize() {
@@ -142,7 +110,6 @@ void TitleScene::ImGuiDraw() {
 }
 
 void TitleScene::ParticleDraw() {
-	//パーティクル
 	particle->Draw();
-
+	
 }

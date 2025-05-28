@@ -34,6 +34,8 @@ void Particle::Initialize(ParticleCommon* particleSetup, ParticleType particleTy
 		CreateVertexData();
 	} else if (particleType_ == ParticleType::Primitive) {
 		CreateVertexData();
+	} else if (particleType_ == ParticleType::Original) {
+		CreateVertexDataForOriginal();
 	}
 
 
@@ -97,9 +99,64 @@ void Particle::Update() {
 				it = group.second.particleList.erase(it);
 				continue;
 			}
-			// スケールをテクスチャサイズに基づいて調整
-		/*	particle.transform.scale.x = textureSize.x * scaleMultiplier;
-			particle.transform.scale.y = textureSize.y * scaleMultiplier;*/
+
+			//パーティクルタイプがオリジナルのときに色の設定とスケールの拡大を行う
+			if (particleType_ == ParticleType::Original) {
+				// 色のグラデーション
+				float t = particle.currentTime / particle.lifeTime;
+				if (t < 0.5f) {
+					// 白→黄色
+					particle.color = Vector4(
+						1.0f,
+						0.9f + 0.1f * t * 2.0f,
+						0.3f * (1.0f - t * 2.0f),
+						1.0f // アルファ値は固定
+					);
+				} else {
+					// 黄色→オレンジ
+					particle.color = Vector4(
+						1.0f,
+						0.9f * (1.0f - (t - 0.5f) * 2.0f),
+						0.3f * (1.0f - (t - 0.5f) * 2.0f),
+						1.0f // アルファ値は固定
+					);
+				}
+				// バウンド時にのみ particle.color.w *= 0.7f; などで減衰
+
+				// スケール縮小（最初大きく、徐々に小さく）
+				float scale = 1.0f - 0.8f * t;
+				if (scale < 0.2f) scale = 0.2f;
+				// バウンドによる減衰を考慮するため、現在のスケールを維持
+				particle.transform.scale = { scale, scale, 1.0f };
+
+				// 重力加速度
+				constexpr float gravity = -9.8f;
+				particle.velocity.y += gravity * kDeltaTime;
+
+				// バウンド処理（地面y=0で反発）
+				if (particle.transform.translate.y <= 0.0f && particle.velocity.y < 0.0f) {
+					particle.transform.translate.y = 0.0f;
+					particle.velocity.y *= -0.9f;
+					particle.velocity.x *= 0.8f;
+					particle.velocity.z *= 0.8f;
+					// 速度が小さくなったら止める
+					if (std::abs(particle.velocity.y) < 0.2f) {
+						particle.velocity.y = 0.0f;
+					}
+					// ★バウンド時にスケールを減衰させる
+					particle.transform.scale.x *= 0.8f;
+					particle.transform.scale.y *= 0.8f;
+					// ★バウンド時に色を減衰させる
+					particle.color.w *= 0.7f;
+				}
+
+				// Z軸回転を加算
+				particle.transform.rotate.z += particle.angularVelocityZ * kDeltaTime;
+
+			}
+
+
+			
 			// 位置の更新
 			particle.transform.translate = particle.transform.translate + (particle.velocity * kDeltaTime);
 
@@ -127,6 +184,8 @@ void Particle::Update() {
 			// 次のパーティクルへ
 			++it;
 		}
+
+
 	}
 }
 
@@ -200,8 +259,10 @@ void Particle::Emit(const std::string name, const Transform& transform, Vector3 
 			//通常の場合
 		} else if (particleType_ == ParticleType::None) {
 			group.particleList.push_back(CreateNewParticle(randomEngine_, transform, velocity, color, lifeTime, currentTime));
-		}
+		} else if (particleType_ == ParticleType::Original) {
 
+			group.particleList.push_back(CreateNewParticleForOriginal(randomEngine_, transform, velocity, color, lifeTime, currentTime));
+		}
 	}
 }
 
@@ -370,16 +431,40 @@ void Particle::CreateVertexDataForCylinder() {
 }
 
 void Particle::CreateVertexDataForOriginal() {
+	// 星型（放射状）のエフェクト
+	const uint32_t kStarPoints = 8;
+	const float kInnerRadius = 0.2f;
+	const float kOuterRadius = 1.0f;
+	const float radianPerDivide = std::numbers::pi_v<float> / float(kStarPoints);
 
-
-
-
-
-
-
-
-
-
+	for (uint32_t i = 0; i < kStarPoints * 2; ++i) {
+		float angle = i * radianPerDivide;
+		float radius = (i % 2 == 0) ? kOuterRadius : kInnerRadius;
+		float x = std::cos(angle) * radius;
+		float y = std::sin(angle) * radius;
+		// 中心
+		modelData_.vertices.push_back(VertexData{
+			.position = {0.0f, 0.0f, 0.0f, 1.0f},
+			.texcoord = {0.5f, 0.5f},
+			.normal = {0.0f, 0.0f, 1.0f}
+			});
+		// 外周
+		modelData_.vertices.push_back(VertexData{
+			.position = {x, y, 0.0f, 1.0f},
+			.texcoord = {0.5f + x * 0.5f, 0.5f - y * 0.5f},
+			.normal = {0.0f, 0.0f, 1.0f}
+			});
+		// 次の外周
+		float nextAngle = ((i + 1) % (kStarPoints * 2)) * radianPerDivide;
+		float nextRadius = ((i + 1) % 2 == 0) ? kOuterRadius : kInnerRadius;
+		float nx = std::cos(nextAngle) * nextRadius;
+		float ny = std::sin(nextAngle) * nextRadius;
+		modelData_.vertices.push_back(VertexData{
+			.position = {nx, ny, 0.0f, 1.0f},
+			.texcoord = {0.5f + nx * 0.5f, 0.5f - ny * 0.5f},
+			.normal = {0.0f, 0.0f, 1.0f}
+			});
+	}
 }
 
 
@@ -512,7 +597,41 @@ ParticleInfo Particle::CreateNewParticleForCylinder(std::mt19937& randomEngine, 
 	return particle;
 }
 
-ParticleInfo Particle::CreateNewParticleForOriginal(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
-	return ParticleInfo();
-}
 
+ParticleInfo Particle::CreateNewParticleForOriginal(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+	ParticleInfo particle = {};
+
+	// ランダムな方向（XZ平面）にゆっくり飛ばす
+	std::uniform_real_distribution<float> angleDist(0.0f, 2.0f * std::numbers::pi_v<float>);
+	std::uniform_real_distribution<float> speedDist(0.8f, 1.8f);
+	float angle = angleDist(randomEngine);
+	float speed = speedDist(randomEngine);
+
+	Vector3 dir = { std::cos(angle), 0.0f, std::sin(angle) };
+	particle.velocity = dir * speed;
+
+	// y方向の初期速度（上向き）
+	std::uniform_real_distribution<float> ySpeedDist(2.0f, 3.5f);
+	particle.velocity.y = ySpeedDist(randomEngine);
+
+	// 生成位置を少し高めに
+	particle.transform.scale = { 0.2f, 0.2f, 1.0f };
+	particle.transform.rotate = { 0.0f, 0.0f, angle };
+	particle.transform.translate = transform.translate;
+	
+
+	// --- 中心点によって回転方向を変える ---
+	// 例: x>0なら時計回り、x<0なら反時計回り
+	float baseRotateSpeed = 2.0f; // ラジアン/秒
+	float rotateSign = (particle.transform.translate.x >= 0.0f) ? 1.0f : -1.0f;
+	particle.angularVelocityZ = baseRotateSpeed * rotateSign;
+
+	// 色は白～黄色～オレンジ
+	particle.color = { 1.0f, 0.9f, 0.3f, 1.0f };
+
+	// 寿命を長めに
+	particle.lifeTime = 1.2f;
+	particle.currentTime = 0.0f;
+
+	return particle;
+}
