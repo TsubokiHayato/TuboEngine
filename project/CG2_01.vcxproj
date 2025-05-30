@@ -113,7 +113,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DissolveEffect.cpp" />
-    <ClCompile Include="DissolvePSO.cpp" />
+    <ClCompile Include="engine\graphic\PSO\DissolvePSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\AddBlendPSO.cpp" />
     <ClCompile Include="engine\scene\ClearScene.cpp" />
     <ClCompile Include="engine\scene\DebugScene.cpp" />
@@ -132,7 +132,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="engine\imgui\ImGuiManager.cpp" />
-    <ClCompile Include="engine\base\Framework\Framework.cpp">
+    <ClCompile Include="Framework\Framework.cpp">
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ClCompile Include="engine\scene\IScene.cpp" />
@@ -151,7 +151,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\base\Utilities\StringUtility.cpp" />
     <ClCompile Include="engine\graphic\2d\TextureManager.cpp" />
     <ClCompile Include="engine\base\Common\WinApp.cpp" />
-    <ClCompile Include="engine\base\Framework\Order.cpp" />
+    <ClCompile Include="Framework\Order.cpp" />
     <ClCompile Include="engine\graphic\Particle\Particle.cpp" />
     <ClCompile Include="engine\graphic\Particle\ParticleCommon.cpp" />
     <ClCompile Include="engine\graphic\Particle\ParticleEmitter.cpp" />
@@ -173,9 +173,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\PostEffectPSOBase.cpp" />
     <ClCompile Include="engine\graphic\PSO\SepiaPSO.cpp" />
     <ClCompile Include="RadialBlurEffect.cpp" />
-    <ClCompile Include="RadialBlurPSO.cpp" />
+    <ClCompile Include="engine\graphic\PSO\RadialBlurPSO.cpp" />
     <ClCompile Include="randomEffect.cpp" />
-    <ClCompile Include="randomPSO.cpp" />
+    <ClCompile Include="engine\graphic\PSO\randomPSO.cpp" />
     <ClCompile Include="SepiaEffect.cpp" />
     <ClCompile Include="SmoothingEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\SmoothingPSO.cpp" />
@@ -184,7 +184,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DissolveEffect.h" />
-    <ClInclude Include="DissolvePSO.h" />
+    <ClInclude Include="engine\graphic\PSO\DissolvePSO.h" />
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
     <ClInclude Include="engine\graphic\data\Node.h" />
     <ClInclude Include="engine\graphic\PSO\AddBlendPSO.h" />
@@ -229,9 +229,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="engine\imgui\ImGuiManager.h" />
-    <ClInclude Include="engine\base\Framework\Framework.h" />
+    <ClInclude Include="Framework\Framework.h" />
     <ClInclude Include="engine\scene\IScene.h" />
-    <ClInclude Include="engine\base\Framework\Order.h" />
+    <ClInclude Include="Framework\Order.h" />
     <ClInclude Include="engine\graphic\Particle\Particle.h" />
     <ClInclude Include="engine\graphic\Particle\ParticleCommon.h" />
     <ClInclude Include="engine\graphic\Particle\ParticleEmitter.h" />
@@ -257,9 +257,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\PSO\PostEffectPSOBase.h" />
     <ClInclude Include="engine\graphic\PSO\SepiaPSO.h" />
     <ClInclude Include="RadialBlurEffect.h" />
-    <ClInclude Include="RadialBlurPSO.h" />
+    <ClInclude Include="engine\graphic\PSO\RadialBlurPSO.h" />
     <ClInclude Include="randomEffect.h" />
-    <ClInclude Include="randomPSO.h" />
+    <ClInclude Include="engine\graphic\PSO\randomPSO.h" />
     <ClInclude Include="SepiaEffect.h" />
     <ClInclude Include="SmoothingEffect.h" />
     <ClInclude Include="engine\graphic\PSO\SmoothingPSO.h" />
