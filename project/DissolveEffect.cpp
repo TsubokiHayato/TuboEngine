@@ -17,6 +17,33 @@ void DissolveEffect::Initialize(DirectXCommon* dxCommon) {
 	cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&params_));
 	// デフォルト値
 	params_->dissolveThreshold = 0.5f;
+	params_->edgeColor = { 1.0f, 0.0f, 0.0f }; // 赤色
+	params_->edgeStrength = 1.0f; // エッジの強さ
+	params_->edgeWidth = 0.1f; // エッジの幅
+
+	
+
+	// マスクテクスチャのリソース生成
+	DirectX::ScratchImage mipImages = DirectXCommon::LoadTexture(maskTextureFileName_);
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	maskTextureResource_ = dxCommon->CreateTextureResource(metadata);
+	
+	maskTextureUploadResource_ = dxCommon->UploadTextureData(maskTextureResource_, mipImages);
+
+
+
+	// SRV作成（インデックス1にSRVを作成）
+	D3D12_SHADER_RESOURCE_VIEW_DESC maskTextureSRVDesc{};
+	maskTextureSRVDesc.Format = maskTextureResource_->GetDesc().Format;
+	maskTextureSRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	maskTextureSRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	maskTextureSRVDesc.Texture2D.MipLevels = 1;
+
+	dxCommon->GetDevice()->CreateShaderResourceView(
+		maskTextureResource_.Get(), &maskTextureSRVDesc,
+		dxCommon->GetSRVCPUDescriptorHandle(1)
+	);
+
 }
 void DissolveEffect::Update() {
 	
@@ -25,6 +52,9 @@ void DissolveEffect::Update() {
 void DissolveEffect::DrawImGui() {
 	ImGui::Begin("Dissolve Effect");
 	ImGui::SliderFloat("Dissolve Threshold", &params_->dissolveThreshold, 0.0f, 1.0f);
+	ImGui::ColorEdit3("Edge Color", &params_->edgeColor.x);
+	ImGui::SliderFloat("Edge Strength", &params_->edgeStrength, 0.0f, 5.0f);
+	ImGui::SliderFloat("Edge Width", &params_->edgeWidth, 0.0f, 1.0f);
 	ImGui::End();
 }
 void DissolveEffect::Draw(ID3D12GraphicsCommandList* commandList) {
