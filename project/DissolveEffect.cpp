@@ -19,7 +19,8 @@ void DissolveEffect::Initialize(DirectXCommon* dxCommon) {
 	params_->dissolveThreshold = 0.5f;
 }
 void DissolveEffect::Update() {
-	// Update logic if needed
+	
+
 }
 void DissolveEffect::DrawImGui() {
 	ImGui::Begin("Dissolve Effect");

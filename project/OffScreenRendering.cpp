@@ -2,7 +2,7 @@
 #include"WinApp.h"
 #include"DirectXCommon.h"
 #include"ImGuiManager.h"
-#include <GrayScaleEffect.h>
+#include "GrayScaleEffect.h"
 #include"VignetteEffect.h"
 #include"SepiaEffect.h"
 #include"SmoothingEffect.h"
@@ -60,7 +60,7 @@ void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 	postEffectManager.AddEffect(std::make_unique<SmoothingEffect>());// スムージングエフェクト
 	postEffectManager.AddEffect(std::make_unique<GaussianBlurEffect>());// ガウスぼかしエフェクト
 	postEffectManager.AddEffect(std::make_unique<RadialBlurEffect>());// ラジアルブラーエフェクト
-	//postEffectManager.AddEffect(std::make_unique<DissolveEffect>());// ディゾルブエフェクトは一旦放置
+	postEffectManager.AddEffect(std::make_unique<DissolveEffect>());// ディゾルブエフェクト
 	postEffectManager.AddEffect(std::make_unique<randomEffect>());// ランダムエフェクト
 
 
@@ -158,7 +158,8 @@ void OffScreenRendering::DrawImGui() {
 	ImGui::Begin("PostEffect");
 
 	static const char* effectNames[]
-		= { "GrayScale", "Sepia", "Vignette", "Smoothing" , "GaussianBlur" , "RadialBlur", "random" };
+		= { "GrayScale", "Sepia", "Vignette", "Smoothing", "GaussianBlur", "RadialBlur", "Dissolve", "Random" };
+		
 	int effectIndex = static_cast<int>(postEffectManager.GetCurrentIndex());
 
 	if (ImGui::Combo("Effect", &effectIndex, effectNames, IM_ARRAYSIZE(effectNames))) {
