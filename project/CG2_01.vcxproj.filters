@@ -156,7 +156,7 @@
     <ClCompile Include="engine\base\Common\SrvManager.cpp">
       <Filter>ソース ファイル\graphic</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\Framework\Framework.cpp">
+    <ClCompile Include="Framework\Framework.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="engine\graphic\PSO\PSO.cpp">
@@ -168,7 +168,7 @@
     <ClCompile Include="engine\scene\SceneManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\base\Framework\Order.cpp">
+    <ClCompile Include="Framework\Order.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="engine\scene\DebugScene.cpp">
@@ -258,13 +258,13 @@
     <ClCompile Include="engine\graphic\PSO\GaussianBlurPSO.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="RadialBlurPSO.cpp">
+    <ClCompile Include="engine\graphic\PSO\RadialBlurPSO.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="RadialBlurEffect.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="DissolvePSO.cpp">
+    <ClCompile Include="engine\graphic\PSO\DissolvePSO.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="DissolveEffect.cpp">
@@ -273,7 +273,7 @@
     <ClCompile Include="randomEffect.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="randomPSO.cpp">
+    <ClCompile Include="engine\graphic\PSO\randomPSO.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -395,7 +395,7 @@
     <ClInclude Include="engine\base\Common\SrvManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\Framework\Framework.h">
+    <ClInclude Include="Framework\Framework.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\graphic\PSO\PSO.h">
@@ -407,7 +407,7 @@
     <ClInclude Include="engine\scene\SceneManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\base\Framework\Order.h">
+    <ClInclude Include="Framework\Order.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="engine\scene\DebugScene.h">
@@ -506,13 +506,13 @@
     <ClInclude Include="engine\graphic\PSO\GaussianBlurPSO.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="RadialBlurPSO.h">
+    <ClInclude Include="engine\graphic\PSO\RadialBlurPSO.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="RadialBlurEffect.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="DissolvePSO.h">
+    <ClInclude Include="engine\graphic\PSO\DissolvePSO.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="DissolveEffect.h">
@@ -521,7 +521,7 @@
     <ClInclude Include="randomEffect.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="randomPSO.h">
+    <ClInclude Include="engine\graphic\PSO\randomPSO.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
