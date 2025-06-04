@@ -1,9 +1,9 @@
 #include "CopyImage.hlsli"
 
 Texture2D<float4> gTexture : register(t0);
-//Texture2D<float> gDepthTexture : register(t1);
+Texture2D<float> gDepthTexture : register(t1);
 SamplerState gSampler : register(s0);
-//SamplerState gSamplerPoint : register(s1);
+SamplerState gSamplerPoint : register(s1);
 
 struct PixelShaderOutput
 {
@@ -60,17 +60,25 @@ PixelShaderOutput main(VertexShaderOutput input)
         for (int y = 0; y < 3; ++y)
         {
             float2 texcoord = input.texcoord + kIndex3x3[x][y] * uvStepSize;
-            float3 fetchColor = gTexture.Sample(gSampler, texcoord).rgb;
-            float luminance = Luminance(fetchColor);
-            difference.x += luminance * kPrewittHorizontalKernel[x][y];
-            difference.y += luminance * kPrewittVerticalKernel[x][y];
+            
+            //float3 fetchColor = gTexture.Sample(gSampler, texcoord).rgb;
+            //float luminance = Luminance(fetchColor);
+            //difference.x += luminance * kPrewittHorizontalKernel[x][y];
+            //difference.y += luminance * kPrewittVerticalKernel[x][y];
+            
+            float ndcDepth = gDepthTexture.Sample(gSamplerPoint, texcoord);
+            //DSC->View。P^{-1}においてxとyはzwに影響を与えないので何でもいい。なので、わざわざ行列を渡さなくてもいい
+            //gMaterial.projectionInverseはCBufferを使って渡しておくこと
+            float4 viewSpace = mul(float4(0.0f, 0.0f, ndcDepth, 1.0f), gMaterial.projectionInverse);
+            float viewZ = viewSpace.z / rcp(viewSpace.w);//同次座標系からデカルト座標系へ変換
+            difference.x += viewZ * kPrewittHorizontalKernel[x][y];
+            difference.y += viewZ * kPrewittVerticalKernel[x][y];
         }
     }
 
     // エッジ強度の計算と出力
     float weight = length(difference);
-    //ここの6.0にしている値を調整することで、エッジの強さを変えることができる
-    weight = saturate(weight * 6.0);
+    weight = saturate(weight);
     PixelShaderOutput output;
    
     output.color.rgb = (1.0f - weight) * gTexture.Sample(gSampler, input.texcoord).rgb;
