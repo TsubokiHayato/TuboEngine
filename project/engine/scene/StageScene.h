@@ -16,6 +16,7 @@
 
 
 #include "Player.h"
+#include "Enemy.h"
 
 
 
@@ -94,6 +95,9 @@ private:
 	
 	/// Player ///
 	std::unique_ptr<Player> player = nullptr;
+	/// Enemy ///
+	std::unique_ptr<Enemy> enemy = nullptr;
+	std::vector<std::unique_ptr<Enemy>> enemies; // Enemyリスト
 
 
 };
