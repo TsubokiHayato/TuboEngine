@@ -89,7 +89,15 @@ void Player::Move() {
 	}
 }
 
-void Player::TakeDamage(int damage) {}
+void Player::TakeDamage(int damage) {
+
+	HP -= damage;
+	if (HP <= 0) {
+		isDead = true;
+		// ここでプレイヤーの死亡処理を行う
+	}
+
+}
 
 void Player::DrawImgui() {
 
@@ -101,5 +109,7 @@ void Player::DrawImgui() {
 	ImGui::DragFloat3("Position", &position.x, 0.1f);
 	ImGui::DragFloat3("Rotation", &rotation.x, 0.1f);
 	ImGui::DragFloat3("Scale", &scale.x, 0.1f);
+	ImGui::Text("HP: %d", HP);
+	ImGui::Text("IsHit: %s", isDead ? "Yes" : "No");
 	ImGui::End();
 }
