@@ -79,5 +79,6 @@ private:
 
 	Vector3 velocity; // プレイヤーの速度
 	int HP;           // プレイヤーのHP
+	bool isHit;       // プレイヤーがヒットしたかどうか
 	bool isDead;      // プレイヤーの死亡状態
 };
