@@ -11,5 +11,8 @@ public:
 	// グラフィックスパイプラインの作成
 	void CreateGraphicPipeline();
 
+	// ルートシグネチャの作成
+	void CreateRootSignature() override;
+
 };
 

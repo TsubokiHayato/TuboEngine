@@ -10,6 +10,11 @@ struct PixelShaderOutput
     float4 color : SV_TARGET0;
 };
 
+cbuffer Material : register(b0)
+{
+    float4x4 projectionInverse;
+};
+
 // Prewittフィルタ用カーネル（横方向・縦方向）
 static const float kPrewittHorizontalKernel[3][3] =
 {
@@ -69,7 +74,7 @@ PixelShaderOutput main(VertexShaderOutput input)
             float ndcDepth = gDepthTexture.Sample(gSamplerPoint, texcoord);
             //DSC->View。P^{-1}においてxとyはzwに影響を与えないので何でもいい。なので、わざわざ行列を渡さなくてもいい
             //gMaterial.projectionInverseはCBufferを使って渡しておくこと
-            float4 viewSpace = mul(float4(0.0f, 0.0f, ndcDepth, 1.0f), gMaterial.projectionInverse);
+            float4 viewSpace = mul(float4(0.0f, 0.0f, ndcDepth, 1.0f), projectionInverse);
             float viewZ = viewSpace.z / rcp(viewSpace.w);//同次座標系からデカルト座標系へ変換
             difference.x += viewZ * kPrewittHorizontalKernel[x][y];
             difference.y += viewZ * kPrewittVerticalKernel[x][y];
