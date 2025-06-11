@@ -75,6 +75,11 @@ public:
 	/// パーティクル描画
 	/// </summary>
 	void ParticleDraw()override;
+
+public:
+	void SetCamera(std::shared_ptr<Camera> camera) override { camera_ = camera; }
+	std::shared_ptr<Camera> GetCamera() const override { return camera_; }
+
 	
 private:
 
@@ -118,7 +123,7 @@ private:
 
 	//Camera///
 
-	std::unique_ptr <Camera> camera = nullptr;
+	std::shared_ptr<Camera> camera_;
 	Vector3 cameraPosition = { 0.0f,0.0f,-15.0f };
 	Vector3 cameraRotation = { 0.0f,0.0f,0.0f };
 	Vector3 cameraScale = { 1.0f,1.0f,1.0f };

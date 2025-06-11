@@ -11,10 +11,10 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	this->spriteCommon = spriteCommon;
 
 	//カメラ
-	camera = std::make_unique<Camera>();
-	camera->SetTranslate({ 0.0f,0.0f,-5.0f });
-	camera->setRotation({ 0.0f,0.0f,0.0f });
-	camera->setScale({ 1.0f,1.0f,1.0f });
+	camera_ = std::make_shared<Camera>();
+	camera_->SetTranslate({ 0.0f,0.0f,-5.0f });
+	camera_->setRotation({ 0.0f,0.0f,0.0f });
+	camera_->setScale({ 1.0f,1.0f,1.0f });
 
 	//テクスチャマネージャに追加する画像ハンドル
 	std::string uvCheckerTextureHandle = "uvChecker.png";
@@ -80,10 +80,10 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 void TitleScene::Update() {
 	//カメラ
-	camera->SetTranslate(cameraPosition);
-	camera->setRotation(cameraRotation);
-	camera->setScale(cameraScale);
-	camera->Update();
+	camera_->SetTranslate(cameraPosition);
+	camera_->setRotation(cameraRotation);
+	camera_->setScale(cameraScale);
+	camera_->Update();
 
 	
 	
@@ -103,14 +103,17 @@ void TitleScene::Update() {
 	particle->SetDistScaleY(0.4f, 1.5f);
 	*/
 	
-	particle->SetCamera(camera.get());
+	particle->SetCamera(camera_.get());
 	particle->Update();
 	particleEmitter_->Update();
 
 }
 
 void TitleScene::Finalize() {
-
+	// リソース解放や後処理
+	particle.reset();
+	particleEmitter_.reset();
+	camera_.reset();
 
 }
 

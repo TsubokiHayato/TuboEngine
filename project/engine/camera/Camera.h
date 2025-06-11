@@ -22,7 +22,7 @@ public:
 	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
 	void setRotation(const Vector3& rotation) { transform_.rotate = rotation; }
 	void setScale(const Vector3& scale) { transform_.scale = scale; }
-	void setFovY(float fovX) { fovY_ = fovX; }
+	void setFovY(float fovY) { fovY_ = fovY; }
 	void setAspect(float aspect) { aspect_ = aspect; }
 	void setNearClip(float nearClip) { nearClip_ = nearClip; }
 	void setFarClip(float farClip) { farClip_ = farClip; }

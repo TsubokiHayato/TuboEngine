@@ -78,6 +78,8 @@ void Framework::Initialize() {
 	sceneManager = std::make_unique<SceneManager>();
 	sceneManager->Initialize(object3dCommon.get(), spriteCommon.get(), particleCommon.get(), winApp.get(), dxCommon.get());
 
+	cameraManager = std::make_unique<CameraManager>();
+	
 
 }
 void Framework::Update() {
@@ -89,6 +91,8 @@ void Framework::Update() {
 	Input::GetInstance()->Update();
 	//シーンマネージャーの更新
 	sceneManager->Update();
+
+	offScreenRendering->SetViewProjection(sceneManager->GetCurrentCamera()->GetViewProjectionMatrix());
 	//オフスクリーンレンダリングの更新
 	offScreenRendering->Update();
 
@@ -157,6 +161,17 @@ void Framework::FrameworkSwapChainPostDraw() {
 	offScreenRendering->TransitionRenderTextureToRenderTarget();
 	//描画
 	dxCommon->PostDraw();
+}
+
+void Framework::TransitionRenderTextureToDepthStencil() {
+	
+	//レンダーテクスチャをシェーダリソース用にバリア遷移
+	offScreenRendering->TransitionRenderTextureToDepthStencil();
+}
+
+void Framework::TransitionRenderTextureToShaderResource() {
+	//レンダーテクスチャを深度ステンシル用にバリア遷移
+	offScreenRendering->TransitionRenderTextureToOffScreen();
 }
 
 void Framework::ImguiPreDraw() {

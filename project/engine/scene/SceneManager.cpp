@@ -47,24 +47,39 @@ void SceneManager::Update()
 			//デバッグシーンを設定
 			currentScene = std::make_unique<DebugScene>();
 			currentScene->Initialize(object3dCommon, spriteCommon,particleCommon, winApp, dxCommon);
+			// カメラを新しいシーンに渡す
+			if (sceneCamera_) {
+				currentScene->SetCamera(sceneCamera_);
+			}
 		}
 		else if (currentSceneNo == TITLE) {
 			//タイトルシーンを設定
 			currentScene = std::make_unique<TitleScene>();
 			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
+			// カメラを新しいシーンに渡す
+			if (sceneCamera_) {
+				currentScene->SetCamera(sceneCamera_);
+			}
 		}
 		else if (currentSceneNo == STAGE) {
 			//ステージシーンを設定
 			currentScene = std::make_unique<StageScene>();
 			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
+			// カメラを新しいシーンに渡す
+			if (sceneCamera_) {
+				currentScene->SetCamera(sceneCamera_);
+			}
 		}
 		else if (currentSceneNo == CLEAR) {
 			//クリアシーンを設定
 			currentScene = std::make_unique<ClearScene>();
 			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
+			// カメラを新しいシーンに渡す
+			if (sceneCamera_) {
+				currentScene->SetCamera(sceneCamera_);
+			}
 		}
-		//初期化
-		currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
+		
 	}
 	//現在のシーンがnullptrでない場合
 	if (currentScene) {

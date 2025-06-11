@@ -108,15 +108,15 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 #pragma region cameraの初期化
 	//カメラ
 
-	camera = std::make_unique<Camera>();
-	camera->SetTranslate(cameraPosition);
-	camera->setRotation(cameraRotation);
-	camera->setScale(cameraScale);
+	camera_ = std::make_shared<Camera>();
+	camera_->SetTranslate(cameraPosition);
+	camera_->setRotation(cameraRotation);
+	camera_->setScale(cameraScale);
 
 	//
-	object3dCommon->SetDefaultCamera(camera.get());
-	object3d->SetCamera(camera.get());
-	object3d2->SetCamera(camera.get());
+	object3dCommon->SetDefaultCamera(camera_.get());
+	object3d->SetCamera(camera_.get());
+	object3d2->SetCamera(camera_.get());
 
 #pragma endregion cameraの初期化
 }
@@ -125,10 +125,10 @@ void DebugScene::Update() {
 	/*--------------
 	   ゲームの処理
 	--------------*/
-	camera->SetTranslate(cameraPosition);
-	camera->setRotation(cameraRotation);
-	camera->setScale(cameraScale);
-	camera->Update();
+	camera_->SetTranslate(cameraPosition);
+	camera_->setRotation(cameraRotation);
+	camera_->setScale(cameraScale);
+	camera_->Update();
 
 
 

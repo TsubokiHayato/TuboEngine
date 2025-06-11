@@ -43,5 +43,16 @@ public:
 	/// パーティクル描画
 	/// </summary>
 	void ParticleDraw()override;
+
+public:
+	void SetCamera(std::shared_ptr<Camera> camera) override { camera_ = camera; }
+	std::shared_ptr<Camera> GetCamera() const override { return camera_; }
+private:
+	WinApp* winApp = nullptr;
+	DirectXCommon* dxCommon = nullptr;
+	Object3dCommon* object3dCommon = nullptr;
+	SpriteCommon* spriteCommon = nullptr;
+	ParticleCommon* particleCommon = nullptr;
+	std::shared_ptr<Camera> camera_ = nullptr; // カメラの共有ポインタ
 };
 

@@ -49,13 +49,35 @@ float Luminance(float3 v)
 
 PixelShaderOutput main(VertexShaderOutput input)
 {
+    // // 畳み込み処理
+    //float2 difference = float2(0.0f, 0.0f);
+    //uint width, height;
+    //gTexture.GetDimensions(width, height);
+    //float2 uvStepSize = float2(1.0f / width, 1.0f / height);
+    //for (int x = 0; x < 3; ++x)
+    //{
+    //    for (int y = 0; y < 3; ++y)
+    //    {
+    //        float2 texcoord = input.texcoord + kIndex3x3[x][y] * uvStepSize;
+            
+    //        float3 fetchColor = gTexture.Sample(gSampler, texcoord).rgb;
+    //        float luminance = Luminance(fetchColor);
+    //        difference.x += luminance * kPrewittHorizontalKernel[x][y];
+    //        difference.y += luminance * kPrewittVerticalKernel[x][y];
+    //    }
+    //}
+    // // エッジ強度の計算と出力
+    //float weight = length(difference);
+    //weight = saturate(weight*6.0f);
+    //PixelShaderOutput output;
+    //output.color.rgb = (1.0f - weight) * gTexture.Sample(gSampler, input.texcoord).rgb;
+    //output.color.a = 1.0f;
     
-    
-        
     /*OutLine*/
     
     // 畳み込み処理
     float2 difference = float2(0.0f, 0.0f);
+    
     uint width, height;
     gTexture.GetDimensions(width, height);
     float2 uvStepSize = float2(1.0f / width, 1.0f / height);
@@ -66,16 +88,11 @@ PixelShaderOutput main(VertexShaderOutput input)
         {
             float2 texcoord = input.texcoord + kIndex3x3[x][y] * uvStepSize;
             
-            //float3 fetchColor = gTexture.Sample(gSampler, texcoord).rgb;
-            //float luminance = Luminance(fetchColor);
-            //difference.x += luminance * kPrewittHorizontalKernel[x][y];
-            //difference.y += luminance * kPrewittVerticalKernel[x][y];
-            
             float ndcDepth = gDepthTexture.Sample(gSamplerPoint, texcoord);
             //DSC->View。P^{-1}においてxとyはzwに影響を与えないので何でもいい。なので、わざわざ行列を渡さなくてもいい
             //gMaterial.projectionInverseはCBufferを使って渡しておくこと
             float4 viewSpace = mul(float4(0.0f, 0.0f, ndcDepth, 1.0f), projectionInverse);
-            float viewZ = viewSpace.z / rcp(viewSpace.w);//同次座標系からデカルト座標系へ変換
+            float viewZ = viewSpace.z / rcp(viewSpace.w); //同次座標系からデカルト座標系へ変換
             difference.x += viewZ * kPrewittHorizontalKernel[x][y];
             difference.y += viewZ * kPrewittVerticalKernel[x][y];
         }

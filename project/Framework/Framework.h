@@ -16,6 +16,7 @@
 #include"ParticleCommon.h"
 #include"Input.h"
 #include"OffScreenRendering.h"
+#include"CameraManager.h"
 
 class OffScreenRenderingPSO;
 
@@ -101,6 +102,16 @@ public:
 	/// </summary>
 	void FrameworkSwapChainPostDraw();
 
+	/// <summary>
+	/// depthステンシルのバリア遷移
+	/// </summary>
+	void TransitionRenderTextureToDepthStencil();
+
+	/// <summary>
+	/// レンダーテクスチャをシェーダリソース用にバリア遷移します。
+	/// </summary>
+	void TransitionRenderTextureToShaderResource();
+
 public:
 
 	/// <summary>
@@ -151,4 +162,6 @@ protected:
 	std::unique_ptr <ParticleCommon> particleCommon = nullptr;
 	// オフスクリーンレンダリング
 	std::unique_ptr<OffScreenRendering> offScreenRendering = nullptr;
+	// カメラマネージャー
+	std::unique_ptr<CameraManager> cameraManager = nullptr;
 };

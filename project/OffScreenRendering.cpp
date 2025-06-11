@@ -49,7 +49,29 @@ void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 	renderTextureSRVDesc.Texture2D.MipLevels = 1;
 
 	// SRVの生成
-	device->CreateShaderResourceView(renderTextureResource_.Get(), &renderTextureSRVDesc, dxCommon->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
+	device->CreateShaderResourceView(renderTextureResource_.Get(), &renderTextureSRVDesc, dxCommon->GetSRVCPUDescriptorHandle(0));
+
+	//深度
+	// 深度ステンシルリソースの作成
+	depthTextureResource_ = CreateDepthStencilResource(
+		device, winApp->kClientWidth, winApp->kClientHeight,
+		DXGI_FORMAT_D32_FLOAT, kOffScreenClearValue
+	);
+	depthTextureResource_->SetName(L"DepthTextureResource");
+	// 深度ステンシルビューの作成
+	offscreenDepthRtvDescriptorHeap = dxCommon->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	// 深度ステンシルビューのハンドルを取得
+	offscreenDepthRtvHandle = offscreenDepthRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	device->CreateDepthStencilView(depthTextureResource_.Get(), nullptr, offscreenDepthRtvHandle);
+
+	
+	// 深度ステンシルビューのSRVを作成
+	D3D12_SHADER_RESOURCE_VIEW_DESC depthTextureSRVDesc{};
+	depthTextureSRVDesc.Format = DXGI_FORMAT_R32_FLOAT; // D32_FLOATリソースにはR32_FLOATを指定
+	depthTextureSRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	depthTextureSRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	depthTextureSRVDesc.Texture2D.MipLevels = 1;
+	device->CreateShaderResourceView(depthTextureResource_.Get(), &depthTextureSRVDesc, dxCommon->GetSRVCPUDescriptorHandle(1));
 
 	///---------------------------------------------------------------------
 	///					PostEffectManagerの初期化
@@ -64,6 +86,8 @@ void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 	postEffectManager.AddEffect(std::make_unique<SmoothingEffect>());// スムージングエフェクト
 	postEffectManager.AddEffect(std::make_unique<GaussianBlurEffect>());// ガウスぼかしエフェクト
 	postEffectManager.AddEffect(std::make_unique<RadialBlurEffect>());// ラジアルブラーエフェクト
+	// OutlineEffectだけは一時変数で保持してSetOutlineEffectする
+	auto outlineEffect = std::make_unique<OutlineEffect>();
 	postEffectManager.AddEffect(std::make_unique<OutlineEffect>());// アウトラインエフェクト
 	postEffectManager.AddEffect(std::make_unique<DissolveEffect>());// ディゾルブエフェクト
 	postEffectManager.AddEffect(std::make_unique<randomEffect>());// ランダムエフェクト
@@ -71,6 +95,7 @@ void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 
 	// PostEffectManagerの初期化
 	postEffectManager.InitializeAll(dxCommon);
+
 
 }
 
@@ -134,6 +159,27 @@ void OffScreenRendering::TransitionRenderTextureToRenderTarget() {
 	commandList->ResourceBarrier(1, &renderingBarrier);
 }
 
+void OffScreenRendering::TransitionRenderTextureToDepthStencil() {
+
+	depthRenderingBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	depthRenderingBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	depthRenderingBarrier.Transition.pResource = depthTextureResource_.Get();
+	depthRenderingBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	depthRenderingBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+	depthRenderingBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+	commandList->ResourceBarrier(1, &depthRenderingBarrier);
+}
+
+void OffScreenRendering::TransitionRenderTextureToOffScreen() {
+
+
+	depthRenderingBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	depthRenderingBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+
+	commandList->ResourceBarrier(1, &depthRenderingBarrier);
+}
+
 /// <summary>
 /// オフスクリーンテクスチャの描画処理
 /// 全画面三角形を描画します。
@@ -163,8 +209,9 @@ void OffScreenRendering::DrawImGui() {
 	ImGui::Begin("PostEffect");
 
 	static const char* effectNames[]
-		= {"None", "GrayScale", "Sepia", "Vignette", "Smoothing", "GaussianBlur", "RadialBlur","Outline","Dissolve", "Random" };
-		
+		= { "None", "GrayScale", "Sepia", "Vignette", "Smoothing", "GaussianBlur", "RadialBlur","Outline","Dissolve", "Random" };
+		//= { "outline"};
+
 	int effectIndex = static_cast<int>(postEffectManager.GetCurrentIndex());
 
 	if (ImGui::Combo("Effect", &effectIndex, effectNames, IM_ARRAYSIZE(effectNames))) {
@@ -216,8 +263,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> OffScreenRendering::CreateRenderTargetRes
 		&heapProperties,                                       // ヒーププロパティ
 		D3D12_HEAP_FLAG_NONE,                                  // ヒープフラグ
 		&resourceDesc,                                         // リソース記述子
-		D3D12_RESOURCE_STATE_RENDER_TARGET,
-		//D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,                   // 初期リソースステート
+		D3D12_RESOURCE_STATE_RENDER_TARGET,                 // 初期リソースステート
 		&clearValue,                                           // クリア値
 		IID_PPV_ARGS(&renderTargetResource)                   // 作成されたリソース
 	);
@@ -229,4 +275,47 @@ Microsoft::WRL::ComPtr<ID3D12Resource> OffScreenRendering::CreateRenderTargetRes
 	}
 
 	return renderTargetResource;
+}
+Microsoft::WRL::ComPtr<ID3D12Resource> OffScreenRendering::CreateDepthStencilResource(
+	Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, DXGI_FORMAT format, const Vector4& clearColor) {
+	// リソースの設定
+	D3D12_RESOURCE_DESC resourceDesc = {};
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D; // 2Dテクスチャ
+	resourceDesc.Width = static_cast<UINT64>(width);            // テクスチャの幅
+	resourceDesc.Height = static_cast<UINT>(height);            // テクスチャの高さ
+	resourceDesc.DepthOrArraySize = 1;                          // 奥行きまたは配列サイズ
+	resourceDesc.MipLevels = 1;                                 // ミップマップレベル
+	resourceDesc.Format = format;                               // テクスチャフォーマット
+	resourceDesc.SampleDesc.Count = 1;                          // サンプリング数（マルチサンプリングなし）
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;         // レイアウト（デフォルト）
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL; // 深度ステンシルとして使用
+
+	// クリア値の設定
+	D3D12_CLEAR_VALUE clearValue = {};
+	clearValue.Format = format;                                 // フォーマット
+	clearValue.DepthStencil.Depth = clearColor.x;               // クリア深度値
+	clearValue.DepthStencil.Stencil = static_cast<UINT8>(clearColor.y); // クリアステンシル値
+
+	// ヒーププロパティの設定
+	D3D12_HEAP_PROPERTIES heapProperties = {};
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;              // デフォルトヒープ
+
+	// リソースの作成
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource;
+	HRESULT hr = device->CreateCommittedResource(
+		&heapProperties,                                       // ヒーププロパティ
+		D3D12_HEAP_FLAG_NONE,                                  // ヒープフラグ
+		&resourceDesc,                                         // リソース記述子
+		D3D12_RESOURCE_STATE_DEPTH_WRITE,                      // 初期リソースステート
+		&clearValue,                                           // クリア値
+		IID_PPV_ARGS(&depthStencilResource)                    // 作成されたリソース
+	);
+
+	// 作成に失敗した場合はエラーを出力
+	if (FAILED(hr)) {
+		Logger::Log(std::format("Failed to create depth stencil resource. HRESULT = {:#010x}\n", hr));
+		assert(SUCCEEDED(hr));
+	}
+
+	return depthStencilResource;
 }

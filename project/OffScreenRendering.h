@@ -48,6 +48,16 @@ public:
 	/// </summary>
 	void TransitionRenderTextureToRenderTarget();
 
+	///<summary>
+	/// レンダーテクスチャを深度ステンシル用にバリア遷移します。
+	///</summary>
+	void TransitionRenderTextureToDepthStencil();
+
+	///<summary>
+	/// レンダーテクスチャをオフスクリーン用にバリア遷移します。
+	///</summary>
+	void TransitionRenderTextureToOffScreen();
+
 	/// <summary>
 	/// 描画処理
 	/// レンダーテクスチャへの描画を行います。
@@ -74,6 +84,20 @@ public:
 		const Vector4& clearColor
 	);
 
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilResource(
+		Microsoft::WRL::ComPtr<ID3D12Device>& device,
+		int32_t width,
+		int32_t height,
+		DXGI_FORMAT format,
+		const Vector4& clearColor
+	);
+
+    public:  
+    Matrix4x4 SetViewProjection(const Matrix4x4& viewProjection) {  
+       postEffectManager.SetOutlineProjection(viewProjection);  
+       return viewProjection;  
+    }
+
 private:
 	///-----------------------------------------------------------------------
 	///                             受取り用変数
@@ -97,21 +121,32 @@ private:
 
 	// オフスクリーン用RTVヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> offscreenRtvDescriptorHeap;
+	//深度用のRTVヒープ
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> offscreenDepthRtvDescriptorHeap;
 
 	// オフスクリーン用RTVハンドル
 	D3D12_CPU_DESCRIPTOR_HANDLE offscreenRtvHandle{};
+	// 深度用RTVハンドル
+	D3D12_CPU_DESCRIPTOR_HANDLE offscreenDepthRtvHandle{};
 
 	// レンダーターゲットのクリアカラー（赤色）
 	const Vector4 kRenderTargetClearValue = { 1.0f, 0.0f, 0.0f, 1.0f };
+	// オフスクリーンレンダリング用のクリアカラー（白色）
+	const Vector4 kOffScreenClearValue = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	// レンダーテクスチャリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_;
+	// 深度テクスチャリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthTextureResource_;
 
 	// レンダーテクスチャの現在の状態
-	D3D12_RESOURCE_STATES renderTextureState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	D3D12_RESOURCE_STATES renderTextureState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
 
 	// リソースバリア構造体
 	D3D12_RESOURCE_BARRIER renderingBarrier{};
+	//　深度バリア
+	D3D12_RESOURCE_BARRIER depthRenderingBarrier{};
 
 	///--------------------------------------------------------------------------
 	///                             PSO関連
@@ -119,13 +154,13 @@ private:
 
 	// オフスクリーン用PSOクラス
 	OffScreenRenderingPSO* offScreenRenderingPSO = nullptr;
-	
+
 	// ヴィネット用PSOクラス
 	VignettePSO* vignettePSO = nullptr;
 	///-----------------------------------------------------------------------
 	///                             リソース
 	///------------------------------------------------------------------------
-	
+
 	Microsoft::WRL::ComPtr <ID3D12Resource> vignetteResource;
 	//VignetteParams* vignetteData = nullptr;
 
