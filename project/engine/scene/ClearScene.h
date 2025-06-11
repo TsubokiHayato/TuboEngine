@@ -42,5 +42,12 @@ public:
 	/// パーティクル描画
 	/// </summary>
 	void ParticleDraw()override;
+
+public:
+	void SetCamera(std::shared_ptr<Camera> camera) override { camera_ = camera; }
+	std::shared_ptr<Camera> GetCamera() const override { return camera_; }
+
+private:
+	std::shared_ptr<Camera> camera_ = nullptr;
 };
 

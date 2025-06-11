@@ -20,6 +20,24 @@ public:
 
 	void ParticleDraw();
 
+	
+public:
+	std::shared_ptr<Camera> GetCurrentCamera() const {
+		if (currentScene) {
+			return currentScene->GetCamera();
+		}
+		return nullptr;
+	}
+	// 現在のシーンを取得
+	IScene* GetCurrentScene() const { return currentScene.get(); }
+
+
+public:
+	void SetSceneCamera(std::shared_ptr<Camera> camera) { sceneCamera_ = camera; }
+	std::shared_ptr<Camera> GetSceneCamera() const { return sceneCamera_; }
+
+
+
 private:
 	
 	//オブジェクト3D共通部
@@ -43,5 +61,7 @@ private:
 	int currentSceneNo = 0;
 	//前のシーン番号
 	int prevSceneNo = 0;
+
+	std::shared_ptr<Camera> sceneCamera_ = nullptr;
 };
 

@@ -47,6 +47,11 @@ public:
 	/// </summary>
 	void ParticleDraw()override;
 
+public:
+	void SetCamera(std::shared_ptr<Camera> camera) override { camera_ = camera; }
+	std::shared_ptr<Camera> GetCamera() const override { return camera_; }
+
+
 private:
 	Object3dCommon* object3dCommon;
 	SpriteCommon* spriteCommon;
@@ -58,7 +63,7 @@ private:
 	std::unique_ptr <Particle> particle;
 	std::unique_ptr<ParticleEmitter> particleEmitter_;
 
-	std::unique_ptr <Camera>camera;
+	std::shared_ptr<Camera> camera_;
 	Vector3 cameraPosition = { 0.0f,0.0f,-5.0f };
 	Vector3 cameraRotation = { 0.0f,0.0f,0.0f };
 	Vector3 cameraScale = { 1.0f,1.0f,1.0f };

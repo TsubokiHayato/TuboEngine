@@ -21,7 +21,7 @@ void Order::Finalize() {
 void Order::Draw() {
 
 	//RenderTargetの描画
-	
+
 	// Renderの設定
 	Framework::FrameWorkRenderTargetPreDraw();
 	//3Dオブジェクト描画
@@ -32,15 +32,19 @@ void Order::Draw() {
 	Framework::ParticleCommonDraw();
 	// swapChainのバリアを設定
 	Framework::FrameworkSwapChainPreDraw();
+
+	// OffScreenのバリアを設定
+	Framework::TransitionRenderTextureToDepthStencil();
 	// OffScreenの描画
 	Framework::OffScreenRenderingDraw();
-	
+	// OffScreenのバリアを設定
+	Framework::TransitionRenderTextureToShaderResource();
 
 
 	//SwapChainの描画
 
 	//ループ前処理
-	
+
 	//ImGuiの受付開始
 	Framework::ImguiPreDraw();
 	//ImGuiの受付終了

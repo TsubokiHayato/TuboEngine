@@ -112,6 +112,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CameraManager.cpp" />
     <ClCompile Include="DissolveEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\DissolvePSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\AddBlendPSO.cpp" />
@@ -187,6 +188,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\VignettePSO.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CameraManager.h" />
     <ClInclude Include="DissolveEffect.h" />
     <ClInclude Include="engine\graphic\PSO\DissolvePSO.h" />
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />

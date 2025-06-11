@@ -38,5 +38,10 @@ public:
 	//シーン番号を設定
 	void SetSceneNo(int no) { sceneNo = no; }
 
+public:
+	virtual void SetCamera(std::shared_ptr<Camera> camera) = 0;
+	virtual std::shared_ptr<Camera> GetCamera() const = 0;
+
+
 };
 
