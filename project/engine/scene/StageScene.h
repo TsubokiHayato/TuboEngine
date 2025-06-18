@@ -4,7 +4,7 @@
 #include "Input.h"
 #include"Audio.h"
 #include"Camera.h"
-
+#include"FollowTopDownCamera.h"
 
 #include"SpriteCommon.h"
 #include"Object3dCommon.h"
@@ -88,7 +88,8 @@ private:
 	std::unique_ptr<Audio> audio = nullptr;
 
 	/// Camera ///
-	std::unique_ptr<Camera> camera = nullptr;
+	std::unique_ptr<FollowTopDownCamera> followCamera;
+    
 	Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
 	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
