@@ -25,7 +25,7 @@ void Player::Initialize(Object3dCommon* object3dCommon) {
 	isDead = false;
 
 	// モデルファイルパス
-	const std::string modelFileNamePath = "plane.gltf";
+	const std::string modelFileNamePath = "barrier.obj";
 
 	object3d = std::make_unique<Object3d>();
 	object3d->Initialize(object3dCommon_, modelFileNamePath);
@@ -36,7 +36,7 @@ void Player::Initialize(Object3dCommon* object3dCommon) {
 }
 
 void Player::Update() {
-
+	isHit = false; // 毎フレームリセット
 	Move();
 	Shoot();
 
@@ -93,7 +93,7 @@ void Player::TakeDamage(int damage) {
 
 	HP -= damage;
 	if (HP <= 0) {
-		isDead = true;
+		isHit = true;
 		// ここでプレイヤーの死亡処理を行う
 	}
 
@@ -110,6 +110,6 @@ void Player::DrawImgui() {
 	ImGui::DragFloat3("Rotation", &rotation.x, 0.1f);
 	ImGui::DragFloat3("Scale", &scale.x, 0.1f);
 	ImGui::Text("HP: %d", HP);
-	ImGui::Text("IsHit: %s", isDead ? "Yes" : "No");
+	ImGui::Text("IsHit: %s", isHit ? "Yes" : "No");
 	ImGui::End();
 }
