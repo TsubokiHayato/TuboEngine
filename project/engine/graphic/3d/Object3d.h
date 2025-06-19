@@ -139,6 +139,8 @@ public:
 	Vector3 GetPosition() const { return transform.translate; }
 	//モデルの色
 	Vector4 GetModelColor();
+	// Camera
+	Camera* GetCamera() { return camera; }
 
 	///-------------------------------------------------------------------------------------------------
 	/// Light
