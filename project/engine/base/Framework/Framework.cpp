@@ -1,8 +1,11 @@
 #include "Framework.h"
 #include"WinApp.h"
+#include"OffScreenRenderingPSO.h"
+#include <dxcapi.h>
 
-void Framework::Initialize()
-{
+
+
+void Framework::Initialize() {
 	//ウィンドウズアプリケーション
 	winApp = std::make_unique<WinApp>();
 	winApp->Initialize();
@@ -53,6 +56,10 @@ void Framework::Initialize()
 	particleCommon = std::make_unique<ParticleCommon>();
 	particleCommon->Initialize(winApp.get(), dxCommon.get(), srvManager.get());
 
+	//オフスクリーンレンダリングの初期化
+	offScreenRendering = std::make_unique<OffScreenRendering>();
+	offScreenRendering->Initialize(winApp.get(), dxCommon.get());
+
 	//テクスチャマネージャーの初期化
 	TextureManager::GetInstance()->Initialize(dxCommon.get(), srvManager.get());
 
@@ -70,9 +77,9 @@ void Framework::Initialize()
 	sceneManager = std::make_unique<SceneManager>();
 	sceneManager->Initialize(object3dCommon.get(), spriteCommon.get(), particleCommon.get(), winApp.get(), dxCommon.get());
 
+
 }
-void Framework::Update()
-{
+void Framework::Update() {
 	//メッセージ処理
 	if (winApp->ProcessMessage()) {
 		endRequest = true;
@@ -81,12 +88,13 @@ void Framework::Update()
 	Input::GetInstance()->Update();
 	//シーンマネージャーの更新
 	sceneManager->Update();
+	//オフスクリーンレンダリングの更新
+	offScreenRendering->Update();
 
 
 }
 
-void Framework::Finalize()
-{
+void Framework::Finalize() {
 
 	//ImGuiManagerの終了
 #ifdef _DEBUG
@@ -112,19 +120,16 @@ void Framework::Finalize()
 }
 
 
-void Framework::Run()
-{
+void Framework::Run() {
 	//初期化
 	Initialize();
 	//メインループ
-	while (true)
-	{
+	while (true) {
 		//更新
 		Update();
 
 		//終了リクエストがあったら
-		if (IsEndRequest())
-		{
+		if (IsEndRequest()) {
 			//ループを抜ける
 			break;
 		}
@@ -136,39 +141,36 @@ void Framework::Run()
 	Finalize();
 }
 
-void Framework::FrameworkPreDraw()
-{
+void Framework::FrameworkSwapChainPreDraw() {
 	//描画前処理
 	dxCommon->PreDraw();
-	//ImGuiの受付開始
-	srvManager->PreDraw();
+
 }
 
-void Framework::FrameworkPostDraw()
-{
+void Framework::FrameworkSwapChainPostDraw() {
 #ifdef _DEBUG
 	//ImGuiの描画
 	imGuiManager->Draw();
 #endif // _DEBUG
 
-
+	offScreenRendering->TransitionRenderTextureToRenderTarget();
 	//描画
 	dxCommon->PostDraw();
 }
 
-void Framework::ImguiPreDraw()
-{
+void Framework::ImguiPreDraw() {
 #ifdef _DEBUG
 	//ImGuiの受付開始
 	imGuiManager->Begin();
 
 	sceneManager->ImGuiDraw();
+
+	offScreenRendering->DrawImGui();
 #endif // _DEBUG
 
 }
 
-void Framework::ImguiPostDraw()
-{
+void Framework::ImguiPostDraw() {
 #ifdef _DEBUG
 	//ImGuiの受付終了
 	ImGui::ShowDemoWindow();
@@ -185,30 +187,54 @@ void Framework::ImguiPostDraw()
 	ImGui::SliderInt("SpriteBlendNum", &spriteBlendModeNum, 0, 5);
 	ImGui::End();
 
-	
+
 
 	imGuiManager->End();
 #endif // _DEBUG
 
 }
 
-void Framework::Object3dCommonDraw()
-{
-	//オブジェクト3Dの描画
-	object3dCommon->DrawSettingsCommon(objectBlendModeNum);
-	sceneManager->Object3DDraw();
+void Framework::FrameWorkRenderTargetPreDraw() {
+
+	//ImGuiの受付開始
+	offScreenRendering->PreDraw();
+
+
+	srvManager->PreDraw();
+
 }
 
-void Framework::SpriteCommonDraw()
-{
+
+
+
+void Framework::Object3dCommonDraw() {
+	//オブジェクト3Dの描画
+	object3dCommon->DrawSettingsCommon(objectBlendModeNum);
+
+	//3Dオブジェクトの描画
+	sceneManager->Object3DDraw();
+
+
+}
+
+void Framework::SpriteCommonDraw() {
 	//スプライトの描画
 	spriteCommon->DrawSettingsCommon(spriteBlendModeNum);
 	sceneManager->SpriteDraw();
 }
 
-void Framework::ParticleCommonDraw()
-{
+void Framework::ParticleCommonDraw() {
 	//パーティクルの描画
 	particleCommon->DrawSettingsCommon();
 	sceneManager->ParticleDraw();
 }
+
+void Framework::OffScreenRenderingDraw() {
+
+	
+	offScreenRendering->TransitionRenderTextureToShaderResource();
+
+	//オフスクリーンレンダリングの描画
+	offScreenRendering->Draw();
+}
+
