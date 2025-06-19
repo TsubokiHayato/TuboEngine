@@ -8,6 +8,7 @@ class AddBlendPSO;
 class MultiplyBlendPSO;
 class SubtractBlendPSO;
 class ScreenBlendPSO;
+
 class Camera;
 class Object3dCommon
 {
@@ -56,7 +57,7 @@ private:
 	MultiplyBlendPSO* multiplyBlendPSO = nullptr;//MultiplyBlendPSO
 	SubtractBlendPSO* subtractBlendPSO = nullptr;//SubtractBlendPSO
 	ScreenBlendPSO* screenBlendPSO = nullptr;//ScreenBlendPSO
-
+	
 	Camera* defaultCamera = nullptr;//デフォルトカメラ
 	int blenderMode_;//ブレンダーモード
 
