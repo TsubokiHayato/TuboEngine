@@ -1,31 +1,9 @@
 #pragma once
-#include "IScene.h"
 
-#include "Input.h"
-#include"Audio.h"
-#include"Camera.h"
-#include"FollowTopDownCamera.h"
-
-#include"SpriteCommon.h"
-#include"Object3dCommon.h"
-#include"ModelCommon.h"
-#include"TextureManager.h"
-#include"ModelManager.h"
-#include"AudioCommon.h"
-#include"ImGuiManager.h"
-
-
-#include "Player.h"
-#include "Enemy.h"
-
-
-
-class StageScene : public IScene {
+#include"IScene.h"
+class StageScene :public IScene
+{
 public:
-	///---------------------------------------------------------------------------------------
-	///				メンバ関数
-	///----------------------------------------------------------------------------------------
-
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -39,66 +17,31 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update() override;
+	void Update()override;
 
 	/// <summary>
 	/// 終了処理
 	/// </summary>
-	void Finalize() override;
+	void Finalize()override;
 
 	/// <summary>
 	/// 3Dオブジェクト描画
 	/// </summary>
-	void Object3DDraw() override;
+	void Object3DDraw()override;
 
 	/// <summary>
 	/// スプライト描画
 	/// </summary>
-	void SpriteDraw() override;
+	void SpriteDraw()override;
 
 	/// <summary>
 	/// ImGui描画
 	/// </summary>
-	void ImGuiDraw() override;
+	void ImGuiDraw()override;
 
 	/// <summary>
 	/// パーティクル描画
 	/// </summary>
-	void ParticleDraw() override;
-
-	
-private:
-
-	///----------------------------------------------------------------------------------------
-	///				引き渡し用変数
-	///-----------------------------------------------------------------------------------------
-
-	WinApp* winApp = nullptr;
-	DirectXCommon* dxCommon = nullptr;
-	Object3dCommon* object3dCommon = nullptr;
-	SpriteCommon* spriteCommon = nullptr;
-
-private:
-	///----------------------------------------------------------------------------------------
-	///				メンバ変数
-	///----------------------------------------------------------------------------------------
-
-	/// Audio///
-	
-	std::unique_ptr<Audio> audio = nullptr;
-
-	/// Camera ///
-	std::unique_ptr<FollowTopDownCamera> followCamera;
-    
-	Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
-	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
-	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
-	
-	/// Player ///
-	std::unique_ptr<Player> player = nullptr;
-	/// Enemy ///
-	std::unique_ptr<Enemy> enemy = nullptr;
-	std::vector<std::unique_ptr<Enemy>> enemies; // Enemyリスト
-
-
+	void ParticleDraw()override;
 };
+
