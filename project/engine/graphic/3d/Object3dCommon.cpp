@@ -7,8 +7,8 @@
 #include"MultiplyBlendPSO.h"
 #include"ScreenBlendPSO.h"
 
-void Object3dCommon::Initialize(WinApp* winApp, DirectXCommon* dxCommon)
-{
+
+void Object3dCommon::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 	// 引数がnullptrでないことを確認
 	assert(dxCommon);
 	assert(winApp);
@@ -39,42 +39,43 @@ void Object3dCommon::Initialize(WinApp* winApp, DirectXCommon* dxCommon)
 	// ScreenBlendPSOの初期化
 	screenBlendPSO = new ScreenBlendPSO();
 	screenBlendPSO->Initialize(dxCommon_);
+	
 
 
 
 }
 
-void Object3dCommon::DrawSettingsCommon(int blendMode)
-{
-    // PSOの共通描画設定
-    switch (blendMode) {
-    case 0:
-        // NoneBlendPSO
-        noneBlendPSO->DrawSettingsCommon();
-        break;
-    case 1:
-        // NormalBlendPSO
-        normalBlendPSO->DrawSettingsCommon();
-        break;
-    case 2:
-        // AddBlendPSO
-        addBlendPSO->DrawSettingsCommon();
-        break;
-    case 3:
-        // SubtractBlendPSO
-        subtractBlendPSO->DrawSettingsCommon();
-        break;
-    case 4:
-        // MultiplyBlendPSO
-        multiplyBlendPSO->DrawSettingsCommon();
-        break;
-    case 5:
-        // ScreenBlendPSO
-        screenBlendPSO->DrawSettingsCommon();
-        break;
-    default:
-        // デフォルトはNoneBlendPSO
-        noneBlendPSO->DrawSettingsCommon();
-        break;
-    }
+void Object3dCommon::DrawSettingsCommon(int blendMode) {
+	// PSOの共通描画設定
+	switch (blendMode) {
+	case 0:
+		// NoneBlendPSO
+		noneBlendPSO->DrawSettingsCommon();
+		break;
+	case 1:
+		// NormalBlendPSO
+		normalBlendPSO->DrawSettingsCommon();
+		break;
+	case 2:
+		// AddBlendPSO
+		addBlendPSO->DrawSettingsCommon();
+		break;
+	case 3:
+		// SubtractBlendPSO
+		subtractBlendPSO->DrawSettingsCommon();
+		break;
+	case 4:
+		// MultiplyBlendPSO
+		multiplyBlendPSO->DrawSettingsCommon();
+		break;
+	case 5:
+		// ScreenBlendPSO
+		screenBlendPSO->DrawSettingsCommon();
+		break;
+	default:
+		// デフォルトはNoneBlendPSO
+		noneBlendPSO->DrawSettingsCommon();
+		break;
+	}
+
 }
