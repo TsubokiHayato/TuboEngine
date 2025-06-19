@@ -90,7 +90,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 	object3d = std::make_unique<Object3d>();
 	object3d->Initialize(this->object3dCommon,modelFileNamePath);
-	
+	object3d->SetModel(modelFileNamePath);
 
 	////////////////////////////////////////////////////////////////////////
 
@@ -101,7 +101,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	object3d2 = std::make_unique<Object3d>();
 	object3d2->Initialize(this->object3dCommon,modelFileNamePath2);
 
-
+	object3d2->SetModel(modelFileNamePath2);
 
 #pragma endregion 3Dモデルの初期化
 
