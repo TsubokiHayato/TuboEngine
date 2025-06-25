@@ -71,7 +71,7 @@ void Enemy::OnCollision(Collider* other) {
 	if (typeID == static_cast<uint32_t>(CollisionTypeId::kPlayer)) {
 		// 敵との衝突処理
 		isHit = true; // 衝突したらヒットフラグを立てる
-	} else if (typeID == static_cast<uint32_t>(CollisionTypeId::kWeapon)) {
+	} else if (typeID == static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon)) {
 		// 武器との衝突処理
 		isHit = true; // 衝突したらヒットフラグを立てる
 	}
