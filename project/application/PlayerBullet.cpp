@@ -1,6 +1,10 @@
 #include "PlayerBullet.h"
+#include"CollisionTypeId.h"
 
 void PlayerBullet::Initialize(Object3dCommon* object3dCommon, const Vector3& startPos, const Vector3& startVel) {
+	
+	Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kPlayer));
+
 	position = startPos;
 	velocity = startVel;
 	isAlive = true;
@@ -30,5 +34,25 @@ void PlayerBullet::Update() {
 
 void PlayerBullet::Draw() {
 	
-	object3d->Draw();
+	object3d->Draw(); }
+
+
+Vector3 PlayerBullet::GetCenterPosition() const {
+	const Vector3 offset = {0.0f, 0.0f, 0.0f}; // プレイヤーの中心を考慮
+	Vector3 worldPosition = position + offset;
+	return worldPosition;
+}
+
+void PlayerBullet::OnCollision(Collider* other) {
+	// 種別IDを取得
+	isHit = false; // 衝突判定を初期化
+
+	uint32_t typeID = other->GetTypeID();
+	if (typeID == static_cast<uint32_t>(CollisionTypeId::kPlayer)) {
+		// 敵との衝突処理
+		isHit = true; // 衝突したらヒットフラグを立てる
+	} else if (typeID == static_cast<uint32_t>(CollisionTypeId::kWeapon)) {
+		// 武器との衝突処理
+		isHit = true; // 衝突したらヒットフラグを立てる
+	}
 }

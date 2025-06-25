@@ -4,7 +4,6 @@
 #include "CollisionManager.h"
 #include "StageScene.h"
 #include "application/FollowTopDownCamera.h"
-// ...（他のinclude）
 
 void StageScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon) {
 	this->object3dCommon = object3dCommon;
@@ -49,6 +48,7 @@ void StageScene::Update() {
 	player_->SetCamera(followCamera->GetCamera());
 	player_->Update();
 
+	
 	for (auto& enemy : enemies) {
 		enemy->SetCamera(followCamera->GetCamera());
 		enemy->Update();
@@ -66,10 +66,15 @@ void StageScene::Finalize()
 }
 
 void StageScene::Object3DDraw() {
+	// 3Dオブジェクトの描画
+	// プレイヤーの3Dオブジェクトを描画
 	player_->Draw();
+
+	// 敵の3Dオブジェクトを描画
 	for (auto& enemy : enemies) {
 		enemy->Draw();
 	}
+	// 当たり判定の可視化
 	collisionManager_->Draw();
 }
 void StageScene::SpriteDraw()
@@ -84,7 +89,10 @@ void StageScene::ImGuiDraw()
 	// PlayerのImGui
 	player_->DrawImGui();
 
-
+	//EnemyのImgui
+	for (auto& enemy : enemies) {
+		enemy->DrawImGui();
+	}
 }
 
 void StageScene::ParticleDraw()
@@ -102,7 +110,10 @@ void StageScene::CheckAllCollisions() {
 		collisionManager_->AddCollider(enemy.get());
 	}
 
-
+	  // プレイヤーの弾
+	for (const auto& bullet : player_->GetBullets()) {
+		collisionManager_->AddCollider(bullet.get());
+	}
 
 
 
