@@ -89,10 +89,13 @@ void StageScene::ImGuiDraw()
 	// PlayerのImGui
 	player_->DrawImGui();
 
+
 	//EnemyのImgui
 	for (auto& enemy : enemies) {
 		enemy->DrawImGui();
 	}
+
+
 }
 
 void StageScene::ParticleDraw()
