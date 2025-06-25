@@ -10,8 +10,6 @@ void BaseCharacter::Update() {}
 
 void BaseCharacter::Draw() {}
 
-void BaseCharacter::Finalize() {}
+void BaseCharacter::OnCollision(Collider* other) {}
 
-void BaseCharacter::Move() {}
-
-void BaseCharacter::TakeDamage(int damage) {}
+Vector3 BaseCharacter::GetCenterPosition() const { return Vector3(); }
