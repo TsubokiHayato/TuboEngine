@@ -3,8 +3,7 @@
 
 #include "CollisionManager.h"
 #include "StageScene.h"
-#include "StageScene.h"
-#include "FollowTopDownCamera.h"
+#include "application/FollowTopDownCamera.h"
 // ...（他のinclude）
 
 void StageScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon) {
