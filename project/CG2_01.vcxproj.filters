@@ -231,10 +231,10 @@
     <ClCompile Include="CollisionManager.cpp">
       <Filter>ソース ファイル\collider</Filter>
     </ClCompile>
-    <ClCompile Include="FollowTopDownCamera.cpp">
+    <ClCompile Include="application\FollowTopDownCamera.cpp">
       <Filter>ソース ファイル\camera</Filter>
     </ClCompile>
-    <ClCompile Include="BaseCharacter.cpp">
+    <ClCompile Include="application\BaseCharacter.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
     <ClCompile Include="engine\base\Framework\Order.cpp">
@@ -434,7 +434,7 @@
     <ClInclude Include="engine\graphic\data\Node.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="BaseCharacter.h">
+    <ClInclude Include="application\BaseCharacter.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\Player.h">
@@ -449,7 +449,7 @@
     <ClInclude Include="CollisionManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="FollowTopDownCamera.h">
+    <ClInclude Include="application\FollowTopDownCamera.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Collider.h">
