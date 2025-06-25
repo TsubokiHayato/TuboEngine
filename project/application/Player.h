@@ -47,6 +47,9 @@ public:
 	// プレイヤーの死亡状態
 	bool IsDead() const { return isDead; }
 
+	// プレイヤーの弾のリスト
+	const std::vector<std::unique_ptr<PlayerBullet>>& GetBullets() const { return bullets; }
+
 	///-----------------------------------
 	///				セッター
 	///-------------------------------------

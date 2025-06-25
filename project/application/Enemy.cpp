@@ -51,6 +51,7 @@ void Enemy::DrawImGui() {
 	ImGui::Text("Enemy Velocity: (%.2f, %.2f, %.2f)", velocity.x, velocity.y, velocity.z);
 	ImGui::Text("Enemy HP: %d", HP);
 	ImGui::Text("Enemy Alive: %s", isAlive ? "Yes" : "No");
+	ImGui::Text("Hit: %s", isHit ? "Yes" : "No");
 	ImGui::End();
 }
 

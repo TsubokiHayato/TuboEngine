@@ -2,22 +2,28 @@
 #include "Vector3.h"
 #include "Object3d.h"
 #include "Object3dCommon.h"
- class PlayerBullet {
+#include "BaseBullet.h"
+ 
+class PlayerBullet : public BaseBullet {
 public:
+	
 	///--------------------------------------------------
 	///				メンバ関数
 	///
 
-	  // 初期化
-	void Initialize(Object3dCommon* object3dCommon,const Vector3& startPos, const Vector3& startVel);
+	void Initialize(Object3dCommon* object3dCommon, const Vector3& startPos, const Vector3& startVel) override;
+	void Update() override;
+	void Draw() override;
 
-	// SRT更新（Object3d等の行列更新用）
-	void Update();
+	/// <summary>
+	/// 　衝突判定
+	/// </summary>
+	/// <param name="other"></param>
+	virtual void OnCollision(Collider* other) override;
 
-	// 描画処理（仮）
-	void Draw();
-
-
+	/// <summary>
+	/// 当たり判定の中心座標を取得
+	virtual Vector3 GetCenterPosition() const override;
 	///--------------------------------------------------
 	///				ゲッター&セッター
 	/// 
@@ -65,4 +71,6 @@ private:
 	Vector3 velocity;
 	// 生存フラグ
 	bool isAlive = true;
+	//
+	bool isHit = false;
 };
