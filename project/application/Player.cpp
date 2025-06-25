@@ -1,12 +1,17 @@
 #include "Player.h"
 #include "ImGuiManager.h"
 #include "Input.h"
+#include"CollisionTypeId.h"
 
 Player::Player() {}
 
 Player::~Player() {}
 
 void Player::Initialize(Object3dCommon* object3dCommon) {
+
+	// プレイヤーのコライダーの設定
+	Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kPlayer));
+
 
 	object3dCommon_ = object3dCommon;
 
@@ -69,8 +74,6 @@ void Player::Draw() {
 
 }
 
-void Player::Finalize() {}
-
 void Player::Move() {
 
 	// プレイヤーの移動処理
@@ -89,17 +92,30 @@ void Player::Move() {
 	}
 }
 
-void Player::TakeDamage(int damage) {
 
-	HP -= damage;
-	if (HP <= 0) {
-		isHit = true;
-		// ここでプレイヤーの死亡処理を行う
-	}
-
+Vector3 Player::GetCenterPosition() const {
+	const Vector3 offset = {0.0f, 0.0f, 0.0f}; // プレイヤーの中心を考慮
+	Vector3 worldPosition = position + offset;
+	return worldPosition;
 }
 
-void Player::DrawImgui() {
+void Player::OnCollision(Collider* other) {
+	// 種別IDを取得
+	isHit = false; // 衝突判定を初期化
+
+	uint32_t typeID = other->GetTypeID();
+	if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy)) {
+		// 敵との衝突処理
+		isHit = true; // 衝突したらヒットフラグを立てる
+	} else if (typeID == static_cast<uint32_t>(CollisionTypeId::kWeapon)) {
+		// 武器との衝突処理
+		isHit = true; // 衝突したらヒットフラグを立てる
+	} else {
+	}
+}
+
+
+void Player::DrawImGui() {
 
 	position = object3d->GetPosition();
 	rotation = object3d->GetRotation();

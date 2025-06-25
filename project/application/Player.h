@@ -16,20 +16,22 @@ public:
 	// 更新処理のオーバーライド
 	void Update() override;
 
+	// 描画処理のオーバーライド
+	void Draw() override;
+	
+	// 衝突時の処理のオーバーライド
+	void OnCollision(Collider* other) override;
+
+	// 当たり判定の中心座標を取得のオーバーライド
+	Vector3 GetCenterPosition() const override;
+
+	// ImGuiの描画処理
+	void DrawImGui();
+
 	// 弾を撃つ処理
 	void Shoot();
 
-	// 描画処理のオーバーライド
-	void Draw() override;
-	// 終了処理のオーバーライド
-	void Finalize() override;
-
-	// 移動処理のオーバーライド
-	void Move() override;
-	// ダメージ処理のオーバーライド
-	void TakeDamage(int damage) override;
-
-	void DrawImgui();
+	void Move();
 
 public:
 	///-----------------------------------
