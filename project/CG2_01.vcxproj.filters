@@ -249,7 +249,10 @@
     <ClCompile Include="engine\graphic\PSO\AddBlendPSO.cpp">
       <Filter>ソース ファイル\graphic\PSO</Filter>
     </ClCompile>
-    <ClCompile Include="BaseBullet.cpp">
+    <ClCompile Include="application\BaseBullet.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="HitEffectManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -464,7 +467,10 @@
     <ClInclude Include="ParameterManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="BaseBullet.h">
+    <ClInclude Include="application\BaseBullet.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="HitEffectManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
