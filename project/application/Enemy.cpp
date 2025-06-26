@@ -31,6 +31,7 @@ void Enemy::Initialize(Object3dCommon* object3dCommon) {
 	particleEmitter_ = nullptr;
 }
 void Enemy::Update() {
+	
 	// まず座標・回転・スケールを最新化
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
@@ -42,6 +43,7 @@ void Enemy::Update() {
 	if (!wasHit && isHit) {
 		EmitHitParticle();
 	}
+	isHit = false;  // 今フレームのヒット状態をリセット
 	wasHit = isHit; // 状態を保存
 
 	// Particle
@@ -100,6 +102,7 @@ void Enemy::DrawImGui() {
 	ImGui::Text("Enemy HP: %d", HP);
 	ImGui::Text("Enemy Alive: %s", isAlive ? "Yes" : "No");
 	ImGui::Text("Hit: %s", isHit ? "Yes" : "No");
+	ImGui::Text("wasHit: %s", isHit ? "Yes" : "No");
 	ImGui::End();
 }
 
@@ -112,8 +115,7 @@ Vector3 Enemy::GetCenterPosition() const {
 }
 
 void Enemy::OnCollision(Collider* other) {
-	isHit = false; // 衝突判定を初期化
-
+	
 	uint32_t typeID = other->GetTypeID();
 	if (typeID == static_cast<uint32_t>(CollisionTypeId::kPlayer)) {
 		isHit = true;
