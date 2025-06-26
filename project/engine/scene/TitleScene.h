@@ -1,11 +1,10 @@
 #pragma once
-#include"IScene.h"
-#include"Particle.h"
-#include"Camera.h"
-#include"ParticleEmitter.h"
+#include "Camera.h"
+#include "IScene.h"
+#include "Particle.h"
+#include "ParticleEmitter.h"
 #include <random>
-class TitleScene :public IScene
-{
+class TitleScene : public IScene {
 public:
 	/// <summary>
 	/// 初期化
@@ -20,32 +19,32 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update()override;
+	void Update() override;
 
 	/// <summary>
 	/// 終了処理
 	/// </summary>
-	void Finalize()override;
+	void Finalize() override;
 
 	/// <summary>
 	/// 3Dオブジェクト描画
 	/// </summary>
-	void Object3DDraw()override;
+	void Object3DDraw() override;
 
 	/// <summary>
 	/// スプライト描画
 	/// </summary>
-	void SpriteDraw()override;
+	void SpriteDraw() override;
 
 	/// <summary>
 	/// ImGui描画
 	/// </summary>
-	void ImGuiDraw()override;
+	void ImGuiDraw() override;
 
 	/// <summary>
 	/// パーティクル描画
 	/// </summary>
-	void ParticleDraw()override;
+	void ParticleDraw() override;
 
 private:
 	Object3dCommon* object3dCommon;
@@ -55,23 +54,19 @@ private:
 	DirectXCommon* dxCommon;
 
 private:
-	std::unique_ptr <Particle> particle;
+	std::unique_ptr<Camera> camera;
+	Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
+	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
+	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
+
+	std::unique_ptr<Particle> particle;
 	std::unique_ptr<ParticleEmitter> particleEmitter_;
 
-	std::unique_ptr <Camera>camera;
-	Vector3 cameraPosition = { 0.0f,0.0f,-5.0f };
-	Vector3 cameraRotation = { 0.0f,0.0f,0.0f };
-	Vector3 cameraScale = { 1.0f,1.0f,1.0f };
-
 	Transform particleTranslate;
-	Vector3 particleVelocity = { 0.0f,0.0f,0.0f};
-	Vector4 particleColor = { 1.0f,1.0f,1.0f,1.0f };
+	Vector3 particleVelocity = {0.0f, 0.0f, 0.0f};
+	Vector4 particleColor = {1.0f, 1.0f, 1.0f, 1.0f};
 	float particleLifeTime = 1.0f;
 	float particleCurrentTime = 0.0f;
 
-	//乱数エンジン
-	std::mt19937 randomEngine_;
 	
-
 };
-

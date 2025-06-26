@@ -27,6 +27,7 @@ void StageScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	const int enemyCount = 5;
 	for (int i = 0; i < enemyCount; ++i) {
 		auto enemy = std::make_unique<Enemy>();
+		enemy->SetParticleCommon(particleCommon);
 		enemy->Initialize(object3dCommon);
 		enemy->SetCamera(followCamera->GetCamera());
 		enemy->SetPosition(Vector3(float(i * 2), 0.0f, 5.0f));
@@ -98,8 +99,11 @@ void StageScene::ImGuiDraw()
 
 }
 
-void StageScene::ParticleDraw()
-{}
+void StageScene::ParticleDraw() {
+	for (auto& enemy : enemies) {
+		enemy->ParticleDraw();
+	}
+	}
 
 void StageScene::CheckAllCollisions() {
 	/// 衝突マネージャのリセット ///
