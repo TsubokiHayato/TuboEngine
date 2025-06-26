@@ -17,14 +17,14 @@ void StageScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 	// 追従カメラの生成・初期化
 	followCamera = std::make_unique<FollowTopDownCamera>();
-	followCamera->Initialize(player_.get(), Vector3(0.0f, 10.0f, 0.0f), 0.2f);
+	followCamera->Initialize(player_.get(), Vector3(0.0f, 40.0f, 0.0f), 0.2f);
 
 	// プレイヤーにカメラをセット
 	player_->SetCamera(followCamera->GetCamera());
 
 	// Enemyリスト
 	enemies.clear();
-	const int enemyCount = 5;
+	const int enemyCount = 1;
 	for (int i = 0; i < enemyCount; ++i) {
 		auto enemy = std::make_unique<Enemy>();
 		enemy->SetParticleCommon(particleCommon);
