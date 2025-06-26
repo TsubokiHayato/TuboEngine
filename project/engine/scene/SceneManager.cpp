@@ -14,7 +14,7 @@ void SceneManager::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spri
 	this->particleCommon = particleCommon;
 
 	//初期シーンを設定
-	currentScene = std::make_unique<DebugScene>();
+	currentScene = std::make_unique<StageScene>();
 	currentScene->Initialize(this->object3dCommon,this->spriteCommon,this->particleCommon,this->winApp,this->dxCommon);
 
 	//シーン番号を設定
