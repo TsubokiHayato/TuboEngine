@@ -2,6 +2,7 @@
 #include"WinApp.h"
 #include"DirectXCommon.h"
 #include"ImGuiManager.h"
+#include"NoneEffect.h"
 #include "GrayScaleEffect.h"
 #include"VignetteEffect.h"
 #include"SepiaEffect.h"
@@ -55,6 +56,7 @@ void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 	///---------------------------------------------------------------------
 
 	// PostEffectの追加
+	postEffectManager.AddEffect(std::make_unique<NoneEffect>());// 何もしないエフェクト
 	postEffectManager.AddEffect(std::make_unique<GrayScaleEffect>());// グレースケールエフェクト
 	postEffectManager.AddEffect(std::make_unique<SepiaEffect>());// セピアエフェクト
 	postEffectManager.AddEffect(std::make_unique<VignetteEffect>());// ビネットエフェクト
@@ -160,8 +162,8 @@ void OffScreenRendering::DrawImGui() {
 	ImGui::Begin("PostEffect");
 
 	static const char* effectNames[]
-		= { "GrayScale", "Sepia", "Vignette", "Smoothing", "GaussianBlur", "RadialBlur", "Outline","Dissolve", "Random"};
-		
+		= { "None","GrayScale", "Sepia", "Vignette", "Smoothing", "GaussianBlur", "RadialBlur", "Outline","Dissolve", "Random" };
+
 	int effectIndex = static_cast<int>(postEffectManager.GetCurrentIndex());
 
 	if (ImGui::Combo("Effect", &effectIndex, effectNames, IM_ARRAYSIZE(effectNames))) {
