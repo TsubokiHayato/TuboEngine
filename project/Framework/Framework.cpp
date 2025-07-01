@@ -56,9 +56,7 @@ void Framework::Initialize() {
 	particleCommon = std::make_unique<ParticleCommon>();
 	particleCommon->Initialize(winApp.get(), dxCommon.get(), srvManager.get());
 
-	//オフスクリーンレンダリングの初期化
-	offScreenRendering = std::make_unique<OffScreenRendering>();
-	offScreenRendering->Initialize(winApp.get(), dxCommon.get());
+	
 
 	//テクスチャマネージャーの初期化
 	TextureManager::GetInstance()->Initialize(dxCommon.get(), srvManager.get());
@@ -72,6 +70,9 @@ void Framework::Initialize() {
 	//入力初期化
 	Input::GetInstance()->Initialize(winApp.get());
 
+//オフスクリーンレンダリングの初期化
+	offScreenRendering = std::make_unique<OffScreenRendering>();
+	offScreenRendering->Initialize(winApp.get(), dxCommon.get());
 
 	//シーンマネージャーの初期化
 	sceneManager = std::make_unique<SceneManager>();
