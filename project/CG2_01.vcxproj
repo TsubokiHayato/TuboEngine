@@ -93,7 +93,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio;$(ProjectDir)engine\graphic\Particle;$(ProjectDir)engine\scene;$(ProjectDir)engine\base\Framework;$(ProjectDir)engine\base\Utilities;$(ProjectDir)engine\base\Common;$(ProjectDir)engine\graphic\data;$(ProjectDir)engine\graphic\PSO;$(ProjectDir)externals\assimp\include;$(ProjectDir)engine\graphic\PSO\Blend;$(ProjectDir)engine\graphic\PSO\PostEffect</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio;$(ProjectDir)engine\graphic\Particle;$(ProjectDir)engine\scene;$(ProjectDir)engine\base\Framework;$(ProjectDir)engine\base\Utilities;$(ProjectDir)engine\base\Common;$(ProjectDir)engine\graphic\data;$(ProjectDir)engine\graphic\PSO;$(ProjectDir)externals\assimp\include;$(ProjectDir)engine\graphic\PSO\Blend;$(ProjectDir)engine\graphic\PSO\PostEffect;$(ProjectDir)engine\graphic\PostEffect</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
     </ClCompile>
     <Link>
@@ -112,7 +112,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DissolveEffect.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\DissolveEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\DissolvePSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\AddBlendPSO.cpp" />
     <ClCompile Include="engine\scene\ClearScene.cpp" />
@@ -136,9 +136,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ClCompile Include="engine\scene\IScene.cpp" />
-    <ClCompile Include="GaussianBlurEffect.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\GaussianBlurEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\GaussianBlurPSO.cpp" />
-    <ClCompile Include="GrayScaleEffect.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\GrayScaleEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\GrayScalePSO.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\graphic\3d\Model.cpp" />
@@ -166,28 +166,28 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\NormalBlendPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\ScreenBlendPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\SubtractBlendPSO.cpp" />
-    <ClCompile Include="NoneEffect.cpp" />
-    <ClCompile Include="NonePSO.cpp" />
-    <ClCompile Include="OffScreenRendering.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\NoneEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\NonePSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\OffScreenRendering.cpp" />
     <ClCompile Include="engine\graphic\PSO\OffScreenRenderingPSO.cpp" />
-    <ClCompile Include="OutlineEffect.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\OutlineEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\OutlinePSO.cpp" />
-    <ClCompile Include="PostEffectBase.cpp" />
-    <ClCompile Include="PostEffectManager.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\PostEffectBase.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\PostEffectManager.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffectPSOBase.cpp" />
     <ClCompile Include="engine\graphic\PSO\SepiaPSO.cpp" />
-    <ClCompile Include="RadialBlurEffect.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\RadialBlurEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\RadialBlurPSO.cpp" />
-    <ClCompile Include="randomEffect.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\randomEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\randomPSO.cpp" />
-    <ClCompile Include="SepiaEffect.cpp" />
-    <ClCompile Include="SmoothingEffect.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\SepiaEffect.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\SmoothingEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\SmoothingPSO.cpp" />
-    <ClCompile Include="VignetteEffect.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\VignetteEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\VignettePSO.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DissolveEffect.h" />
+    <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
     <ClInclude Include="engine\graphic\PSO\DissolvePSO.h" />
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
     <ClInclude Include="engine\graphic\data\Node.h" />
@@ -250,28 +250,28 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\PSO\NormalBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\ScreenBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\SubtractBlendPSO.h" />
-    <ClInclude Include="GaussianBlurEffect.h" />
+    <ClInclude Include="engine\graphic\PostEffect\GaussianBlurEffect.h" />
     <ClInclude Include="engine\graphic\PSO\GaussianBlurPSO.h" />
-    <ClInclude Include="GrayScaleEffect.h" />
+    <ClInclude Include="engine\graphic\PostEffect\GrayScaleEffect.h" />
     <ClInclude Include="engine\graphic\PSO\GrayScalePSO.h" />
-    <ClInclude Include="NoneEffect.h" />
-    <ClInclude Include="NonePSO.h" />
-    <ClInclude Include="OffScreenRendering.h" />
+    <ClInclude Include="engine\graphic\PostEffect\NoneEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\NonePSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\OffScreenRendering.h" />
     <ClInclude Include="engine\graphic\PSO\OffScreenRenderingPSO.h" />
-    <ClInclude Include="OutlineEffect.h" />
+    <ClInclude Include="engine\graphic\PostEffect\OutlineEffect.h" />
     <ClInclude Include="engine\graphic\PSO\OutlinePSO.h" />
-    <ClInclude Include="PostEffectBase.h" />
-    <ClInclude Include="PostEffectManager.h" />
+    <ClInclude Include="engine\graphic\PostEffect\PostEffectBase.h" />
+    <ClInclude Include="engine\graphic\PostEffect\PostEffectManager.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffectPSOBase.h" />
     <ClInclude Include="engine\graphic\PSO\SepiaPSO.h" />
-    <ClInclude Include="RadialBlurEffect.h" />
+    <ClInclude Include="engine\graphic\PostEffect\RadialBlurEffect.h" />
     <ClInclude Include="engine\graphic\PSO\RadialBlurPSO.h" />
-    <ClInclude Include="randomEffect.h" />
+    <ClInclude Include="engine\graphic\PostEffect\randomEffect.h" />
     <ClInclude Include="engine\graphic\PSO\randomPSO.h" />
-    <ClInclude Include="SepiaEffect.h" />
-    <ClInclude Include="SmoothingEffect.h" />
+    <ClInclude Include="engine\graphic\PostEffect\SepiaEffect.h" />
+    <ClInclude Include="engine\graphic\PostEffect\SmoothingEffect.h" />
     <ClInclude Include="engine\graphic\PSO\SmoothingPSO.h" />
-    <ClInclude Include="VignetteEffect.h" />
+    <ClInclude Include="engine\graphic\PostEffect\VignetteEffect.h" />
     <ClInclude Include="engine\graphic\PSO\VignettePSO.h" />
   </ItemGroup>
   <ItemGroup>

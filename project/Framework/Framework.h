@@ -15,7 +15,7 @@
 #include"SceneManager.h"
 #include"ParticleCommon.h"
 #include"Input.h"
-#include"OffScreenRendering.h"
+#include"./PostEffect/OffScreenRendering.h"
 
 class OffScreenRenderingPSO;
 
