@@ -168,6 +168,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\SubtractBlendPSO.cpp" />
     <ClCompile Include="OffScreenRendering.cpp" />
     <ClCompile Include="engine\graphic\PSO\OffScreenRenderingPSO.cpp" />
+    <ClCompile Include="OutlineEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\OutlinePSO.cpp" />
     <ClCompile Include="PostEffectBase.cpp" />
     <ClCompile Include="PostEffectManager.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffectPSOBase.cpp" />
@@ -252,6 +254,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\PSO\GrayScalePSO.h" />
     <ClInclude Include="OffScreenRendering.h" />
     <ClInclude Include="engine\graphic\PSO\OffScreenRenderingPSO.h" />
+    <ClInclude Include="OutlineEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\OutlinePSO.h" />
     <ClInclude Include="PostEffectBase.h" />
     <ClInclude Include="PostEffectManager.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffectPSOBase.h" />
