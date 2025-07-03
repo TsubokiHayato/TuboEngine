@@ -185,6 +185,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\SmoothingPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\VignetteEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\VignettePSO.cpp" />
+    <ClCompile Include="SkyBox.cpp" />
+    <ClCompile Include="SkyBoxCommon.cpp" />
+    <ClCompile Include="SkyBoxPSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
@@ -273,6 +276,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\PSO\SmoothingPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\VignetteEffect.h" />
     <ClInclude Include="engine\graphic\PSO\VignettePSO.h" />
+    <ClInclude Include="SkyBox.h" />
+    <ClInclude Include="SkyBoxCommon.h" />
+    <ClInclude Include="SkyBoxPSO.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\imgui\imgui.vcxproj">
