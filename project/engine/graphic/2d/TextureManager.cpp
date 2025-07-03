@@ -5,8 +5,8 @@
 
 TextureManager* TextureManager::instance = nullptr;
 uint32_t TextureManager::kSRVIndexTop = 1;
-void TextureManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager) {
-	dxCommon_ = dxCommon;
+void TextureManager::Initialize(SrvManager* srvManager) {
+	
 	srvManager_ = srvManager;
 	textureDatas.reserve(SrvManager::kMaxSRVCount);
 	directoryPath_ = "Resources/Textures/";
@@ -56,7 +56,7 @@ void TextureManager::LoadTexture(const std::string& filePath) {
 
 	textureData.filePath = fullPath_;
 	textureData.metadata = mipImages.GetMetadata();
-	textureData.resource = dxCommon_->CreateTextureResource(textureData.metadata);
+	textureData.resource = DirectXCommon::GetInstance()->CreateTextureResource(textureData.metadata);
 
 	// テクスチャデータの要素番号をSRVのインデックスとする
 	textureData.srvIndex = srvManager_->Allocate();
@@ -82,12 +82,12 @@ void TextureManager::LoadTexture(const std::string& filePath) {
 
 
 	// SRVの生成
-	Microsoft::WRL::ComPtr<ID3D12Device> device = dxCommon_->GetDevice();
+	Microsoft::WRL::ComPtr<ID3D12Device> device = DirectXCommon::GetInstance()->GetDevice();
 	device->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = dxCommon_->UploadTextureData(textureData.resource, mipImages);
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = DirectXCommon::GetInstance()->UploadTextureData(textureData.resource, mipImages);
 
-	dxCommon_->CommandExecution();
+	DirectXCommon::GetInstance()->CommandExecution();
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& filePath) {

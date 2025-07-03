@@ -9,7 +9,7 @@
 void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 {
 	this->spriteCommon = spriteCommon;
-	this->dxCommon_ = this->spriteCommon->GetDxCommon();
+	
 	this->winApp_ =this->spriteCommon->GetWinApp();
 
 	textureFilePath_ = textureFilePath;
@@ -18,7 +18,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 
 #pragma region SpriteResource
 
-	vertexResource = dxCommon_->CreateBufferResource(sizeof(VertexData) * 6);
+	vertexResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * 6);
 
 	//頂点バッファビューを作成する
 
@@ -63,7 +63,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 	vertexData[3].normal = { 0.0f,0.0f,1.0f };
 
 
-	transformationMatrixResource = dxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
+	transformationMatrixResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	//データを書き込む
 	transformationMatrixData = nullptr;
 
@@ -80,7 +80,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 #pragma region indexResourceSprite
 
 	//WVP用のリソースを作る
-	indexResource = dxCommon_->CreateBufferResource(sizeof(uint32_t) * 6);
+	indexResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t) * 6);
 	indexBufferView.BufferLocation = indexResource->GetGPUVirtualAddress();
 
 	indexBufferView.SizeInBytes = sizeof(uint32_t) * 6;
@@ -101,7 +101,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 #pragma region Material_Resource_Sprite
 	//マテリアル用のリソースを作る。今回はColor1つ分のサイズを用意する
 	materialResource =
-		dxCommon_->CreateBufferResource(sizeof(Material));
+		DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
 	//マテリアルにデータを書き込む
 	//書き込むためのアドレスを取得
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
@@ -210,7 +210,7 @@ void Sprite::Update()
 
 
 
-	commandList = dxCommon_->GetCommandList();
+	commandList = DirectXCommon::GetInstance()->GetCommandList();
 
 
 

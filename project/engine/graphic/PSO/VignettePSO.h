@@ -5,7 +5,7 @@ class VignettePSO : public PostEffectPSOBase
 {
 public:
     // 初期化
-    void Initialize(DirectXCommon* dxCommon) override;
+    void Initialize() override;
 
     // グラフィックスパイプラインの作成
     void CreateGraphicPipeline();
