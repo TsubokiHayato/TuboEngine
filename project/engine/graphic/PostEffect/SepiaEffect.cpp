@@ -1,9 +1,9 @@
 #include "SepiaEffect.h"
 
 
-void SepiaEffect::Initialize(DirectXCommon* dxCommon) {
+void SepiaEffect::Initialize() {
     pso_ = std::make_unique<SepiaPSO>();
-    pso_->Initialize(dxCommon);
+    pso_->Initialize();
 }
 
 void SepiaEffect::Draw(ID3D12GraphicsCommandList* commandList) {

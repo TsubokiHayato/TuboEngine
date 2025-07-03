@@ -10,13 +10,13 @@ GaussianBlurEffect::~GaussianBlurEffect() {
     }
 }
 
-void GaussianBlurEffect::Initialize(DirectXCommon* dxCommon) {
+void GaussianBlurEffect::Initialize() {
     // PSO初期化
     pso_ = std::make_unique<GaussianBlurPSO>();
-    pso_->Initialize(dxCommon);
+    pso_->Initialize();
 
     // 定数バッファ作成
-    cbResource_ = dxCommon->CreateBufferResource(sizeof(GaussianParams));
+    cbResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(GaussianParams));
     cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&params_));
     // デフォルト値
 	params_->sigma = 1.0f;

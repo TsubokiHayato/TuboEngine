@@ -13,7 +13,7 @@ public:
     virtual ~PostEffectPSOBase() = default;
 
     // 初期化
-    virtual void Initialize(DirectXCommon* dxCommon);
+    virtual void Initialize();
 
     // グラフィックスパイプラインの作成
     virtual void CreateGraphicPipeline(
@@ -27,7 +27,7 @@ protected:
     // ルートシグネチャ作成（SRV1つ＋サンプラ1つのシンプルな例）
     virtual void CreateRootSignature();
 protected:
-    DirectXCommon* dxCommon_ = nullptr;
+   
     Microsoft::WRL::ComPtr<ID3D12Device> device_;
     Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList_ = nullptr;
 

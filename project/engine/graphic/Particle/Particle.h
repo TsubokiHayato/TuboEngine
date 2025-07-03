@@ -276,7 +276,7 @@ private:
 
 private:
 	ParticleCommon* particleCommon = nullptr; // パーティクル共通部分
-	DirectXCommon* dxCommon_ = nullptr; // DirectX共通部分
+
 	WinApp* winApp_ = nullptr; // ウィンドウズアプリケーション
 
 	ModelCommon* modelCommon_ = nullptr; // モデル共通部分

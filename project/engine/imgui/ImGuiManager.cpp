@@ -4,12 +4,12 @@
 #include "externals/imgui/imgui_impl_dx12.h"
 #include <cassert>
 
-void ImGuiManager::Initialize(WinApp* winApp, DirectXCommon* dxCommon)
+void ImGuiManager::Initialize(WinApp* winApp)
 {
 	//WindowsAppのポインタを受け取る
 	this->winApp_ = winApp;
 	//DirectXCommonのポインタを受け取る
-	this->dxCommon = dxCommon;
+	
 	//ImGuiのコンテキストを作成
 	ImGui::CreateContext();
 	//ImGuiのスタイルを設定
@@ -25,11 +25,11 @@ void ImGuiManager::Initialize(WinApp* winApp, DirectXCommon* dxCommon)
 	desc.NumDescriptors = 1;
 	desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	//descriptorHeapの生成
-	HRESULT result = dxCommon->GetDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&srvHeap));
+	HRESULT result = DirectXCommon::GetInstance()->GetDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&srvHeap));
 	assert(SUCCEEDED(result));
 
-	ImGui_ImplDX12_Init(dxCommon->GetDevice().Get(),
-		static_cast<int>(dxCommon->GetBackBufferCount()),
+	ImGui_ImplDX12_Init(DirectXCommon::GetInstance()->GetDevice().Get(),
+		static_cast<int>(DirectXCommon::GetInstance()->GetBackBufferCount()),
 		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
 		srvHeap.Get(),
 		srvHeap->GetCPUDescriptorHandleForHeapStart(),
@@ -62,7 +62,7 @@ void ImGuiManager::End()
 
 void ImGuiManager::Draw()
 {
-	Microsoft::WRL::ComPtr<	ID3D12GraphicsCommandList> commandList = dxCommon->GetCommandList();
+	Microsoft::WRL::ComPtr<	ID3D12GraphicsCommandList> commandList = DirectXCommon::GetInstance()->GetCommandList();
 
 	//ディスクリプタヒープの配列をセットするコマンド
 	ID3D12DescriptorHeap* ppHeaps[] = { srvHeap.Get() };	

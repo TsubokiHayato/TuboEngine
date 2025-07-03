@@ -21,8 +21,20 @@ class DirectXCommon
 {
 
 private:
+	// シングルトン用
+	DirectXCommon() = default;
+	~DirectXCommon() = default;
+	DirectXCommon(const DirectXCommon&) = delete;
+	DirectXCommon& operator=(const DirectXCommon&) = delete;
+	DirectXCommon(DirectXCommon&&) = delete;
+	DirectXCommon& operator=(DirectXCommon&&) = delete;
 
-
+public:
+	// インスタンス取得
+	static DirectXCommon* GetInstance() {
+		static DirectXCommon instance;
+		return &instance;
+	}
 public:
 
 	//初期化

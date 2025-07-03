@@ -17,11 +17,11 @@ void Framework::Initialize() {
 
 	//DirectX共通部分
 
-	dxCommon = std::make_unique<DirectXCommon>();
-	dxCommon->Initialize(winApp.get());
+	
+	DirectXCommon::GetInstance()->Initialize(winApp.get());
 
 	// リソースの有効性を確認
-	if (!dxCommon->GetDevice() || !dxCommon->GetCommandList()) {
+	if (!DirectXCommon::GetInstance()->GetDevice() || !DirectXCommon::GetInstance()->GetCommandList()) {
 		throw std::runtime_error("DirectXリソースの初期化に失敗しました。");
 	}
 
@@ -30,39 +30,39 @@ void Framework::Initialize() {
 	//ImGuiの初期化
 
 	imGuiManager = std::make_unique<ImGuiManager>();
-	imGuiManager->Initialize(winApp.get(), dxCommon.get());
+	imGuiManager->Initialize(winApp.get());
 
 #endif // DEBUG
 
 	srvManager = std::make_unique<SrvManager>();
-	srvManager->Initialize(dxCommon.get());
+	srvManager->Initialize();
 
 	//スプライト共通部分
 
 	spriteCommon = std::make_unique<SpriteCommon>();
-	spriteCommon->Initialize(winApp.get(), dxCommon.get());
+	spriteCommon->Initialize(winApp.get());
 
 
 
 	//オブジェクト3Dの共通部分
 	object3dCommon = std::make_unique<Object3dCommon>();
-	object3dCommon->Initialize(winApp.get(), dxCommon.get());
+	object3dCommon->Initialize(winApp.get());
 
 	//モデル共通部分
 	modelCommon = std::make_unique<ModelCommon>();
-	modelCommon->Initialize(dxCommon.get());
+	modelCommon->Initialize();
 
 	//パーティクル共通部分
 	particleCommon = std::make_unique<ParticleCommon>();
-	particleCommon->Initialize(winApp.get(), dxCommon.get(), srvManager.get());
+	particleCommon->Initialize(winApp.get() ,srvManager.get());
 
 	
 
 	//テクスチャマネージャーの初期化
-	TextureManager::GetInstance()->Initialize(dxCommon.get(), srvManager.get());
+	TextureManager::GetInstance()->Initialize(srvManager.get());
 
 	//モデルマネージャーの初期化
-	ModelManager::GetInstance()->initialize(dxCommon.get());
+	ModelManager::GetInstance()->initialize();
 
 	//オーディオ共通部
 	AudioCommon::GetInstance()->Initialize();
@@ -72,11 +72,11 @@ void Framework::Initialize() {
 
 //オフスクリーンレンダリングの初期化
 	offScreenRendering = std::make_unique<OffScreenRendering>();
-	offScreenRendering->Initialize(winApp.get(), dxCommon.get());
+	offScreenRendering->Initialize(winApp.get());
 
 	//シーンマネージャーの初期化
 	sceneManager = std::make_unique<SceneManager>();
-	sceneManager->Initialize(object3dCommon.get(), spriteCommon.get(), particleCommon.get(), winApp.get(), dxCommon.get());
+	sceneManager->Initialize(object3dCommon.get(), spriteCommon.get(), particleCommon.get(), winApp.get());
 
 
 }
@@ -110,10 +110,9 @@ void Framework::Finalize() {
 	//モデルマネージャーの終了
 	ModelManager::GetInstance()->Finalize();
 	//DirectX共通部分の削除
-	CloseHandle(dxCommon->GetFenceEvent());
+	CloseHandle(DirectXCommon::GetInstance()->GetFenceEvent());
 
-	//DirectX共通部分の終了
-	dxCommon.reset();
+	
 	//WindowsAppの削除
 	winApp->Finalize();
 	winApp.reset();
@@ -144,7 +143,7 @@ void Framework::Run() {
 
 void Framework::FrameworkSwapChainPreDraw() {
 	//描画前処理
-	dxCommon->PreDraw();
+	DirectXCommon::GetInstance()->PreDraw();
 
 }
 
@@ -156,7 +155,7 @@ void Framework::FrameworkSwapChainPostDraw() {
 
 	offScreenRendering->TransitionRenderTextureToRenderTarget();
 	//描画
-	dxCommon->PostDraw();
+	DirectXCommon::GetInstance()->PostDraw();
 }
 
 void Framework::ImguiPreDraw() {

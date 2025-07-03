@@ -3,6 +3,7 @@
 #include "VignettePSO.h"
 #include <wrl.h>
 #include <memory>
+#include "DirectXCommon.h"
 
 // Vignette用パラメータ
 struct VignetteParams
@@ -18,7 +19,7 @@ public:
     VignetteEffect();
     ~VignetteEffect();
 
-    void Initialize(DirectXCommon* dxCommon) override;
+    void Initialize() override;
     void Update() override;
     void DrawImGui() override;
     void Draw(ID3D12GraphicsCommandList* commandList) override;

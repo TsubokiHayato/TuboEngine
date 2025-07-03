@@ -1,8 +1,8 @@
 #include "GaussianBlurPSO.h"
 
-void GaussianBlurPSO::Initialize(DirectXCommon* dxCommon) {
+void GaussianBlurPSO::Initialize() {
 
-	PostEffectPSOBase::Initialize(dxCommon);
+	PostEffectPSOBase::Initialize();
 	CreateGraphicPipeline();
 }
 

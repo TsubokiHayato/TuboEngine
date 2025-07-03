@@ -1,11 +1,10 @@
 #include "NormalBlendPSO.h"
 
-void NormalBlendPSO::Initialize(DirectXCommon* dxCommon)
+void NormalBlendPSO::Initialize()
 {
-	assert(dxCommon);
-	dxCommon_ = dxCommon;
-	device = dxCommon_->GetDevice();
-	commandList = dxCommon_->GetCommandList();
+	
+	device = DirectXCommon::GetInstance()->GetDevice();
+	commandList = DirectXCommon::GetInstance()->GetCommandList();
 
 
 	//グラフィックスパイプラインの作成
@@ -110,18 +109,18 @@ void NormalBlendPSO::CreateRootSignature()
 
 
 
-	dxCommon_->hr = D3D12SerializeRootSignature(&descriptionRootSignature,
+	DirectXCommon::GetInstance()->hr = D3D12SerializeRootSignature(&descriptionRootSignature,
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 
-	if (FAILED(dxCommon_->hr)) {
+	if (FAILED(DirectXCommon::GetInstance()->hr)) {
 		Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 	//バイナリを元に作成
 
-	dxCommon_->hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
+	DirectXCommon::GetInstance()->hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
 		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
-	assert(SUCCEEDED(dxCommon_->hr));
+	assert(SUCCEEDED(DirectXCommon::GetInstance()->hr));
 
 
 }
@@ -188,11 +187,11 @@ void NormalBlendPSO::CreateGraphicPipeline()
 	-------------------*/
 
 	//Shaderをコンパイルする
-	vertexShaderBlob = dxCommon_->CompileShader(L"Resources/Shaders/Object3d.VS.hlsl",
+	vertexShaderBlob = DirectXCommon::GetInstance()->CompileShader(L"Resources/Shaders/Object3d.VS.hlsl",
 		L"vs_6_0");
 	assert(vertexShaderBlob != nullptr);
 
-	pixelShaderBlob = dxCommon_->CompileShader(L"Resources/Shaders/Object3d.PS.hlsl",
+	pixelShaderBlob = DirectXCommon::GetInstance()->CompileShader(L"Resources/Shaders/Object3d.PS.hlsl",
 		L"ps_6_0");
 	assert(pixelShaderBlob != nullptr);
 
@@ -243,9 +242,9 @@ void NormalBlendPSO::CreateGraphicPipeline()
 	graphicPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	//実際に生成
-	dxCommon_->hr = device->CreateGraphicsPipelineState(&graphicPipelineStateDesc,
+	DirectXCommon::GetInstance()->hr = device->CreateGraphicsPipelineState(&graphicPipelineStateDesc,
 		IID_PPV_ARGS(&graphicsPipeLineState));
-	assert(SUCCEEDED(dxCommon_->hr));
+	assert(SUCCEEDED(DirectXCommon::GetInstance()->hr));
 
 
 }

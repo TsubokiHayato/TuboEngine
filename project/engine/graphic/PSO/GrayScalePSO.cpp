@@ -1,8 +1,8 @@
 #include "GrayScalePSO.h"
 #include "DirectXCommon.h"
 
-void GrayScalePSO::Initialize(DirectXCommon* dxCommon) {
-    PostEffectPSOBase::Initialize(dxCommon);
+void GrayScalePSO::Initialize() {
+    PostEffectPSOBase::Initialize();
     CreateGraphicPipeline();
 }
 

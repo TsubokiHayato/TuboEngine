@@ -1,8 +1,8 @@
 #include "DissolvePSO.h"
 
-void DissolvePSO::Initialize(DirectXCommon* dxCommon) {
+void DissolvePSO::Initialize() {
 
-	PostEffectPSOBase::Initialize(dxCommon);
+	PostEffectPSOBase::Initialize();
 	CreateGraphicPipeline();
 }
 void DissolvePSO::CreateGraphicPipeline() {

@@ -1,8 +1,8 @@
 #include "SepiaPSO.h"
 
-void SepiaPSO::Initialize(DirectXCommon* dxCommon) {
+void SepiaPSO::Initialize() {
 
-	PostEffectPSOBase::Initialize(dxCommon);
+	PostEffectPSOBase::Initialize();
 	CreateGraphicPipeline();
 }
 
