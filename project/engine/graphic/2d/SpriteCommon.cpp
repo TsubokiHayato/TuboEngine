@@ -6,34 +6,34 @@
 #include"MultiplyBlendPSO.h"
 #include"SubtractBlendPSO.h"
 #include"ScreenBlendPSO.h"
-void SpriteCommon::Initialize(WinApp* winApp, DirectXCommon* dxCommon)
+void SpriteCommon::Initialize(WinApp* winApp)
 {
     winApp_ = winApp;
-    dxCommon_ = dxCommon;
+   
 
     /*---------------------------------------
         PSOの初期化
     ---------------------------------------*/
     pso = new PSO();
-    pso->Initialize(dxCommon_);
+    pso->Initialize();
     // NoneBlendPSOの初期化
     noneBlendPSO = new NoneBlendPSO();
-    noneBlendPSO->Initialize(dxCommon_);
+    noneBlendPSO->Initialize();
     // NormalBlendPSOの初期化
     normalBlendPSO = new NormalBlendPSO();
-    normalBlendPSO->Initialize(dxCommon_);
+    normalBlendPSO->Initialize();
     // AddBlendPSOの初期化
     addBlendPSO = new AddBlendPSO();
-    addBlendPSO->Initialize(dxCommon_);
+    addBlendPSO->Initialize();
     // MultiplyBlendPSOの初期化
     multiplyBlendPSO = new MultiplyBlendPSO();
-    multiplyBlendPSO->Initialize(dxCommon_);
+    multiplyBlendPSO->Initialize();
     // SubtractBlendPSOの初期化
     subtractBlendPSO = new SubtractBlendPSO();
-    subtractBlendPSO->Initialize(dxCommon_);
+    subtractBlendPSO->Initialize();
     // ScreenBlendPSOの初期化
     screenBlendPSO = new ScreenBlendPSO();
-    screenBlendPSO->Initialize(dxCommon_);
+    screenBlendPSO->Initialize();
 }
 
 void SpriteCommon::DrawSettingsCommon(int blendMode)

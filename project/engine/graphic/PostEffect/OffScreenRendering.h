@@ -25,7 +25,7 @@ public:
 	/// 初期化処理
 	/// 必要なリソースの生成や各種設定を行います。
 	/// </summary>
-	void Initialize(WinApp* winApp, DirectXCommon* dxCommon);
+	void Initialize(WinApp* winApp);
 
 	/// <summary>
 	/// 更新処理
@@ -78,8 +78,7 @@ private:
 	///-----------------------------------------------------------------------
 	///                             受取り用変数
 	///-----------------------------------------------------------------------
-	// DirectX共通部分へのポインタ
-	DirectXCommon* dxCommon_ = nullptr;
+	
 
 	// ウィンドウアプリケーションへのポインタ
 	WinApp* winApp_ = nullptr;

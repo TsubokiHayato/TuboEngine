@@ -1,8 +1,8 @@
 #include "GrayScaleEffect.h"
 
-void GrayScaleEffect::Initialize(DirectXCommon* dxCommon) {
+void GrayScaleEffect::Initialize() {
     pso_ = std::make_unique<GrayScalePSO>();
-    pso_->Initialize(dxCommon);
+    pso_->Initialize();
 }
 
 void GrayScaleEffect::Draw(ID3D12GraphicsCommandList* commandList) {

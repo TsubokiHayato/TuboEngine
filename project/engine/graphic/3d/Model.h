@@ -1,5 +1,5 @@
 #pragma once
-#include "DirectXcommon.h"
+
 #include "WinApp.h"
 
 #include "Material.h"
@@ -8,6 +8,7 @@
 #include "Transform.h"
 #include "TransformationMatrix.h"
 #include "VertexData.h"
+#include"DirectXCommon.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>

@@ -19,7 +19,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(WinApp* winApp, DirectXCommon* dxCommon);
+	void Initialize(WinApp* winApp);
 
 	/// <summary>
    /// 共通描画設定
@@ -37,12 +37,12 @@ public:
 	/*---------------------------------------------------
 			GETTER!
 	---------------------------------------------------*/
-	DirectXCommon* GetDxCommon()const { return dxCommon_; }
+	
 	WinApp* GetWinApp()const { return winApp_; }
 
 private:
 	WinApp* winApp_ = nullptr;
-	DirectXCommon* dxCommon_;
+	
 	PSO* pso = nullptr;
 	NoneBlendPSO* noneBlendPSO = nullptr;//NoneBlendPSO
 	NormalBlendPSO* normalBlendPSO = nullptr;//NormalBlendPSO

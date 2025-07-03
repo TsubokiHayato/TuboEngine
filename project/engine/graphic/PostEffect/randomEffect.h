@@ -18,7 +18,7 @@ public:
 
 	randomEffect();
 	~randomEffect();
-	void Initialize(DirectXCommon* dxCommon) override;
+	void Initialize() override;
 	void Update() override;
 	void DrawImGui() override;
 	void Draw(ID3D12GraphicsCommandList* commandList) override;

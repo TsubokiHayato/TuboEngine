@@ -9,14 +9,6 @@ public:
     /// 初期化
     /// </summary>
     /// <param name="dxCommon">DirectX共通部分</param>
-    void Initialize(DirectXCommon* dxCommon);
+    void Initialize();
 
-    /// <summary>
-    /// DirectX共通部分を取得する
-    /// </summary>
-    /// <returns>DirectXを返す</returns>
-    DirectXCommon* GetDxCommon() { return dxCommon_; }
-private:
-    // DirectX共通部分
-    DirectXCommon* dxCommon_ = nullptr;
 };

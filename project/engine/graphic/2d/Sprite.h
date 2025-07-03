@@ -80,7 +80,7 @@ public:
 
 private:
 	SpriteCommon* spriteCommon = nullptr;
-	DirectXCommon* dxCommon_ = nullptr;
+	
 	WinApp* winApp_ = nullptr;
 
 

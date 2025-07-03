@@ -9,7 +9,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="dxCommon">DirectX共通部分</param>
-	void Initialize(DirectXCommon* dxCommon);
+	void Initialize();
 
 	/// <summary>
 	/// SRVの割り当て
@@ -55,7 +55,7 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
 
 	void SetGraphicsRootDescriptorTable(uint32_t rootParameterIndex, uint32_t srvIndex) {
-		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(rootParameterIndex, GetGPUDescriptorHandle(srvIndex));
+		DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(rootParameterIndex, GetGPUDescriptorHandle(srvIndex));
 	}
 
 	//最大SRV数(最大テクスチャ枚数)
@@ -63,8 +63,7 @@ public:
 
 private:
 
-	//DirectX共通部分
-	DirectXCommon* dxCommon_ = nullptr;
+	
 
 
 

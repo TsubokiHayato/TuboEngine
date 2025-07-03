@@ -15,7 +15,6 @@
 void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileNamePath) {
 	// 引数で受け取ってメンバ変数に記録する
 	this->object3dCommon = object3dCommon;
-	this->dxCommon_ = object3dCommon->GetDxCommon();
 	this->winApp_ = object3dCommon->GetWinApp();
 	this->camera = object3dCommon->GetDefaultCamera();
 
@@ -24,7 +23,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileN
 #pragma region TransformMatrixResourced
 
 	// WVP用のリソースを作る
-	transformMatrixResource = this->dxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
+	transformMatrixResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	// データを書き込む
 	transformMatrixData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -37,7 +36,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileN
 
 #pragma region DirectionalLightData
 	// 平行光源用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	directionalLightResource = this->dxCommon_->CreateBufferResource(sizeof(DirectionalLight));
+	directionalLightResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(DirectionalLight));
 	// 平行光源用にデータを書き込む
 	directionalLightData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -53,7 +52,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileN
 #pragma region PointLight
 
 	// ポイントライト用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	pointLightResource = this->dxCommon_->CreateBufferResource(sizeof(PointLight));
+	pointLightResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(PointLight));
 	// 平行光源用にデータを書き込む
 	pointLightData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -68,7 +67,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileN
 #pragma region SpotLight
 
 	// スポットライト用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	spotLightResource = this->dxCommon_->CreateBufferResource(sizeof(SpotLight));
+	spotLightResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(SpotLight));
 	// 平行光源用にデータを書き込む
 	spotLightData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -86,7 +85,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileN
 
 #pragma region cameraWorldPos
 	// 平行光源用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	cameraForGPUResource = this->dxCommon_->CreateBufferResource(sizeof(CameraForGPU));
+	cameraForGPUResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGPU));
 	// 平行光源用にデータを書き込む
 	cameraForGPUData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -97,7 +96,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileN
 
 #pragma region LightType
 	// ライトの種類
-	lightTypeResource = this->dxCommon_->CreateBufferResource(sizeof(LightType));
+	lightTypeResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(LightType));
 	// 平行光源用にデータを書き込む
 	lightTypeData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -143,7 +142,7 @@ void Object3d::Update() {
 	transformMatrixData->WVP = model_->GetRootNodeLocalMatrix() * worldMatrix * Multiply(viewMatrix, projectionMatrix);
 	transformMatrixData->World = model_->GetRootNodeLocalMatrix() * worldMatrix;
 
-	commandList = dxCommon_->GetCommandList();
+	commandList = DirectXCommon::GetInstance()->GetCommandList();
 }
 
 void Object3d::Draw() {
