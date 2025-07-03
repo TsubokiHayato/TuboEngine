@@ -81,10 +81,6 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 
 	//WVP用のリソースを作る
 	indexResource = dxCommon_->CreateBufferResource(sizeof(uint32_t) * 6);
-
-
-
-
 	indexBufferView.BufferLocation = indexResource->GetGPUVirtualAddress();
 
 	indexBufferView.SizeInBytes = sizeof(uint32_t) * 6;
