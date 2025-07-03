@@ -1,8 +1,8 @@
 #include "OutlinePSO.h"
 #include "DirectXCommon.h"
 
-void OutlinePSO::Initialize(DirectXCommon* dxCommon) {
-    PostEffectPSOBase::Initialize(dxCommon);
+void OutlinePSO::Initialize() {
+    PostEffectPSOBase::Initialize();
     CreateGraphicPipeline();
 }
 

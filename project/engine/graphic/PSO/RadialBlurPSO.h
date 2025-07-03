@@ -3,7 +3,7 @@
 class RadialBlurPSO : public PostEffectPSOBase
 {
 public:
-	void Initialize(DirectXCommon* dxCommon) override;
+	void Initialize() override;
 	void CreateGraphicPipeline();
 	void CreateRootSignature() override;
 

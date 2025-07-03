@@ -4,14 +4,13 @@
 
 const uint32_t SrvManager::kMaxSRVCount = 1024;
 
-void SrvManager::Initialize(DirectXCommon* dxCommon)
+void SrvManager::Initialize()
 {
-	//DirectX共通部分の設定
-	this->dxCommon_ = dxCommon;
+	
 	//ディスクリプタヒープの生成
-	descriptorHeap = this->dxCommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
+	descriptorHeap = DirectXCommon::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
 	//ディスクリプタサイズの取得
-	descriptorSize = this->dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	descriptorSize = DirectXCommon::GetInstance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
 
@@ -41,7 +40,7 @@ void SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResou
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = mipLevels;
 	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-	dxCommon_->GetDevice()->CreateShaderResourceView(pResource, &srvDesc, handleCPU);
+	DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(pResource, &srvDesc, handleCPU);
 }
 
 ///=============================================================================
@@ -61,14 +60,14 @@ void SrvManager::CreateSRVForStructuredBuffer(uint32_t index, ID3D12Resource* pR
 	srvDesc.Buffer.FirstElement = 0;
 	srvDesc.Buffer.NumElements = elements;
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	dxCommon_->GetDevice()->CreateShaderResourceView(pResource, &srvDesc, GetCPUDescriptorHandle(index));
+	DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(pResource, &srvDesc, GetCPUDescriptorHandle(index));
 }
 void SrvManager::PreDraw()
 {
 	//ディスクリプタヒープのインデックスをリセット
 	ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap.Get() };
 	//SRV用のディスクリプタヒープを指定する
-	dxCommon_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
+	DirectXCommon::GetInstance()->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
 }
 
 

@@ -1,6 +1,7 @@
 #pragma once
 #include"PostEffectBase.h"
 #include"GaussianBlurPSO.h"
+#include"DirectXCommon.h"
 struct GaussianParams
 {
     float sigma;
@@ -13,7 +14,7 @@ public:
 	GaussianBlurEffect();
 	~GaussianBlurEffect();
 
-    void Initialize(DirectXCommon* dxCommon) override;
+    void Initialize() override;
     void Update() override;
     void DrawImGui() override;
     void Draw(ID3D12GraphicsCommandList* commandList) override;

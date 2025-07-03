@@ -11,12 +11,12 @@ randomEffect::~randomEffect() {
     }
 }
 
-void randomEffect::Initialize(DirectXCommon* dxCommon) {
+void randomEffect::Initialize() {
     // PSO初期化
     pso_ = std::make_unique<randomPSO>();
-    pso_->Initialize(dxCommon);
+    pso_->Initialize();
     // 定数バッファ作成
-    cbResource_ = dxCommon->CreateBufferResource(sizeof(RandomParams));
+    cbResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(RandomParams));
     cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&params_));
 
     // 乱数エンジンで値を生成（シードは時間ベースで初期化）
