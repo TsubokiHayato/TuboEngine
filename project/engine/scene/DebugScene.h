@@ -21,6 +21,9 @@
 #include"AudioCommon.h"
 #include"ImGuiManager.h"
 
+#include"SkyBox.h"
+#include"SkyBoxCommon.h"
+
 
 #undef min//minマクロを無効化
 #undef max//maxマクロを
@@ -119,7 +122,7 @@ private:
 	//Camera///
 
 	std::unique_ptr <Camera> camera = nullptr;
-	Vector3 cameraPosition = { 0.0f,0.0f,-15.0f };
+	Vector3 cameraPosition = { 0.0f,1.0f,-15.0f };
 	Vector3 cameraRotation = { 0.0f,0.0f,0.0f };
 	Vector3 cameraScale = { 1.0f,1.0f,1.0f };
 
@@ -134,6 +137,11 @@ private:
 	Vector4 pointLightColor = { 1.0f,1.0f,1.0f,1.0f };
 	float pointLightIntensity = 1.0f;
 
+
+
+	///SkyBox
+	std::unique_ptr<SkyBoxCommon> skyBoxCommon = nullptr;
+	std::unique_ptr<SkyBox> skyBox = nullptr;
 	
 };
 
