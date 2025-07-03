@@ -178,8 +178,7 @@ private:
 
 	//共通部分
 	Object3dCommon* object3dCommon = nullptr;
-	//DirectX共通部分
-	DirectXCommon* dxCommon_ = nullptr;
+	
 	//ウィンドウズアプリケーション
 	WinApp* winApp_ = nullptr;
 

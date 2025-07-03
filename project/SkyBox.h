@@ -31,7 +31,7 @@ public:
 private:
    
     SkyBoxCommon* skyBoxCommon = nullptr;
-    DirectXCommon* dxCommon_ = nullptr;
+   
     Camera* camera_ = nullptr;
     Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
 

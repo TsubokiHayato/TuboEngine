@@ -133,8 +133,7 @@ protected:
 
 	// 基盤システム
 	std::unique_ptr<WinApp> winApp = nullptr;
-	// DirectX共通部分
-	std::unique_ptr <DirectXCommon> dxCommon = nullptr;
+
 	// スプライト共通部分
 	std::unique_ptr <SpriteCommon> spriteCommon = nullptr;
 	// オブジェクト3Dの共通部分

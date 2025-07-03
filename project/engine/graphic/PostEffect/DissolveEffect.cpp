@@ -8,12 +8,12 @@ DissolveEffect::~DissolveEffect() {
 		params_ = nullptr;
 	}
 }
-void DissolveEffect::Initialize(DirectXCommon* dxCommon) {
+void DissolveEffect::Initialize() {
 	// PSO初期化
 	pso_ = std::make_unique<DissolvePSO>();
-	pso_->Initialize(dxCommon);
+	pso_->Initialize();
 	// 定数バッファ作成
-	cbResource_ = dxCommon->CreateBufferResource(sizeof(DissolveParams));
+	cbResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(DissolveParams));
 	cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&params_));
 	// デフォルト値
 	params_->dissolveThreshold = 0.5f;
@@ -26,9 +26,9 @@ void DissolveEffect::Initialize(DirectXCommon* dxCommon) {
 	// マスクテクスチャのリソース生成
 	DirectX::ScratchImage mipImages = DirectXCommon::LoadTexture(maskTextureFileName_);
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	maskTextureResource_ = dxCommon->CreateTextureResource(metadata);
+	maskTextureResource_ = DirectXCommon::GetInstance()->CreateTextureResource(metadata);
 	
-	maskTextureUploadResource_ = dxCommon->UploadTextureData(maskTextureResource_, mipImages);
+	maskTextureUploadResource_ = DirectXCommon::GetInstance()->UploadTextureData(maskTextureResource_, mipImages);
 
 
 
@@ -39,9 +39,9 @@ void DissolveEffect::Initialize(DirectXCommon* dxCommon) {
 	maskTextureSRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	maskTextureSRVDesc.Texture2D.MipLevels = 1;
 
-	dxCommon->GetDevice()->CreateShaderResourceView(
+	DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(
 		maskTextureResource_.Get(), &maskTextureSRVDesc,
-		dxCommon->GetSRVCPUDescriptorHandle(1)
+		DirectXCommon::GetInstance()->GetSRVCPUDescriptorHandle(1)
 	);
 
 }

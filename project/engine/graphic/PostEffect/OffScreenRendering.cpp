@@ -17,16 +17,16 @@
 /// オフスクリーンレンダリングの初期化処理
 /// 必要なリソースの生成やディスクリプタの設定、PSOの初期化を行います。
 /// </summary>
-void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
+void OffScreenRendering::Initialize(WinApp* winApp) {
 
 	// NULL検出
-	assert(dxCommon);
+
 	assert(winApp);
 	// メンバ変数に記録
-	dxCommon_ = dxCommon;
+	
 	winApp_ = winApp;
-	device = dxCommon_->GetDevice();
-	commandList = dxCommon_->GetCommandList();
+	device = DirectXCommon::GetInstance()->GetDevice();
+	commandList = DirectXCommon::GetInstance()->GetCommandList();
 
 	// RTVの作成
 	renderTextureResource_ = CreateRenderTargetResource(
@@ -36,7 +36,7 @@ void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 	renderTextureResource_->SetName(L"RenderTargetResource");
 
 	// オフスクリーン用（必要な数だけ。ここでは1つ）
-	offscreenRtvDescriptorHeap = dxCommon->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
+	offscreenRtvDescriptorHeap = DirectXCommon::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
 	// オフスクリーン用RTVディスクリプタの取得
 	offscreenRtvHandle = offscreenRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	device->CreateRenderTargetView(renderTextureResource_.Get(), nullptr, offscreenRtvHandle);
@@ -49,7 +49,7 @@ void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 	renderTextureSRVDesc.Texture2D.MipLevels = 1;
 
 	// SRVの生成
-	device->CreateShaderResourceView(renderTextureResource_.Get(), &renderTextureSRVDesc, dxCommon->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
+	device->CreateShaderResourceView(renderTextureResource_.Get(), &renderTextureSRVDesc, DirectXCommon::GetInstance()->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 
 	///---------------------------------------------------------------------
 	///					PostEffectManagerの初期化
@@ -69,7 +69,7 @@ void OffScreenRendering::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
 
 
 	// PostEffectManagerの初期化
-	postEffectManager.InitializeAll(dxCommon);
+	postEffectManager.InitializeAll();
 
 }
 
@@ -92,8 +92,8 @@ void OffScreenRendering::PreDraw() {
 	renderingBarrier.Transition.pResource = renderTextureResource_.Get();
 
 	// RTV/DSVの設定
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = dxCommon_->GetRTVCPUDescriptorHandle(0); // renderTextureResource用
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dxCommon_->GetDSVCPUDescriptorHandle(0);
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = DirectXCommon::GetInstance()->GetRTVCPUDescriptorHandle(0); // renderTextureResource用
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = DirectXCommon::GetInstance()->GetDSVCPUDescriptorHandle(0);
 	commandList->OMSetRenderTargets(1, &offscreenRtvHandle, FALSE, &dsvHandle);
 	// クリア
 	FLOAT clearColor[4] = { kRenderTargetClearValue.x, kRenderTargetClearValue.y, kRenderTargetClearValue.z, kRenderTargetClearValue.w };
@@ -101,10 +101,10 @@ void OffScreenRendering::PreDraw() {
 	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	//viewportの設定
-	D3D12_VIEWPORT viewport = dxCommon_->GetViewport();
+	D3D12_VIEWPORT viewport = DirectXCommon::GetInstance()->GetViewport();
 
 	// シザー矩形を一時変数に格納
-	D3D12_RECT scissorRect = dxCommon_->GetScissorRect();
+	D3D12_RECT scissorRect = DirectXCommon::GetInstance()->GetScissorRect();
 
 	// ビューポート/シザー設定
 	commandList->RSSetViewports(1, &viewport);
@@ -140,7 +140,7 @@ void OffScreenRendering::TransitionRenderTextureToRenderTarget() {
 void OffScreenRendering::Draw() {
 
 	// 4. SRV用ディスクリプタヒープをセット
-	ID3D12DescriptorHeap* descriptorHeaps[] = { dxCommon_->GetSrvDescriptorHeap().Get() };
+	ID3D12DescriptorHeap* descriptorHeaps[] = { DirectXCommon::GetInstance()->GetSrvDescriptorHeap().Get() };
 	commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
 	// 5. PSO・ルートシグネチャ設定
@@ -148,7 +148,7 @@ void OffScreenRendering::Draw() {
 
 	// 6. SRV（オフスクリーンテクスチャ）をルートパラメータにセット
 	// ※ルートシグネチャのSRVインデックスに合わせて変更（例: 0番なら0）
-	commandList->SetGraphicsRootDescriptorTable(0, dxCommon_->GetSRVGPUDescriptorHandle(0));
+	commandList->SetGraphicsRootDescriptorTable(0, DirectXCommon::GetInstance()->GetSRVGPUDescriptorHandle(0));
 
 
 	// 7. 全画面三角形を描画

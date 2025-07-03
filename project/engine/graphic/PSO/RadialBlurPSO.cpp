@@ -1,8 +1,8 @@
 #include "RadialBlurPSO.h"
 #include "DirectXCommon.h"
 
-void RadialBlurPSO::Initialize(DirectXCommon* dxCommon) {
-    PostEffectPSOBase::Initialize(dxCommon);
+void RadialBlurPSO::Initialize() {
+    PostEffectPSOBase::Initialize();
     CreateGraphicPipeline();
 }
 

@@ -17,7 +17,7 @@
 void Particle::Initialize(ParticleCommon* particleSetup, ParticleType particleType) {
 	// 引数からSetupを受け取る
 	this->particleCommon = particleSetup;
-	dxCommon_ = particleSetup->GetDxCommon();
+
 	winApp_ = particleSetup->GetWinApp();
 	// パーティクルのタイプを設定
 	this->particleType_ = particleType;
@@ -134,7 +134,7 @@ void Particle::Update() {
 /// 描画処理
 /// </summary>
 void Particle::Draw() {
-	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList().Get();
+	ID3D12GraphicsCommandList* commandList = DirectXCommon::GetInstance()->GetCommandList().Get();
 
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 
@@ -245,7 +245,7 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 	}
 
 	// インスタンシング用リソースの生成
-	newGroup.instancingResource = dxCommon_->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
+	newGroup.instancingResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
 
 	newGroup.instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&newGroup.instancingDataPtr));
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
@@ -388,7 +388,7 @@ void Particle::CreateVertexDataForOriginal() {
 /// </summary>
 void Particle::CreateVertexBufferView() {
 	// 頂点バッファの作成
-	vertexBuffer_ = dxCommon_->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
+	vertexBuffer_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
 
 	// 頂点バッファビューの作成
 	// リソースの先頭のアドレスから使う
@@ -404,7 +404,7 @@ void Particle::CreateVertexBufferView() {
 /// </summary>
 void Particle::CreateMaterialData() {
 	// マテリアル用のリソースを作成
-	materialBuffer_ = dxCommon_->CreateBufferResource(sizeof(Material));
+	materialBuffer_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
 
 	// 書き込むためのアドレスを取得
 	materialBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));

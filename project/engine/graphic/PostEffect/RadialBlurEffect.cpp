@@ -9,13 +9,13 @@ RadialBlurEffect::~RadialBlurEffect() {
     }
 }
 
-void RadialBlurEffect::Initialize(DirectXCommon* dxCommon) {
+void RadialBlurEffect::Initialize() {
     // PSO初期化
 	pso_ = std::make_unique<RadialBlurPSO>();
-	pso_->Initialize(dxCommon);
+	pso_->Initialize();
 
     // 定数バッファ作成
-    cbResource_ = dxCommon->CreateBufferResource(sizeof(RadialBlurParams));
+    cbResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(RadialBlurParams));
     cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&params_));
     // デフォルト値
 	

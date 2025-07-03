@@ -18,7 +18,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="dxCommon">DirectX共通部分</param>
-	void Initialize(DirectXCommon* dxCommon);
+	void Initialize();
 
 	/// <summary>
 	/// 共通描画設定
@@ -43,7 +43,7 @@ private:
 	/*-----------------
 		rootSignature
 	-----------------*/
-	DirectXCommon* dxCommon_=nullptr;
+
 
 	//RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};

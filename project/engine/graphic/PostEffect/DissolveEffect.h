@@ -2,6 +2,7 @@
 #include "PostEffectBase.h"
 #include"DissolvePSO.h"
 #include "Vector3.h"
+#include"DirectXCommon.h"
 
 struct DissolveParams
 {
@@ -16,7 +17,7 @@ class DissolveEffect : public PostEffectBase
 public:
 	DissolveEffect();
 	~DissolveEffect();
-	void Initialize(DirectXCommon* dxCommon) override;
+	void Initialize() override;
 	void Update() override;
 	void DrawImGui() override;
 	void Draw(ID3D12GraphicsCommandList* commandList) override;
