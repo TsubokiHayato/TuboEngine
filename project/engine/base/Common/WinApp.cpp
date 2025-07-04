@@ -24,10 +24,13 @@ LRESULT CALLBACK CallWindowProc(HWND hwnd, UINT msg,
 }
 
 
+WinApp* WinApp::instance = nullptr; // シングルトンインスタンス
 void WinApp::Finalize()
 {	
 	CloseWindow(hwnd);
 	CoUninitialize();
+	delete instance;
+	instance = nullptr;
 }
 
 void WinApp::Initialize()

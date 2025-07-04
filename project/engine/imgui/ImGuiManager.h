@@ -13,11 +13,14 @@ public:
 	/// シングルトンインスタンス取得
 	/// </summary>
 	static ImGuiManager* GetInstance() {
-		static ImGuiManager instance;
-		return &instance;
+		if (!instance) {
+			instance = new ImGuiManager();
+		}
+		return instance;
 	}
 private:
 	// コンストラクタ・デストラクタ・コピー禁止
+	static ImGuiManager* instance;
 	ImGuiManager() = default;
 	~ImGuiManager() = default;
 	ImGuiManager(const ImGuiManager&) = delete;
