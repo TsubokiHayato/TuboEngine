@@ -161,16 +161,6 @@ public:
 	float GetSpotLightDecay() { return spotLightData->decay; }
 	float GetSpotLightCosAngle() { return spotLightData->cosAngle; }
 
-
-
-
-
-
-
-
-
-
-
 private:
 
 	//-------------------------------------------------------------------
@@ -178,9 +168,6 @@ private:
 
 	//共通部分
 	Object3dCommon* object3dCommon = nullptr;
-	
-	//ウィンドウズアプリケーション
-	WinApp* winApp_ = nullptr;
 
 	//モデル共通部分
 	ModelCommon* modelCommon_ = nullptr;

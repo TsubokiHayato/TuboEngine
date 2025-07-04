@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 #include "Model.h"
-#include "ModelCommon.h"
+
 
 class ModelManager
 {
@@ -17,7 +17,7 @@ private:
 
 
 	std::map<std::string, std::unique_ptr<Model>> models;
-	ModelCommon* modelCommon = nullptr;
+	
 public:
 
 	//シングルトンインスタンスの取得

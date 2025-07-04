@@ -4,7 +4,7 @@
 #include"TitleScene.h"
 #include"StageScene.h"
 #include"ClearScene.h"
-void SceneManager::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp)
+void SceneManager::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon)
 {
 	//各共通部分のポインタを受け取る
 	this->object3dCommon = object3dCommon;
@@ -15,7 +15,7 @@ void SceneManager::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spri
 
 	//初期シーンを設定
 	currentScene = std::make_unique<DebugScene>();
-	currentScene->Initialize(this->object3dCommon,this->spriteCommon,this->particleCommon,this->winApp);
+	currentScene->Initialize(this->object3dCommon,this->spriteCommon,this->particleCommon);
 
 	//シーン番号を設定
 	currentSceneNo = 0;
@@ -46,25 +46,25 @@ void SceneManager::Update()
 		if (currentSceneNo == DEBUG) {
 			//デバッグシーンを設定
 			currentScene = std::make_unique<DebugScene>();
-			currentScene->Initialize(object3dCommon, spriteCommon,particleCommon, winApp);
+			currentScene->Initialize(object3dCommon, spriteCommon,particleCommon);
 		}
 		else if (currentSceneNo == TITLE) {
 			//タイトルシーンを設定
 			currentScene = std::make_unique<TitleScene>();
-			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp);
+			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon);
 		}
 		else if (currentSceneNo == STAGE) {
 			//ステージシーンを設定
 			currentScene = std::make_unique<StageScene>();
-			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp);
+			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon);
 		}
 		else if (currentSceneNo == CLEAR) {
 			//クリアシーンを設定
 			currentScene = std::make_unique<ClearScene>();
-			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp);
+			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon);
 		}
 		//初期化
-		currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp);
+		currentScene->Initialize(object3dCommon, spriteCommon, particleCommon);
 	}
 	//現在のシーンがnullptrでない場合
 	if (currentScene) {

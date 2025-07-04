@@ -1,13 +1,10 @@
 #include "ParticleCommon.h"
 #include"ParticlePSO.h"
-void ParticleCommon::Initialize(WinApp* winApp,SrvManager* srvManager)
+void ParticleCommon::Initialize(SrvManager* srvManager)
 {
 	//引数がnullptrでないかチェック
 	
-	assert(winApp);
-	// 引数で受け取ってメンバ変数に記録する
-	winApp_ = winApp;
-
+	
 	this->srvManager_ = srvManager;
 
 	// PSOの初期化
