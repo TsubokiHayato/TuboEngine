@@ -8,14 +8,10 @@
 #include"ScreenBlendPSO.h"
 
 
-void Object3dCommon::Initialize(WinApp* winApp) {
+void Object3dCommon::Initialize() {
 	// 引数がnullptrでないことを確認
 
-	assert(winApp);
-	// 引数で受け取ってメンバ変数に記録する
-	winApp_ = winApp;
-
-
+	
 	/*---------------------------------------
 		PSOの初期化
 	---------------------------------------*/

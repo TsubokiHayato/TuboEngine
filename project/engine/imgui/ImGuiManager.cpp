@@ -4,20 +4,17 @@
 #include "externals/imgui/imgui_impl_dx12.h"
 #include <cassert>
 
-void ImGuiManager::Initialize(WinApp* winApp)
+void ImGuiManager::Initialize()
 {
-	//WindowsAppのポインタを受け取る
-	this->winApp_ = winApp;
-	//DirectXCommonのポインタを受け取る
 	
 	//ImGuiのコンテキストを作成
 	ImGui::CreateContext();
 	//ImGuiのスタイルを設定
 	ImGui::StyleColorsDark();
 	// WinAppが正しく初期化されているか確認
-	assert(winApp->GetHWND() != nullptr);
+	assert(WinApp::GetInstance()->GetHWND() != nullptr);
 	//ImGuiのDirectX12の初期化
-	ImGui_ImplWin32_Init(winApp_->GetHWND());
+	ImGui_ImplWin32_Init(WinApp::GetInstance()->GetHWND());
 
 	//descriptorHeapの設定
 	D3D12_DESCRIPTOR_HEAP_DESC desc = {};

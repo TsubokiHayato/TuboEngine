@@ -6,11 +6,9 @@
 #include"MultiplyBlendPSO.h"
 #include"SubtractBlendPSO.h"
 #include"ScreenBlendPSO.h"
-void SpriteCommon::Initialize(WinApp* winApp)
+void SpriteCommon::Initialize()
 {
-    winApp_ = winApp;
-   
-
+ 
     /*---------------------------------------
         PSOの初期化
     ---------------------------------------*/

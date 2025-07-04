@@ -1,6 +1,4 @@
 #pragma once
-#include"WinApp.h"
-#include"DirectXcommon.h"
 #include<memory>
 class PSO;//前方宣言
 class NoneBlendPSO;
@@ -19,7 +17,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(WinApp* winApp);
+	void Initialize();
 
 	/// <summary>
    /// 共通描画設定
@@ -34,15 +32,9 @@ public:
    /// 5: ScreenBlendPSO
    /// </remarks>
 	void DrawSettingsCommon(int blendMode);
-	/*---------------------------------------------------
-			GETTER!
-	---------------------------------------------------*/
 	
-	WinApp* GetWinApp()const { return winApp_; }
-
 private:
-	WinApp* winApp_ = nullptr;
-	
+
 	PSO* pso = nullptr;
 	NoneBlendPSO* noneBlendPSO = nullptr;//NoneBlendPSO
 	NormalBlendPSO* normalBlendPSO = nullptr;//NormalBlendPSO

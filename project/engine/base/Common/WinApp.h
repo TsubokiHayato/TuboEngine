@@ -3,42 +3,82 @@
 #include<cstdint>
 #include<windows.h>
 
-
-
-
+//! アプリケーションウィンドウ管理クラス（シングルトン）
 class WinApp
 {
+public:
+    // シングルトンインスタンス取得
+    static WinApp* GetInstance() {
+        static WinApp instance;
+        return &instance;
+    }
+
+private:
+    // コンストラクタ（外部から生成不可）
+    WinApp() = default;
+    // デストラクタ
+    ~WinApp() = default;
+    // コピーコンストラクタ禁止
+    WinApp(const WinApp&) = delete;
+    // 代入演算子禁止
+    WinApp& operator=(const WinApp&) = delete;
+
 
 public:
+    // 終了処理
+    void Finalize();
 
-	void Finalize();
+    // 初期化処理
+    void Initialize();
 
-	void Initialize();
-	void Update();
+    // ウィンドウハンドル取得
+    HWND GetHWND() const { return hwnd; }
 
-	HWND GetHWND() const { return hwnd; }
-	HINSTANCE GetHInstance() const { return wc.hInstance; }
-	MSG GetMSG()const { return msg; }
+    // インスタンスハンドル取得
+    HINSTANCE GetHInstance() const { return wc.hInstance; }
 
-	static const int32_t kClientWidth = 1280;
-	static const int32_t kClientHeight = 720;
+    // メッセージ構造体取得
+    MSG GetMSG()const { return msg; }
 
-	bool ProcessMessage();
+   
+    // メッセージ処理
+    bool ProcessMessage();
 
-	//static LRESULT CALLBACK CallWindowProc(HWND hwnd, UINT msg,
-	//	WPARAM wparam, LPARAM lparam);
+
+public:
+	///------------------------------------------------
+    /// Getter関数
+	///------------------------------------------------
+	// クライアント領域のサイズ取得
+	RECT GetClientRect() const {
+		return wrc;
+	}
+	// クライアント領域の幅取得
+	int32_t GetClientWidth() const {
+		return kClientWidth;
+	}
+	// クライアント領域の高さ取得
+	int32_t GetClientHeight() const {
+		return kClientHeight;
+	}
+
+
 private:
+    // クライアント領域のサイズ（ウィンドウサイズを表す構造体）
+    RECT wrc;
 
-	//クライアント領域のサイズ
+    // ウィンドウハンドル
+    HWND hwnd = nullptr;
 
-	//ウィンドウサイズを表す構造体にクライアント領域を入れる
-	RECT wrc;
+    // ウィンドウクラス情報
+    WNDCLASS wc{};
 
-	//ウィンドウの生成
-	HWND hwnd = nullptr;
-
-	WNDCLASS wc{};
-	MSG msg{};
+    // メッセージ構造体
+    MSG msg{};
+    
+    // クライアント領域の幅
+    static const int32_t kClientWidth = 1280;
+    // クライアント領域の高さ
+    static const int32_t kClientHeight = 720;
 
 };
-
