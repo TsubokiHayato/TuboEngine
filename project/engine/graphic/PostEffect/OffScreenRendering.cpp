@@ -13,6 +13,10 @@
 #include"DissolveEffect.h"
 #include"randomEffect.h"
 
+
+OffScreenRendering* OffScreenRendering::instance = nullptr;
+
+
 /// <summary>
 /// オフスクリーンレンダリングの初期化処理
 /// 必要なリソースの生成やディスクリプタの設定、PSOの初期化を行います。
@@ -170,6 +174,12 @@ void OffScreenRendering::DrawImGui() {
 
 	ImGui::End();
 
+}
+
+void OffScreenRendering::Finalize() {
+
+	delete instance;
+	instance = nullptr;
 }
 
 /// <summary>

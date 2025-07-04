@@ -7,13 +7,18 @@
 class WinApp
 {
 public:
+
+  
     // シングルトンインスタンス取得
     static WinApp* GetInstance() {
-        static WinApp instance;
-        return &instance;
-    }
+		if (!instance) {
+			instance = new WinApp();
+		}
+		return instance;
+	}
 
 private:
+	static WinApp* instance; // シングルトンインスタンス
     // コンストラクタ（外部から生成不可）
     WinApp() = default;
     // デストラクタ

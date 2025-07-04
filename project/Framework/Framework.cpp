@@ -6,12 +6,12 @@
 
 
 void Framework::Initialize() {
-	
+
 	WinApp::GetInstance()->Initialize();
 
 	//DirectX共通部分
 
-	
+
 	DirectXCommon::GetInstance()->Initialize();
 
 	// リソースの有効性を確認
@@ -23,7 +23,7 @@ void Framework::Initialize() {
 
 	//ImGuiの初期化
 
-	
+
 	ImGuiManager::GetInstance()->Initialize();
 
 #endif // DEBUG
@@ -35,11 +35,11 @@ void Framework::Initialize() {
 	//オブジェクト3Dの共通部分
 	Object3dCommon::GetInstance()->Initialize();
 
-	
+
 	//パーティクル共通部分
 	ParticleCommon::GetInstance()->Initialize();
 
-	
+
 
 	//テクスチャマネージャーの初期化
 	TextureManager::GetInstance()->Initialize();
@@ -53,11 +53,11 @@ void Framework::Initialize() {
 	//入力初期化
 	Input::GetInstance()->Initialize();
 
-//オフスクリーンレンダリングの初期化
+	//オフスクリーンレンダリングの初期化
 	OffScreenRendering::GetInstance()->Initialize();
 
 	//シーンマネージャーの初期化
-	SceneManager::GetInstance()->Initialize(); 
+	SceneManager::GetInstance()->Initialize();
 
 }
 void Framework::Update() {
@@ -82,9 +82,14 @@ void Framework::Finalize() {
 	TextureManager::GetInstance()->Finalize();
 	ModelManager::GetInstance()->Finalize();
 	CloseHandle(DirectXCommon::GetInstance()->GetFenceEvent());
-	WinApp::GetInstance()->Finalize();
+
+	OffScreenRendering::GetInstance()->Finalize();
+	SrvManager::GetInstance()->Finalize();
+	SceneManager::GetInstance()->Finalize();
 
 	AudioCommon::GetInstance()->Finalize();
+	DirectXCommon::GetInstance()->Finalize();
+	WinApp::GetInstance()->Finalize();
 }
 
 
@@ -167,7 +172,7 @@ void Framework::FrameWorkRenderTargetPreDraw() {
 
 	//ImGuiの受付開始
 	OffScreenRendering::GetInstance()->PreDraw();
-	
+
 	SrvManager::GetInstance()->PreDraw();
 }
 
