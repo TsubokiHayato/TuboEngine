@@ -4,11 +4,11 @@
 #include"ModelManager.h"
 #include"TextureManager.h"
 #include"BlendMode.h"
-void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp) {
+void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon) {
 
 	this->object3dCommon = object3dCommon;
 	this->spriteCommon = spriteCommon;
-	this->winApp = winApp;
+	
 
 	//テクスチャマネージャに追加する画像ハンドル
 	std::string uvCheckerTextureHandle = "uvChecker.png";
@@ -124,7 +124,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 
 	skyBoxCommon = std::make_unique<SkyBoxCommon>();
-	skyBoxCommon->Initialize(winApp);
+	skyBoxCommon->Initialize();
 
 	skyBox = std::make_unique<SkyBox>();
 	skyBox->Initialize(skyBoxCommon.get(), testDDSTextureHandle);

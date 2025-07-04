@@ -15,7 +15,7 @@ public:
 	/// <param name="particleCommon">パーティクル共通部分</param>
 	/// <param name="winApp">ウィンドウアプリケーション</param>
 	/// <param name="dxCommon">DirectX共通部分</param>
-	void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp);
+	void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon);
 
 	/// <summary>
 	/// 更新
@@ -51,8 +51,6 @@ private:
 	Object3dCommon* object3dCommon;
 	SpriteCommon* spriteCommon;
 	ParticleCommon* particleCommon;
-	WinApp* winApp;
-	
 
 private:
 	std::unique_ptr <Particle> particle;

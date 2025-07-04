@@ -142,7 +142,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\GrayScalePSO.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\graphic\3d\Model.cpp" />
-    <ClCompile Include="engine\graphic\3d\ModelCommon.cpp" />
     <ClCompile Include="engine\graphic\3d\ModelManager.cpp" />
     <ClCompile Include="engine\graphic\3d\Object3d.cpp" />
     <ClCompile Include="engine\graphic\3d\Object3dCommon.cpp" />
@@ -210,7 +209,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\math\Matrix3x3.h" />
     <ClInclude Include="engine\math\Matrix4x4.h" />
     <ClInclude Include="engine\graphic\3d\Model.h" />
-    <ClInclude Include="engine\graphic\3d\ModelCommon.h" />
     <ClInclude Include="engine\graphic\data\ModelData.h" />
     <ClInclude Include="engine\graphic\3d\ModelManager.h" />
     <ClInclude Include="engine\math\MT_Matrix.h" />
