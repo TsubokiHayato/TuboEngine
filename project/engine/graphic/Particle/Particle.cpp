@@ -14,9 +14,7 @@
 /// 初期化処理
 /// </summary>
 /// <param name="particleSetup">パーティクル共通部分</param>
-void Particle::Initialize(ParticleCommon* particleSetup, ParticleType particleType) {
-	// 引数からSetupを受け取る
-	this->particleCommon = particleSetup;
+void Particle::Initialize( ParticleType particleType) {
 
 	// パーティクルのタイプを設定
 	this->particleType_ = particleType;
@@ -148,10 +146,10 @@ void Particle::Draw() {
 		commandList->SetGraphicsRootConstantBufferView(0, materialBuffer_->GetGPUVirtualAddress());
 
 		// テクスチャのSRVのDescriptorTableを設定
-		commandList->SetGraphicsRootDescriptorTable(2, particleCommon->GetSrvManager()->GetGPUDescriptorHandle(group.second.srvIndex));
+		commandList->SetGraphicsRootDescriptorTable(2, ParticleCommon::GetInstance()->GetSrvManager()->GetGPUDescriptorHandle(group.second.srvIndex));
 
 		// インスタンシングデータのSRVのDescriptorTableを設定
-		commandList->SetGraphicsRootDescriptorTable(1, particleCommon->GetSrvManager()->GetGPUDescriptorHandle(group.second.instancingSrvIndex));
+		commandList->SetGraphicsRootDescriptorTable(1, ParticleCommon::GetInstance()->GetSrvManager()->GetGPUDescriptorHandle(group.second.instancingSrvIndex));
 
 		// Draw Call (インスタンシング描画)
 		commandList->DrawInstanced((UINT)modelData_.vertices.size(), group.second.instanceCount, 0, 0);
@@ -253,9 +251,9 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 	}
 
 	// インスタンシング用SRVを確保してSRVインデックスを記録
-	newGroup.instancingSrvIndex = particleCommon->GetSrvManager()->Allocate() + 1;
+	newGroup.instancingSrvIndex = ParticleCommon::GetInstance()->GetSrvManager()->Allocate() + 1;
 	// 作成したSRVをインスタンシング用リソースに設定
-	particleCommon->GetSrvManager()->CreateSRVForStructuredBuffer(newGroup.instancingSrvIndex, newGroup.instancingResource.Get(), kNumMaxInstance, sizeof(ParticleForGPU));
+	ParticleCommon::GetInstance()->GetSrvManager()->CreateSRVForStructuredBuffer(newGroup.instancingSrvIndex, newGroup.instancingResource.Get(), kNumMaxInstance, sizeof(ParticleForGPU));
 
 	// パーティクルグループをリストに追加
 	particleGroups.emplace(name, newGroup);

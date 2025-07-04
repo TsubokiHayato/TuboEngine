@@ -75,7 +75,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="object3dCommon"></param>
-	void Initialize(Object3dCommon* object3dCommon, std::string modelFileNamePath);
+	void Initialize(std::string modelFileNamePath);
 
 	/// <summary>
 	/// 更新処理
@@ -165,9 +165,6 @@ private:
 
 	//-------------------------------------------------------------------
 	//		メンバ変数
-
-	//共通部分
-	Object3dCommon* object3dCommon = nullptr;
 
 	//モデル共通部分
 	ModelCommon* modelCommon_ = nullptr;

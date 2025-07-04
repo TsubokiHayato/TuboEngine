@@ -20,7 +20,7 @@ public:
 	/// <param name="spriteCommon">スプライトの共通情報を保持するポインタ。</param>
 	/// /// <param name="dxCommon">WinAppを保持するポインタ。</param>
 	/// <param name="dxCommon">DirectXの共通情報を保持するポインタ。</param>
-	void Initialize(SpriteCommon* spriteCommon,std::string textureFilePath);
+	void Initialize(std::string textureFilePath);
 
 	/// <summary>
 	///　更新処理
@@ -79,7 +79,6 @@ public:
 	void AdjustTextureSize();
 
 private:
-	SpriteCommon* spriteCommon = nullptr;
 	
 	//バッファリソース
 	Microsoft::WRL::ComPtr <ID3D12Resource> vertexResource;

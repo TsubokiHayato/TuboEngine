@@ -11,10 +11,10 @@
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 
-void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileNamePath) {
+void Object3d::Initialize(std::string modelFileNamePath) {
 	// 引数で受け取ってメンバ変数に記録する
-	this->object3dCommon = object3dCommon;
-	this->camera = object3dCommon->GetDefaultCamera();
+	
+	this->camera = Object3dCommon::GetInstance()->GetDefaultCamera();
 
 	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
 

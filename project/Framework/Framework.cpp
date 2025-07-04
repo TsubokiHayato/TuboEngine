@@ -37,20 +37,14 @@ void Framework::Initialize() {
 	srvManager->Initialize();
 
 	//スプライト共通部分
-
-	spriteCommon = std::make_unique<SpriteCommon>();
-	spriteCommon->Initialize();
-
-
+	SpriteCommon::GetInstance()->Initialize();
 
 	//オブジェクト3Dの共通部分
-	object3dCommon = std::make_unique<Object3dCommon>();
-	object3dCommon->Initialize();
+	Object3dCommon::GetInstance()->Initialize();
 
 	
 	//パーティクル共通部分
-	particleCommon = std::make_unique<ParticleCommon>();
-	particleCommon->Initialize(srvManager.get());
+	ParticleCommon::GetInstance()->Initialize(srvManager.get());
 
 	
 
@@ -72,7 +66,7 @@ void Framework::Initialize() {
 
 	//シーンマネージャーの初期化
 	sceneManager = std::make_unique<SceneManager>();
-	sceneManager->Initialize(object3dCommon.get(), spriteCommon.get(), particleCommon.get());
+	sceneManager->Initialize();
 
 
 }
@@ -205,8 +199,7 @@ void Framework::FrameWorkRenderTargetPreDraw() {
 
 void Framework::Object3dCommonDraw() {
 	//オブジェクト3Dの描画
-	object3dCommon->DrawSettingsCommon(objectBlendModeNum);
-
+	Object3dCommon::GetInstance()->DrawSettingsCommon(objectBlendModeNum);
 	//3Dオブジェクトの描画
 	sceneManager->Object3DDraw();
 
@@ -215,13 +208,13 @@ void Framework::Object3dCommonDraw() {
 
 void Framework::SpriteCommonDraw() {
 	//スプライトの描画
-	spriteCommon->DrawSettingsCommon(spriteBlendModeNum);
+	SpriteCommon::GetInstance()->DrawSettingsCommon(spriteBlendModeNum);
 	sceneManager->SpriteDraw();
 }
 
 void Framework::ParticleCommonDraw() {
 	//パーティクルの描画
-	particleCommon->DrawSettingsCommon();
+	ParticleCommon::GetInstance()->DrawSettingsCommon();
 	sceneManager->ParticleDraw();
 }
 

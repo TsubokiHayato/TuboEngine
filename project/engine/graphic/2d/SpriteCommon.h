@@ -9,6 +9,23 @@ class SubtractBlendPSO;
 class ScreenBlendPSO;
 class SpriteCommon
 {
+
+public:
+	/// <summary>
+	/// シングルトンインスタンス取得
+	/// </summary>
+	static SpriteCommon* GetInstance() {
+		static SpriteCommon instance;
+		return &instance;
+	}
+
+private:
+	// コンストラクタ・デストラクタ・コピー禁止
+	SpriteCommon() = default;
+	~SpriteCommon() = default;
+	SpriteCommon(const SpriteCommon&) = delete;
+	SpriteCommon& operator=(const SpriteCommon&) = delete;
+
 public:
 	/*------------------------------------------------------------
 			関数

@@ -1,15 +1,7 @@
 #include "ClearScene.h"
 
-void ClearScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon)
+void ClearScene::Initialize()
 {
-	//引数の受け取り
-	object3dCommon;
-	spriteCommon;
-	particleCommon;
-	
-
-
-
 }
 
 void ClearScene::Update()

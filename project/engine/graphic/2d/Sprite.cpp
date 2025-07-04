@@ -6,9 +6,8 @@
 #include "externals/imgui/imgui_impl_win32.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 
-void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
+void Sprite::Initialize(std::string textureFilePath)
 {
-	this->spriteCommon = spriteCommon;
 	
 	
 	textureFilePath_ = textureFilePath;

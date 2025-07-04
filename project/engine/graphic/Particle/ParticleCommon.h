@@ -10,6 +10,22 @@ class ParticleCommon
 
 public:
 	/// <summary>
+	/// シングルトンインスタンス取得
+	/// </summary>
+	static ParticleCommon* GetInstance() {
+		static ParticleCommon instance;
+		return &instance;
+	}
+
+private:
+	// コンストラクタ・デストラクタ・コピー禁止
+	ParticleCommon() = default;
+	~ParticleCommon() = default;
+	ParticleCommon(const ParticleCommon&) = delete;
+	ParticleCommon& operator=(const ParticleCommon&) = delete;
+
+public:
+	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <param name="dxCommon">DirectX共通部分</param>
