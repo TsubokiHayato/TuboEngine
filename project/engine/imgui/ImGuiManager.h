@@ -10,6 +10,21 @@ class ImGuiManager
 {
 public:
 	/// <summary>
+	/// シングルトンインスタンス取得
+	/// </summary>
+	static ImGuiManager* GetInstance() {
+		static ImGuiManager instance;
+		return &instance;
+	}
+private:
+	// コンストラクタ・デストラクタ・コピー禁止
+	ImGuiManager() = default;
+	~ImGuiManager() = default;
+	ImGuiManager(const ImGuiManager&) = delete;
+	ImGuiManager& operator=(const ImGuiManager&) = delete;
+
+public:
+	/// <summary>
 	/// 初期化
 	/// </summary>
 	void Initialize();

@@ -44,7 +44,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize( SrvManager* srvManager);
+	void Initialize();
 
 	void LoadTexture(const std::string& filePath);
 
@@ -71,9 +71,6 @@ public:
 
 private:
 	
-	//SRVマネージャー
-	SrvManager* srvManager_;
-
 	std::string directoryPath_;//ディレクトリパス
 	std::string filePath_;//ファイルパス
 

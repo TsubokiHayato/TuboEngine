@@ -9,11 +9,6 @@ void Framework::Initialize() {
 	
 	WinApp::GetInstance()->Initialize();
 
-#ifdef DEBUG
-	//リークチェッカー
-	D3DResourceLeakChecker leakChecker;
-#endif // _DEBUG
-
 	//DirectX共通部分
 
 	
@@ -28,14 +23,12 @@ void Framework::Initialize() {
 
 	//ImGuiの初期化
 
-	imGuiManager = std::make_unique<ImGuiManager>();
-	imGuiManager->Initialize();
+	
+	ImGuiManager::GetInstance()->Initialize();
 
 #endif // DEBUG
-
-	srvManager = std::make_unique<SrvManager>();
-	srvManager->Initialize();
-
+	//SRVマネージャーの初期化
+	SrvManager::GetInstance()->Initialize();
 	//スプライト共通部分
 	SpriteCommon::GetInstance()->Initialize();
 
@@ -44,12 +37,12 @@ void Framework::Initialize() {
 
 	
 	//パーティクル共通部分
-	ParticleCommon::GetInstance()->Initialize(srvManager.get());
+	ParticleCommon::GetInstance()->Initialize();
 
 	
 
 	//テクスチャマネージャーの初期化
-	TextureManager::GetInstance()->Initialize(srvManager.get());
+	TextureManager::GetInstance()->Initialize();
 
 	//モデルマネージャーの初期化
 	ModelManager::GetInstance()->initialize();
@@ -61,13 +54,10 @@ void Framework::Initialize() {
 	Input::GetInstance()->Initialize();
 
 //オフスクリーンレンダリングの初期化
-	offScreenRendering = std::make_unique<OffScreenRendering>();
-	offScreenRendering->Initialize();
+	OffScreenRendering::GetInstance()->Initialize();
 
 	//シーンマネージャーの初期化
-	sceneManager = std::make_unique<SceneManager>();
-	sceneManager->Initialize();
-
+	SceneManager::GetInstance()->Initialize(); 
 
 }
 void Framework::Update() {
@@ -78,36 +68,25 @@ void Framework::Update() {
 	//入力の更新
 	Input::GetInstance()->Update();
 	//シーンマネージャーの更新
-	sceneManager->Update();
+	SceneManager::GetInstance()->Update();
 	//オフスクリーンレンダリングの更新
-	offScreenRendering->Update();
-
+	OffScreenRendering::GetInstance()->Update();
 
 }
-
 void Framework::Finalize() {
-
-	//ImGuiManagerの終了
 #ifdef _DEBUG
-	imGuiManager->Finalize();
+	ImGuiManager::GetInstance()->Finalize();
 #endif // DEBUG
-	AudioCommon::GetInstance()->Finalize();
 
 	Input::GetInstance()->Finalize();
-
-	//テクスチャマネージャの終了
 	TextureManager::GetInstance()->Finalize();
-	//モデルマネージャーの終了
 	ModelManager::GetInstance()->Finalize();
-	//DirectX共通部分の削除
 	CloseHandle(DirectXCommon::GetInstance()->GetFenceEvent());
-
-	
-	//WindowsAppの削除
 	WinApp::GetInstance()->Finalize();
-	
 
+	AudioCommon::GetInstance()->Finalize();
 }
+
 
 
 void Framework::Run() {
@@ -140,10 +119,10 @@ void Framework::FrameworkSwapChainPreDraw() {
 void Framework::FrameworkSwapChainPostDraw() {
 #ifdef _DEBUG
 	//ImGuiの描画
-	imGuiManager->Draw();
+	ImGuiManager::GetInstance()->Draw();
 #endif // _DEBUG
 
-	offScreenRendering->TransitionRenderTextureToRenderTarget();
+	OffScreenRendering::GetInstance()->TransitionRenderTextureToRenderTarget();
 	//描画
 	DirectXCommon::GetInstance()->PostDraw();
 }
@@ -151,11 +130,11 @@ void Framework::FrameworkSwapChainPostDraw() {
 void Framework::ImguiPreDraw() {
 #ifdef _DEBUG
 	//ImGuiの受付開始
-	imGuiManager->Begin();
+	ImGuiManager::GetInstance()->Begin();
 
-	sceneManager->ImGuiDraw();
+	SceneManager::GetInstance()->ImGuiDraw();
 
-	offScreenRendering->DrawImGui();
+	OffScreenRendering::GetInstance()->DrawImGui();
 #endif // _DEBUG
 
 }
@@ -179,7 +158,7 @@ void Framework::ImguiPostDraw() {
 
 
 
-	imGuiManager->End();
+	ImGuiManager::GetInstance()->End();
 #endif // _DEBUG
 
 }
@@ -187,11 +166,9 @@ void Framework::ImguiPostDraw() {
 void Framework::FrameWorkRenderTargetPreDraw() {
 
 	//ImGuiの受付開始
-	offScreenRendering->PreDraw();
-
-
-	srvManager->PreDraw();
-
+	OffScreenRendering::GetInstance()->PreDraw();
+	
+	SrvManager::GetInstance()->PreDraw();
 }
 
 
@@ -201,7 +178,7 @@ void Framework::Object3dCommonDraw() {
 	//オブジェクト3Dの描画
 	Object3dCommon::GetInstance()->DrawSettingsCommon(objectBlendModeNum);
 	//3Dオブジェクトの描画
-	sceneManager->Object3DDraw();
+	SceneManager::GetInstance()->Object3DDraw();
 
 
 }
@@ -209,21 +186,19 @@ void Framework::Object3dCommonDraw() {
 void Framework::SpriteCommonDraw() {
 	//スプライトの描画
 	SpriteCommon::GetInstance()->DrawSettingsCommon(spriteBlendModeNum);
-	sceneManager->SpriteDraw();
+	SceneManager::GetInstance()->SpriteDraw();
 }
 
 void Framework::ParticleCommonDraw() {
 	//パーティクルの描画
 	ParticleCommon::GetInstance()->DrawSettingsCommon();
-	sceneManager->ParticleDraw();
+	SceneManager::GetInstance()->ParticleDraw();
 }
 
 void Framework::OffScreenRenderingDraw() {
-
-	
-	offScreenRendering->TransitionRenderTextureToShaderResource();
+	OffScreenRendering::GetInstance()->TransitionRenderTextureToShaderResource();
 
 	//オフスクリーンレンダリングの描画
-	offScreenRendering->Draw();
+	OffScreenRendering::GetInstance()->Draw();
 }
 

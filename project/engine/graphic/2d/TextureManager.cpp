@@ -5,9 +5,9 @@
 
 TextureManager* TextureManager::instance = nullptr;
 uint32_t TextureManager::kSRVIndexTop = 1;
-void TextureManager::Initialize(SrvManager* srvManager) {
+void TextureManager::Initialize() {
 	
-	srvManager_ = srvManager;
+	
 	textureDatas.reserve(SrvManager::kMaxSRVCount);
 	directoryPath_ = "Resources/Textures/";
 }
@@ -59,9 +59,9 @@ void TextureManager::LoadTexture(const std::string& filePath) {
 	textureData.resource = DirectXCommon::GetInstance()->CreateTextureResource(textureData.metadata);
 
 	// テクスチャデータの要素番号をSRVのインデックスとする
-	textureData.srvIndex = srvManager_->Allocate();
-	textureData.srvHandleCPU = srvManager_->GetCPUDescriptorHandle(textureData.srvIndex);
-	textureData.srvHandleGPU = srvManager_->GetGPUDescriptorHandle(textureData.srvIndex);
+	textureData.srvIndex = SrvManager::GetInstance()->Allocate();
+	textureData.srvHandleCPU = SrvManager::GetInstance()->GetCPUDescriptorHandle(textureData.srvIndex);
+	textureData.srvHandleGPU = SrvManager::GetInstance()->GetGPUDescriptorHandle(textureData.srvIndex);
 
 	// SRVの設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};

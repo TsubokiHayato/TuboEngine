@@ -29,7 +29,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="dxCommon">DirectX共通部分</param>
-	void Initialize(SrvManager* srvManager);
+	void Initialize();
 
 	/// <summary>
 	/// 共通描画設定
@@ -41,13 +41,10 @@ public:
 	void SetDefaultCamera(Camera* camera) { defaultCamera = camera; }
 	Camera* GetDefaultCamera()const { return defaultCamera; }
 
-	SrvManager* GetSrvManager() const { return srvManager_; }
 private:
 
 	ParticlePSO* pso = nullptr;//PSO
 	Camera* defaultCamera = nullptr;//デフォルトカメラ
-
-	SrvManager* srvManager_ = nullptr;//SRV共通部分
 
 };
 

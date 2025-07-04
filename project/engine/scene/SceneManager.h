@@ -3,6 +3,22 @@
 #include"IScene.h"
 class SceneManager
 {
+public:
+	/// <summary>
+	/// シングルトンインスタンス取得
+	/// </summary>
+	static SceneManager* GetInstance() {
+		static SceneManager instance;
+		return &instance;
+	}
+
+private:
+	// コンストラクタ・デストラクタ・コピー禁止
+	SceneManager() = default;
+	~SceneManager() = default;
+	SceneManager(const SceneManager&) = delete;
+	SceneManager& operator=(const SceneManager&) = delete;
+
 
 public:
 	//初期化

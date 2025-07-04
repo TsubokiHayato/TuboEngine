@@ -131,15 +131,5 @@ protected:
 	int spriteBlendModeNum = 0; // スプライトのブレンドモード
 
 	// 基盤システム
-	
-	
-	std::unique_ptr <SrvManager> srvManager = nullptr;
-#ifdef _DEBUG
-	std::unique_ptr<ImGuiManager> imGuiManager = nullptr;
-#endif // _DEBUG
 
-	std::unique_ptr<SceneManager> sceneManager = nullptr;
-	
-	// オフスクリーンレンダリング
-	std::unique_ptr<OffScreenRendering> offScreenRendering = nullptr;
 };

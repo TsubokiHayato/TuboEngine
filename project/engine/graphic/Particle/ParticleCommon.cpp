@@ -1,12 +1,8 @@
 #include "ParticleCommon.h"
 #include"ParticlePSO.h"
-void ParticleCommon::Initialize(SrvManager* srvManager)
+void ParticleCommon::Initialize()
 {
-	//引数がnullptrでないかチェック
 	
-	
-	this->srvManager_ = srvManager;
-
 	// PSOの初期化
 	pso = new ParticlePSO();
 	pso->Initialize();
