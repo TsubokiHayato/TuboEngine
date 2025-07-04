@@ -26,7 +26,7 @@ uint32_t SrvManager::Allocate()
 	//上で記録した番号を返す
 	return index;
 }
-void SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT format, UINT mipLevels) {
+void SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> pResource, DXGI_FORMAT format, UINT mipLevels) {
 	//========================================
 	// ディスクリプタハンドルの取得
 	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -40,12 +40,12 @@ void SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResou
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = mipLevels;
 	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-	DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(pResource, &srvDesc, handleCPU);
+	DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(pResource.Get(), &srvDesc, handleCPU);
 }
 
 ///=============================================================================
 ///						SRV生成(構造化バッファ用)
-void SrvManager::CreateSRVForStructuredBuffer(uint32_t index, ID3D12Resource* pResource, UINT elements, UINT structureByteStride) {
+void SrvManager::CreateSRVForStructuredBuffer(uint32_t index, Microsoft::WRL::ComPtr<ID3D12Resource> pResource, UINT elements, UINT structureByteStride) {
 	//========================================
 	// ディスクリプタハンドルの取得
 	//D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();
@@ -60,7 +60,7 @@ void SrvManager::CreateSRVForStructuredBuffer(uint32_t index, ID3D12Resource* pR
 	srvDesc.Buffer.FirstElement = 0;
 	srvDesc.Buffer.NumElements = elements;
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(pResource, &srvDesc, GetCPUDescriptorHandle(index));
+	DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(pResource.Get(), &srvDesc, GetCPUDescriptorHandle(index));
 }
 void SrvManager::PreDraw()
 {

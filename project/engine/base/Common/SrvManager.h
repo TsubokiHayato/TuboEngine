@@ -3,6 +3,20 @@
 
 class SrvManager
 {
+public:
+	/// <summary>
+	/// シングルトンインスタンス取得
+	/// </summary>
+	static SrvManager* GetInstance() {
+		static SrvManager instance;
+		return &instance;
+	}
+private:
+	// コンストラクタ・デストラクタ・コピー禁止
+	SrvManager() = default;
+	~SrvManager() = default;
+	SrvManager(const SrvManager&) = delete;
+	SrvManager& operator=(const SrvManager&) = delete;
 
 public:
 	/// <summary>
@@ -24,7 +38,7 @@ public:
 	/// <param name="pResource">リソース</param>
 	/// <param name="format">フォーマット</param>
 	/// <param name="MipLevels">ミップマップレベル</param>
-	void CreateSRVforTexture2D(uint32_t index, ID3D12Resource* pResource, DXGI_FORMAT format, UINT MipLevels);
+	void CreateSRVforTexture2D(uint32_t index, Microsoft::WRL::ComPtr<ID3D12Resource> pResource, DXGI_FORMAT format, UINT MipLevels);
 
 	/// <summary>
 	/// ディスクリプタヒープのCPUハンドルを取得
@@ -33,7 +47,7 @@ public:
 	/// <param name="pResource">リソース</param>
 	/// <param name="numElements">要素数</param>
 	/// <param name="strideInBytes">バイト数</param>
-	void CreateSRVForStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT enelemtQuantity, UINT structureByteStride);
+	void CreateSRVForStructuredBuffer(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> pResource, UINT enelemtQuantity, UINT structureByteStride);
 	/// <summary>
 	/// 描画前処理
 	/// </summary>
