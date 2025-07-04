@@ -17,6 +17,22 @@ class VignettePSO;
 class OffScreenRendering
 {
 public:
+	/// <summary>
+	/// シングルトンインスタンス取得
+	/// </summary>
+	static OffScreenRendering* GetInstance() {
+		static OffScreenRendering instance;
+		return &instance;
+	}
+
+private:
+	// コンストラクタ・デストラクタ・コピー禁止
+	OffScreenRendering() = default;
+	~OffScreenRendering() = default;
+	OffScreenRendering(const OffScreenRendering&) = delete;
+	OffScreenRendering& operator=(const OffScreenRendering&) = delete;
+
+public:
 	///------------------------------------------------------------------------
 	///                             メンバ関数
 	///------------------------------------------------------------------------
@@ -75,7 +91,7 @@ public:
 	);
 
 private:
-	
+
 	///-----------------------------------------------------------------------
 	///                             メンバ変数
 	///-----------------------------------------------------------------------
@@ -111,13 +127,13 @@ private:
 
 	// オフスクリーン用PSOクラス
 	OffScreenRenderingPSO* offScreenRenderingPSO = nullptr;
-	
+
 	// ヴィネット用PSOクラス
 	VignettePSO* vignettePSO = nullptr;
 	///-----------------------------------------------------------------------
 	///                             リソース
 	///------------------------------------------------------------------------
-	
+
 	Microsoft::WRL::ComPtr <ID3D12Resource> vignetteResource;
 	//VignetteParams* vignetteData = nullptr;
 
