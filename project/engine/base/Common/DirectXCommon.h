@@ -38,7 +38,7 @@ public:
 public:
 
 	//初期化
-	void Initialize(WinApp* winApp);
+	void Initialize();
 
 	//デバイスの初期化
 	void Device_Initialize();
@@ -229,9 +229,6 @@ private:
 
 
 
-
-
-	std::unique_ptr<WinApp> winApp = nullptr;
 
 	//DXGIファクトリーの設置
 	Microsoft::WRL::ComPtr <IDXGIFactory7> dxgiFactory = nullptr;

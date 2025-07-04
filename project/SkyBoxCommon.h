@@ -18,20 +18,14 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(WinApp* winApp);
+	void Initialize();
 
 	/// <summary>
     /// 共通描画設定
     /// </summary>
 	void DrawSettingsCommon();
-	/*---------------------------------------------------
-			GETTER!
-	---------------------------------------------------*/
-
-	WinApp* GetWinApp()const { return winApp_; }
-
+	
 private:
-	WinApp* winApp_ = nullptr;
 	SkyBoxPSO* pso = nullptr;
 };
 

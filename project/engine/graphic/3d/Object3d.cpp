@@ -2,7 +2,6 @@
 #include "Camera.h"
 #include "MT_Matrix.h"
 #include "Model.h"
-#include "ModelCommon.h"
 #include "ModelManager.h"
 #include "Object3dCommon.h"
 #include "TextureManager.h"
@@ -15,7 +14,6 @@
 void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileNamePath) {
 	// 引数で受け取ってメンバ変数に記録する
 	this->object3dCommon = object3dCommon;
-	this->winApp_ = object3dCommon->GetWinApp();
 	this->camera = object3dCommon->GetDefaultCamera();
 
 	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
@@ -128,7 +126,7 @@ void Object3d::Update() {
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera->GetScale(), camera->GetRotation(), camera->GetTranslate());
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(winApp_->kClientWidth) / float(winApp_->kClientHeight), 0.1f, 100.0f);
+	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(WinApp::GetInstance()->GetClientWidth()) / float(WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
 	if (camera) {

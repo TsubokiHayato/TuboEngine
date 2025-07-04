@@ -81,9 +81,6 @@ public:
 private:
 	SpriteCommon* spriteCommon = nullptr;
 	
-	WinApp* winApp_ = nullptr;
-
-
 	//バッファリソース
 	Microsoft::WRL::ComPtr <ID3D12Resource> vertexResource;
 	Microsoft::WRL::ComPtr <ID3D12Resource> indexResource;

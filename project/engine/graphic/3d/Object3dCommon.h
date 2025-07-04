@@ -1,5 +1,4 @@
 #pragma once
-#include"WinApp.h"
 class PSO;
 class NoneBlendPSO;
 class NormalBlendPSO;
@@ -16,7 +15,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(WinApp* winApp);
+	void Initialize();
 
 	/// <summary>
    /// 共通描画設定
@@ -36,8 +35,6 @@ public:
 			GETTER & SETTER
 	---------------------------------------------------*/
 	
-	WinApp* GetWinApp()const { return winApp_; }
-
 	void SetDefaultCamera(Camera* camera) { defaultCamera = camera; }
 	Camera* GetDefaultCamera()const { return defaultCamera; }
 
@@ -46,7 +43,7 @@ public:
 private:
 	
 	
-	WinApp* winApp_ = nullptr;//ウィンドウズアプリケーション
+	
 	PSO* pso = nullptr;//PSO
 	NoneBlendPSO* noneBlendPSO = nullptr;//NoneBlendPSO
 	NormalBlendPSO* normalBlendPSO = nullptr;//NormalBlendPSO

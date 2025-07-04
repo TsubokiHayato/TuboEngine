@@ -18,7 +18,6 @@ void Particle::Initialize(ParticleCommon* particleSetup, ParticleType particleTy
 	// 引数からSetupを受け取る
 	this->particleCommon = particleSetup;
 
-	winApp_ = particleSetup->GetWinApp();
 	// パーティクルのタイプを設定
 	this->particleType_ = particleType;
 
@@ -64,7 +63,7 @@ void Particle::Update() {
 	// ビュー行列の取得
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 	// プロジェクション行列の取得
-	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(winApp_->kClientWidth) / float(winApp_->kClientHeight), 0.1f, 100.0f);
+	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(WinApp::GetInstance()->GetClientWidth()) / float(WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
 	// ビュープロジェクション行列の取得
 	Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 

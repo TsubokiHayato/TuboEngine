@@ -12,7 +12,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(WinApp* winApp);
+	void Initialize();
 
 	/// <summary>
 	/// ImGuiの解放
@@ -35,8 +35,7 @@ public:
 	void Draw();
 
 private:
-	//WindowsAppのポインタ
-	WinApp* winApp_;
+	
 	
 	//SRVディスクリプタヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;

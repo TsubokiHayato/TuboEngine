@@ -1,9 +1,7 @@
 #include "skyBoxCommon.h"
 #include"SkyBoxPSO.h"
-void SkyBoxCommon::Initialize(WinApp* winApp) {
-    winApp_ = winApp;
-   
-
+void SkyBoxCommon::Initialize() {
+  
     /*---------------------------------------
         PSOの初期化
     ---------------------------------------*/

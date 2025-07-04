@@ -11,12 +11,8 @@
 
 using namespace Microsoft::WRL;
 
-void DirectXCommon::Initialize(WinApp* winApp) {
-	//NULL検出
-	assert(winApp);
-	//メンバ変数に記録
-	this->winApp = std::make_unique<WinApp>(*winApp);
-
+void DirectXCommon::Initialize() {
+	
 	//FPS固定初期化
 	InitializeFixFPS();
 
@@ -27,7 +23,7 @@ void DirectXCommon::Initialize(WinApp* winApp) {
 	//スワップチェーンの生成
 	SwapChain_Create();
 	//深度バッファの生成
-	DepthBuffer_Create(winApp->kClientWidth, winApp->kClientHeight);
+	DepthBuffer_Create(WinApp::GetInstance()->GetClientWidth(), WinApp::GetInstance()->GetClientHeight());
 	//各種ディスクリプタヒープの生成
 	DescriptorHeap_Create();
 	//レンダーターゲットビューの初期化
@@ -204,8 +200,8 @@ void DirectXCommon::SwapChain_Create() {
 
 	//スワップチェーンを生成する
 
-	swapChainDesc.Width = winApp->kClientWidth;//画面の幅。ウィンドウのいクライアント領域を同じものにしておく
-	swapChainDesc.Height = winApp->kClientHeight;//画面の高さ。ウィンドウのいクライアント領域を同じものにしておく
+	swapChainDesc.Width = WinApp::GetInstance()->GetClientWidth();//画面の幅。ウィンドウのいクライアント領域を同じものにしておく
+	swapChainDesc.Height = WinApp::GetInstance()->GetClientHeight();//画面の高さ。ウィンドウのいクライアント領域を同じものにしておく
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;//色の形式
 	swapChainDesc.SampleDesc.Count = 1;//マルチサンプルしない
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;//描画のターゲットとして利用する
@@ -213,7 +209,7 @@ void DirectXCommon::SwapChain_Create() {
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;//モニタにうつしたら、中身を破棄
 
 	//コマンドキュー、ウィンドウハンドル、せっていを渡して生成する
-	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), winApp->GetHWND(), &swapChainDesc,
+	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), WinApp::GetInstance()->GetHWND(), &swapChainDesc,
 		nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));
 
 
@@ -382,8 +378,8 @@ void DirectXCommon::Viewport_Initialize() {
 
 
 	//クライアント領域の領域のサイズと一緒にして画面全体に表示
-	viewport.Width = (float)winApp->kClientWidth;
-	viewport.Height = (float)winApp->kClientHeight;
+	viewport.Width = (float)WinApp::GetInstance()->GetClientWidth();
+	viewport.Height = (float)WinApp::GetInstance()->GetClientHeight();
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 	viewport.MinDepth = 0.0f;
@@ -397,9 +393,9 @@ void DirectXCommon::Scissor_Initialize() {
 
 	//基本的にビューポートと同じ矩形が構成されるようにする
 	scissorRect.left = 0;
-	scissorRect.right = winApp->kClientWidth;
+	scissorRect.right = WinApp::GetInstance()->GetClientWidth();
 	scissorRect.top = 0;
-	scissorRect.bottom = winApp->kClientHeight;
+	scissorRect.bottom = WinApp::GetInstance()->GetClientHeight();
 }
 
 void DirectXCommon::dxcCompiler_Create() {

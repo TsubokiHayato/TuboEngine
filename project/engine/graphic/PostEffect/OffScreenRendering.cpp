@@ -17,20 +17,18 @@
 /// オフスクリーンレンダリングの初期化処理
 /// 必要なリソースの生成やディスクリプタの設定、PSOの初期化を行います。
 /// </summary>
-void OffScreenRendering::Initialize(WinApp* winApp) {
+void OffScreenRendering::Initialize() {
 
-	// NULL検出
-
-	assert(winApp);
+	
 	// メンバ変数に記録
 	
-	winApp_ = winApp;
+
 	device = DirectXCommon::GetInstance()->GetDevice();
 	commandList = DirectXCommon::GetInstance()->GetCommandList();
 
 	// RTVの作成
 	renderTextureResource_ = CreateRenderTargetResource(
-		device, winApp->kClientWidth, winApp->kClientHeight,
+		device, WinApp::GetInstance()->GetClientWidth(), WinApp::GetInstance()->GetClientHeight(),
 		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, kRenderTargetClearValue
 	);
 	renderTextureResource_->SetName(L"RenderTargetResource");

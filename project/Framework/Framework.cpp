@@ -6,9 +6,8 @@
 
 
 void Framework::Initialize() {
-	//ウィンドウズアプリケーション
-	winApp = std::make_unique<WinApp>();
-	winApp->Initialize();
+	
+	WinApp::GetInstance()->Initialize();
 
 #ifdef DEBUG
 	//リークチェッカー
@@ -18,7 +17,7 @@ void Framework::Initialize() {
 	//DirectX共通部分
 
 	
-	DirectXCommon::GetInstance()->Initialize(winApp.get());
+	DirectXCommon::GetInstance()->Initialize();
 
 	// リソースの有効性を確認
 	if (!DirectXCommon::GetInstance()->GetDevice() || !DirectXCommon::GetInstance()->GetCommandList()) {
@@ -30,7 +29,7 @@ void Framework::Initialize() {
 	//ImGuiの初期化
 
 	imGuiManager = std::make_unique<ImGuiManager>();
-	imGuiManager->Initialize(winApp.get());
+	imGuiManager->Initialize();
 
 #endif // DEBUG
 
@@ -40,21 +39,18 @@ void Framework::Initialize() {
 	//スプライト共通部分
 
 	spriteCommon = std::make_unique<SpriteCommon>();
-	spriteCommon->Initialize(winApp.get());
+	spriteCommon->Initialize();
 
 
 
 	//オブジェクト3Dの共通部分
 	object3dCommon = std::make_unique<Object3dCommon>();
-	object3dCommon->Initialize(winApp.get());
+	object3dCommon->Initialize();
 
-	//モデル共通部分
-	modelCommon = std::make_unique<ModelCommon>();
-	modelCommon->Initialize();
-
+	
 	//パーティクル共通部分
 	particleCommon = std::make_unique<ParticleCommon>();
-	particleCommon->Initialize(winApp.get() ,srvManager.get());
+	particleCommon->Initialize(srvManager.get());
 
 	
 
@@ -68,21 +64,21 @@ void Framework::Initialize() {
 	AudioCommon::GetInstance()->Initialize();
 
 	//入力初期化
-	Input::GetInstance()->Initialize(winApp.get());
+	Input::GetInstance()->Initialize();
 
 //オフスクリーンレンダリングの初期化
 	offScreenRendering = std::make_unique<OffScreenRendering>();
-	offScreenRendering->Initialize(winApp.get());
+	offScreenRendering->Initialize();
 
 	//シーンマネージャーの初期化
 	sceneManager = std::make_unique<SceneManager>();
-	sceneManager->Initialize(object3dCommon.get(), spriteCommon.get(), particleCommon.get(), winApp.get());
+	sceneManager->Initialize(object3dCommon.get(), spriteCommon.get(), particleCommon.get());
 
 
 }
 void Framework::Update() {
 	//メッセージ処理
-	if (winApp->ProcessMessage()) {
+	if (WinApp::GetInstance()->ProcessMessage()) {
 		endRequest = true;
 	}
 	//入力の更新
@@ -114,8 +110,8 @@ void Framework::Finalize() {
 
 	
 	//WindowsAppの削除
-	winApp->Finalize();
-	winApp.reset();
+	WinApp::GetInstance()->Finalize();
+	
 
 }
 

@@ -2,10 +2,9 @@
 #include"TextureManager.h"
 #include"ImGuiManager.h"
 #include"numbers"
-void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp) {
+void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon) {
 	//各共通部分のポインタを受け取る
 	this->particleCommon = particleCommon;
-	this->winApp = winApp;
 	this->object3dCommon = object3dCommon;
 	this->spriteCommon = spriteCommon;
 
