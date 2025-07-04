@@ -6,7 +6,7 @@ class SceneManager
 
 public:
 	//初期化
-	void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon,ParticleCommon*particleCommon );
+	void Initialize();
 	//更新
 	void Update();
 	//終了処理
@@ -19,18 +19,6 @@ public:
 	void ImGuiDraw();
 
 	void ParticleDraw();
-
-private:
-	
-	//オブジェクト3D共通部
-	Object3dCommon* object3dCommon;
-	//スプライト共通部
-	SpriteCommon* spriteCommon;
-	//パーティクル共通部
-	ParticleCommon* particleCommon;
-	//ウィンドウズアプリケーション
-	WinApp* winApp;
-	
 
 private:
 

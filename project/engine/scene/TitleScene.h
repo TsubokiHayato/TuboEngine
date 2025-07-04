@@ -10,12 +10,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	/// <param name="object3dCommon">3Dオブジェクト共通部分</param>
-	/// <param name="spriteCommon">スプライト共通部分</param>
-	/// <param name="particleCommon">パーティクル共通部分</param>
-	/// <param name="winApp">ウィンドウアプリケーション</param>
-	/// <param name="dxCommon">DirectX共通部分</param>
-	void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon);
+	void Initialize();
 
 	/// <summary>
 	/// 更新
@@ -46,11 +41,6 @@ public:
 	/// パーティクル描画
 	/// </summary>
 	void ParticleDraw()override;
-
-private:
-	Object3dCommon* object3dCommon;
-	SpriteCommon* spriteCommon;
-	ParticleCommon* particleCommon;
 
 private:
 	std::unique_ptr <Particle> particle;
