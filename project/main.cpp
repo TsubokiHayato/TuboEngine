@@ -4,8 +4,8 @@
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
-#ifdef _DEBUG
-    D3DResourceLeakChecker leakChecker; // ここで宣言
+#ifdef DEBUG
+    D3DResourceLeakChecker leakChecker;
 #endif
 
     //フレームワークのインスタンスを生成
