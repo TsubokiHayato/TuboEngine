@@ -10,7 +10,7 @@
 
 
 using namespace Microsoft::WRL;
-
+DirectXCommon* DirectXCommon::instance = nullptr; // シングルトンインスタンス
 void DirectXCommon::Initialize() {
 	
 	//FPS固定初期化
@@ -39,6 +39,11 @@ void DirectXCommon::Initialize() {
 	//DXCコンパイラの生成
 	dxcCompiler_Create();
 
+}
+
+void DirectXCommon::Finalize() {
+	delete instance;
+	instance = nullptr;
 }
 
 
