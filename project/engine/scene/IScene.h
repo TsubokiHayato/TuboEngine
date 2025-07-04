@@ -17,7 +17,7 @@ protected:
 public:
 
 	//初期化
-	virtual void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon,ParticleCommon* particleCommon) = 0;
+	virtual void Initialize() = 0;
 	//更新
 	virtual void Update() = 0;
 	//終了処理

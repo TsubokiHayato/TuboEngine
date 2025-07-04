@@ -78,7 +78,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="particleCommon">パーティクル共通部分</param>
-	void Initialize(ParticleCommon* particleCommon, ParticleType particleType);
+	void Initialize( ParticleType particleType);
 
 	/// <summary>
 	/// 更新処理
@@ -274,11 +274,7 @@ private:
 	
 
 private:
-	ParticleCommon* particleCommon = nullptr; // パーティクル共通部分
-
-	WinApp* winApp_ = nullptr; // ウィンドウズアプリケーション
-
-	ModelCommon* modelCommon_ = nullptr; // モデル共通部分
+	
 	Model* model_ = nullptr; // モデルデータ
 
 	DirectionalLight* directionalLightData = nullptr; // 平行光源データ

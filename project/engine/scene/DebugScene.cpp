@@ -4,11 +4,7 @@
 #include"ModelManager.h"
 #include"TextureManager.h"
 #include"BlendMode.h"
-void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon) {
-
-	this->object3dCommon = object3dCommon;
-	this->spriteCommon = spriteCommon;
-	
+void DebugScene::Initialize() {
 
 	//テクスチャマネージャに追加する画像ハンドル
 	std::string uvCheckerTextureHandle = "uvChecker.png";
@@ -31,7 +27,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 #pragma region Audioの初期化
 	audio = std::make_unique<Audio>();
 	audio->Initialize(audioFileName, audioDirectoryPath);
-	audio->Play(true);
+	audio->Play(false);
 
 #pragma endregion Audioの初期化
 	/*---------------
@@ -47,10 +43,10 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 		//もしfor文のiが偶数なら
 		if (i % 2 == 0) {
 			//モンスターボールを表示させる
-			sprite->Initialize(this->spriteCommon, monsterBallTextureHandle);
+			sprite->Initialize( monsterBallTextureHandle);
 		} else {
 			//uvCheckerを表示させる
-			sprite->Initialize(this->spriteCommon, uvCheckerTextureHandle);
+			sprite->Initialize( uvCheckerTextureHandle);
 		}
 
 
@@ -91,7 +87,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//オブジェクト3D
 
 	object3d = std::make_unique<Object3d>();
-	object3d->Initialize(this->object3dCommon, modelFileNamePath);
+	object3d->Initialize(modelFileNamePath);
 	object3d->SetModel(modelFileNamePath);
 
 	////////////////////////////////////////////////////////////////////////
@@ -101,7 +97,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//オブジェクト3D
 
 	object3d2 = std::make_unique<Object3d>();
-	object3d2->Initialize(this->object3dCommon, modelFileNamePath2);
+	object3d2->Initialize(modelFileNamePath2);
 
 	object3d2->SetModel(modelFileNamePath2);
 
@@ -115,8 +111,6 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	camera->setRotation(cameraRotation);
 	camera->setScale(cameraScale);
 
-	//
-	object3dCommon->SetDefaultCamera(camera.get());
 	object3d->SetCamera(camera.get());
 	object3d2->SetCamera(camera.get());
 
