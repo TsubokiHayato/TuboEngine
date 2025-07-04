@@ -4,6 +4,7 @@
 
 const uint32_t SrvManager::kMaxSRVCount = 1024;
 
+SrvManager* SrvManager::instance = nullptr; // シングルトンインスタンス
 void SrvManager::Initialize()
 {
 	
@@ -89,4 +90,11 @@ D3D12_GPU_DESCRIPTOR_HANDLE SrvManager::GetGPUDescriptorHandle(uint32_t index)
 	handleGPU.ptr += (descriptorSize * index);
 	//GPUハンドルを返す
 	return handleGPU;
+}
+
+void SrvManager::Finalize() {
+	//インスタンスを削除
+	delete instance;
+	instance = nullptr;
+	
 }

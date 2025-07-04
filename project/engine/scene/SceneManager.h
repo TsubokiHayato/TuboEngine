@@ -8,12 +8,16 @@ public:
 	/// シングルトンインスタンス取得
 	/// </summary>
 	static SceneManager* GetInstance() {
-		static SceneManager instance;
-		return &instance;
+		
+		if (!instance) {
+			instance = new SceneManager();
+		}
+		return instance;
 	}
 
 private:
 	// コンストラクタ・デストラクタ・コピー禁止
+	static SceneManager* instance ;
 	SceneManager() = default;
 	~SceneManager() = default;
 	SceneManager(const SceneManager&) = delete;
