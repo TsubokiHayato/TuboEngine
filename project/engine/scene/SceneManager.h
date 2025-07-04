@@ -6,7 +6,7 @@ class SceneManager
 
 public:
 	//初期化
-	void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon,ParticleCommon*particleCommon ,WinApp* winApp);
+	void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon,ParticleCommon*particleCommon );
 	//更新
 	void Update();
 	//終了処理

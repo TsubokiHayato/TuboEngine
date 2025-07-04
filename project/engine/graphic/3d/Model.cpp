@@ -1,6 +1,4 @@
 #include "Model.h"
-#include "ModelCommon.h"
-
 #include "MT_Matrix.h"
 #include "Object3d.h"
 #include "TextureManager.h"
@@ -10,11 +8,9 @@
 #include <fstream>
 #include <sstream>
 
-void Model::Initialize(ModelCommon* modelCommon, const std::string& directoryPath, const std::string& filename) {
+void Model::Initialize(const std::string& directoryPath, const std::string& filename) {
 
-	// 引数で受け取ってメンバ変数に記録する
-	this->modelCommon_ = modelCommon;
-
+	
 	commandList = DirectXCommon::GetInstance()->GetCommandList();
 
 #pragma region ModelData

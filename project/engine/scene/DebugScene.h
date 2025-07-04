@@ -15,7 +15,6 @@
 
 #include"SpriteCommon.h"
 #include"Object3dCommon.h"
-#include"ModelCommon.h"
 #include"TextureManager.h"
 #include"ModelManager.h"
 #include"AudioCommon.h"
@@ -45,9 +44,7 @@ public:
 	/// <param name="object3dCommon">3Dオブジェクト共通部分</param>
 	/// <param name="spriteCommon">スプライト共通部分</param>
 	/// <param name="particleCommon">パーティクル共通部分</param>
-	/// <param name="winApp">ウィンドウアプリケーション</param>
-	/// <param name="dxCommon">DirectX共通部分</param>
-	void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp);
+	void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon);
 
 	/// <summary>
 	/// 更新
@@ -81,8 +78,7 @@ public:
 	
 private:
 
-	WinApp* winApp = nullptr;
-
+	
 	Object3dCommon* object3dCommon = nullptr;
 	SpriteCommon* spriteCommon = nullptr;
 

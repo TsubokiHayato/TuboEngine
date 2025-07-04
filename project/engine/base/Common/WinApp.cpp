@@ -76,10 +76,6 @@ void WinApp::Initialize()
 
 }
 
-void WinApp::Update()
-{
-}
-
 bool WinApp::ProcessMessage()
 {
 	MSG msg{};
