@@ -4,6 +4,7 @@
 #include "externals/imgui/imgui_impl_dx12.h"
 #include <cassert>
 
+ImGuiManager* ImGuiManager::instance = nullptr; // シングルトンインスタンス
 void ImGuiManager::Initialize()
 {
 	
@@ -40,7 +41,8 @@ void ImGuiManager::Finalize()
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
-
+	delete instance;
+	instance = nullptr;
 
 }
 

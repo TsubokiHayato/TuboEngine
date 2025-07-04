@@ -4,6 +4,9 @@
 #include"TitleScene.h"
 #include"StageScene.h"
 #include"ClearScene.h"
+
+
+SceneManager* SceneManager::instance = nullptr; // シングルトンインスタンス
 void SceneManager::Initialize() {
 	
 	//初期シーンを設定
@@ -68,6 +71,8 @@ void SceneManager::Finalize() {
 		//終了処理
 		currentScene->Finalize();
 	}
+	delete instance;
+	instance = nullptr;
 
 }
 

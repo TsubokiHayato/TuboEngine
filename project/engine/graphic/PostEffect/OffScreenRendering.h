@@ -21,12 +21,16 @@ public:
 	/// シングルトンインスタンス取得
 	/// </summary>
 	static OffScreenRendering* GetInstance() {
-		static OffScreenRendering instance;
-		return &instance;
+		if (!instance) {
+			instance = new OffScreenRendering();
+		}
+		return instance;
 	}
+
 
 private:
 	// コンストラクタ・デストラクタ・コピー禁止
+	static OffScreenRendering* instance;
 	OffScreenRendering() = default;
 	~OffScreenRendering() = default;
 	OffScreenRendering(const OffScreenRendering&) = delete;
@@ -71,6 +75,9 @@ public:
 	void Draw();
 
 	void DrawImGui();
+
+
+	void Finalize();
 
 	/// <summary>
 	/// レンダーターゲットリソースの作成

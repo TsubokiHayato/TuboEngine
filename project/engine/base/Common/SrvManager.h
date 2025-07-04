@@ -8,11 +8,15 @@ public:
 	/// シングルトンインスタンス取得
 	/// </summary>
 	static SrvManager* GetInstance() {
-		static SrvManager instance;
-		return &instance;
+		
+		if (!instance) {
+			instance = new SrvManager();
+		}
+		return instance;
 	}
 private:
 	// コンストラクタ・デストラクタ・コピー禁止
+	static SrvManager* instance;
 	SrvManager() = default;
 	~SrvManager() = default;
 	SrvManager(const SrvManager&) = delete;
@@ -52,6 +56,8 @@ public:
 	/// 描画前処理
 	/// </summary>
 	void PreDraw();
+
+	void Finalize();
 
 
 	//-------------------Getter & Setter-------------------//

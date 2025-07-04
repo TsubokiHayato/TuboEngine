@@ -21,6 +21,7 @@ class DirectXCommon
 {
 
 private:
+	static DirectXCommon* instance;
 	// シングルトン用
 	DirectXCommon() = default;
 	~DirectXCommon() = default;
@@ -32,13 +33,18 @@ private:
 public:
 	// インスタンス取得
 	static DirectXCommon* GetInstance() {
-		static DirectXCommon instance;
-		return &instance;
+		// インスタンスがない場合は作成する
+		if (instance == nullptr) {
+			instance = new DirectXCommon;
+		}
+		return instance;
 	}
 public:
 
 	//初期化
 	void Initialize();
+
+	void Finalize();
 
 	//デバイスの初期化
 	void Device_Initialize();
