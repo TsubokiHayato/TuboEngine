@@ -1,6 +1,6 @@
 #include "StageScene.h"
 
-void StageScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon)
+void StageScene::Initialize()
 {
 }
 

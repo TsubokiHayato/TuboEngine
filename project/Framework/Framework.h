@@ -132,10 +132,6 @@ protected:
 
 	// 基盤システム
 	
-	// スプライト共通部分
-	std::unique_ptr <SpriteCommon> spriteCommon = nullptr;
-	// オブジェクト3Dの共通部分
-	std::unique_ptr <Object3dCommon> object3dCommon = nullptr;
 	
 	std::unique_ptr <SrvManager> srvManager = nullptr;
 #ifdef _DEBUG
@@ -143,8 +139,7 @@ protected:
 #endif // _DEBUG
 
 	std::unique_ptr<SceneManager> sceneManager = nullptr;
-	// パーティクル共通部分
-	std::unique_ptr <ParticleCommon> particleCommon = nullptr;
+	
 	// オフスクリーンレンダリング
 	std::unique_ptr<OffScreenRendering> offScreenRendering = nullptr;
 };
