@@ -1,7 +1,7 @@
 #include "randomPSO.h"
 
-void randomPSO::Initialize(DirectXCommon* dxCommon) {
-    PostEffectPSOBase::Initialize(dxCommon);
+void randomPSO::Initialize() {
+    PostEffectPSOBase::Initialize();
 	CreateGraphicPipeline();
 }
 
