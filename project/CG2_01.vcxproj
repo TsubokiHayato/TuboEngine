@@ -184,8 +184,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\SmoothingPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\VignetteEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\VignettePSO.cpp" />
-    <ClCompile Include="engine\graphic\PSO\SkyBox\SkyBox.cpp" />
-    <ClCompile Include="engine\graphic\PSO\SkyBox\SkyBoxCommon.cpp" />
+    <ClCompile Include="engine\graphic\SkyBox\SkyBox.cpp" />
+    <ClCompile Include="engine\graphic\SkyBox\SkyBoxCommon.cpp" />
     <ClCompile Include="engine\graphic\PSO\SkyBoxPSO.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -274,8 +274,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\PSO\SmoothingPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\VignetteEffect.h" />
     <ClInclude Include="engine\graphic\PSO\VignettePSO.h" />
-    <ClInclude Include="engine\graphic\PSO\SkyBox\SkyBox.h" />
-    <ClInclude Include="engine\graphic\PSO\SkyBox\SkyBoxCommon.h" />
+    <ClInclude Include="engine\graphic\SkyBox\SkyBox.h" />
+    <ClInclude Include="engine\graphic\SkyBox\SkyBoxCommon.h" />
     <ClInclude Include="engine\graphic\PSO\SkyBoxPSO.h" />
   </ItemGroup>
   <ItemGroup>

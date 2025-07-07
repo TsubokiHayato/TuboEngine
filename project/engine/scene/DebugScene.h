@@ -20,7 +20,7 @@
 #include"AudioCommon.h"
 #include"ImGuiManager.h"
 
-#include"./SkyBox/SkyBox.h"
+#include"SkyBox.h"
 
 
 #undef min//minマクロを無効化

@@ -13,9 +13,9 @@
 #endif // DEBUG
 #include"SceneManager.h"
 #include"ParticleCommon.h"
-#include"./SkyBox/SkyBoxCommon.h"
+#include"SkyBoxCommon.h"
 #include"Input.h"
-#include"./PostEffect/OffScreenRendering.h"
+#include"OffScreenRendering.h"
 
 class OffScreenRenderingPSO;
 
