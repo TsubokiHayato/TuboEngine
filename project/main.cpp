@@ -4,7 +4,7 @@
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
-#ifdef DEBUG
+#ifdef _DEBUG
     D3DResourceLeakChecker leakChecker;
 #endif
 

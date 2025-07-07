@@ -90,7 +90,7 @@ void Framework::Finalize() {
 	ParticleCommon::GetInstance()->Finalize();
 	SpriteCommon::GetInstance()->Finalize();
 	Object3dCommon::GetInstance()->Finalize();
-	SkyBoxCommon::GetInstance()->Finalize();
+	//SkyBoxCommon::GetInstance()->Finalize();
 	
 	AudioCommon::GetInstance()->Finalize();
 	DirectXCommon::GetInstance()->Finalize();
