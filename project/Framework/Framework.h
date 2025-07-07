@@ -4,7 +4,6 @@
 #include"D3DResourceLeakChecker.h"
 #include"SpriteCommon.h"
 #include"Object3dCommon.h"
-#include"ModelCommon.h"
 #include"TextureManager.h"
 #include"ModelManager.h"
 #include <SrvManager.h>
@@ -14,6 +13,7 @@
 #endif // DEBUG
 #include"SceneManager.h"
 #include"ParticleCommon.h"
+#include"SkyBoxCommon.h"
 #include"Input.h"
 #include"./PostEffect/OffScreenRendering.h"
 
@@ -132,23 +132,5 @@ protected:
 	int spriteBlendModeNum = 0; // スプライトのブレンドモード
 
 	// 基盤システム
-	std::unique_ptr<WinApp> winApp = nullptr;
-	// DirectX共通部分
-	std::unique_ptr <DirectXCommon> dxCommon = nullptr;
-	// スプライト共通部分
-	std::unique_ptr <SpriteCommon> spriteCommon = nullptr;
-	// オブジェクト3Dの共通部分
-	std::unique_ptr <Object3dCommon> object3dCommon = nullptr;
-	// モデル共通部分
-	std::unique_ptr <ModelCommon> modelCommon = nullptr;
-	std::unique_ptr <SrvManager> srvManager = nullptr;
-#ifdef _DEBUG
-	std::unique_ptr<ImGuiManager> imGuiManager = nullptr;
-#endif // _DEBUG
 
-	std::unique_ptr<SceneManager> sceneManager = nullptr;
-	// パーティクル共通部分
-	std::unique_ptr <ParticleCommon> particleCommon = nullptr;
-	// オフスクリーンレンダリング
-	std::unique_ptr<OffScreenRendering> offScreenRendering = nullptr;
 };

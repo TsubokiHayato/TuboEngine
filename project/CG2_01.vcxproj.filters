@@ -87,9 +87,6 @@
     <ClCompile Include="engine\graphic\3d\Object3dCommon.cpp">
       <Filter>ソース ファイル\graphic\3d</Filter>
     </ClCompile>
-    <ClCompile Include="engine\graphic\3d\ModelCommon.cpp">
-      <Filter>ソース ファイル\graphic\3d</Filter>
-    </ClCompile>
     <ClCompile Include="engine\graphic\3d\Model.cpp">
       <Filter>ソース ファイル\graphic\3d</Filter>
     </ClCompile>
@@ -318,9 +315,6 @@
       <Filter>ヘッダー ファイル\math</Filter>
     </ClInclude>
     <ClInclude Include="engine\graphic\3d\Model.h">
-      <Filter>ヘッダー ファイル\graphic\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\3d\ModelCommon.h">
       <Filter>ヘッダー ファイル\graphic\3d</Filter>
     </ClInclude>
     <ClInclude Include="engine\graphic\3d\ModelManager.h">
