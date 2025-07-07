@@ -9,6 +9,7 @@ void DebugScene::Initialize() {
 	//テクスチャマネージャに追加する画像ハンドル
 	std::string uvCheckerTextureHandle = "uvChecker.png";
 	std::string monsterBallTextureHandle = "monsterBall.png";
+
 	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
 
 	TextureManager::GetInstance()->LoadTexture(testDDSTextureHandle);
