@@ -3,7 +3,8 @@
 #include"WinApp.h"
 #include"DirectXCommon.h"
 #include"SrvManager.h"
-class ParticlePSO;
+#include"ParticlePSO.h"
+
 class Camera;
 class ParticleCommon
 {
@@ -13,12 +14,16 @@ public:
 	/// シングルトンインスタンス取得
 	/// </summary>
 	static ParticleCommon* GetInstance() {
-		static ParticleCommon instance;
-		return &instance;
+	
+		if (!instance) {
+			instance = new ParticleCommon();
+		}
+		return instance;
 	}
 
 private:
 	// コンストラクタ・デストラクタ・コピー禁止
+	static ParticleCommon* instance; // シングルトンインスタンス
 	ParticleCommon() = default;
 	~ParticleCommon() = default;
 	ParticleCommon(const ParticleCommon&) = delete;
@@ -30,6 +35,8 @@ public:
 	/// </summary>
 	/// <param name="dxCommon">DirectX共通部分</param>
 	void Initialize();
+
+	void Finalize();
 
 	/// <summary>
 	/// 共通描画設定
@@ -43,7 +50,7 @@ public:
 
 private:
 
-	ParticlePSO* pso = nullptr;//PSO
+	std::unique_ptr<ParticlePSO> pso = nullptr; // PSOのユニークポインタ
 	Camera* defaultCamera = nullptr;//デフォルトカメラ
 
 };
