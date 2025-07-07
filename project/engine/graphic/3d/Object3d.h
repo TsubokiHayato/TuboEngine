@@ -75,7 +75,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="object3dCommon"></param>
-	void Initialize(Object3dCommon* object3dCommon, std::string modelFileNamePath);
+	void Initialize(std::string modelFileNamePath);
 
 	/// <summary>
 	/// 更新処理
@@ -161,27 +161,10 @@ public:
 	float GetSpotLightDecay() { return spotLightData->decay; }
 	float GetSpotLightCosAngle() { return spotLightData->cosAngle; }
 
-
-
-
-
-
-
-
-
-
-
 private:
 
 	//-------------------------------------------------------------------
 	//		メンバ変数
-
-	//共通部分
-	Object3dCommon* object3dCommon = nullptr;
-	//DirectX共通部分
-	DirectXCommon* dxCommon_ = nullptr;
-	//ウィンドウズアプリケーション
-	WinApp* winApp_ = nullptr;
 
 	//モデル共通部分
 	ModelCommon* modelCommon_ = nullptr;

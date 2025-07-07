@@ -1,8 +1,8 @@
 #include "VignettePSO.h"
 #include "DirectXCommon.h"
 
-void VignettePSO::Initialize(DirectXCommon* dxCommon) {
-    PostEffectPSOBase::Initialize(dxCommon);
+void VignettePSO::Initialize() {
+    PostEffectPSOBase::Initialize();
     CreateGraphicPipeline();
 }
 

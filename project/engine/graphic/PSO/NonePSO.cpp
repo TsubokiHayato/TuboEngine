@@ -1,8 +1,8 @@
 #include "NonePSO.h"
 #include "DirectXCommon.h"
 
-void NonePSO::Initialize(DirectXCommon* dxCommon) {
-    PostEffectPSOBase::Initialize(dxCommon);
+void NonePSO::Initialize() {
+    PostEffectPSOBase::Initialize();
     CreateGraphicPipeline();
 }
 

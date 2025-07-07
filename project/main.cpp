@@ -1,17 +1,23 @@
 #include"Framework/Framework.h"
 #include"Framework/Order.h"
+#include"D3DResourceLeakChecker.h"
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
-	//フレームワークのインスタンスを生成
-	Framework* framework = new Order();
+#ifdef _DEBUG
+    D3DResourceLeakChecker leakChecker;
+#endif
 
-	//フレームワークを実行
-	framework->Run();
+    //フレームワークのインスタンスを生成
+    Framework* framework = new Order();
 
-	//フレームワークのインスタンスを破棄
-	delete framework;
-	
-	return 0;
+    //フレームワークを実行
+    framework->Run();
 
+    //フレームワークのインスタンスを破棄
+    delete framework;
+
+    // ここでleakCheckerのデストラクタが呼ばれる
+
+    return 0;
 }

@@ -1,19 +1,18 @@
 #include "PostEffectPSOBase.h"
 #include "DirectXCommon.h"
 
-void PostEffectPSOBase::Initialize(DirectXCommon* dxCommon) {
-	assert(dxCommon);
-	dxCommon_ = dxCommon;
-	device_ = dxCommon_->GetDevice();
-	commandList_ = dxCommon_->GetCommandList();
+void PostEffectPSOBase::Initialize() {
+	
+	device_ = DirectXCommon::GetInstance()->GetDevice();
+	commandList_ = DirectXCommon::GetInstance()->GetCommandList();
 }
 
 void PostEffectPSOBase::CreateGraphicPipeline(const std::wstring& vsPath, const std::wstring& psPath) {
 	CreateRootSignature();
 
 	// シェーダーのコンパイル
-	vertexShaderBlob_ = dxCommon_->CompileShader(vsPath, L"vs_6_0");
-	pixelShaderBlob_ = dxCommon_->CompileShader(psPath, L"ps_6_0");
+	vertexShaderBlob_ = DirectXCommon::GetInstance()->CompileShader(vsPath, L"vs_6_0");
+	pixelShaderBlob_ = DirectXCommon::GetInstance()->CompileShader(psPath, L"ps_6_0");
 	assert(vertexShaderBlob_ && pixelShaderBlob_);
 
 	// PSO設定

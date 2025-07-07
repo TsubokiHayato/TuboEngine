@@ -1,8 +1,8 @@
 #include "NoneEffect.h"
 
-void NoneEffect::Initialize(DirectXCommon* dxCommon) {
+void NoneEffect::Initialize() {
     pso_ = std::make_unique<NonePSO>();
-    pso_->Initialize(dxCommon);
+    pso_->Initialize();
 }
 
 void NoneEffect::Draw(ID3D12GraphicsCommandList* commandList) {

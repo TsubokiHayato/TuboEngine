@@ -2,10 +2,9 @@
 #include "TextureManager.h"
 #include "MT_Matrix.h"
 
-void SkyBox::Initialize(SkyBoxCommon* skyBoxCommon, const std::string& textureFilePath) {
-	// 引数で受け取ってメンバ変数に記録する
-	this->skyBoxCommon = skyBoxCommon;
-	this->dxCommon_ = skyBoxCommon->GetDxCommon();
+void SkyBox::Initialize(const std::string& textureFilePath) {
+	SkyBoxCommon::GetInstance()->Initialize();
+	
 	textureFilePath_ = textureFilePath;//このテクスチャはdds形式であることを想定している
 
 	// テクスチャロード
@@ -14,7 +13,7 @@ void SkyBox::Initialize(SkyBoxCommon* skyBoxCommon, const std::string& textureFi
 
 
 	// 頂点バッファ
-	vertexResource = dxCommon_->CreateBufferResource(sizeof(VertexData) * 24);
+	vertexResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * 24);
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	vertexBufferView.SizeInBytes = sizeof(VertexData) * 24;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
@@ -61,7 +60,7 @@ void SkyBox::Initialize(SkyBoxCommon* skyBoxCommon, const std::string& textureFi
 #pragma region indexResourceSprite
 
 	// インデックスバッファ（36個分）を作成
-	indexResource = dxCommon_->CreateBufferResource(sizeof(uint32_t) * 36);
+	indexResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t) * 36);
 	indexBufferView.BufferLocation = indexResource->GetGPUVirtualAddress();
 	indexBufferView.SizeInBytes = sizeof(uint32_t) * 36;
 	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
@@ -91,7 +90,7 @@ void SkyBox::Initialize(SkyBoxCommon* skyBoxCommon, const std::string& textureFi
 
 
 	// transformationMatrixResource_ の生成
-	transformationMatrixResource_ = dxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
+	transformationMatrixResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
 	transformationMatrixData->WVP = MakeIdentity4x4();
 	transformationMatrixData->World = MakeIdentity4x4();
@@ -100,7 +99,7 @@ void SkyBox::Initialize(SkyBoxCommon* skyBoxCommon, const std::string& textureFi
 #pragma region Material_Resource_Sprite
 	//マテリアル用のリソースを作る。今回はColor1つ分のサイズを用意する
 	materialResource =
-		dxCommon_->CreateBufferResource(sizeof(Material));
+		DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
 	//マテリアルにデータを書き込む
 	//書き込むためのアドレスを取得
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
@@ -125,7 +124,7 @@ void SkyBox::Update() {
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera_->GetScale(), camera_->GetRotation(), camera_->GetTranslate());
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(skyBoxCommon->GetWinApp()->kClientWidth) / float(skyBoxCommon->GetWinApp()->kClientHeight), 0.1f, 100.0f);
+	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(WinApp::GetInstance()->GetClientWidth()) / float(WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
 	if (camera_) {
@@ -138,10 +137,12 @@ void SkyBox::Update() {
 	transformationMatrixData->WVP = worldMatrix * Multiply(viewMatrix, projectionMatrix);
 	transformationMatrixData->World = worldMatrix;
 
-	commandList = dxCommon_->GetCommandList();
+	commandList = DirectXCommon::GetInstance()->GetCommandList();
 }
 
 void SkyBox::Draw() {
+
+	SkyBoxCommon::GetInstance()->DrawSettingsCommon();
 
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 	commandList->IASetIndexBuffer(&indexBufferView);

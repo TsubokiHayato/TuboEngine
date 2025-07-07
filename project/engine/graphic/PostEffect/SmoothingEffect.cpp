@@ -1,9 +1,9 @@
 #include "SmoothingEffect.h"
 
-void SmoothingEffect::Initialize(DirectXCommon* dxCommon) {
+void SmoothingEffect::Initialize() {
 
 	pso_ = std::make_unique<SmoothingPSO>();
-	pso_->Initialize(dxCommon);
+	pso_->Initialize();
 }
 
 void SmoothingEffect::Draw(ID3D12GraphicsCommandList* commandList) {

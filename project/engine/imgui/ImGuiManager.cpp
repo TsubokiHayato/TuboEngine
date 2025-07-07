@@ -4,20 +4,18 @@
 #include "externals/imgui/imgui_impl_dx12.h"
 #include <cassert>
 
-void ImGuiManager::Initialize(WinApp* winApp, DirectXCommon* dxCommon)
+ImGuiManager* ImGuiManager::instance = nullptr; // シングルトンインスタンス
+void ImGuiManager::Initialize()
 {
-	//WindowsAppのポインタを受け取る
-	this->winApp_ = winApp;
-	//DirectXCommonのポインタを受け取る
-	this->dxCommon = dxCommon;
+	
 	//ImGuiのコンテキストを作成
 	ImGui::CreateContext();
 	//ImGuiのスタイルを設定
 	ImGui::StyleColorsDark();
 	// WinAppが正しく初期化されているか確認
-	assert(winApp->GetHWND() != nullptr);
+	assert(WinApp::GetInstance()->GetHWND() != nullptr);
 	//ImGuiのDirectX12の初期化
-	ImGui_ImplWin32_Init(winApp_->GetHWND());
+	ImGui_ImplWin32_Init(WinApp::GetInstance()->GetHWND());
 
 	//descriptorHeapの設定
 	D3D12_DESCRIPTOR_HEAP_DESC desc = {};
@@ -25,11 +23,11 @@ void ImGuiManager::Initialize(WinApp* winApp, DirectXCommon* dxCommon)
 	desc.NumDescriptors = 1;
 	desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	//descriptorHeapの生成
-	HRESULT result = dxCommon->GetDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&srvHeap));
+	HRESULT result = DirectXCommon::GetInstance()->GetDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&srvHeap));
 	assert(SUCCEEDED(result));
 
-	ImGui_ImplDX12_Init(dxCommon->GetDevice().Get(),
-		static_cast<int>(dxCommon->GetBackBufferCount()),
+	ImGui_ImplDX12_Init(DirectXCommon::GetInstance()->GetDevice().Get(),
+		static_cast<int>(DirectXCommon::GetInstance()->GetBackBufferCount()),
 		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
 		srvHeap.Get(),
 		srvHeap->GetCPUDescriptorHandleForHeapStart(),
@@ -43,7 +41,8 @@ void ImGuiManager::Finalize()
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
-
+	delete instance;
+	instance = nullptr;
 
 }
 
@@ -62,7 +61,7 @@ void ImGuiManager::End()
 
 void ImGuiManager::Draw()
 {
-	Microsoft::WRL::ComPtr<	ID3D12GraphicsCommandList> commandList = dxCommon->GetCommandList();
+	Microsoft::WRL::ComPtr<	ID3D12GraphicsCommandList> commandList = DirectXCommon::GetInstance()->GetCommandList();
 
 	//ディスクリプタヒープの配列をセットするコマンド
 	ID3D12DescriptorHeap* ppHeaps[] = { srvHeap.Get() };	

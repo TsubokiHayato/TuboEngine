@@ -10,13 +10,13 @@ VignetteEffect::~VignetteEffect() {
     }
 }
 
-void VignetteEffect::Initialize(DirectXCommon* dxCommon) {
+void VignetteEffect::Initialize() {
     // PSO初期化
     pso_ = std::make_unique<VignettePSO>();
-    pso_->Initialize(dxCommon);
+    pso_->Initialize();
 
     // 定数バッファ作成
-    cbResource_ = dxCommon->CreateBufferResource(sizeof(VignetteParams));
+    cbResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VignetteParams));
     cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&params_));
     // デフォルト値
     params_->vignetteScale = 16.0f;

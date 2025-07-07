@@ -1,7 +1,7 @@
 #include "SmoothingPSO.h"
 
-void SmoothingPSO::Initialize(DirectXCommon* dxCommon) {
-	PostEffectPSOBase::Initialize(dxCommon);
+void SmoothingPSO::Initialize() {
+	PostEffectPSOBase::Initialize();
 	CreateGraphicPipeline();
 }
 
