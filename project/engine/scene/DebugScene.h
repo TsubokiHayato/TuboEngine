@@ -127,7 +127,7 @@ private:
 
 
 	///SkyBox
-	std::unique_ptr<SkyBoxCommon> skyBoxCommon = nullptr;
+	
 	std::unique_ptr<SkyBox> skyBox = nullptr;
 	
 };
