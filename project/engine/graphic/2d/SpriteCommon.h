@@ -1,26 +1,29 @@
 #pragma once
 #include<memory>
-class PSO;//前方宣言
-class NoneBlendPSO;
-class NormalBlendPSO;
-class AddBlendPSO;
-class MultiplyBlendPSO;
-class SubtractBlendPSO;
-class ScreenBlendPSO;
+#include"PSO.h"
+#include"NoneBlendPSO.h"
+#include"NormalBlendPSO.h"
+#include"AddBlendPSO.h"
+#include"SubtractBlendPSO.h"
+#include"MultiplyBlendPSO.h"
+#include"ScreenBlendPSO.h"
+
 class SpriteCommon
 {
-
 public:
 	/// <summary>
 	/// シングルトンインスタンス取得
 	/// </summary>
 	static SpriteCommon* GetInstance() {
-		static SpriteCommon instance;
-		return &instance;
+		if (!instance) {
+			instance = new SpriteCommon();
+		}
+		return instance;
 	}
 
 private:
 	// コンストラクタ・デストラクタ・コピー禁止
+	static SpriteCommon* instance; // シングルトンインスタンス
 	SpriteCommon() = default;
 	~SpriteCommon() = default;
 	SpriteCommon(const SpriteCommon&) = delete;
@@ -35,6 +38,8 @@ public:
 	/// 初期化
 	/// </summary>
 	void Initialize();
+
+	void Finalize();
 
 	/// <summary>
    /// 共通描画設定
@@ -52,13 +57,14 @@ public:
 	
 private:
 
-	PSO* pso = nullptr;
-	NoneBlendPSO* noneBlendPSO = nullptr;//NoneBlendPSO
-	NormalBlendPSO* normalBlendPSO = nullptr;//NormalBlendPSO
-	AddBlendPSO* addBlendPSO = nullptr;//AddBlendPSO
-	MultiplyBlendPSO* multiplyBlendPSO = nullptr;//MultiplyBlendPSO
-	SubtractBlendPSO* subtractBlendPSO = nullptr;//SubtractBlendPSO
-	ScreenBlendPSO* screenBlendPSO = nullptr;//ScreenBlendPSO
+	std::unique_ptr <PSO> pso = nullptr;//PSOのユニークポインタ
+	std::unique_ptr <NoneBlendPSO > noneBlendPSO;//NoneBlendPSOのユニークポインタ
+	std::unique_ptr <NormalBlendPSO > normalBlendPSO;//NormalBlendPSOのユニークポインタ
+	std::unique_ptr <AddBlendPSO > addBlendPSO;//AddBlendPSOのユニークポインタ
+	std::unique_ptr <MultiplyBlendPSO > multiplyBlendPSO;//MultiplyBlendPSOのユニークポインタ
+	std::unique_ptr <SubtractBlendPSO > subtractBlendPSO;//SubtractBlendPSOのユニークポインタ
+	std::unique_ptr <ScreenBlendPSO > screenBlendPSO;//ScreenBlendPSOのユニークポインタ
+
 
 	int blenderMode_;//ブレンダーモード
 };

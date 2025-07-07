@@ -1,13 +1,5 @@
 #include "Object3dCommon.h"
-#include"PSO.h"
-#include"NoneBlendPSO.h"
-#include"NormalBlendPSO.h"
-#include"AddBlendPSO.h"
-#include"SubtractBlendPSO.h"
-#include"MultiplyBlendPSO.h"
-#include"ScreenBlendPSO.h"
-
-
+Object3dCommon* Object3dCommon::instance = nullptr; // シングルトンインスタンス
 void Object3dCommon::Initialize() {
 	// 引数がnullptrでないことを確認
 
@@ -15,29 +7,36 @@ void Object3dCommon::Initialize() {
 	/*---------------------------------------
 		PSOの初期化
 	---------------------------------------*/
-	pso = new PSO();
+	pso = std::make_unique<PSO>();
 	pso->Initialize();
 	// NoneBlendPSOの初期化
-	noneBlendPSO = new NoneBlendPSO();
+	noneBlendPSO = std::make_unique<NoneBlendPSO>();
 	noneBlendPSO->Initialize();
 	// NormalBlendPSOの初期化
-	normalBlendPSO = new NormalBlendPSO();
+	normalBlendPSO = std::make_unique<NormalBlendPSO>();
 	normalBlendPSO->Initialize();
 	// AddBlendPSOの初期化
-	addBlendPSO = new AddBlendPSO();
+	addBlendPSO = std::make_unique<AddBlendPSO>();
 	addBlendPSO->Initialize();
 	// MultiplyBlendPSOの初期化
-	multiplyBlendPSO = new MultiplyBlendPSO();
+	multiplyBlendPSO = std::make_unique<MultiplyBlendPSO>();
 	multiplyBlendPSO->Initialize();
 	// SubtractBlendPSOの初期化
-	subtractBlendPSO = new SubtractBlendPSO();
+	subtractBlendPSO = std::make_unique<SubtractBlendPSO>();
 	subtractBlendPSO->Initialize();
 	// ScreenBlendPSOの初期化
-	screenBlendPSO = new ScreenBlendPSO();
+	screenBlendPSO = std::make_unique<ScreenBlendPSO>();
 	screenBlendPSO->Initialize();
 	
 
 
+
+}
+
+void Object3dCommon::Finalize() {
+
+	delete instance;
+	instance = nullptr;
 
 }
 

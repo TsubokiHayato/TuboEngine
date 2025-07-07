@@ -117,11 +117,8 @@ void DebugScene::Initialize() {
 #pragma endregion cameraの初期化
 
 
-	skyBoxCommon = std::make_unique<SkyBoxCommon>();
-	skyBoxCommon->Initialize();
-
 	skyBox = std::make_unique<SkyBox>();
-	skyBox->Initialize(skyBoxCommon.get(), testDDSTextureHandle);
+	skyBox->Initialize(testDDSTextureHandle);
 }
 
 void DebugScene::Update() {
@@ -190,10 +187,9 @@ void DebugScene::Finalize() {
 }
 
 void DebugScene::Object3DDraw() {
-	object3d->Draw();
+	
 	object3d2->Draw();
 
-	skyBoxCommon->DrawSettingsCommon();
 	skyBox->Draw();
 }
 
@@ -203,6 +199,7 @@ void DebugScene::SpriteDraw() {
 			sprite->Draw();
 		}
 	}
+	object3d->Draw();
 }
 
 void DebugScene::ImGuiDraw() {

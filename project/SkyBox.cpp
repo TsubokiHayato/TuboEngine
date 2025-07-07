@@ -2,9 +2,8 @@
 #include "TextureManager.h"
 #include "MT_Matrix.h"
 
-void SkyBox::Initialize(SkyBoxCommon* skyBoxCommon, const std::string& textureFilePath) {
-	// 引数で受け取ってメンバ変数に記録する
-	this->skyBoxCommon = skyBoxCommon;
+void SkyBox::Initialize(const std::string& textureFilePath) {
+	SkyBoxCommon::GetInstance()->Initialize();
 	
 	textureFilePath_ = textureFilePath;//このテクスチャはdds形式であることを想定している
 
@@ -142,6 +141,8 @@ void SkyBox::Update() {
 }
 
 void SkyBox::Draw() {
+
+	SkyBoxCommon::GetInstance()->DrawSettingsCommon();
 
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 	commandList->IASetIndexBuffer(&indexBufferView);

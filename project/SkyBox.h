@@ -12,7 +12,7 @@
 class SkyBox
 {
 public:
-    void Initialize(SkyBoxCommon* skyBoxCommon, const std::string& textureFilePath);
+    void Initialize(const std::string& textureFilePath);
     void Update();
     void Draw();
 
@@ -30,7 +30,6 @@ public:
 	
 private:
    
-    SkyBoxCommon* skyBoxCommon = nullptr;
    
     Camera* camera_ = nullptr;
     Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
