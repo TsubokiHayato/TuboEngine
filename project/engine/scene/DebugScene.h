@@ -15,7 +15,6 @@
 
 #include"SpriteCommon.h"
 #include"Object3dCommon.h"
-#include"ModelCommon.h"
 #include"TextureManager.h"
 #include"ModelManager.h"
 #include"AudioCommon.h"
@@ -42,12 +41,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	/// <param name="object3dCommon">3Dオブジェクト共通部分</param>
-	/// <param name="spriteCommon">スプライト共通部分</param>
-	/// <param name="particleCommon">パーティクル共通部分</param>
-	/// <param name="winApp">ウィンドウアプリケーション</param>
-	/// <param name="dxCommon">DirectX共通部分</param>
-	void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon);
+	void Initialize();
 
 	/// <summary>
 	/// 更新
@@ -78,13 +72,6 @@ public:
 	/// パーティクル描画
 	/// </summary>
 	void ParticleDraw()override;
-	
-private:
-
-	WinApp* winApp = nullptr;
-	DirectXCommon* dxCommon = nullptr;
-	Object3dCommon* object3dCommon = nullptr;
-	SpriteCommon* spriteCommon = nullptr;
 
 private:
 
@@ -140,7 +127,7 @@ private:
 
 
 	///SkyBox
-	std::unique_ptr<SkyBoxCommon> skyBoxCommon = nullptr;
+	
 	std::unique_ptr<SkyBox> skyBox = nullptr;
 	
 };

@@ -4,8 +4,8 @@ void PostEffectManager::AddEffect(std::unique_ptr<PostEffectBase> effect) {
     effects_.emplace_back(std::move(effect));
 }
 
-void PostEffectManager::InitializeAll(DirectXCommon* dxCommon) {
-    for (auto& e : effects_) e->Initialize(dxCommon);
+void PostEffectManager::InitializeAll() {
+    for (auto& e : effects_) e->Initialize();
 }
 
 void PostEffectManager::UpdateAll() {
