@@ -5,11 +5,28 @@
 #include"WinApp.h"
 #include"DirectXcommon.h"
 #include<memory>
-class SkyBoxPSO;//前方宣言
+#include"SkyBoxPSO.h"
 
 
 class SkyBoxCommon
 {
+
+public:
+	// シングルトンインスタンス取得
+	static SkyBoxCommon* GetInstance() {
+		if (!instance) {
+			instance = new SkyBoxCommon();
+		}
+		return instance;
+	}
+
+private:
+	static SkyBoxCommon* instance; // シングルトンインスタンス
+	SkyBoxCommon() = default; // コンストラクタ（外部から生成不可）
+	~SkyBoxCommon() = default; // デストラクタ
+	SkyBoxCommon(const SkyBoxCommon&) = delete; // コピーコンストラクタ禁止
+	SkyBoxCommon& operator=(const SkyBoxCommon&) = delete; // 代入演算子禁止
+
 public:
 	/*------------------------------------------------------------
 			関数
@@ -18,21 +35,16 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(WinApp* winApp, DirectXCommon* dxCommon);
+	void Initialize();
+
+	void Finalize();
 
 	/// <summary>
     /// 共通描画設定
     /// </summary>
 	void DrawSettingsCommon();
-	/*---------------------------------------------------
-			GETTER!
-	---------------------------------------------------*/
-	DirectXCommon* GetDxCommon()const { return dxCommon_; }
-	WinApp* GetWinApp()const { return winApp_; }
-
+	
 private:
-	WinApp* winApp_ = nullptr;
-	DirectXCommon* dxCommon_;
-	SkyBoxPSO* pso = nullptr;
+	std::unique_ptr<SkyBoxPSO> pso = nullptr; // スカイボックスのパイプラインステートオブジェクト
 };
 

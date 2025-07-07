@@ -17,6 +17,26 @@ class VignettePSO;
 class OffScreenRendering
 {
 public:
+	/// <summary>
+	/// シングルトンインスタンス取得
+	/// </summary>
+	static OffScreenRendering* GetInstance() {
+		if (!instance) {
+			instance = new OffScreenRendering();
+		}
+		return instance;
+	}
+
+
+private:
+	// コンストラクタ・デストラクタ・コピー禁止
+	static OffScreenRendering* instance;
+	OffScreenRendering() = default;
+	~OffScreenRendering() = default;
+	OffScreenRendering(const OffScreenRendering&) = delete;
+	OffScreenRendering& operator=(const OffScreenRendering&) = delete;
+
+public:
 	///------------------------------------------------------------------------
 	///                             メンバ関数
 	///------------------------------------------------------------------------
@@ -25,7 +45,7 @@ public:
 	/// 初期化処理
 	/// 必要なリソースの生成や各種設定を行います。
 	/// </summary>
-	void Initialize(WinApp* winApp, DirectXCommon* dxCommon);
+	void Initialize();
 
 	/// <summary>
 	/// 更新処理
@@ -56,6 +76,9 @@ public:
 
 	void DrawImGui();
 
+
+	void Finalize();
+
 	/// <summary>
 	/// レンダーターゲットリソースの作成
 	/// 指定されたサイズ・フォーマット・クリアカラーでリソースを生成します。
@@ -75,14 +98,6 @@ public:
 	);
 
 private:
-	///-----------------------------------------------------------------------
-	///                             受取り用変数
-	///-----------------------------------------------------------------------
-	// DirectX共通部分へのポインタ
-	DirectXCommon* dxCommon_ = nullptr;
-
-	// ウィンドウアプリケーションへのポインタ
-	WinApp* winApp_ = nullptr;
 
 	///-----------------------------------------------------------------------
 	///                             メンバ変数
@@ -119,13 +134,13 @@ private:
 
 	// オフスクリーン用PSOクラス
 	OffScreenRenderingPSO* offScreenRenderingPSO = nullptr;
-	
+
 	// ヴィネット用PSOクラス
 	VignettePSO* vignettePSO = nullptr;
 	///-----------------------------------------------------------------------
 	///                             リソース
 	///------------------------------------------------------------------------
-	
+
 	Microsoft::WRL::ComPtr <ID3D12Resource> vignetteResource;
 	//VignetteParams* vignetteData = nullptr;
 

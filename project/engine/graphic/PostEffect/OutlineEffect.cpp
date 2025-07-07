@@ -1,8 +1,8 @@
 #include "OutlineEffect.h"
 
-void OutlineEffect::Initialize(DirectXCommon* dxCommon) {
+void OutlineEffect::Initialize() {
     pso_ = std::make_unique<OutlinePSO>();
-    pso_->Initialize(dxCommon);
+    pso_->Initialize();
 }
 
 void OutlineEffect::Draw(ID3D12GraphicsCommandList* commandList) {

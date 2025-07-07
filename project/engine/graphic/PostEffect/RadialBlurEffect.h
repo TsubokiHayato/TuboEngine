@@ -2,6 +2,7 @@
 #include "PostEffectBase.h"
 #include "RadialBlurPSO.h"
 #include"Vector2.h"
+#include"DirectXCommon.h"
 
 struct RadialBlurParams
 {
@@ -16,7 +17,7 @@ class RadialBlurEffect : public PostEffectBase
 public:
 	RadialBlurEffect();
 	~RadialBlurEffect();
-	void Initialize(DirectXCommon* dxCommon) override;
+	void Initialize() override;
 	void Update() override;
 	void DrawImGui() override;
 	void Draw(ID3D12GraphicsCommandList* commandList) override;

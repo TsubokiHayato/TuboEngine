@@ -7,7 +7,7 @@ class PostEffectManager
 public:
     void AddEffect(std::unique_ptr<PostEffectBase> effect);
 
-    void InitializeAll(DirectXCommon* dxCommon);
+    void InitializeAll();
 
     void UpdateAll();
 

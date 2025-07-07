@@ -1,15 +1,19 @@
 #include "skyBoxCommon.h"
 #include"SkyBoxPSO.h"
-void SkyBoxCommon::Initialize(WinApp* winApp, DirectXCommon* dxCommon) {
-    winApp_ = winApp;
-    dxCommon_ = dxCommon;
-
+SkyBoxCommon* SkyBoxCommon::instance = nullptr; // シングルトンインスタンス
+void SkyBoxCommon::Initialize() {
+  
     /*---------------------------------------
         PSOの初期化
     ---------------------------------------*/
-    pso = new SkyBoxPSO();
-    pso->Initialize(dxCommon_);
+	pso = std::make_unique<SkyBoxPSO>();
+    pso->Initialize();
    
+}
+
+void SkyBoxCommon::Finalize() {
+	delete instance;
+	instance = nullptr;
 }
 
 void SkyBoxCommon::DrawSettingsCommon() {
