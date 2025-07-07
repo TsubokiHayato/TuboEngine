@@ -285,13 +285,13 @@
     <ClCompile Include="engine\graphic\PSO\NonePSO.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="SkyBoxCommon.cpp">
+    <ClCompile Include="engine\graphic\PSO\SkyBox\SkyBoxCommon.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="SkyBox.cpp">
+    <ClCompile Include="engine\graphic\PSO\SkyBox\SkyBox.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="SkyBoxPSO.cpp">
+    <ClCompile Include="engine\graphic\PSO\SkyBoxPSO.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -551,13 +551,13 @@
     <ClInclude Include="engine\graphic\PSO\NonePSO.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="SkyBoxCommon.h">
+    <ClInclude Include="engine\graphic\PSO\SkyBox\SkyBoxCommon.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="SkyBox.h">
+    <ClInclude Include="engine\graphic\PSO\SkyBox\SkyBox.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="SkyBoxPSO.h">
+    <ClInclude Include="engine\graphic\PSO\SkyBoxPSO.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
