@@ -13,7 +13,7 @@
 #endif // DEBUG
 #include"SceneManager.h"
 #include"ParticleCommon.h"
-#include"SkyBoxCommon.h"
+#include"./SkyBox/SkyBoxCommon.h"
 #include"Input.h"
 #include"./PostEffect/OffScreenRendering.h"
 
