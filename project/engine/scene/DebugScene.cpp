@@ -22,12 +22,12 @@ void DebugScene::Initialize() {
 
 	//オーディオ
 	const std::string audioFileName = "fanfare.wav";
-	const std::string audioDirectoryPath = "Resources/Audio/";
+	
 
 
 #pragma region Audioの初期化
 	audio = std::make_unique<Audio>();
-	audio->Initialize(audioFileName, audioDirectoryPath);
+	audio->Initialize(audioFileName);
 	audio->Play(false);
 
 #pragma endregion Audioの初期化
