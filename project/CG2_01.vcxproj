@@ -93,7 +93,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio;$(ProjectDir)engine\graphic\Particle;$(ProjectDir)engine\scene;$(ProjectDir)engine\base\Framework;$(ProjectDir)engine\base\Utilities;$(ProjectDir)engine\base\Common;$(ProjectDir)engine\graphic\data;$(ProjectDir)engine\graphic\PSO;$(ProjectDir)externals\assimp\include;$(ProjectDir)application</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio;$(ProjectDir)engine\graphic\Particle;$(ProjectDir)engine\scene;$(ProjectDir)engine\base\Framework;$(ProjectDir)engine\base\Utilities;$(ProjectDir)engine\base\Common;$(ProjectDir)engine\graphic\data;$(ProjectDir)engine\graphic\PSO;$(ProjectDir)externals\assimp\include;$(ProjectDir)application;$(ProjectDir)engine\collision</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
     </ClCompile>
     <Link>
@@ -104,7 +104,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
       <AdditionalOptions>/ignore:4049 /ignore:4098 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc143-mt.lib;dxcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
@@ -112,9 +112,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BaseCharacter.cpp" />
+    <ClCompile Include="application\BaseCharacter.cpp" />
+    <ClCompile Include="application\BaseBullet.cpp" />
+    <ClCompile Include="Collider.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
-    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="application\Enemy.cpp" />
     <ClCompile Include="engine\graphic\PSO\AddBlendPSO.cpp" />
     <ClCompile Include="engine\scene\ClearScene.cpp" />
     <ClCompile Include="engine\scene\DebugScene.cpp" />
@@ -137,7 +139,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ClCompile Include="engine\scene\IScene.cpp" />
-    <ClCompile Include="FollowTopDownCamera.cpp" />
+    <ClCompile Include="application\FollowTopDownCamera.cpp" />
+    <ClCompile Include="HitEffectManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\graphic\3d\Model.cpp" />
     <ClCompile Include="engine\graphic\3d\ModelCommon.cpp" />
@@ -164,13 +167,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\NormalBlendPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\ScreenBlendPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\SubtractBlendPSO.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PlayerBullet.cpp" />
+    <ClCompile Include="ParameterManager.cpp" />
+    <ClCompile Include="application\Player.cpp" />
+    <ClCompile Include="application\PlayerBullet.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BaseCharacter.h" />
+    <ClInclude Include="application\BaseCharacter.h" />
+    <ClInclude Include="application\BaseBullet.h" />
+    <ClInclude Include="Collider.h" />
     <ClInclude Include="CollisionManager.h" />
-    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="CollisionTypeId.h" />
+    <ClInclude Include="application\Enemy.h" />
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
     <ClInclude Include="engine\graphic\data\Node.h" />
     <ClInclude Include="engine\graphic\PSO\AddBlendPSO.h" />
@@ -232,9 +239,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\PSO\NormalBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\ScreenBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\SubtractBlendPSO.h" />
-    <ClInclude Include="FollowTopDownCamera.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="PlayerBullet.h" />
+    <ClInclude Include="application\FollowTopDownCamera.h" />
+    <ClInclude Include="HitEffectManager.h" />
+    <ClInclude Include="ParameterManager.h" />
+    <ClInclude Include="application\Player.h" />
+    <ClInclude Include="application\PlayerBullet.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\imgui\imgui.vcxproj">

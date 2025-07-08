@@ -73,6 +73,18 @@
     <Filter Include="ヘッダー ファイル\camera">
       <UniqueIdentifier>{1a14542c-7933-44f9-8a3b-269ecdf443bb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\scene">
+      <UniqueIdentifier>{7557eb50-1ec7-4c3e-a41e-33285cdabdd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\collider">
+      <UniqueIdentifier>{05b6a909-c9a8-47d6-a79e-b033805d922f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\application">
+      <UniqueIdentifier>{a02d2e07-c1f1-494f-8483-621ff1cf5e95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\graphic\PSO">
+      <UniqueIdentifier>{a2fb0177-8491-445e-ad05-c8ae48cc5f98}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="engine\graphic\2d\Sprite.cpp">
@@ -162,27 +174,6 @@
     <ClCompile Include="engine\graphic\PSO\PSO.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\scene\IScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\SceneManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\base\Framework\Order.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\DebugScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\TitleScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\StageScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\ClearScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="engine\graphic\Particle\ParticleCommon.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -201,9 +192,6 @@
     <ClCompile Include="engine\graphic\PSO\NormalBlendPSO.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\AddBlendPSO.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="engine\graphic\PSO\SubtractBlendPSO.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -213,22 +201,58 @@
     <ClCompile Include="engine\graphic\PSO\ScreenBlendPSO.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="BaseCharacter.cpp">
+    <ClCompile Include="application\PlayerBullet.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
+    <ClCompile Include="ParameterManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerBullet.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="engine\scene\IScene.cpp">
+      <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
-    <ClCompile Include="Enemy.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="engine\scene\TitleScene.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\scene\SceneManager.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\scene\StageScene.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\scene\ClearScene.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\scene\DebugScene.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Collider.cpp">
+      <Filter>ソース ファイル\collider</Filter>
     </ClCompile>
     <ClCompile Include="CollisionManager.cpp">
+      <Filter>ソース ファイル\collider</Filter>
+    </ClCompile>
+    <ClCompile Include="application\FollowTopDownCamera.cpp">
+      <Filter>ソース ファイル\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="application\BaseCharacter.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\base\Framework\Order.cpp">
+      <Filter>ソース ファイル\base</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Player.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Enemy.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\graphic\PSO\AddBlendPSO.cpp">
+      <Filter>ソース ファイル\graphic\PSO</Filter>
+    </ClCompile>
+    <ClCompile Include="application\BaseBullet.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="FollowTopDownCamera.cpp">
+    <ClCompile Include="HitEffectManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -416,22 +440,37 @@
     <ClInclude Include="engine\graphic\data\Node.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="BaseCharacter.h">
+    <ClInclude Include="application\BaseCharacter.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
+    <ClInclude Include="application\Player.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerBullet.h">
+    <ClInclude Include="application\PlayerBullet.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Enemy.h">
+    <ClInclude Include="application\Enemy.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="CollisionManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="FollowTopDownCamera.h">
+    <ClInclude Include="application\FollowTopDownCamera.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionTypeId.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="ParameterManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="application\BaseBullet.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="HitEffectManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
