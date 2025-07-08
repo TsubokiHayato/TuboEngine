@@ -2,6 +2,7 @@
 #include"TextureManager.h"
 #include"ImGuiManager.h"
 #include"numbers"
+#include <Input.h>
 void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon) {
 	//各共通部分のポインタを受け取る
 	this->particleCommon = particleCommon;
@@ -131,7 +132,7 @@ void TitleScene::ImGuiDraw() {
 	ImGui::DragFloat3("Scale", &particleTranslate.scale.x);
 	ImGui::End();
 
-
+	Input::GetInstance()->ShowInputDebugWindow();
 }
 
 void TitleScene::ParticleDraw() {
