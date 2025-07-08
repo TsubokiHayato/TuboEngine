@@ -4,7 +4,8 @@
 #include "Input.h"
 #include"Audio.h"
 #include"Camera.h"
-#include"FollowTopDownCamera.h"
+#include"CollisionManager.h"
+#include"application/FollowTopDownCamera.h"
 
 #include"SpriteCommon.h"
 #include"Object3dCommon.h"
@@ -13,10 +14,11 @@
 #include"ModelManager.h"
 #include"AudioCommon.h"
 #include"ImGuiManager.h"
+#include "Collider.h"
 
-
-#include "Player.h"
-#include "Enemy.h"
+#include"application/Player.h"
+#include"application/PlayerBullet.h"
+#include"application/Enemy.h"
 
 
 
@@ -66,6 +68,8 @@ public:
 	/// </summary>
 	void ParticleDraw() override;
 
+
+	void CheckAllCollisions();
 	
 private:
 
@@ -87,6 +91,9 @@ private:
 	
 	std::unique_ptr<Audio> audio = nullptr;
 
+	/// Collider ///
+	std::unique_ptr<CollisionManager> collisionManager_;
+
 	/// Camera ///
 	std::unique_ptr<FollowTopDownCamera> followCamera;
     
@@ -95,9 +102,9 @@ private:
 	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
 	
 	/// Player ///
-	std::unique_ptr<Player> player = nullptr;
+	std::unique_ptr<Player> player_ = nullptr;
 	/// Enemy ///
-	std::unique_ptr<Enemy> enemy = nullptr;
+	std::unique_ptr<Enemy> enemy_ = nullptr;
 	std::vector<std::unique_ptr<Enemy>> enemies; // Enemyリスト
 
 
