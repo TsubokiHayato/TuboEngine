@@ -55,6 +55,7 @@ void Player::Initialize(Object3dCommon* object3dCommon) {
 void Player::Update() {
 	isHit = false;
 	Move();
+	Rotate();
 
 	// 発射タイマー更新
 	if (bulletTimer > 0.0f) {
@@ -125,6 +126,30 @@ void Player::Move() {
 	}
 }
 
+///---------------------------------------------------
+// 回転処理
+//---------------------------------------------------
+void Player::Rotate() {
+	// --- マウスの方向に身体を向ける処理 ---
+	int screenWidth = 1280; // TODO: DirectXから取得するように
+	int screenHeight = 720;
+
+	int mouseX = static_cast<int>(Input::GetInstance()->GetMousePosition().x);
+	int mouseY = static_cast<int>(Input::GetInstance()->GetMousePosition().y);
+
+	float centerX = static_cast<float>(screenWidth) / 2.0f;
+	float centerY = static_cast<float>(screenHeight) / 2.0f;
+
+	float dx = static_cast<float>(mouseX) - centerX;
+	float dy = static_cast<float>(mouseY) - centerY;
+
+	// Z+前方が0度、X+右方向が+90度
+	float angle = std::atan2(dx, -dy);
+
+	rotation.y = angle;
+}
+
+
 //--------------------------------------------------
 // 当たり判定の中心座標を取得
 //--------------------------------------------------
@@ -167,6 +192,8 @@ void Player::DrawImGui() {
 	ImGui::Text("HP: %d", HP);
 	ImGui::Text("IsHit: %s", isHit ? "Yes" : "No");
 	ImGui::End();
+
+	Input::GetInstance()->ShowInputDebugWindow();
 
 	// プレイヤー弾のグローバルパラメータImGui
 	PlayerBullet::DrawImGuiGlobal();
