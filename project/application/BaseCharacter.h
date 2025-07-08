@@ -1,8 +1,10 @@
 #pragma once
 #include "Object3d.h"
 #include "Vector3.h"
+#include"Collider.h"
 
-class BaseCharacter {
+
+class BaseCharacter : public Collider {
 
 public:
 	///--------------------------------------------------
@@ -29,23 +31,17 @@ public:
 	virtual void Draw();
 	
 	/// <summary>
-	/// 終了処理
+	///　衝突判定
 	/// </summary>
-	virtual void Finalize();
-
-	
-	/// <summary>
-	/// 移動処理
-	/// </summary>
-	virtual void Move();
+	/// <param name="other"></param>
+	virtual void OnCollision(Collider* other) override;
 
 	/// <summary>
-	/// ダメージ処理
-	/// </summary>
-	/// <param name="damage"></param>
-	virtual void TakeDamage(int damage);
-
+	/// 当たり判定の中心座標を取得
+	virtual Vector3 GetCenterPosition() const override;
 	
+
+
 	///--------------------------------------------------
 	///				メンバ変数
 	/// -------------------------------------------------
