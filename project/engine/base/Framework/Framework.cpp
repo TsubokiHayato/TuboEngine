@@ -63,7 +63,7 @@ void Framework::Initialize()
 	AudioCommon::GetInstance()->Initialize();
 
 	//入力初期化
-	Input::GetInstance()->Initialize(winApp.get());
+	Input::GetInstance()->Initialize(winApp->GetHWND());
 
 
 	//シーンマネージャーの初期化
