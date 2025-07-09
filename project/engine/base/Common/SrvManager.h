@@ -3,13 +3,31 @@
 
 class SrvManager
 {
+public:
+	/// <summary>
+	/// シングルトンインスタンス取得
+	/// </summary>
+	static SrvManager* GetInstance() {
+		
+		if (!instance) {
+			instance = new SrvManager();
+		}
+		return instance;
+	}
+private:
+	// コンストラクタ・デストラクタ・コピー禁止
+	static SrvManager* instance;
+	SrvManager() = default;
+	~SrvManager() = default;
+	SrvManager(const SrvManager&) = delete;
+	SrvManager& operator=(const SrvManager&) = delete;
 
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <param name="dxCommon">DirectX共通部分</param>
-	void Initialize(DirectXCommon* dxCommon);
+	void Initialize();
 
 	/// <summary>
 	/// SRVの割り当て
@@ -24,7 +42,7 @@ public:
 	/// <param name="pResource">リソース</param>
 	/// <param name="format">フォーマット</param>
 	/// <param name="MipLevels">ミップマップレベル</param>
-	void CreateSRVforTexture2D(uint32_t index, ID3D12Resource* pResource, DXGI_FORMAT format, UINT MipLevels);
+	void CreateSRVforTexture2D(uint32_t index, Microsoft::WRL::ComPtr<ID3D12Resource> pResource, DXGI_FORMAT format, UINT MipLevels);
 
 	/// <summary>
 	/// ディスクリプタヒープのCPUハンドルを取得
@@ -33,11 +51,13 @@ public:
 	/// <param name="pResource">リソース</param>
 	/// <param name="numElements">要素数</param>
 	/// <param name="strideInBytes">バイト数</param>
-	void CreateSRVForStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT enelemtQuantity, UINT structureByteStride);
+	void CreateSRVForStructuredBuffer(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> pResource, UINT enelemtQuantity, UINT structureByteStride);
 	/// <summary>
 	/// 描画前処理
 	/// </summary>
 	void PreDraw();
+
+	void Finalize();
 
 
 	//-------------------Getter & Setter-------------------//
@@ -55,7 +75,7 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
 
 	void SetGraphicsRootDescriptorTable(uint32_t rootParameterIndex, uint32_t srvIndex) {
-		dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(rootParameterIndex, GetGPUDescriptorHandle(srvIndex));
+		DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(rootParameterIndex, GetGPUDescriptorHandle(srvIndex));
 	}
 
 	//最大SRV数(最大テクスチャ枚数)
@@ -63,8 +83,7 @@ public:
 
 private:
 
-	//DirectX共通部分
-	DirectXCommon* dxCommon_ = nullptr;
+	
 
 
 

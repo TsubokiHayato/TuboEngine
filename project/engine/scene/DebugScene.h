@@ -15,11 +15,12 @@
 
 #include"SpriteCommon.h"
 #include"Object3dCommon.h"
-#include"ModelCommon.h"
 #include"TextureManager.h"
 #include"ModelManager.h"
 #include"AudioCommon.h"
 #include"ImGuiManager.h"
+
+#include"SkyBox.h"
 
 
 #undef min//minマクロを無効化
@@ -39,12 +40,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	/// <param name="object3dCommon">3Dオブジェクト共通部分</param>
-	/// <param name="spriteCommon">スプライト共通部分</param>
-	/// <param name="particleCommon">パーティクル共通部分</param>
-	/// <param name="winApp">ウィンドウアプリケーション</param>
-	/// <param name="dxCommon">DirectX共通部分</param>
-	void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon);
+	void Initialize();
 
 	/// <summary>
 	/// 更新
@@ -75,13 +71,6 @@ public:
 	/// パーティクル描画
 	/// </summary>
 	void ParticleDraw()override;
-	
-private:
-
-	WinApp* winApp = nullptr;
-	DirectXCommon* dxCommon = nullptr;
-	Object3dCommon* object3dCommon = nullptr;
-	SpriteCommon* spriteCommon = nullptr;
 
 private:
 
@@ -119,7 +108,7 @@ private:
 	//Camera///
 
 	std::unique_ptr <Camera> camera = nullptr;
-	Vector3 cameraPosition = { 0.0f,0.0f,-15.0f };
+	Vector3 cameraPosition = { 0.0f,1.0f,-15.0f };
 	Vector3 cameraRotation = { 0.0f,0.0f,0.0f };
 	Vector3 cameraScale = { 1.0f,1.0f,1.0f };
 
@@ -134,6 +123,11 @@ private:
 	Vector4 pointLightColor = { 1.0f,1.0f,1.0f,1.0f };
 	float pointLightIntensity = 1.0f;
 
+
+
+	///SkyBox
+	
+	std::unique_ptr<SkyBox> skyBox = nullptr;
 	
 };
 

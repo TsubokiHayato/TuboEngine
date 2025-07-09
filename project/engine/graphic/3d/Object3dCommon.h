@@ -1,24 +1,43 @@
 #pragma once
-#include"WinApp.h"
-#include"DirectXCommon.h"
-class PSO;
-class NoneBlendPSO;
-class NormalBlendPSO;
-class AddBlendPSO;
-class MultiplyBlendPSO;
-class SubtractBlendPSO;
-class ScreenBlendPSO;
+#include"PSO.h"
+#include"NoneBlendPSO.h"
+#include"NormalBlendPSO.h"
+#include"AddBlendPSO.h"
+#include"SubtractBlendPSO.h"
+#include"MultiplyBlendPSO.h"
+#include"ScreenBlendPSO.h"
+
 
 class Camera;
 class Object3dCommon
 {
+public:
+	/// <summary>
+	/// シングルトンインスタンス取得
+	/// </summary>
+	static Object3dCommon* GetInstance() {
+
+		if (instance == nullptr) {
+			instance = new Object3dCommon();
+		}
+		return instance;
+	}
+
+private:
+	// コンストラクタ・デストラクタ・コピー禁止
+	static Object3dCommon* instance; // シングルトンインスタンス
+	Object3dCommon() = default;
+	~Object3dCommon() = default;
+	Object3dCommon(const Object3dCommon&) = delete;
+	Object3dCommon& operator=(const Object3dCommon&) = delete;
 
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	/// <param name="dxCommon">DirectX共通部分</param>
-	void Initialize(WinApp* winApp,DirectXCommon* dxCommon);
+	void Initialize();
+
+	void Finalize();
 
 	/// <summary>
    /// 共通描画設定
@@ -37,27 +56,27 @@ public:
 	/*---------------------------------------------------
 			GETTER & SETTER
 	---------------------------------------------------*/
-	DirectXCommon* GetDxCommon()const { return dxCommon_; }
-	WinApp* GetWinApp()const { return winApp_; }
 
 	void SetDefaultCamera(Camera* camera) { defaultCamera = camera; }
 	Camera* GetDefaultCamera()const { return defaultCamera; }
 
 
-	
+
+    
 private:
-	
-	
-	WinApp* winApp_ = nullptr;//ウィンドウズアプリケーション
-	DirectXCommon* dxCommon_ = nullptr;//DirectX共通部分
-	PSO* pso = nullptr;//PSO
-	NoneBlendPSO* noneBlendPSO = nullptr;//NoneBlendPSO
-	NormalBlendPSO* normalBlendPSO = nullptr;//NormalBlendPSO
-	AddBlendPSO* addBlendPSO = nullptr;//AddBlendPSO
-	MultiplyBlendPSO* multiplyBlendPSO = nullptr;//MultiplyBlendPSO
-	SubtractBlendPSO* subtractBlendPSO = nullptr;//SubtractBlendPSO
-	ScreenBlendPSO* screenBlendPSO = nullptr;//ScreenBlendPSO
-	
+
+
+	std::unique_ptr <PSO> pso = nullptr;//PSOのユニークポインタ
+	std::unique_ptr <NoneBlendPSO > noneBlendPSO;//NoneBlendPSOのユニークポインタ
+	std::unique_ptr <NormalBlendPSO > normalBlendPSO;//NormalBlendPSOのユニークポインタ
+	std::unique_ptr <AddBlendPSO > addBlendPSO;//AddBlendPSOのユニークポインタ
+	std::unique_ptr <MultiplyBlendPSO > multiplyBlendPSO;//MultiplyBlendPSOのユニークポインタ
+	std::unique_ptr <SubtractBlendPSO > subtractBlendPSO;//SubtractBlendPSOのユニークポインタ
+	std::unique_ptr <ScreenBlendPSO > screenBlendPSO;//ScreenBlendPSOのユニークポインタ
+
+
+
+
 	Camera* defaultCamera = nullptr;//デフォルトカメラ
 	int blenderMode_;//ブレンダーモード
 
