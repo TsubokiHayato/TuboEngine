@@ -169,6 +169,9 @@ void Input::ShowInputDebugWindow() {
 					if (joy.rgbButtons[b] & 0x80) {
 						ImGui::Text("    Button %d: Down", b);
 					}
+					LONG rightStickX = joy.lRx;
+					LONG rightStickY = joy.lRy;
+					// rightStickX, rightStickYが右スティックの値
 				}
 			}
 		} else if (joystick.type_ == PadType::XInput) {
@@ -259,6 +262,13 @@ BOOL CALLBACK Input::EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance,
 
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> device;
 	HRESULT hr = input->dInput_->CreateDevice(pdidInstance->guidInstance, &device, nullptr);
+	if (FAILED(hr))
+		return DIENUM_CONTINUE;
+
+	hr = device->SetDataFormat(&c_dfDIJoystick2);
+	if (FAILED(hr))
+		return DIENUM_CONTINUE;
+	hr = device->SetCooperativeLevel(input->hwnd_, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
 	if (FAILED(hr))
 		return DIENUM_CONTINUE;
 
