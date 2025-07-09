@@ -8,7 +8,6 @@
 #include"ModelData.h"
 #include"Camera.h"
 #include"ParticleCommon.h"
-#include"ModelCommon.h"
 #include"ModelManager.h"
 #include <random>
 
@@ -58,6 +57,7 @@ struct ParticleGroup
 		Primitive, // プリミティブ
 		Ring, // リング
 		Cylinder, // 円柱
+		Original, // オリジナル
 	};
 
 class Particle
@@ -78,7 +78,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="particleCommon">パーティクル共通部分</param>
-	void Initialize(ParticleCommon* particleCommon, ParticleType particleType);
+	void Initialize( ParticleType particleType);
 
 	/// <summary>
 	/// 更新処理
@@ -126,6 +126,12 @@ private:
 	/// </summary>
 	void CreateVertexDataForCylinder();
 
+	///<summary>
+	/// 頂点データの作成(オリジナル)
+	/// </summary>
+	void CreateVertexDataForOriginal();
+
+	
 
 
 	/// <summary>
@@ -189,6 +195,19 @@ private:
 	/// <returns>新しいパーティクル情報</returns>
 	ParticleInfo CreateNewParticleForCylinder(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
 
+
+
+	/// <summary>
+	/// 新しいパーティクルの作成(オリジナル)
+	/// </summary>
+	/// <param name="randomEngine">ランダムエンジン</param>
+	/// <param name="transform">エミッターのトランスフォーム</param>
+	/// <param name="velocity">速度</param>
+	/// <param name="color">カラー</param>
+	/// <param name="lifeTime">寿命</param>
+	/// <param name="currentTime">経過時間</param>
+	/// /// <returns>新しいパーティクル情報</returns>
+	ParticleInfo CreateNewParticleForOriginal(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
 
 
 public:
@@ -255,11 +274,7 @@ private:
 	
 
 private:
-	ParticleCommon* particleCommon = nullptr; // パーティクル共通部分
-	DirectXCommon* dxCommon_ = nullptr; // DirectX共通部分
-	WinApp* winApp_ = nullptr; // ウィンドウズアプリケーション
-
-	ModelCommon* modelCommon_ = nullptr; // モデル共通部分
+	
 	Model* model_ = nullptr; // モデルデータ
 
 	DirectionalLight* directionalLightData = nullptr; // 平行光源データ

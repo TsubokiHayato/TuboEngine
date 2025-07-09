@@ -21,12 +21,30 @@ class DirectXCommon
 {
 
 private:
+	static DirectXCommon* instance;
+	// シングルトン用
+	DirectXCommon() = default;
+	~DirectXCommon() = default;
+	DirectXCommon(const DirectXCommon&) = delete;
+	DirectXCommon& operator=(const DirectXCommon&) = delete;
+	DirectXCommon(DirectXCommon&&) = delete;
+	DirectXCommon& operator=(DirectXCommon&&) = delete;
 
-
+public:
+	// インスタンス取得
+	static DirectXCommon* GetInstance() {
+		// インスタンスがない場合は作成する
+		if (instance == nullptr) {
+			instance = new DirectXCommon;
+		}
+		return instance;
+	}
 public:
 
 	//初期化
-	void Initialize(WinApp* winApp);
+	void Initialize();
+
+	void Finalize();
 
 	//デバイスの初期化
 	void Device_Initialize();
@@ -217,9 +235,6 @@ private:
 
 
 
-
-
-	std::unique_ptr<WinApp> winApp = nullptr;
 
 	//DXGIファクトリーの設置
 	Microsoft::WRL::ComPtr <IDXGIFactory7> dxgiFactory = nullptr;
