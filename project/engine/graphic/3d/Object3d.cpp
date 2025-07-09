@@ -2,7 +2,6 @@
 #include "Camera.h"
 #include "MT_Matrix.h"
 #include "Model.h"
-#include "ModelCommon.h"
 #include "ModelManager.h"
 #include "Object3dCommon.h"
 #include "TextureManager.h"
@@ -12,21 +11,17 @@
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 
-void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileNamePath) {
+void Object3d::Initialize(std::string modelFileNamePath) {
 	// 引数で受け取ってメンバ変数に記録する
-	this->object3dCommon = object3dCommon;
-	this->dxCommon_ = object3dCommon->GetDxCommon();
-	this->winApp_ = object3dCommon->GetWinApp();
-	this->camera = object3dCommon->GetDefaultCamera();
+	
+	this->camera = Object3dCommon::GetInstance()->GetDefaultCamera();
 
 	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
-	// モデルを取得
-	model_ = ModelManager::GetInstance()->FindModel(modelFileNamePath);
 
 #pragma region TransformMatrixResourced
 
 	// WVP用のリソースを作る
-	transformMatrixResource = this->dxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
+	transformMatrixResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	// データを書き込む
 	transformMatrixData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -39,7 +34,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileN
 
 #pragma region DirectionalLightData
 	// 平行光源用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	directionalLightResource = this->dxCommon_->CreateBufferResource(sizeof(DirectionalLight));
+	directionalLightResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(DirectionalLight));
 	// 平行光源用にデータを書き込む
 	directionalLightData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -55,7 +50,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileN
 #pragma region PointLight
 
 	// ポイントライト用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	pointLightResource = this->dxCommon_->CreateBufferResource(sizeof(PointLight));
+	pointLightResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(PointLight));
 	// 平行光源用にデータを書き込む
 	pointLightData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -70,7 +65,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileN
 #pragma region SpotLight
 
 	// スポットライト用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	spotLightResource = this->dxCommon_->CreateBufferResource(sizeof(SpotLight));
+	spotLightResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(SpotLight));
 	// 平行光源用にデータを書き込む
 	spotLightData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -88,7 +83,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileN
 
 #pragma region cameraWorldPos
 	// 平行光源用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	cameraForGPUResource = this->dxCommon_->CreateBufferResource(sizeof(CameraForGPU));
+	cameraForGPUResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGPU));
 	// 平行光源用にデータを書き込む
 	cameraForGPUData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -99,7 +94,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon, std::string modelFileN
 
 #pragma region LightType
 	// ライトの種類
-	lightTypeResource = this->dxCommon_->CreateBufferResource(sizeof(LightType));
+	lightTypeResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(LightType));
 	// 平行光源用にデータを書き込む
 	lightTypeData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -131,7 +126,7 @@ void Object3d::Update() {
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera->GetScale(), camera->GetRotation(), camera->GetTranslate());
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(winApp_->kClientWidth) / float(winApp_->kClientHeight), 0.1f, 100.0f);
+	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(WinApp::GetInstance()->GetClientWidth()) / float(WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
 	if (camera) {
@@ -145,7 +140,7 @@ void Object3d::Update() {
 	transformMatrixData->WVP = model_->GetRootNodeLocalMatrix() * worldMatrix * Multiply(viewMatrix, projectionMatrix);
 	transformMatrixData->World = model_->GetRootNodeLocalMatrix() * worldMatrix;
 
-	commandList = dxCommon_->GetCommandList();
+	commandList = DirectXCommon::GetInstance()->GetCommandList();
 }
 
 void Object3d::Draw() {
