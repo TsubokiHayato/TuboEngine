@@ -27,7 +27,7 @@ public:
 	void Finalize();
 
 	//初期化
-	void Initialize(WinApp* winApp);
+	void Initialize();
 	//更新
 	void Update();
 
@@ -60,9 +60,6 @@ private:
 	BYTE key[256] = {};
 	//前のキーの状態
 	BYTE keyPre[256] = {};
-	//ウィンドウアプリケーション
-	WinApp* winApp_ = nullptr;
-
-
+	
 
 };
