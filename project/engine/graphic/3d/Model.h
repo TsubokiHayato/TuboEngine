@@ -1,6 +1,6 @@
 #pragma once
-#include "DirectXcommon.h"
-#include "WinApp.h"
+
+
 
 #include "Material.h"
 #include "ModelData.h"
@@ -8,12 +8,12 @@
 #include "Transform.h"
 #include "TransformationMatrix.h"
 #include "VertexData.h"
+#include"DirectXCommon.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-class ModelCommon;
 class Model {
 public:
 	//------------------------------------
@@ -23,7 +23,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="modelCommon">モデル共通部分</param>
-	void Initialize(ModelCommon* modelCommon, const std::string& directoryPath, const std::string& filename);
+	void Initialize( const std::string& directoryPath, const std::string& filename);
 
 	/// <summary>
 	/// 描画処理
@@ -72,8 +72,7 @@ public:
 
 
 private:
-	// 共通部分
-	ModelCommon* modelCommon_ = nullptr;
+
 
 	// モデルデータ
 	ModelData modelData;

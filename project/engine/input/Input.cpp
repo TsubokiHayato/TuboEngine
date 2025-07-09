@@ -22,15 +22,13 @@ void Input::Finalize()
 }
 
 
-void Input::Initialize(WinApp* winApp)
+void Input::Initialize()
 {
 
     HRESULT result;
-	//引数のウィンドウアプリケーションを保持
-    this->winApp_ = winApp;
-
+	
     // DirectInputのインスタンス生成
-    result = DirectInput8Create(winApp->GetHInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
+    result = DirectInput8Create(WinApp::GetInstance()->GetHInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
     assert(SUCCEEDED(result));
 
     // キーボードデバイスの作成
@@ -43,7 +41,7 @@ void Input::Initialize(WinApp* winApp)
     assert(SUCCEEDED(result));
 
     // 協調レベルのセット
-    result = keyboard->SetCooperativeLevel(winApp->GetHWND(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+    result = keyboard->SetCooperativeLevel(WinApp::GetInstance()->GetHWND(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
     assert(SUCCEEDED(result));
 }
 void Input::Update()
