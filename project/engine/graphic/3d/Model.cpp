@@ -1,6 +1,4 @@
 #include "Model.h"
-#include "ModelCommon.h"
-
 #include "MT_Matrix.h"
 #include "Object3d.h"
 #include "TextureManager.h"
@@ -10,18 +8,16 @@
 #include <fstream>
 #include <sstream>
 
-void Model::Initialize(ModelCommon* modelCommon, const std::string& directoryPath, const std::string& filename) {
+void Model::Initialize(const std::string& directoryPath, const std::string& filename) {
 
-	// 引数で受け取ってメンバ変数に記録する
-	this->modelCommon_ = modelCommon;
-
-	commandList = modelCommon_->GetDxCommon()->GetCommandList();
+	
+	commandList = DirectXCommon::GetInstance()->GetCommandList();
 
 #pragma region ModelData
 	// モデル読み込み
 	modelData = LoadModelFile(directoryPath, filename);
 	// 頂点リソースを作る
-	vertexResource = modelCommon_->GetDxCommon()->CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
+	vertexResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
 	// 頂点バッファビューを作成する
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
@@ -35,7 +31,7 @@ void Model::Initialize(ModelCommon* modelCommon, const std::string& directoryPat
 
 #pragma region Material_Resource
 	// マテリアル用のリソースを作る。今回はColor1つ分のサイズを用意する
-	materialResource = modelCommon_->GetDxCommon()->CreateBufferResource(sizeof(Material));
+	materialResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
 	// マテリアルにデータを書き込む
 	materialData = nullptr;
 	// 書き込むためのアドレスを取得

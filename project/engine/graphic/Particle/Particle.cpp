@@ -14,11 +14,8 @@
 /// 初期化処理
 /// </summary>
 /// <param name="particleSetup">パーティクル共通部分</param>
-void Particle::Initialize(ParticleCommon* particleSetup, ParticleType particleType) {
-	// 引数からSetupを受け取る
-	this->particleCommon = particleSetup;
-	dxCommon_ = particleSetup->GetDxCommon();
-	winApp_ = particleSetup->GetWinApp();
+void Particle::Initialize( ParticleType particleType) {
+
 	// パーティクルのタイプを設定
 	this->particleType_ = particleType;
 
@@ -64,7 +61,7 @@ void Particle::Update() {
 	// ビュー行列の取得
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 	// プロジェクション行列の取得
-	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(winApp_->kClientWidth) / float(winApp_->kClientHeight), 0.1f, 100.0f);
+	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(WinApp::GetInstance()->GetClientWidth()) / float(WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
 	// ビュープロジェクション行列の取得
 	Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 
@@ -134,7 +131,7 @@ void Particle::Update() {
 /// 描画処理
 /// </summary>
 void Particle::Draw() {
-	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList().Get();
+	ID3D12GraphicsCommandList* commandList = DirectXCommon::GetInstance()->GetCommandList().Get();
 
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 
@@ -149,10 +146,10 @@ void Particle::Draw() {
 		commandList->SetGraphicsRootConstantBufferView(0, materialBuffer_->GetGPUVirtualAddress());
 
 		// テクスチャのSRVのDescriptorTableを設定
-		commandList->SetGraphicsRootDescriptorTable(2, particleCommon->GetSrvManager()->GetGPUDescriptorHandle(group.second.srvIndex));
+		commandList->SetGraphicsRootDescriptorTable(2, SrvManager::GetInstance()->GetGPUDescriptorHandle(group.second.srvIndex));
 
 		// インスタンシングデータのSRVのDescriptorTableを設定
-		commandList->SetGraphicsRootDescriptorTable(1, particleCommon->GetSrvManager()->GetGPUDescriptorHandle(group.second.instancingSrvIndex));
+		commandList->SetGraphicsRootDescriptorTable(1, SrvManager::GetInstance()->GetGPUDescriptorHandle(group.second.instancingSrvIndex));
 
 		// Draw Call (インスタンシング描画)
 		commandList->DrawInstanced((UINT)modelData_.vertices.size(), group.second.instanceCount, 0, 0);
@@ -245,7 +242,7 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 	}
 
 	// インスタンシング用リソースの生成
-	newGroup.instancingResource = dxCommon_->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
+	newGroup.instancingResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
 
 	newGroup.instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&newGroup.instancingDataPtr));
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
@@ -254,9 +251,9 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 	}
 
 	// インスタンシング用SRVを確保してSRVインデックスを記録
-	newGroup.instancingSrvIndex = particleCommon->GetSrvManager()->Allocate() + 1;
+	newGroup.instancingSrvIndex = SrvManager::GetInstance()->Allocate() + 1;
 	// 作成したSRVをインスタンシング用リソースに設定
-	particleCommon->GetSrvManager()->CreateSRVForStructuredBuffer(newGroup.instancingSrvIndex, newGroup.instancingResource.Get(), kNumMaxInstance, sizeof(ParticleForGPU));
+	SrvManager::GetInstance()->CreateSRVForStructuredBuffer(newGroup.instancingSrvIndex, newGroup.instancingResource.Get(), kNumMaxInstance, sizeof(ParticleForGPU));
 
 	// パーティクルグループをリストに追加
 	particleGroups.emplace(name, newGroup);
@@ -369,13 +366,26 @@ void Particle::CreateVertexDataForCylinder() {
 
 }
 
+void Particle::CreateVertexDataForOriginal() {
+
+
+
+
+
+
+
+
+
+
+}
+
 
 /// <summary>
 /// 頂点バッファビューの作成
 /// </summary>
 void Particle::CreateVertexBufferView() {
 	// 頂点バッファの作成
-	vertexBuffer_ = dxCommon_->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
+	vertexBuffer_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
 
 	// 頂点バッファビューの作成
 	// リソースの先頭のアドレスから使う
@@ -391,7 +401,7 @@ void Particle::CreateVertexBufferView() {
 /// </summary>
 void Particle::CreateMaterialData() {
 	// マテリアル用のリソースを作成
-	materialBuffer_ = dxCommon_->CreateBufferResource(sizeof(Material));
+	materialBuffer_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
 
 	// 書き込むためのアドレスを取得
 	materialBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
@@ -497,5 +507,9 @@ ParticleInfo Particle::CreateNewParticleForCylinder(std::mt19937& randomEngine, 
 
 
 	return particle;
+}
+
+ParticleInfo Particle::CreateNewParticleForOriginal(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+	return ParticleInfo();
 }
 
