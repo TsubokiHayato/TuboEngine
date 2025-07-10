@@ -89,7 +89,7 @@ void DebugScene::Initialize() {
 
 	object3d = std::make_unique<Object3d>();
 	object3d->Initialize(modelFileNamePath);
-	object3d->SetModel(modelFileNamePath);
+
 
 	////////////////////////////////////////////////////////////////////////
 
@@ -99,8 +99,7 @@ void DebugScene::Initialize() {
 
 	object3d2 = std::make_unique<Object3d>();
 	object3d2->Initialize(modelFileNamePath2);
-
-	object3d2->SetModel(modelFileNamePath2);
+	
 
 #pragma endregion 3Dモデルの初期化
 
@@ -123,39 +122,7 @@ void DebugScene::Initialize() {
 }
 
 void DebugScene::Update() {
-	// パッド入力取得
-	Input* input = Input::GetInstance();
-	if (input->IsPadConnected(0)) {
-		DIJOYSTATE2 joyState;
-		if (input->GetJoystickState(0, joyState)) {
-			// 左スティック（DirectInputの場合、lX/lYは-32768～32767）
-			float stickX = static_cast<float>(joyState.lX) / 32768.0f;
-			float stickY = static_cast<float>(joyState.lY) / 32768.0f;
-
-			// デッドゾーン処理
-			const float deadZone = 0.2f;
-			if (fabsf(stickX) < deadZone)
-				stickX = 0.0f;
-			if (fabsf(stickY) < deadZone)
-				stickY = 0.0f;
-
-			// 移動速度
-			const float speed = 2.0f;
-
-			// XZ平面移動
-			modelPosition.x += stickX * speed;
-			modelPosition.z += stickY * speed;
-
-			// Aボタン（ボタン0）でY座標を上げる例
-			if (joyState.rgbButtons[0] & 0x80) {
-				modelPosition.y += speed;
-			}
-			// Bボタン（ボタン1）でY座標を下げる例
-			if (joyState.rgbButtons[1] & 0x80) {
-				modelPosition.y -= speed;
-			}
-		}
-	}
+	
 
 	// --- 既存のカメラ・オブジェクト・スプライト更新処理 ---
 	camera->SetTranslate(cameraPosition);
@@ -214,7 +181,7 @@ void DebugScene::Finalize() {
 }
 
 void DebugScene::Object3DDraw() {
-	
+	object3d->Draw();
 	object3d2->Draw();
 
 	skyBox->Draw();
@@ -226,7 +193,7 @@ void DebugScene::SpriteDraw() {
 			sprite->Draw();
 		}
 	}
-	object3d->Draw();
+	
 }
 
 void DebugScene::ImGuiDraw() {
