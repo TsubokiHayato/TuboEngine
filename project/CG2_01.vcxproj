@@ -65,7 +65,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio;$(ProjectDir)engine\graphic\Particle;$(ProjectDir)engine\scene;$(ProjectDir)engine\base\Framework;$(ProjectDir)engine\base\Utilities;$(ProjectDir)engine\base\Common;$(ProjectDir)engine\graphic\data;$(ProjectDir)engine\graphic\PSO;$(ProjectDir)externals\assimp\include;$(ProjectDir)engine\graphic\PSO\Blend;$(ProjectDir)engine\graphic\PSO\PostEffect;$(ProjectDir)engine\graphic\PostEffect;$(ProjectDir)engine\graphic\SkyBox</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio;$(ProjectDir)engine\graphic\Particle;$(ProjectDir)engine\scene;$(ProjectDir)engine\base\Framework;$(ProjectDir)engine\base\Utilities;$(ProjectDir)engine\base\Common;$(ProjectDir)engine\graphic\data;$(ProjectDir)engine\graphic\PSO;$(ProjectDir)externals\assimp\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -115,6 +115,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PostEffect\DissolveEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\DissolvePSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\Blend\AddBlendPSO.cpp" />
+    <ClCompile Include="application\BaseCharacter.cpp" />
+    <ClCompile Include="application\BaseBullet.cpp" />
+    <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="CollisionManager.cpp" />
+    <ClCompile Include="application\Enemy.cpp" />
+    <ClCompile Include="engine\graphic\PSO\AddBlendPSO.cpp" />
     <ClCompile Include="engine\scene\ClearScene.cpp" />
     <ClCompile Include="engine\scene\DebugScene.cpp" />
     <ClCompile Include="engine\audio\Audio.cpp" />
@@ -132,7 +138,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="engine\imgui\ImGuiManager.cpp" />
-    <ClCompile Include="Framework\Framework.cpp">
+    <ClCompile Include="engine\base\Framework\Framework.cpp">
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ClCompile Include="engine\scene\IScene.cpp" />
@@ -140,6 +146,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\PostEffect\GaussianBlurPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\GrayScaleEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\GrayScalePSO.cpp" />
+    <ClCompile Include="application\FollowTopDownCamera.cpp" />
+    <ClCompile Include="HitEffectManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\graphic\3d\Model.cpp" />
     <ClCompile Include="engine\graphic\3d\ModelManager.cpp" />
@@ -189,6 +197,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\SkyBoxPSO.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application\BaseCharacter.h" />
+    <ClInclude Include="application\BaseBullet.h" />
+    <ClInclude Include="Collider.h" />
+    <ClInclude Include="CollisionManager.h" />
+    <ClInclude Include="CollisionTypeId.h" />
+    <ClInclude Include="application\Enemy.h" />
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\DissolvePSO.h" />
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
@@ -209,6 +223,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\math\Matrix3x3.h" />
     <ClInclude Include="engine\math\Matrix4x4.h" />
     <ClInclude Include="engine\graphic\3d\Model.h" />
+    <ClInclude Include="engine\graphic\3d\ModelCommon.h" />
     <ClInclude Include="engine\graphic\data\ModelData.h" />
     <ClInclude Include="engine\graphic\3d\ModelManager.h" />
     <ClInclude Include="engine\math\MT_Matrix.h" />
@@ -234,9 +249,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="engine\imgui\ImGuiManager.h" />
-    <ClInclude Include="Framework\Framework.h" />
+    <ClInclude Include="engine\base\Framework\Framework.h" />
     <ClInclude Include="engine\scene\IScene.h" />
-    <ClInclude Include="Framework\Order.h" />
+    <ClInclude Include="engine\base\Framework\Order.h" />
     <ClInclude Include="engine\graphic\Particle\Particle.h" />
     <ClInclude Include="engine\graphic\Particle\ParticleCommon.h" />
     <ClInclude Include="engine\graphic\Particle\ParticleEmitter.h" />
@@ -292,7 +307,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="Resources\Shaders\Particle.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
