@@ -3,10 +3,30 @@
 #include"IScene.h"
 class SceneManager
 {
+public:
+	/// <summary>
+	/// シングルトンインスタンス取得
+	/// </summary>
+	static SceneManager* GetInstance() {
+		
+		if (!instance) {
+			instance = new SceneManager();
+		}
+		return instance;
+	}
+
+private:
+	// コンストラクタ・デストラクタ・コピー禁止
+	static SceneManager* instance ;
+	SceneManager() = default;
+	~SceneManager() = default;
+	SceneManager(const SceneManager&) = delete;
+	SceneManager& operator=(const SceneManager&) = delete;
+
 
 public:
 	//初期化
-	void Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon,ParticleCommon*particleCommon ,WinApp* winApp, DirectXCommon* dxCommon);
+	void Initialize();
 	//更新
 	void Update();
 	//終了処理
@@ -19,19 +39,6 @@ public:
 	void ImGuiDraw();
 
 	void ParticleDraw();
-
-private:
-	
-	//オブジェクト3D共通部
-	Object3dCommon* object3dCommon;
-	//スプライト共通部
-	SpriteCommon* spriteCommon;
-	//パーティクル共通部
-	ParticleCommon* particleCommon;
-	//ウィンドウズアプリケーション
-	WinApp* winApp;
-	//DirectX共通部
-	DirectXCommon* dxCommon;
 
 private:
 
