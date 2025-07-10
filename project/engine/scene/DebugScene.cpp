@@ -4,17 +4,16 @@
 #include"ModelManager.h"
 #include"TextureManager.h"
 #include"BlendMode.h"
-void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon) {
+void DebugScene::Initialize() {
 
-	this->object3dCommon = object3dCommon;
-	this->spriteCommon = spriteCommon;
-	this->winApp = winApp;
-	this->dxCommon = dxCommon;
 	//テクスチャマネージャに追加する画像ハンドル
 	std::string uvCheckerTextureHandle = "uvChecker.png";
 	std::string monsterBallTextureHandle = "monsterBall.png";
 
-	
+	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
+
+	TextureManager::GetInstance()->LoadTexture(testDDSTextureHandle);
+
 	//モデルファイルパス
 	const std::string modelFileNamePath = "plane.gltf";
 	//モデルファイルパス2
@@ -29,7 +28,7 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 #pragma region Audioの初期化
 	audio = std::make_unique<Audio>();
 	audio->Initialize(audioFileName, audioDirectoryPath);
-	audio->Play(true);
+	audio->Play(false);
 
 #pragma endregion Audioの初期化
 	/*---------------
@@ -45,10 +44,10 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 		//もしfor文のiが偶数なら
 		if (i % 2 == 0) {
 			//モンスターボールを表示させる
-			sprite->Initialize(this->spriteCommon, monsterBallTextureHandle);
+			sprite->Initialize( monsterBallTextureHandle);
 		} else {
 			//uvCheckerを表示させる
-			sprite->Initialize(this->spriteCommon, uvCheckerTextureHandle);
+			sprite->Initialize( uvCheckerTextureHandle);
 		}
 
 
@@ -89,8 +88,8 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//オブジェクト3D
 
 	object3d = std::make_unique<Object3d>();
-	object3d->Initialize(this->object3dCommon,modelFileNamePath);
-	
+	object3d->Initialize(modelFileNamePath);
+	object3d->SetModel(modelFileNamePath);
 
 	////////////////////////////////////////////////////////////////////////
 
@@ -99,9 +98,9 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	//オブジェクト3D
 
 	object3d2 = std::make_unique<Object3d>();
-	object3d2->Initialize(this->object3dCommon,modelFileNamePath2);
+	object3d2->Initialize(modelFileNamePath2);
 
-
+	object3d2->SetModel(modelFileNamePath2);
 
 #pragma endregion 3Dモデルの初期化
 
@@ -113,12 +112,14 @@ void DebugScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	camera->setRotation(cameraRotation);
 	camera->setScale(cameraScale);
 
-	//
-	object3dCommon->SetDefaultCamera(camera.get());
 	object3d->SetCamera(camera.get());
 	object3d2->SetCamera(camera.get());
 
 #pragma endregion cameraの初期化
+
+
+	skyBox = std::make_unique<SkyBox>();
+	skyBox->Initialize(testDDSTextureHandle);
 }
 
 void DebugScene::Update() {
@@ -194,7 +195,8 @@ void DebugScene::Update() {
 	}
 
 
-
+	skyBox->SetCamera(camera.get());
+	skyBox->Update();
 
 
 
@@ -212,8 +214,10 @@ void DebugScene::Finalize() {
 }
 
 void DebugScene::Object3DDraw() {
-	object3d->Draw();
+	
 	object3d2->Draw();
+
+	skyBox->Draw();
 }
 
 void DebugScene::SpriteDraw() {
@@ -222,6 +226,7 @@ void DebugScene::SpriteDraw() {
 			sprite->Draw();
 		}
 	}
+	object3d->Draw();
 }
 
 void DebugScene::ImGuiDraw() {
@@ -229,101 +234,115 @@ void DebugScene::ImGuiDraw() {
 	ImGui::Text("Hello, DebugScene!");
 	ImGui::End();
 
-#ifdef _DEBUG
+	//skyBoxのImGui
 
-	ImGui::Begin("camera");
-	ImGui::DragFloat3("Position", &cameraPosition.x, 0.1f);
-	ImGui::DragFloat3("Rotation", &cameraRotation.x, 0.1f);
-	ImGui::DragFloat3("Scale", &cameraScale.x, 0.1f);
+	static Vector3 skyBoxPosition = skyBox->GetTransform().translate;
+	static Vector3 skyBoxRotation = skyBox->GetTransform().rotate;
+	static Vector3 skyBoxScale = skyBox->GetTransform().scale;
+
+	ImGui::Begin("SkyBox");
+	ImGui::DragFloat3("Position", &skyBoxPosition.x, 0.1f);
+	ImGui::DragFloat3("Rotation", &skyBoxRotation.x, 0.1f);
+	ImGui::DragFloat3("Scale", &skyBoxScale.x, 0.1f);
 	ImGui::End();
 
-	//スプライトのImGui
-	for (Sprite* sprite : sprites) {
-		if (sprite) {
-			ImGui::Begin("Sprite");
 
-
-			Vector2 spritePosition = sprite->GetPosition();
-			ImGui::SliderFloat2("Position", &spritePosition.x, 0.0f, 1920.0f, "%.1f");
-			sprite->SetPosition(spritePosition);
-
-			ImGui::Checkbox("isFlipX", &isFlipX_);
-			ImGui::Checkbox("isFlipY", &isFlipY_);
-			ImGui::Checkbox("isAdjustTextureSize", &isAdjustTextureSize);
-			ImGui::DragFloat2("textureLeftTop", &textureLeftTop.x);
-
-			Vector4 color = sprite->GetColor();
-			ImGui::ColorEdit4("Color", &color.x);
-			sprite->SetColor(color);
-
-			ImGui::End();
+	
+	#ifdef _DEBUG
+	
+		ImGui::Begin("camera");
+		ImGui::DragFloat3("Position", &cameraPosition.x, 0.1f);
+		ImGui::DragFloat3("Rotation", &cameraRotation.x, 0.1f);
+		ImGui::DragFloat3("Scale", &cameraScale.x, 0.1f);
+		ImGui::End();
+	
+		//スプライトのImGui
+		for (Sprite* sprite : sprites) {
+			if (sprite) {
+				ImGui::Begin("Sprite");
+	
+	
+				Vector2 spritePosition = sprite->GetPosition();
+				ImGui::SliderFloat2("Position", &spritePosition.x, 0.0f, 1920.0f, "%.1f");
+				sprite->SetPosition(spritePosition);
+	
+				ImGui::Checkbox("isFlipX", &isFlipX_);
+				ImGui::Checkbox("isFlipY", &isFlipY_);
+				ImGui::Checkbox("isAdjustTextureSize", &isAdjustTextureSize);
+				ImGui::DragFloat2("textureLeftTop", &textureLeftTop.x);
+	
+				Vector4 color = sprite->GetColor();
+				ImGui::ColorEdit4("Color", &color.x);
+				sprite->SetColor(color);
+	
+				ImGui::End();
+			}
 		}
-	}
-	ImGui::Begin("Object3D");
-	ImGui::DragFloat3("Position", &modelPosition.x);
-	ImGui::DragFloat3("Rotation", &modelRotation.x);
-	ImGui::DragFloat3("Scale", &modelScale.x);
-
-
-	//色
-	Vector4 color = object3d->GetModelColor();
-	ImGui::ColorEdit4("Color", &color.x);
-	object3d->SetModelColor(color);
-
-	ImGui::End();
-
-	object3d->ShowImGuiLight();
-	ImGui::Begin("Object3D2");
-	ImGui::DragFloat3("Position", &modelPosition2.x);
-	ImGui::DragFloat3("Rotation", &modelRotation2.x);
-	ImGui::DragFloat3("Scale", &modelScale2.x);
-
-
-	object3d2->SetModelColor(color);
-	ImGui::End();
-
-	static float scratchPosition = 0.0f;
-	static bool isScratching = false;
-	static float lastScratchPosition = 0.0f;
-	//再生時間
-	float duration = audio->GetSoundDuration();
-
-	ImGui::Begin("Audio Control");
-
-	if (ImGui::Button("Play")) {
-		audio->Play(false);
-	}
-	if (ImGui::Button("Stop")) {
-		audio->Stop();
-	}
-	if (ImGui::Button("Pause")) {
-		audio->Pause();
-	}
-	if (ImGui::Button("Resume")) {
-		audio->Resume();
-	}
-	//volume
-	static float volume = 0.1f;
-	ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f);
-	audio->SetVolume(volume);
-
-	// 再生バー
-	static float playbackPosition = 0.0f;
-	//再生位置の取得
-	playbackPosition = audio->GetPlaybackPosition();
-	//再生位置の視認
-	ImGui::SliderFloat("Playback Position", &playbackPosition, 0.0f, duration);
-	//audio->SetPlaybackPosition(playbackPosition);
-
-	//speed
-	static float speed = 1.0f;
-	ImGui::SliderFloat("Speed", &speed, 0.0f, 2.0f);
-	audio->SetPlaybackSpeed(speed);
-
-	ImGui::End();
-
-
-#endif // DEBUG
+		ImGui::Begin("Object3D");
+		ImGui::DragFloat3("Position", &modelPosition.x);
+		ImGui::DragFloat3("Rotation", &modelRotation.x);
+		ImGui::DragFloat3("Scale", &modelScale.x);
+	
+	
+		//色
+		Vector4 color = object3d->GetModelColor();
+		ImGui::ColorEdit4("Color", &color.x);
+		object3d->SetModelColor(color);
+	
+		ImGui::End();
+	
+		object3d->ShowImGuiLight();
+		ImGui::Begin("Object3D2");
+		ImGui::DragFloat3("Position", &modelPosition2.x);
+		ImGui::DragFloat3("Rotation", &modelRotation2.x);
+		ImGui::DragFloat3("Scale", &modelScale2.x);
+	
+	
+		object3d2->SetModelColor(color);
+		ImGui::End();
+	
+		static float scratchPosition = 0.0f;
+		static bool isScratching = false;
+		static float lastScratchPosition = 0.0f;
+		//再生時間
+		float duration = audio->GetSoundDuration();
+	
+		ImGui::Begin("Audio Control");
+	
+		if (ImGui::Button("Play")) {
+			audio->Play(false);
+		}
+		if (ImGui::Button("Stop")) {
+			audio->Stop();
+		}
+		if (ImGui::Button("Pause")) {
+			audio->Pause();
+		}
+		if (ImGui::Button("Resume")) {
+			audio->Resume();
+		}
+		//volume
+		static float volume = 0.1f;
+		ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f);
+		audio->SetVolume(volume);
+	
+		// 再生バー
+		static float playbackPosition = 0.0f;
+		//再生位置の取得
+		playbackPosition = audio->GetPlaybackPosition();
+		//再生位置の視認
+		ImGui::SliderFloat("Playback Position", &playbackPosition, 0.0f, duration);
+		//audio->SetPlaybackPosition(playbackPosition);
+	
+		//speed
+		static float speed = 1.0f;
+		ImGui::SliderFloat("Speed", &speed, 0.0f, 2.0f);
+		audio->SetPlaybackSpeed(speed);
+	
+		ImGui::End();
+	
+	
+	#endif // DEBUG
 
 }
 

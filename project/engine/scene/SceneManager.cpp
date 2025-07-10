@@ -4,18 +4,14 @@
 #include"TitleScene.h"
 #include"StageScene.h"
 #include"ClearScene.h"
-void SceneManager::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon)
-{
-	//各共通部分のポインタを受け取る
-	this->object3dCommon = object3dCommon;
-	this->spriteCommon = spriteCommon;
-	this->winApp = winApp;
-	this->dxCommon = dxCommon;
-	this->particleCommon = particleCommon;
 
+
+SceneManager* SceneManager::instance = nullptr; // シングルトンインスタンス
+void SceneManager::Initialize() {
+	
 	//初期シーンを設定
 	currentScene = std::make_unique<DebugScene>();
-	currentScene->Initialize(this->object3dCommon,this->spriteCommon,this->particleCommon,this->winApp,this->dxCommon);
+	currentScene->Initialize();
 
 	//シーン番号を設定
 	currentSceneNo = 0;
@@ -23,8 +19,7 @@ void SceneManager::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spri
 	prevSceneNo = -1;
 }
 
-void SceneManager::Update()
-{
+void SceneManager::Update() {
 	//現在のシーンがnullptrでない場合
 	if (currentScene == nullptr) {
 		return;
@@ -46,25 +41,22 @@ void SceneManager::Update()
 		if (currentSceneNo == DEBUG) {
 			//デバッグシーンを設定
 			currentScene = std::make_unique<DebugScene>();
-			currentScene->Initialize(object3dCommon, spriteCommon,particleCommon, winApp, dxCommon);
-		}
-		else if (currentSceneNo == TITLE) {
+			currentScene->Initialize();
+		} else if (currentSceneNo == TITLE) {
 			//タイトルシーンを設定
 			currentScene = std::make_unique<TitleScene>();
-			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
-		}
-		else if (currentSceneNo == STAGE) {
+			currentScene->Initialize();
+		} else if (currentSceneNo == STAGE) {
 			//ステージシーンを設定
 			currentScene = std::make_unique<StageScene>();
-			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
-		}
-		else if (currentSceneNo == CLEAR) {
+			currentScene->Initialize();
+		} else if (currentSceneNo == CLEAR) {
 			//クリアシーンを設定
 			currentScene = std::make_unique<ClearScene>();
-			currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
+			currentScene->Initialize();
 		}
 		//初期化
-		currentScene->Initialize(object3dCommon, spriteCommon, particleCommon, winApp, dxCommon);
+		currentScene->Initialize();
 	}
 	//現在のシーンがnullptrでない場合
 	if (currentScene) {
@@ -73,18 +65,18 @@ void SceneManager::Update()
 	}
 }
 
-void SceneManager::Finalize()
-{
+void SceneManager::Finalize() {
 	//現在のシーンがnullptrでない場合
 	if (currentScene) {
 		//終了処理
 		currentScene->Finalize();
 	}
+	delete instance;
+	instance = nullptr;
 
 }
 
-void SceneManager::Object3DDraw()
-{
+void SceneManager::Object3DDraw() {
 	//現在のシーンがnullptrでない場合
 	if (currentScene) {
 		//3Dオブジェクト描画
@@ -92,8 +84,7 @@ void SceneManager::Object3DDraw()
 	}
 }
 
-void SceneManager::SpriteDraw()
-{
+void SceneManager::SpriteDraw() {
 	//現在のシーンがnullptrでない場合
 	if (currentScene) {
 		//スプライト描画
@@ -101,8 +92,7 @@ void SceneManager::SpriteDraw()
 	}
 }
 
-void SceneManager::ImGuiDraw()
-{
+void SceneManager::ImGuiDraw() {
 	//現在のシーンがnullptrでない場合
 	if (currentScene) {
 		//ImGui描画
@@ -127,8 +117,7 @@ void SceneManager::ImGuiDraw()
 
 }
 
-void SceneManager::ParticleDraw()
-{
+void SceneManager::ParticleDraw() {
 	//現在のシーンがnullptrでない場合
 	if (currentScene) {
 		//パーティクル描画
