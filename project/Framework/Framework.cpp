@@ -51,7 +51,7 @@ void Framework::Initialize() {
 	AudioCommon::GetInstance()->Initialize();
 
 	//入力初期化
-	Input::GetInstance()->Initialize();
+	Input::GetInstance()->Initialize(WinApp::GetInstance()->GetHWND());
 
 	//オフスクリーンレンダリングの初期化
 	OffScreenRendering::GetInstance()->Initialize();

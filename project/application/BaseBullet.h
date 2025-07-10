@@ -8,7 +8,7 @@ class BaseBullet :public Collider {
 public:
 	virtual ~BaseBullet() = default;
 
-	virtual void Initialize(Object3dCommon* object3dCommon, const Vector3& startPos) = 0;
+	virtual void Initialize(const Vector3& startPos) = 0;
 	virtual void Update() = 0;
 	virtual void Draw() = 0;
 

@@ -130,6 +130,7 @@ public:
 	}
 	void SetModel(const std::string& filePath);
 	void SetCamera(Camera* camera) { this->camera = camera; }
+	Camera* GetCamera() const { return camera; }
 
 	void SetModelColor(const Vector4& color);
 
