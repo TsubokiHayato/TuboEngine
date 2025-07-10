@@ -10,9 +10,27 @@ class ImGuiManager
 {
 public:
 	/// <summary>
+	/// シングルトンインスタンス取得
+	/// </summary>
+	static ImGuiManager* GetInstance() {
+		if (!instance) {
+			instance = new ImGuiManager();
+		}
+		return instance;
+	}
+private:
+	// コンストラクタ・デストラクタ・コピー禁止
+	static ImGuiManager* instance;
+	ImGuiManager() = default;
+	~ImGuiManager() = default;
+	ImGuiManager(const ImGuiManager&) = delete;
+	ImGuiManager& operator=(const ImGuiManager&) = delete;
+
+public:
+	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(WinApp* winApp,DirectXCommon* dxCommon);
+	void Initialize();
 
 	/// <summary>
 	/// ImGuiの解放
@@ -35,9 +53,8 @@ public:
 	void Draw();
 
 private:
-	//WindowsAppのポインタ
-	WinApp* winApp_;
-	DirectXCommon* dxCommon;
+	
+	
 	//SRVディスクリプタヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
 };

@@ -7,7 +7,7 @@
 Enemy::Enemy() {}
 Enemy::~Enemy() {}
 
-void Enemy::Initialize(Object3dCommon* object3dCommon) {
+void Enemy::Initialize() {
 	// プレイヤーのコライダーの設定
 	Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kEnemy));
 
@@ -18,7 +18,7 @@ void Enemy::Initialize(Object3dCommon* object3dCommon) {
 
 	object3d = std::make_unique<Object3d>();
 	const std::string modelFileNamePath = "barrier.obj";
-	object3d->Initialize(object3dCommon, modelFileNamePath);
+	object3d->Initialize( modelFileNamePath);
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
 	object3d->SetScale(scale);
@@ -65,7 +65,7 @@ void Enemy::EmitHitParticle() {
 	TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
 
 	particle = std::make_unique<Particle>();
-	particle->Initialize(this->particleCommon_, ParticleType::Ring);
+	particle->Initialize(ParticleType::Ring);
 	particle->CreateParticleGroup("Particle", particleTextureHandle);
 
 	// 必ず最新のpositionを使う

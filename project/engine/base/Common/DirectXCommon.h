@@ -13,18 +13,38 @@
 #include "externals/DirectXTex/DirectXTex.h"
 #include<vector>
 #include<chrono>
+#include<Vector4.h>
+#include<OffScreenRenderingPSO.h>
 
 
 class DirectXCommon
 {
 
 private:
+	static DirectXCommon* instance;
+	// シングルトン用
+	DirectXCommon() = default;
+	~DirectXCommon() = default;
+	DirectXCommon(const DirectXCommon&) = delete;
+	DirectXCommon& operator=(const DirectXCommon&) = delete;
+	DirectXCommon(DirectXCommon&&) = delete;
+	DirectXCommon& operator=(DirectXCommon&&) = delete;
 
-
+public:
+	// インスタンス取得
+	static DirectXCommon* GetInstance() {
+		// インスタンスがない場合は作成する
+		if (instance == nullptr) {
+			instance = new DirectXCommon;
+		}
+		return instance;
+	}
 public:
 
 	//初期化
-	void Initialize(WinApp* winApp);
+	void Initialize();
+
+	void Finalize();
 
 	//デバイスの初期化
 	void Device_Initialize();
@@ -113,6 +133,9 @@ public:
 	//DSVの指定番号のGPUディスクリプタハンドルを取得する
 	D3D12_GPU_DESCRIPTOR_HANDLE GetDSVGPUDescriptorHandle(uint32_t index);
 
+	//ディスクリプタヒープの取得
+
+
 
 	//DescriptorSizeの取得
 	uint32_t GetDescriptorSizeSRV() {
@@ -141,7 +164,7 @@ public:
 
 
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[3];
 
 	Microsoft::WRL::ComPtr<ID3D12Fence> GetFence() { return fence; }
 	uint64_t GetFenceValue() { return fenceValue; }
@@ -158,6 +181,11 @@ public:
 	IDxcIncludeHandler* GetIncludeHandler() { return includeHandler; }
 
 	size_t GetBackBufferCount()const { return swapChainDesc.BufferCount; }
+
+	//viewportの取得
+	D3D12_VIEWPORT GetViewport()const { return viewport; }
+	//scissorRectの取得
+	D3D12_RECT GetScissorRect()const { return scissorRect; }
 
 	//シェーダーのコンパイル
 	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
@@ -207,9 +235,6 @@ private:
 
 
 
-
-
-	std::unique_ptr<WinApp> winApp = nullptr;
 
 	//DXGIファクトリーの設置
 	Microsoft::WRL::ComPtr <IDXGIFactory7> dxgiFactory = nullptr;
@@ -264,6 +289,7 @@ private:
 
 	//TransitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier{};
+	
 
 	UINT backBufferIndex;
 
@@ -272,6 +298,10 @@ private:
 
 
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> backBuffers; // Add this line to define backBuffers
+
+
+
+
 
 
 };
