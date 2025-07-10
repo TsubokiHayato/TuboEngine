@@ -1,7 +1,6 @@
 #pragma once
 #include "BaseBullet.h"
 #include "Object3d.h"
-#include "Object3dCommon.h"
 #include "Vector3.h"
 
 class Player;
@@ -17,7 +16,7 @@ public:
 	///--------------------------------------------------
 
 	// 初期化処理
-	void Initialize(Object3dCommon* object3dCommon, const Vector3& startPos) override;
+	void Initialize(const Vector3& startPos) override;
 
 	// 更新処理
 	void Update() override;
@@ -81,9 +80,7 @@ private:
 	///				メンバ変数
 	///--------------------------------------------------
 
-	// 弾の3Dオブジェクト
-	std::unique_ptr<Object3d> object3d;
-
+	
 	///  弾のパラメータ ///
 	// 弾の位置
 	Vector3 position;

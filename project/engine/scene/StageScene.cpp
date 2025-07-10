@@ -1,19 +1,14 @@
 #include "StageScene.h"
-#include"CollisionManager.h"
 
 #include "CollisionManager.h"
 #include "StageScene.h"
 #include "application/FollowTopDownCamera.h"
 
-void StageScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon) {
-	this->object3dCommon = object3dCommon;
-	this->spriteCommon = spriteCommon;
-	this->winApp = winApp;
-	this->dxCommon = dxCommon;
-
+void StageScene::Initialize() {
+	
 	// プレイヤー
 	player_ = std::make_unique<Player>();
-	player_->Initialize(object3dCommon);
+	player_->Initialize();
 
 	// 追従カメラの生成・初期化
 	followCamera = std::make_unique<FollowTopDownCamera>();
@@ -27,8 +22,7 @@ void StageScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 	const int enemyCount = 1;
 	for (int i = 0; i < enemyCount; ++i) {
 		auto enemy = std::make_unique<Enemy>();
-		enemy->SetParticleCommon(particleCommon);
-		enemy->Initialize(object3dCommon);
+		enemy->Initialize();
 		enemy->SetCamera(followCamera->GetCamera());
 		enemy->SetPosition(Vector3(float(i * 2), 0.0f, 5.0f));
 		enemies.push_back(std::move(enemy));
@@ -40,11 +34,9 @@ void StageScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 }
 
-void StageScene::Update() {
-	// 追従カメラの更新
-	if (followCamera) {
-		followCamera->Update();
-	}
+void StageScene::Update()
+{
+
 
 	player_->SetCamera(followCamera->GetCamera());
 	player_->Update();
@@ -63,7 +55,6 @@ void StageScene::Update() {
 
 void StageScene::Finalize()
 {
-	
 }
 
 void StageScene::Object3DDraw() {

@@ -17,7 +17,7 @@ public:
 	~Player() override;
 
 	// 初期化のオーバーライド
-	void Initialize(Object3dCommon* object3dCommon) override;
+	void Initialize() override;
 	// 更新処理のオーバーライド
 	void Update() override;
 	// 描画処理のオーバーライド
@@ -75,8 +75,7 @@ private:
 	///--------------------------------------------------
 	///				引き渡し用変数
 	///--------------------------------------------------
-	Object3dCommon* object3dCommon_ = nullptr; // 3Dオブジェクト共通部分
-
+	
 private:
 	///--------------------------------------------------
 	///				メンバ変数

@@ -75,7 +75,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="object3dCommon"></param>
-	void Initialize(Object3dCommon* object3dCommon, std::string modelFileNamePath);
+	void Initialize(std::string modelFileNamePath);
 
 	/// <summary>
 	/// 更新処理
@@ -130,6 +130,7 @@ public:
 	}
 	void SetModel(const std::string& filePath);
 	void SetCamera(Camera* camera) { this->camera = camera; }
+	Camera* GetCamera() const { return camera; }
 
 	void SetModelColor(const Vector4& color);
 
@@ -139,8 +140,6 @@ public:
 	Vector3 GetPosition() const { return transform.translate; }
 	//モデルの色
 	Vector4 GetModelColor();
-	// Camera
-	Camera* GetCamera() { return camera; }
 
 	///-------------------------------------------------------------------------------------------------
 	/// Light
@@ -163,27 +162,10 @@ public:
 	float GetSpotLightDecay() { return spotLightData->decay; }
 	float GetSpotLightCosAngle() { return spotLightData->cosAngle; }
 
-
-
-
-
-
-
-
-
-
-
 private:
 
 	//-------------------------------------------------------------------
 	//		メンバ変数
-
-	//共通部分
-	Object3dCommon* object3dCommon = nullptr;
-	//DirectX共通部分
-	DirectXCommon* dxCommon_ = nullptr;
-	//ウィンドウズアプリケーション
-	WinApp* winApp_ = nullptr;
 
 	//モデル共通部分
 	ModelCommon* modelCommon_ = nullptr;
