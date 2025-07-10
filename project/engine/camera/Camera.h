@@ -38,7 +38,6 @@ public:
 
 	
 private:
-	WinApp* winApp;//ウィンドウアプリケーション
 	
 	Transform transform_;//座標変換
 	Matrix4x4 worldMatrix_;//ワールド行列
