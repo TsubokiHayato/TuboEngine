@@ -4,29 +4,15 @@
 #include<cassert>
 #include <thread>
 #include<SrvManager.h>
+
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 
 
 using namespace Microsoft::WRL;
-//
-//DirectXCommon* DirectXCommon::GetInstance()
-//{
-//
-//	if (instance == nullptr) {
-//		instance = new DirectXCommon;
-//	}
-//	return instance;
-//
-//}
-
-void DirectXCommon::Initialize(WinApp* winApp)
-{
-	//NULL検出
-	assert(winApp);
-	//メンバ変数に記録
-	this->winApp = std::make_unique<WinApp>(*winApp);
-
+DirectXCommon* DirectXCommon::instance = nullptr; // シングルトンインスタンス
+void DirectXCommon::Initialize() {
+	
 	//FPS固定初期化
 	InitializeFixFPS();
 
@@ -37,7 +23,7 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	//スワップチェーンの生成
 	SwapChain_Create();
 	//深度バッファの生成
-	DepthBuffer_Create(winApp->kClientWidth, winApp->kClientHeight);
+	DepthBuffer_Create(WinApp::GetInstance()->GetClientWidth(), WinApp::GetInstance()->GetClientHeight());
 	//各種ディスクリプタヒープの生成
 	DescriptorHeap_Create();
 	//レンダーターゲットビューの初期化
@@ -52,12 +38,16 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	Scissor_Initialize();
 	//DXCコンパイラの生成
 	dxcCompiler_Create();
-	
+
+}
+
+void DirectXCommon::Finalize() {
+	delete instance;
+	instance = nullptr;
 }
 
 
-void DirectXCommon::Device_Initialize()
-{
+void DirectXCommon::Device_Initialize() {
 
 
 #ifdef _DEBUG
@@ -175,8 +165,7 @@ void DirectXCommon::Device_Initialize()
 
 }
 
-void DirectXCommon::Command_Initialize()
-{
+void DirectXCommon::Command_Initialize() {
 
 
 	//コマンドアロケータを生成する
@@ -210,15 +199,14 @@ void DirectXCommon::Command_Initialize()
 
 }
 
-void DirectXCommon::SwapChain_Create()
-{
+void DirectXCommon::SwapChain_Create() {
 
 #pragma region SwapChain
 
 	//スワップチェーンを生成する
 
-	swapChainDesc.Width = winApp->kClientWidth;//画面の幅。ウィンドウのいクライアント領域を同じものにしておく
-	swapChainDesc.Height = winApp->kClientHeight;//画面の高さ。ウィンドウのいクライアント領域を同じものにしておく
+	swapChainDesc.Width = WinApp::GetInstance()->GetClientWidth();//画面の幅。ウィンドウのいクライアント領域を同じものにしておく
+	swapChainDesc.Height = WinApp::GetInstance()->GetClientHeight();//画面の高さ。ウィンドウのいクライアント領域を同じものにしておく
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;//色の形式
 	swapChainDesc.SampleDesc.Count = 1;//マルチサンプルしない
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;//描画のターゲットとして利用する
@@ -226,7 +214,7 @@ void DirectXCommon::SwapChain_Create()
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;//モニタにうつしたら、中身を破棄
 
 	//コマンドキュー、ウィンドウハンドル、せっていを渡して生成する
-	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), winApp->GetHWND(), &swapChainDesc,
+	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), WinApp::GetInstance()->GetHWND(), &swapChainDesc,
 		nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));
 
 
@@ -238,10 +226,12 @@ void DirectXCommon::SwapChain_Create()
 
 
 	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResources[0]));
+	swapChainResources[0]->SetName(L"SwapChainBuffer0");
 
 	//うまく取得できなければ起動できない
 	assert(SUCCEEDED(hr));
 	hr = swapChain->GetBuffer(1, IID_PPV_ARGS(&swapChainResources[1]));
+	swapChainResources[1]->SetName(L"SwapChainBuffer1");
 	assert(SUCCEEDED(hr));
 
 #pragma endregion
@@ -250,8 +240,7 @@ void DirectXCommon::SwapChain_Create()
 
 }
 
-void DirectXCommon::DepthBuffer_Create(int32_t width, int32_t height)
-{
+void DirectXCommon::DepthBuffer_Create(int32_t width, int32_t height) {
 
 	//生成するResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
@@ -296,8 +285,7 @@ void DirectXCommon::DepthBuffer_Create(int32_t width, int32_t height)
 
 }
 
-void DirectXCommon::DescriptorHeap_Create()
-{
+void DirectXCommon::DescriptorHeap_Create() {
 
 
 #pragma region DescriptorSize
@@ -311,12 +299,14 @@ void DirectXCommon::DescriptorHeap_Create()
 
 #pragma region DescriptorHeap
 
-	
+
 	//RTVディスクイリプタヒープの生成
 	rtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
+	
+
 	//SRVディスクイリプタヒープの生成
-	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,SrvManager::kMaxSRVCount, true);
+	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, SrvManager::kMaxSRVCount, true);
 
 	//DSVディスクイリプタヒープの生成
 	dsvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
@@ -325,8 +315,7 @@ void DirectXCommon::DescriptorHeap_Create()
 
 }
 
-void DirectXCommon::RTV_Initialize()
-{
+void DirectXCommon::RTV_Initialize() {
 
 
 
@@ -351,11 +340,12 @@ void DirectXCommon::RTV_Initialize()
 	//2つ目を作る
 	device->CreateRenderTargetView(swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
 
+
+
 #pragma endregion
 }
 
-void DirectXCommon::DSV_Initialize()
-{
+void DirectXCommon::DSV_Initialize() {
 
 
 
@@ -374,8 +364,7 @@ void DirectXCommon::DSV_Initialize()
 
 }
 
-void DirectXCommon::Fence_Create()
-{
+void DirectXCommon::Fence_Create() {
 
 #pragma region Fence&Event
 
@@ -390,13 +379,12 @@ void DirectXCommon::Fence_Create()
 
 }
 
-void DirectXCommon::Viewport_Initialize()
-{
+void DirectXCommon::Viewport_Initialize() {
 
 
 	//クライアント領域の領域のサイズと一緒にして画面全体に表示
-	viewport.Width = (float)winApp->kClientWidth;
-	viewport.Height = (float)winApp->kClientHeight;
+	viewport.Width = (float)WinApp::GetInstance()->GetClientWidth();
+	viewport.Height = (float)WinApp::GetInstance()->GetClientHeight();
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 	viewport.MinDepth = 0.0f;
@@ -406,18 +394,16 @@ void DirectXCommon::Viewport_Initialize()
 
 
 
-void DirectXCommon::Scissor_Initialize()
-{
+void DirectXCommon::Scissor_Initialize() {
 
 	//基本的にビューポートと同じ矩形が構成されるようにする
 	scissorRect.left = 0;
-	scissorRect.right = winApp->kClientWidth;
+	scissorRect.right = WinApp::GetInstance()->GetClientWidth();
 	scissorRect.top = 0;
-	scissorRect.bottom = winApp->kClientHeight;
+	scissorRect.bottom = WinApp::GetInstance()->GetClientHeight();
 }
 
-void DirectXCommon::dxcCompiler_Create()
-{
+void DirectXCommon::dxcCompiler_Create() {
 
 
 
@@ -432,15 +418,8 @@ void DirectXCommon::dxcCompiler_Create()
 
 }
 
-
-
-
-
-
-
 //描画前処理
-void DirectXCommon::PreDraw()
-{
+void DirectXCommon::PreDraw() {
 	/*バックバッファの番号取得*/
 
 	//これから書き込むバックバッファのインデックスを取得
@@ -464,13 +443,13 @@ void DirectXCommon::PreDraw()
 	//TransitionBarrierを張る
 	commandList->ResourceBarrier(1, &barrier);
 
-	
+
 
 
 	/* 描画先のRTVとDSVを指定する*/
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle =
 		GetDSVCPUDescriptorHandle(0);
-	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
+	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
 
 
 	/* 描画全体の色をクリア*/
@@ -478,12 +457,6 @@ void DirectXCommon::PreDraw()
 
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };//RGBの値。青っぽい色
 	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
-
-
-	/* 画面全体の深度をクリア*/
-
-			//depthClear
-	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 
 	/* SRV用のディスクリプタヒープを指定する*/
@@ -500,17 +473,17 @@ void DirectXCommon::PreDraw()
 	commandList->RSSetScissorRects(1, &scissorRect);//Scissorを設定
 
 }
+
+
+
+
 //描画後処理
-void DirectXCommon::PostDraw()
-{
-	/*バックバッファの番号取得*/
-	UINT bbIndex = swapChain->GetCurrentBackBufferIndex();
-
-
-
+void DirectXCommon::PostDraw() {
+	
 	/*リソースバリアで表示状態に変更*/
 
 #pragma region TransitionBarrier
+
 	  //画面に書く処理がすべて終わり、画面に映すので、状態を偏移
 	  // 今回はRenderTargetからPresentにする
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -583,8 +556,7 @@ void DirectXCommon::PostDraw()
 
 }
 
-void DirectXCommon::CommandExecution()
-{
+void DirectXCommon::CommandExecution() {
 
 #pragma endregion
 
@@ -646,8 +618,7 @@ void DirectXCommon::CommandExecution()
 
 
 
-Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile)
-{
+Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile) {
 
 	/*---------------
 	1 mslファイルを読む
@@ -727,8 +698,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 	return shaderBlob;
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateBufferResource(size_t sizeInBytes)
-{
+Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateBufferResource(size_t sizeInBytes) {
 
 	Microsoft::WRL::ComPtr <IDXGIFactory7>dxgiFactory = nullptr;
 
@@ -769,8 +739,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateBufferResource(size_
 
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(const DirectX::TexMetadata& metadata)
-{
+Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(const DirectX::TexMetadata& metadata) {
 
 	/*------------------------
 	metaDataを基にResourceの設定
@@ -818,14 +787,13 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(cons
 
 [[nodiscard]]
 Microsoft::WRL::ComPtr <ID3D12Resource> DirectXCommon::
-UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages)
-{
+UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages) {
 	std::vector<D3D12_SUBRESOURCE_DATA> subResources;
 	DirectX::PrepareUpload(device.Get(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subResources);
 	uint64_t intermediateSize = GetRequiredIntermediateSize(texture.Get(), 0, UINT(subResources.size()));
-	
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = CreateBufferResource(intermediateSize);
-	UpdateSubresources(commandList.Get(), texture.Get(), intermediateResource.Get(), 0, 0, UINT(subResources.size()),subResources.data());
+	UpdateSubresources(commandList.Get(), texture.Get(), intermediateResource.Get(), 0, 0, UINT(subResources.size()), subResources.data());
 
 	//Textureへの転送後は利用できるよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
 	D3D12_RESOURCE_BARRIER barrier{};
@@ -840,8 +808,7 @@ UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const D
 	return intermediateResource;
 }
 
-DirectX::ScratchImage DirectXCommon::LoadTexture(const std::string& filePath)
-{
+DirectX::ScratchImage DirectXCommon::LoadTexture(const std::string& filePath) {
 	//テクスチャファイルを読んでプログラムで扱えるようにする
 	DirectX::ScratchImage image{};
 	std::wstring filePathW = StringUtility::ConvertString(filePath);
@@ -857,8 +824,7 @@ DirectX::ScratchImage DirectXCommon::LoadTexture(const std::string& filePath)
 	return mipImages;
 }
 
-void DirectXCommon::InitializeFixFPS()
-{
+void DirectXCommon::InitializeFixFPS() {
 
 	//現在時間を記録する
 	reference_ = std::chrono::steady_clock::now();
@@ -866,8 +832,7 @@ void DirectXCommon::InitializeFixFPS()
 
 }
 
-void DirectXCommon::UpdateFixFPS()
-{
+void DirectXCommon::UpdateFixFPS() {
 
 	//1/60秒ピッタリの時間
 	const std::chrono::microseconds kMinTime(uint64_t(1000000.0f / 60.0f));
@@ -893,13 +858,7 @@ void DirectXCommon::UpdateFixFPS()
 	reference_ = std::chrono::steady_clock::now();
 }
 
-
-
-
-
-
-Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap( D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
-{
+Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible) {
 
 	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> descriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
@@ -913,48 +872,43 @@ Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap
 	return descriptorHeap;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index)
-{
+
+
+
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index) {
 
 	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	handleCPU.ptr += (descriptorSize * index);
 	return handleCPU;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index)
-{
+D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, uint32_t descriptorSize, uint32_t index) {
 
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	handleGPU.ptr += (descriptorSize * index);
 	return handleGPU;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVCPUDescriptorHandle(uint32_t index)
-{
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVCPUDescriptorHandle(uint32_t index) {
 	return GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, index);
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVGPUDescriptorHandle(uint32_t index)
-{
+D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVGPUDescriptorHandle(uint32_t index) {
 	return  GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, index);
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetRTVCPUDescriptorHandle(uint32_t index)
-{
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetRTVCPUDescriptorHandle(uint32_t index) {
 	return GetCPUDescriptorHandle(rtvDescriptorHeap, descriptorSizeRTV, index);
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetRTVGPUDescriptorHandle(uint32_t index)
-{
+D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetRTVGPUDescriptorHandle(uint32_t index) {
 	return  GetGPUDescriptorHandle(rtvDescriptorHeap, descriptorSizeRTV, index);
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetDSVCPUDescriptorHandle(uint32_t index)
-{
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetDSVCPUDescriptorHandle(uint32_t index) {
 	return GetCPUDescriptorHandle(dsvDescriptorHeap, descriptorSizeDSV, index);
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetDSVGPUDescriptorHandle(uint32_t index)
-{
+D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetDSVGPUDescriptorHandle(uint32_t index) {
 	return  GetGPUDescriptorHandle(dsvDescriptorHeap, descriptorSizeDSV, index);
 }
