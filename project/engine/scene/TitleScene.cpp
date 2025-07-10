@@ -81,6 +81,13 @@ void TitleScene::Update() {
 
 	
 	
+	const uint32_t kRingDivide = 32;
+	const float kRingRadius = 1.0f;
+	const float kRingHeight = 0.2f;
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
+	
+
+
 	///Particle///
 	
 	particle->SetCamera(camera.get());
