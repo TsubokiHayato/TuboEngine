@@ -2,15 +2,9 @@
 #include"TextureManager.h"
 #include"ImGuiManager.h"
 #include"numbers"
-#include <Input.h>
-void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon) {
-	//各共通部分のポインタを受け取る
-	this->particleCommon = particleCommon;
-	this->dxCommon = dxCommon;
-	this->winApp = winApp;
-	this->object3dCommon = object3dCommon;
-	this->spriteCommon = spriteCommon;
-
+#include"Input.h"
+void TitleScene::Initialize() {
+	
 	//カメラ
 	camera = std::make_unique<Camera>();
 	camera->SetTranslate({ 0.0f,0.0f,-5.0f });
@@ -32,7 +26,7 @@ void TitleScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 	//パーティクル
 	particle = std::make_unique<Particle>();
-	particle->Initialize(this->particleCommon, ParticleType::Ring);
+	particle->Initialize(ParticleType::Ring);
 	particle->CreateParticleGroup("Particle", particleTextureHandle);
 	particleTranslate = {
 		//Scale
