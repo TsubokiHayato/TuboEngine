@@ -2,6 +2,7 @@
 #include"TextureManager.h"
 #include"ImGuiManager.h"
 #include"numbers"
+#include"Input.h"
 void TitleScene::Initialize() {
 	
 	//カメラ
