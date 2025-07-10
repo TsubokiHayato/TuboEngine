@@ -65,7 +65,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio;$(ProjectDir)engine\graphic\Particle;$(ProjectDir)engine\scene;$(ProjectDir)engine\base\Framework;$(ProjectDir)engine\base\Utilities;$(ProjectDir)engine\base\Common;$(ProjectDir)engine\graphic\data;$(ProjectDir)engine\graphic\PSO;$(ProjectDir)externals\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio;$(ProjectDir)engine\graphic\Particle;$(ProjectDir)engine\scene;$(ProjectDir)engine\base\Framework;$(ProjectDir)engine\base\Utilities;$(ProjectDir)engine\base\Common;$(ProjectDir)engine\graphic\data;$(ProjectDir)engine\graphic\PSO;$(ProjectDir)externals\assimp\include;$(ProjectDir)engine\graphic\PSO\Blend;$(ProjectDir)engine\graphic\PSO\PostEffect;$(ProjectDir)engine\graphic\PostEffect;$(ProjectDir)engine\graphic\SkyBox;$(ProjectDir)application</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -93,7 +93,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio;$(ProjectDir)engine\graphic\Particle;$(ProjectDir)engine\scene;$(ProjectDir)engine\base\Framework;$(ProjectDir)engine\base\Utilities;$(ProjectDir)engine\base\Common;$(ProjectDir)engine\graphic\data;$(ProjectDir)engine\graphic\PSO;$(ProjectDir)externals\assimp\include;$(ProjectDir)application;$(ProjectDir)engine\collision</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio;$(ProjectDir)engine\graphic\Particle;$(ProjectDir)engine\scene;$(ProjectDir)engine\base\Framework;$(ProjectDir)engine\base\Utilities;$(ProjectDir)engine\base\Common;$(ProjectDir)engine\graphic\data;$(ProjectDir)engine\graphic\PSO;$(ProjectDir)externals\assimp\include;$(ProjectDir)engine\graphic\PSO\Blend;$(ProjectDir)engine\graphic\PSO\PostEffect;$(ProjectDir)engine\graphic\PostEffect;$(ProjectDir)engine\graphic\SkyBox;$(ProjectDir)application</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
     </ClCompile>
     <Link>
@@ -104,7 +104,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
       <AdditionalOptions>/ignore:4049 /ignore:4098 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc143-mt.lib;dxcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
@@ -112,12 +112,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application\Player.cpp" />
+    <ClCompile Include="application\PlayerBullet.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\DissolveEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\DissolvePSO.cpp" />
+    <ClCompile Include="engine\graphic\PSO\Blend\AddBlendPSO.cpp" />
     <ClCompile Include="application\BaseCharacter.cpp" />
     <ClCompile Include="application\BaseBullet.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="application\Enemy.cpp" />
-    <ClCompile Include="engine\graphic\PSO\AddBlendPSO.cpp" />
     <ClCompile Include="engine\scene\ClearScene.cpp" />
     <ClCompile Include="engine\scene\DebugScene.cpp" />
     <ClCompile Include="engine\audio\Audio.cpp" />
@@ -135,15 +139,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="engine\imgui\ImGuiManager.cpp" />
-    <ClCompile Include="engine\base\Framework\Framework.cpp">
-      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
-    </ClCompile>
     <ClCompile Include="engine\scene\IScene.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\GaussianBlurEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\GaussianBlurPSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\GrayScaleEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\GrayScalePSO.cpp" />
     <ClCompile Include="application\FollowTopDownCamera.cpp" />
+    <ClCompile Include="Framework\Framework.cpp" />
+    <ClCompile Include="Framework\Order.cpp" />
     <ClCompile Include="HitEffectManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\graphic\3d\Model.cpp" />
-    <ClCompile Include="engine\graphic\3d\ModelCommon.cpp" />
     <ClCompile Include="engine\graphic\3d\ModelManager.cpp" />
     <ClCompile Include="engine\graphic\3d\Object3d.cpp" />
     <ClCompile Include="engine\graphic\3d\Object3dCommon.cpp" />
@@ -152,7 +158,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\base\Utilities\StringUtility.cpp" />
     <ClCompile Include="engine\graphic\2d\TextureManager.cpp" />
     <ClCompile Include="engine\base\Common\WinApp.cpp" />
-    <ClCompile Include="engine\base\Framework\Order.cpp" />
     <ClCompile Include="engine\graphic\Particle\Particle.cpp" />
     <ClCompile Include="engine\graphic\Particle\ParticleCommon.cpp" />
     <ClCompile Include="engine\graphic\Particle\ParticleEmitter.cpp" />
@@ -162,14 +167,33 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\base\Common\SrvManager.cpp" />
     <ClCompile Include="engine\scene\StageScene.cpp" />
     <ClCompile Include="engine\scene\TitleScene.cpp" />
-    <ClCompile Include="engine\graphic\PSO\MultiplyBlendPSO.cpp" />
-    <ClCompile Include="engine\graphic\PSO\NoneBlendPSO.cpp" />
-    <ClCompile Include="engine\graphic\PSO\NormalBlendPSO.cpp" />
-    <ClCompile Include="engine\graphic\PSO\ScreenBlendPSO.cpp" />
-    <ClCompile Include="engine\graphic\PSO\SubtractBlendPSO.cpp" />
-    <ClCompile Include="ParameterManager.cpp" />
-    <ClCompile Include="application\Player.cpp" />
-    <ClCompile Include="application\PlayerBullet.cpp" />
+    <ClCompile Include="engine\graphic\PSO\Blend\MultiplyBlendPSO.cpp" />
+    <ClCompile Include="engine\graphic\PSO\Blend\NoneBlendPSO.cpp" />
+    <ClCompile Include="engine\graphic\PSO\Blend\NormalBlendPSO.cpp" />
+    <ClCompile Include="engine\graphic\PSO\Blend\ScreenBlendPSO.cpp" />
+    <ClCompile Include="engine\graphic\PSO\Blend\SubtractBlendPSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\NoneEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\NonePSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\OffScreenRendering.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\OffScreenRenderingPSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\OutlineEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\OutlinePSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\PostEffectBase.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\PostEffectManager.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\PostEffectPSOBase.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\SepiaPSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\RadialBlurEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\RadialBlurPSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\randomEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\randomPSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\SepiaEffect.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\SmoothingEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\SmoothingPSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\VignetteEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\VignettePSO.cpp" />
+    <ClCompile Include="engine\graphic\SkyBox\SkyBox.cpp" />
+    <ClCompile Include="engine\graphic\SkyBox\SkyBoxCommon.cpp" />
+    <ClCompile Include="engine\graphic\PSO\SkyBoxPSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseCharacter.h" />
@@ -178,10 +202,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="CollisionTypeId.h" />
     <ClInclude Include="application\Enemy.h" />
+    <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\DissolvePSO.h" />
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
     <ClInclude Include="engine\graphic\data\Node.h" />
-    <ClInclude Include="engine\graphic\PSO\AddBlendPSO.h" />
-    <ClInclude Include="engine\graphic\PSO\BlendMode.h" />
+    <ClInclude Include="engine\graphic\PSO\Blend\AddBlendPSO.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\BlendMode.h" />
     <ClInclude Include="engine\scene\ClearScene.h" />
     <ClInclude Include="engine\scene\DebugScene.h" />
     <ClInclude Include="engine\audio\Audio.h" />
@@ -234,16 +260,39 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\base\Common\SrvManager.h" />
     <ClInclude Include="engine\scene\StageScene.h" />
     <ClInclude Include="engine\scene\TitleScene.h" />
-    <ClInclude Include="engine\graphic\PSO\MultiplyBlendPSO.h" />
-    <ClInclude Include="engine\graphic\PSO\NoneBlendPSO.h" />
-    <ClInclude Include="engine\graphic\PSO\NormalBlendPSO.h" />
-    <ClInclude Include="engine\graphic\PSO\ScreenBlendPSO.h" />
-    <ClInclude Include="engine\graphic\PSO\SubtractBlendPSO.h" />
-    <ClInclude Include="application\FollowTopDownCamera.h" />
-    <ClInclude Include="HitEffectManager.h" />
-    <ClInclude Include="ParameterManager.h" />
-    <ClInclude Include="application\Player.h" />
-    <ClInclude Include="application\PlayerBullet.h" />
+    <ClInclude Include="engine\graphic\PSO\Blend\MultiplyBlendPSO.h" />
+    <ClInclude Include="engine\graphic\PSO\Blend\NoneBlendPSO.h" />
+    <ClInclude Include="engine\graphic\PSO\Blend\NormalBlendPSO.h" />
+    <ClInclude Include="engine\graphic\PSO\Blend\ScreenBlendPSO.h" />
+    <ClInclude Include="engine\graphic\PSO\Blend\SubtractBlendPSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\GaussianBlurEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\GaussianBlurPSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\GrayScaleEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\GrayScalePSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\NoneEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\NonePSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\OffScreenRendering.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\OffScreenRenderingPSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\OutlineEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\OutlinePSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\PostEffectBase.h" />
+    <ClInclude Include="engine\graphic\PostEffect\PostEffectManager.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\PostEffectPSOBase.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\SepiaPSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\RadialBlurEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\RadialBlurPSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\randomEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\randomPSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\SepiaEffect.h" />
+    <ClInclude Include="engine\graphic\PostEffect\SmoothingEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\SmoothingPSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\VignetteEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\VignettePSO.h" />
+    <ClInclude Include="engine\graphic\SkyBox\SkyBox.h" />
+    <ClInclude Include="engine\graphic\SkyBox\SkyBoxCommon.h" />
+    <ClInclude Include="engine\graphic\PSO\SkyBoxPSO.h" />
+    <ClInclude Include="Framework\Framework.h" />
+    <ClInclude Include="Framework\Order.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\imgui\imgui.vcxproj">
