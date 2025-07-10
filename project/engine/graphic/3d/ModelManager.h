@@ -3,8 +3,7 @@
 #include <memory>
 #include <string>
 #include "Model.h"
-#include "ModelCommon.h"
-#include "DirectXCommon.h"
+
 
 class ModelManager
 {
@@ -18,7 +17,7 @@ private:
 
 
 	std::map<std::string, std::unique_ptr<Model>> models;
-	ModelCommon* modelCommon = nullptr;
+	
 public:
 
 	//シングルトンインスタンスの取得
@@ -36,7 +35,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="dxCommon">DirectX基盤</param>
-	void initialize(DirectXCommon* dxCommon);
+	void initialize();
 
 	/// <summary>
 	/// モデルの読み込み
