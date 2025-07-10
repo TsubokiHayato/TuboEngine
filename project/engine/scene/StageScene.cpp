@@ -46,6 +46,7 @@ void StageScene::Update()
 		enemy->SetCamera(followCamera->GetCamera());
 		enemy->Update();
 	}
+	followCamera->Update();
 
 	collisionManager_->Update();
 	CheckAllCollisions();
