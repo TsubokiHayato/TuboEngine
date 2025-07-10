@@ -18,7 +18,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	virtual void Initialize(Object3dCommon* object3dCommon);
+	virtual void Initialize();
 
 	/// <summary>
 	/// 終了処理

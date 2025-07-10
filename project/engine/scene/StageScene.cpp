@@ -4,36 +4,31 @@
 #include "StageScene.h"
 #include "application/FollowTopDownCamera.h"
 
-void StageScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* spriteCommon, ParticleCommon* particleCommon, WinApp* winApp, DirectXCommon* dxCommon) {
-	this->object3dCommon = object3dCommon;
-	this->spriteCommon = spriteCommon;
-	this->winApp = winApp;
-	this->dxCommon = dxCommon;
-
-	// ƒvƒŒƒCƒ„[
+void StageScene::Initialize() {
+	
+	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
 	player_ = std::make_unique<Player>();
-	player_->Initialize(object3dCommon);
+	player_->Initialize();
 
-	// ’Ç]ƒJƒƒ‰‚Ì¶¬E‰Šú‰»
+	// è¿½å¾“ã‚«ãƒ¡ãƒ©ã®ç”Ÿæˆãƒ»åˆæœŸåŒ–
 	followCamera = std::make_unique<FollowTopDownCamera>();
 	followCamera->Initialize(player_.get(), Vector3(0.0f, 40.0f, 0.0f), 0.2f);
 
-	// ƒvƒŒƒCƒ„[‚ÉƒJƒƒ‰‚ğƒZƒbƒg
+	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«ã‚«ãƒ¡ãƒ©ã‚’ã‚»ãƒƒãƒˆ
 	player_->SetCamera(followCamera->GetCamera());
 
-	// EnemyƒŠƒXƒg
+	// Enemyãƒªã‚¹ãƒˆ
 	enemies.clear();
 	const int enemyCount = 1;
 	for (int i = 0; i < enemyCount; ++i) {
 		auto enemy = std::make_unique<Enemy>();
-		enemy->SetParticleCommon(particleCommon);
-		enemy->Initialize(object3dCommon);
+		enemy->Initialize();
 		enemy->SetCamera(followCamera->GetCamera());
 		enemy->SetPosition(Vector3(float(i * 2), 0.0f, 5.0f));
 		enemies.push_back(std::move(enemy));
 	}
 
-	// Õ“Ëƒ}ƒl[ƒWƒƒ‚Ì¶¬
+	// è¡çªãƒãƒãƒ¼ã‚¸ãƒ£ã®ç”Ÿæˆ
 	collisionManager_ = std::make_unique<CollisionManager>();
 	collisionManager_->Initialize();
 
@@ -41,7 +36,7 @@ void StageScene::Initialize(Object3dCommon* object3dCommon, SpriteCommon* sprite
 
 void StageScene::Update()
 {
-}
+
 
 	player_->SetCamera(followCamera->GetCamera());
 	player_->Update();
@@ -63,15 +58,15 @@ void StageScene::Finalize()
 }
 
 void StageScene::Object3DDraw() {
-	// 3DƒIƒuƒWƒFƒNƒg‚Ì•`‰æ
-	// ƒvƒŒƒCƒ„[‚Ì3DƒIƒuƒWƒFƒNƒg‚ğ•`‰æ
+	// 3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æç”»
+	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æç”»
 	player_->Draw();
 
-	// “G‚Ì3DƒIƒuƒWƒFƒNƒg‚ğ•`‰æ
+	// æ•µã®3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æç”»
 	for (auto& enemy : enemies) {
 		enemy->Draw();
 	}
-	// “–‚½‚è”»’è‚Ì‰Â‹‰»
+	// å½“ãŸã‚Šåˆ¤å®šã®å¯è¦–åŒ–
 	collisionManager_->Draw();
 }
 void StageScene::SpriteDraw()
@@ -80,14 +75,14 @@ void StageScene::SpriteDraw()
 
 void StageScene::ImGuiDraw()
 {
-	// Camera‚ÌImGui
+	// Cameraã®ImGui
 	followCamera->DrawImGui();
 
-	// Player‚ÌImGui
+	// Playerã®ImGui
 	player_->DrawImGui();
 
 
-	//Enemy‚ÌImgui
+	//Enemyã®Imgui
 	for (auto& enemy : enemies) {
 		enemy->DrawImGui();
 	}
@@ -102,32 +97,32 @@ void StageScene::ParticleDraw() {
 	}
 
 void StageScene::CheckAllCollisions() {
-	/// Õ“Ëƒ}ƒl[ƒWƒƒ‚ÌƒŠƒZƒbƒg ///
+	/// è¡çªãƒãƒãƒ¼ã‚¸ãƒ£ã®ãƒªã‚»ãƒƒãƒˆ ///
 	collisionManager_->Reset();
 
-	/// ƒRƒ‰ƒCƒ_[‚ğƒŠƒXƒg‚É“o˜^ ///
+	/// ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã‚’ãƒªã‚¹ãƒˆã«ç™»éŒ² ///
 	collisionManager_->AddCollider(player_.get());
 
-	// •¡”‚Ì“G‚ğ“o˜^ ///
+	// è¤‡æ•°ã®æ•µã‚’ç™»éŒ² ///
 	for (const auto& enemy : enemies) {
 		collisionManager_->AddCollider(enemy.get());
 	}
 
-	  // ƒvƒŒƒCƒ„[‚Ì’e
+	  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å¼¾
 	for (const auto& bullet : player_->GetBullets()) {
 		collisionManager_->AddCollider(bullet.get());
 	}
 
 
 
-	// ƒvƒŒƒCƒ„[‚ª€–S‚µ‚½‚çƒRƒ‰ƒCƒ_[‚ğíœ‚Ü‚½‚Í“G‚ª€–S‚µ‚½‚çƒRƒ‰ƒCƒ_[‚ğíœ ///
+	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒæ­»äº¡ã—ãŸã‚‰ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã‚’å‰Šé™¤ã¾ãŸã¯æ•µãŒæ­»äº¡ã—ãŸã‚‰ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã‚’å‰Šé™¤ ///
 	//if (player_->GetHP() <= 0 || enemy_->GetHP() <= 0) {
 	//	collisionManager_->RemoveCollider(player_.get());
 	//	collisionManager_->RemoveCollider(enemy_.get());
 
 	//}
 
-	// Õ“Ë”»’è‚Æ‰“š
+	// è¡çªåˆ¤å®šã¨å¿œç­”
 	collisionManager_->CheckAllCollisions();
 
 

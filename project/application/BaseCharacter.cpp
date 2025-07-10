@@ -4,7 +4,7 @@ BaseCharacter::BaseCharacter() {}
 
 BaseCharacter::~BaseCharacter() {}
 
-void BaseCharacter::Initialize(Object3dCommon* object3dCommon) {}
+void BaseCharacter::Initialize() {}
 
 void BaseCharacter::Update() {}
 

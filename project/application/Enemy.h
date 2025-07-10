@@ -11,7 +11,7 @@ public:
 	Enemy();
 	~Enemy() override;
 
-	void Initialize(Object3dCommon* object3dCommon) override;
+	void Initialize() override;
 	void Update() override;
 	void Draw() override;
 	void ParticleDraw();
@@ -33,8 +33,7 @@ public:
 	///				ゲッター&セッター
 	///------------------------------------------------------
 public:
-	void SetParticleCommon(ParticleCommon* particleCommon) { this->particleCommon_ = particleCommon; }
-
+	
 	// カメラ
 	void SetCamera(Camera* camera) { camera_ = camera;
 	}
@@ -59,7 +58,7 @@ public:
 	///				受取り変数
 	/// ---------------------------------
 private:
-	ParticleCommon* particleCommon_ = nullptr; // パーティクル共通部分
+
 	Camera* camera_ = nullptr;                 // カメラ
 
 	///---------------------------------------

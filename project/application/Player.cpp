@@ -16,12 +16,10 @@ Player::~Player() {}
 //--------------------------------------------------
 // 初期化処理
 //--------------------------------------------------
-void Player::Initialize(Object3dCommon* object3dCommon) {
+void Player::Initialize() {
 
 	// プレイヤーのコライダーの設定
 	Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kPlayer));
-
-	object3dCommon_ = object3dCommon;
 
 	// プレイヤーの初期位置
 	position = Vector3(0.0f, 0.0f, 0.0f);
@@ -42,7 +40,7 @@ void Player::Initialize(Object3dCommon* object3dCommon) {
 
 	// 3Dオブジェクト生成・初期化
 	object3d = std::make_unique<Object3d>();
-	object3d->Initialize(object3dCommon_, modelFileNamePath);
+	object3d->Initialize(modelFileNamePath);
 
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
@@ -86,7 +84,7 @@ void Player::Shoot() {
 	// スペースキーが押され、発射間隔を満たしていれば弾を生成
 	if (Input::GetInstance()->PushKey(DIK_SPACE) && bulletTimer <= 0.0f) {
 		auto bullet = std::make_unique<PlayerBullet>();
-		bullet->Initialize(object3dCommon_, position);
+		bullet->Initialize(position);
 		bullet->SetPlayerRotation(rotation);
 		bullet->SetPlayerPosition(position);
 		bullets.push_back(std::move(bullet));
