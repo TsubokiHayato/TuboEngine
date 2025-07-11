@@ -12,8 +12,6 @@ void DebugScene::Initialize() {
 
 	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
 
-	TextureManager::GetInstance()->LoadTexture(testDDSTextureHandle);
-
 	//モデルファイルパス
 	const std::string modelFileNamePath = "plane.gltf";
 	//モデルファイルパス2
@@ -81,6 +79,11 @@ void DebugScene::Initialize() {
 	}
 #pragma endregion スプライトの初期化
 
+
+	skyBox = std::make_unique<SkyBox>();
+	skyBox->Initialize(testDDSTextureHandle);
+
+
 	/*---------------
 	  オブジェクト3D
 	---------------*/
@@ -90,6 +93,7 @@ void DebugScene::Initialize() {
 	object3d = std::make_unique<Object3d>();
 	object3d->Initialize(modelFileNamePath);
 	object3d->SetModel(modelFileNamePath);
+	object3d->SetCubeMapFilePath(skyBox->GetTextureFilePath());
 
 	////////////////////////////////////////////////////////////////////////
 
@@ -118,8 +122,6 @@ void DebugScene::Initialize() {
 #pragma endregion cameraの初期化
 
 
-	skyBox = std::make_unique<SkyBox>();
-	skyBox->Initialize(testDDSTextureHandle);
 }
 
 void DebugScene::Update() {
