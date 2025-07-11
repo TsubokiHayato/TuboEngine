@@ -6,6 +6,8 @@ struct Material
     int enableLighting; //ライティングを有効にするかどうか
     float4x4 uvTransform; //UV変換行列
     float shininess; //反射の強さ
+    float environmentCoefficient; // 環境マップ寄与度 [0:無し, 1:全反射]
+
 };
 
 
@@ -175,14 +177,14 @@ PixcelShaderOutput main(VertexShaderOutPut input)
             float3 reflectedVector = reflect(cameraTopPosition, normalize(input.normal));
             float4 environmentColor = gCubeTexture.Sample(gSampler, reflectedVector);
 
-             // 通常のライティング
+    // 通常のライティング
             float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
             float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-            output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
-            output.color.a = gMaterial.color.a * textureColor.a;
+            float3 baseColor = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
 
-            // 環境マップ色を加算
-            output.color.rgb += environmentColor.rgb;
+    // 環境マップ色とベースカラーをenvironmentCoefficientで線形補間
+            output.color.rgb = lerp(baseColor, environmentColor.rgb, gMaterial.environmentCoefficient);
+            output.color.a = gMaterial.color.a * textureColor.a;
         }
         else
         {
