@@ -88,7 +88,12 @@ public:
 	/// </summary>
 	void Draw();
 
-	void ShowImGuiLight();
+	/// <summary>
+	/// ImGuiで全機能をまとめて操作・確認する関数
+	/// </summary>
+	void DrawImGui(const char* windowName);
+
+	
 
 public:
 
