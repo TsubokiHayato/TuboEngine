@@ -1,6 +1,8 @@
 #pragma once
 #include "BaseCharacter.h"
 #include "PlayerBullet.h"
+#include "Object3d.h"
+#include "Sprite.h"
 
 ///--------------------------------------------------
 /// プレイヤークラス
@@ -37,6 +39,8 @@ public:
 	void Move();
 
 	void Rotate();
+
+	void ReticleDraw();
 
 public:
 	///-----------------------------------
@@ -93,4 +97,11 @@ private:
 	int HP;           // プレイヤーのHP
 	bool isHit;       // プレイヤーがヒットしたかどうか
 	bool isDead;      // プレイヤーの死亡状態
+
+	//Reticle
+
+	std::unique_ptr<Sprite> reticleSprite; // スプライト
+	Vector2 reticlePosition = {0.0f, 0.0f}; // レティクルの位置（画面中央）
+	Vector2 reticleSize = {50.0f, 50.0f};   // レティクルのサイズ
+
 };
