@@ -106,6 +106,8 @@ void Object3d::Initialize(std::string modelFileNamePath) {
 
 #pragma endregion
 
+
+
 	// transform変数を作る
 	transform = {
 	    {1.0f, 1.0f, 1.0f},
@@ -146,18 +148,27 @@ void Object3d::Update() {
 
 void Object3d::Draw() {
 
-	// wvp用のCBufferの場所を設定
+	// TransformMatrix (b0, VertexShader)
 	commandList->SetGraphicsRootConstantBufferView(1, transformMatrixResource->GetGPUVirtualAddress());
-	// 平行光源用のCBufferの場所を設定
-	commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
-	// カメラ情報のCBufferの場所を設定
-	commandList->SetGraphicsRootConstantBufferView(4, cameraForGPUResource->GetGPUVirtualAddress());
-	// ライトの種類のCBufferの場所を設定
-	commandList->SetGraphicsRootConstantBufferView(5, lightTypeResource->GetGPUVirtualAddress());
-	// ポイントライトのCBufferの場所を設定
-	commandList->SetGraphicsRootConstantBufferView(6, pointLightResource->GetGPUVirtualAddress());
-	// スポットライトのCBufferの場所を設定
-	commandList->SetGraphicsRootConstantBufferView(7, spotLightResource->GetGPUVirtualAddress());
+
+	// gTexture (t0, PixelShader)はModelクラスにある。
+	
+	// 例: キューブマップSRVをt1（gCubeTexture）にバインド
+	// gCubeTexture (t1, PixelShader)
+	commandList->SetGraphicsRootDescriptorTable(3, TextureManager::GetInstance()->GetSrvHandleGPU(cubeMapFilePath_));
+	// DirectionalLight (b1, PixelShader)
+	commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
+	// Camera (b2, PixelShader)
+	commandList->SetGraphicsRootConstantBufferView(5, cameraForGPUResource->GetGPUVirtualAddress());
+	// LightType (b3, PixelShader)
+	commandList->SetGraphicsRootConstantBufferView(6, lightTypeResource->GetGPUVirtualAddress());
+	// PointLight (b4, PixelShader)
+	commandList->SetGraphicsRootConstantBufferView(7, pointLightResource->GetGPUVirtualAddress());
+	// SpotLight (b5, PixelShader)
+	commandList->SetGraphicsRootConstantBufferView(8, spotLightResource->GetGPUVirtualAddress());
+
+	
+
 
 	// 3Dモデルが割り当てられていれば描画
 	if (model_) {
@@ -168,69 +179,104 @@ void Object3d::Draw() {
 	}
 }
 
-void Object3d::ShowImGuiLight() {
+void Object3d::DrawImGui(const char* windowName) {
+    ImGui::Begin(windowName);
 
-	ImGui::Begin("Light");
-	// 光源のタイプ
+    ImGui::Separator();
+    ImGui::Text("Object3d ImGui コントロール");
+    // 位置
+    Vector3 pos = GetPosition();
+    if (ImGui::DragFloat3("Position", &pos.x, 0.1f)) {
+        SetPosition(pos);
+    }
+    // 回転
+    Vector3 rot = GetRotation();
+    if (ImGui::DragFloat3("Rotation", &rot.x, 0.01f)) {
+        SetRotation(rot);
+    }
+    // スケール
+    Vector3 scale = GetScale();
+    if (ImGui::DragFloat3("Scale", &scale.x, 0.01f)) {
+        SetScale(scale);
+    }
+    // モデル色
+    Vector4 color = GetModelColor();
+    if (ImGui::ColorEdit4("Color", &color.x)) {
+        SetModelColor(color);
+    }
 
-	ImGui::SliderInt("LightType", &lightTypeData->type, 0, 4);
-	// 光沢度
-	float shininess = model_->GetModelShininess();
-	ImGui::DragFloat("Shininess", &shininess);
-	model_->SetModelShininess(shininess);
+    // ライトタイプ選択
+    static const char* lightTypeItems[] = {
+        "Directional", "Phong", "Blinn-Phong", "Point", "Spot", "EnvironmentMap"
+    };
+    int lightType = GetLightType();
+    if (ImGui::Combo("LightType", &lightType, lightTypeItems, IM_ARRAYSIZE(lightTypeItems))) {
+        SetLightType(lightType);
+    }
 
-	// 光源の色
-
-	ImGui::ColorEdit4("LightColor", &directionalLightData->color.x);
-
-	// 光源の方向
-
-	ImGui::DragFloat3("LightDirection", &directionalLightData->direction.x, 0.1f);
-
-	// 光源の強さ
-
-	ImGui::DragFloat("LightIntensity", &directionalLightData->intensity, 0.1f);
-
-	ImGui::Text("PointLight");
-	// 光源の色
-
-	ImGui::ColorEdit4("PointLightColor", &pointLightData->color.x);
-
-	// 光源の位置
-	ImGui::DragFloat3("PointLightPosition", &pointLightData->position.x, 0.1f);
-
-	// 光源の強さ
-	ImGui::DragFloat("PointLightIntensity", &pointLightData->intensity, 0.1f);
-
-	ImGui::Text("SpotLight");
-	// 光源の色
-
-	ImGui::ColorEdit4("SpotLightColor", &spotLightData->color.x);
-
-	// 光源の位置
-
-	ImGui::DragFloat3("SpotLightPosition", &spotLightData->position.x, 0.1f);
-
-	// 光源の方向
-
-	ImGui::DragFloat3("SpotLightDirection", &spotLightData->direction.x, 0.1f);
-
-	// 光源の強さ
-
-	ImGui::DragFloat("SpotLightIntensity", &spotLightData->intensity, 0.1f);
-
-	// 光源の距離
-	ImGui::DragFloat("SpotLightDistance", &spotLightData->distance, 0.1f);
-
-	// 光源の減衰
-
-	ImGui::DragFloat("SpotLightDecay", &spotLightData->decay, 0.1f);
-
-	// 光源の角度
-
-	ImGui::DragFloat("SpotLightCosAngle", &spotLightData->cosAngle, 0.1f);
-
-	ImGui::End();
+    // 必要なライトだけImGui表示
+    if (lightType == 0) { // Directional
+        ImGui::Separator();
+        ImGui::Text("Directional Light");
+        ImGui::ColorEdit4("LightColor", &directionalLightData->color.x);
+        ImGui::DragFloat3("LightDirection", &directionalLightData->direction.x, 0.1f);
+        ImGui::DragFloat("LightIntensity", &directionalLightData->intensity, 0.1f);
+        float shininess = model_->GetModelShininess();
+        if (ImGui::DragFloat("Shininess", &shininess)) {
+            model_->SetModelShininess(shininess);
+        }
+    } else if (lightType == 1) { // Phong
+        ImGui::Separator();
+        ImGui::Text("Phong Reflection");
+        ImGui::ColorEdit4("LightColor", &directionalLightData->color.x);
+        ImGui::DragFloat3("LightDirection", &directionalLightData->direction.x, 0.1f);
+        ImGui::DragFloat("LightIntensity", &directionalLightData->intensity, 0.1f);
+        float shininess = model_->GetModelShininess();
+        if (ImGui::DragFloat("Shininess", &shininess)) {
+            model_->SetModelShininess(shininess);
+        }
+    } else if (lightType == 2) { // Blinn-Phong
+        ImGui::Separator();
+        ImGui::Text("Blinn-Phong Reflection");
+        ImGui::ColorEdit4("LightColor", &directionalLightData->color.x);
+        ImGui::DragFloat3("LightDirection", &directionalLightData->direction.x, 0.1f);
+        ImGui::DragFloat("LightIntensity", &directionalLightData->intensity, 0.1f);
+        float shininess = model_->GetModelShininess();
+        if (ImGui::DragFloat("Shininess", &shininess)) {
+            model_->SetModelShininess(shininess);
+        }
+    } else if (lightType == 3) { // Point
+        ImGui::Separator();
+        ImGui::Text("Point Light");
+        ImGui::ColorEdit4("PointLightColor", &pointLightData->color.x);
+        ImGui::DragFloat3("PointLightPosition", &pointLightData->position.x, 0.1f);
+        ImGui::DragFloat("PointLightIntensity", &pointLightData->intensity, 0.1f);
+    } else if (lightType == 4) { // Spot
+        ImGui::Separator();
+        ImGui::Text("Spot Light");
+        ImGui::ColorEdit4("SpotLightColor", &spotLightData->color.x);
+        ImGui::DragFloat3("SpotLightPosition", &spotLightData->position.x, 0.1f);
+        ImGui::DragFloat3("SpotLightDirection", &spotLightData->direction.x, 0.1f);
+        ImGui::DragFloat("SpotLightIntensity", &spotLightData->intensity, 0.1f);
+        ImGui::DragFloat("SpotLightDistance", &spotLightData->distance, 0.1f);
+        ImGui::DragFloat("SpotLightDecay", &spotLightData->decay, 0.1f);
+        ImGui::DragFloat("SpotLightCosAngle", &spotLightData->cosAngle, 0.1f);
+    } else if (lightType == 5) { // EnvironmentMap
+        ImGui::Separator();
+        ImGui::Text("Environment Mapping");
+        ImGui::ColorEdit4("LightColor", &directionalLightData->color.x);
+        ImGui::DragFloat3("LightDirection", &directionalLightData->direction.x, 0.1f);
+        ImGui::DragFloat("LightIntensity", &directionalLightData->intensity, 0.1f);
+        float shininess = model_->GetModelShininess();
+        if (ImGui::DragFloat("Shininess", &shininess)) {
+            model_->SetModelShininess(shininess);
+        }
+        float envCoef = model_->GetModelEnvironmentCoefficient();
+        if (ImGui::SliderFloat("Environment Coefficient", &envCoef, 0.0f, 1.0f)) {
+            model_->SetModelEnvironmentCoefficient(envCoef);
+        }
+    }
+    ImGui::End();
 }
 
 void Object3d::SetLightShininess(float shininess) { model_->SetModelShininess(shininess); }
