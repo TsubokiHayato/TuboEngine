@@ -37,6 +37,8 @@ void Player::Initialize() {
 
 	// モデルファイルパス
 	const std::string modelFileNamePath = "barrier.obj";
+	// スプライトファイルパス
+	const std::string reticleFileNamePath = "2D_Reticle.png";
 
 	// 3Dオブジェクト生成・初期化
 	object3d = std::make_unique<Object3d>();
@@ -45,6 +47,11 @@ void Player::Initialize() {
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
 	object3d->SetScale(scale);
+
+	// Reticleの初期化
+	// Reticleはプレイヤーの中心に配置
+	reticleSprite = std::make_unique<Sprite>();
+	reticleSprite->Initialize(reticleFileNamePath);
 }
 
 //--------------------------------------------------
@@ -75,6 +82,10 @@ void Player::Update() {
 	object3d->SetRotation(rotation);
 	object3d->SetScale(scale);
 	object3d->Update();
+
+	reticleSprite->SetPosition(reticlePosition);
+	reticleSprite->
+	reticleSprite->Update();
 }
 
 //--------------------------------------------------
@@ -129,8 +140,8 @@ void Player::Move() {
 //---------------------------------------------------
 void Player::Rotate() {
 	// --- マウスの方向に身体を向ける処理 ---
-	int screenWidth = 1280; // TODO: DirectXから取得するように
-	int screenHeight = 720;
+	int screenWidth = static_cast<int>(WinApp::GetInstance()->GetClientWidth()); // TODO: DirectXから取得するように
+	int screenHeight = static_cast<int>(WinApp::GetInstance()->GetClientHeight());
 
 	int mouseX = static_cast<int>(Input::GetInstance()->GetMousePosition().x);
 	int mouseY = static_cast<int>(Input::GetInstance()->GetMousePosition().y);
@@ -145,8 +156,12 @@ void Player::Rotate() {
 	float angle = std::atan2(dx, -dy);
 
 	rotation.y = angle;
+
+	reticlePosition = Vector2(centerX, centerY); // Reticleの位置を画面中央に設定
 }
 
+void Player::ReticleDraw() {reticleSprite -> Draw();
+}
 
 //--------------------------------------------------
 // 当たり判定の中心座標を取得
