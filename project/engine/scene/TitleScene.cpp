@@ -2,6 +2,7 @@
 #include"TextureManager.h"
 #include"ImGuiManager.h"
 #include"numbers"
+#include"Input.h"
 void TitleScene::Initialize() {
 	
 	//カメラ
@@ -125,7 +126,7 @@ void TitleScene::ImGuiDraw() {
 	ImGui::DragFloat3("Scale", &particleTranslate.scale.x);
 	ImGui::End();
 
-
+	Input::GetInstance()->ShowInputDebugWindow();
 }
 
 void TitleScene::ParticleDraw() {

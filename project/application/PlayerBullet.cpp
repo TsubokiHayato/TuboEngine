@@ -38,7 +38,7 @@ static float Distance(const Vector3& a, const Vector3& b) {
 //--------------------------------------------------
 // 初期化処理
 //--------------------------------------------------
-void PlayerBullet::Initialize(Object3dCommon* object3dCommon, const Vector3& startPos) {
+void PlayerBullet::Initialize( const Vector3& startPos) {
 	// 衝突判定のタイプIDを設定
 	Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon));
 	// 弾の初期位置を設定
@@ -59,7 +59,7 @@ void PlayerBullet::Initialize(Object3dCommon* object3dCommon, const Vector3& sta
 	const std::string modelFileNamePath = "plane.gltf";
 	// 3Dオブジェクト生成・初期化
 	object3d = std::make_unique<Object3d>();
-	object3d->Initialize(object3dCommon, modelFileNamePath);
+	object3d->Initialize(modelFileNamePath);
 }
 
 //--------------------------------------------------

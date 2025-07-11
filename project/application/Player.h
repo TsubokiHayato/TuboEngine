@@ -1,6 +1,8 @@
 #pragma once
 #include "BaseCharacter.h"
 #include "PlayerBullet.h"
+#include "Object3d.h"
+#include "Sprite.h"
 
 ///--------------------------------------------------
 /// プレイヤークラス
@@ -17,7 +19,7 @@ public:
 	~Player() override;
 
 	// 初期化のオーバーライド
-	void Initialize(Object3dCommon* object3dCommon) override;
+	void Initialize() override;
 	// 更新処理のオーバーライド
 	void Update() override;
 	// 描画処理のオーバーライド
@@ -35,6 +37,10 @@ public:
 
 	// 移動処理
 	void Move();
+
+	void Rotate();
+
+	void ReticleDraw();
 
 public:
 	///-----------------------------------
@@ -73,8 +79,7 @@ private:
 	///--------------------------------------------------
 	///				引き渡し用変数
 	///--------------------------------------------------
-	Object3dCommon* object3dCommon_ = nullptr; // 3Dオブジェクト共通部分
-
+	
 private:
 	///--------------------------------------------------
 	///				メンバ変数
@@ -92,4 +97,11 @@ private:
 	int HP;           // プレイヤーのHP
 	bool isHit;       // プレイヤーがヒットしたかどうか
 	bool isDead;      // プレイヤーの死亡状態
+
+	//Reticle
+
+	std::unique_ptr<Sprite> reticleSprite; // スプライト
+	Vector2 reticlePosition = {0.0f, 0.0f}; // レティクルの位置（画面中央）
+	Vector2 reticleSize = {50.0f, 50.0f};   // レティクルのサイズ
+
 };
