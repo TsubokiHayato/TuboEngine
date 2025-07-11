@@ -246,7 +246,9 @@ void Sprite::AdjustTextureSize()
 }
 
 // ImGuiでSpriteの全機能をまとめて操作・確認できる関数
-void Sprite::DrawImGui() {
+void Sprite::DrawImGui(const char* windowName) {
+	const char* windowName_ = windowName;
+	ImGui::Begin(windowName_);
     ImGui::Separator();
     ImGui::Text("Sprite ImGui コントロール"); // セクションタイトル
     // 位置
@@ -300,4 +302,5 @@ void Sprite::DrawImGui() {
         SetColor(color);
     }
     // コメント: ここでSpriteの全てのプロパティをImGuiで操作できます
+	ImGui::End(); // ウィンドウ終了
 }

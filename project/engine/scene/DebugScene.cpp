@@ -56,24 +56,13 @@ void DebugScene::Initialize() {
 		Vector4 spriteColor = { 1.0f, 1.0f, 1.0f, 1.0f }; // 色は白（RGBA）
 		Vector2 size = { 50.0f, 50.0f };             // 任意のサイズ
 
-		//各種機能を使えるようにする
-		//左右反転
-		isFlipX_ = sprite->GetFlipX();
-		//上下反転
-		isFlipY_ = sprite->GetFlipY();
-		//テクスチャの左上座標
-		textureLeftTop = sprite->GetTextureLeftTop();
-		//テクスチャから初期サイズを得るフラグ
-		isAdjustTextureSize = sprite->GetIsAdjustTextureSize();
-
+		
 		//スプライトの位置や回転を設定
 		sprite->SetPosition(spritePosition);
 		sprite->SetRotation(spriteRotation);
 		sprite->SetColor(spriteColor);
 		sprite->SetSize(size);
-		sprite->SetTextureLeftTop(textureLeftTop);
-		sprite->SetGetIsAdjustTextureSize(isAdjustTextureSize);
-
+		
 		sprites.push_back(sprite);
 
 	}
@@ -152,20 +141,7 @@ void DebugScene::Update() {
 	//スプライトの更新
 	for (Sprite* sprite : sprites) {
 		if (sprite) {
-			// ここでは各スプライトの位置や回転を更新する処理を行う
-			// 例: X軸方向に少しずつ移動させる
-			Vector2 currentPosition = sprite->GetPosition();
-			/*currentPosition.x = 100.0f;
-			currentPosition.y = 100.0f;*/
-			float currentRotation = sprite->GetRotation();
-
-			sprite->SetPosition(currentPosition);
-			sprite->SetRotation(currentRotation);
-			sprite->SetTextureLeftTop(textureLeftTop);
-			sprite->SetFlipX(isFlipX_);
-			sprite->SetFlipY(isFlipY_);
-			sprite->SetGetIsAdjustTextureSize(isAdjustTextureSize);
-
+			
 			sprite->Update();
 		}
 	}
@@ -235,49 +211,13 @@ void DebugScene::ImGuiDraw() {
 		//スプライトのImGui
 		for (Sprite* sprite : sprites) {
 			if (sprite) {
-				ImGui::Begin("Sprite");
-	
-	
-				Vector2 spritePosition = sprite->GetPosition();
-				ImGui::SliderFloat2("Position", &spritePosition.x, 0.0f, 1920.0f, "%.1f");
-				sprite->SetPosition(spritePosition);
-	
-				ImGui::Checkbox("isFlipX", &isFlipX_);
-				ImGui::Checkbox("isFlipY", &isFlipY_);
-				ImGui::Checkbox("isAdjustTextureSize", &isAdjustTextureSize);
-				ImGui::DragFloat2("textureLeftTop", &textureLeftTop.x);
-	
-				Vector4 color = sprite->GetColor();
-				ImGui::ColorEdit4("Color", &color.x);
-				sprite->SetColor(color);
-	
-				ImGui::End();
+				sprite->DrawImGui("sprite");
 			}
 		}
-		ImGui::Begin("Object3D");
-		ImGui::DragFloat3("Position", &modelPosition.x);
-		ImGui::DragFloat3("Rotation", &modelRotation.x);
-		ImGui::DragFloat3("Scale", &modelScale.x);
-	
-	
-		//色
-		Vector4 color = object3d->GetModelColor();
-		ImGui::ColorEdit4("Color", &color.x);
-		object3d->SetModelColor(color);
-	
-		ImGui::End();
-	
-		object3d->ShowImGuiLight();
-		ImGui::Begin("Object3D2");
-		ImGui::DragFloat3("Position", &modelPosition2.x);
-		ImGui::DragFloat3("Rotation", &modelRotation2.x);
-		ImGui::DragFloat3("Scale", &modelScale2.x);
-	
-	
-		object3d2->SetModelColor(color);
-		object3d2->ShowImGuiLight();
-		ImGui::End();
-	
+
+		object3d->DrawImGui("plane");
+		object3d2->DrawImGui("terran");
+
 		static float scratchPosition = 0.0f;
 		static bool isScratching = false;
 		static float lastScratchPosition = 0.0f;
