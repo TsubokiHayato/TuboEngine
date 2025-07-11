@@ -147,26 +147,14 @@ void Object3d::Update() {
 
 void Object3d::Draw() {
 
-	//// wvp用のCBufferの場所を設定
-	//commandList->SetGraphicsRootConstantBufferView(1, transformMatrixResource->GetGPUVirtualAddress());
-	//// 平行光源用のCBufferの場所を設定
-	//commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
-	//// カメラ情報のCBufferの場所を設定
-	//commandList->SetGraphicsRootConstantBufferView(4, cameraForGPUResource->GetGPUVirtualAddress());
-	//// ライトの種類のCBufferの場所を設定
-	//commandList->SetGraphicsRootConstantBufferView(5, lightTypeResource->GetGPUVirtualAddress());
-	//// ポイントライトのCBufferの場所を設定
-	//commandList->SetGraphicsRootConstantBufferView(6, pointLightResource->GetGPUVirtualAddress());
-	//// スポットライトのCBufferの場所を設定
-	//commandList->SetGraphicsRootConstantBufferView(7, spotLightResource->GetGPUVirtualAddress());
-
 	// TransformMatrix (b0, VertexShader)
 	commandList->SetGraphicsRootConstantBufferView(1, transformMatrixResource->GetGPUVirtualAddress());
+
 	// gTexture (t0, PixelShader)はModelクラスにある。
+	
 	// 例: キューブマップSRVをt1（gCubeTexture）にバインド
-	auto cubeMapHandle = TextureManager::GetInstance()->GetSrvHandleGPU("rostock_laage_airport_4k.dds");
 	// gCubeTexture (t1, PixelShader)
-	commandList->SetGraphicsRootDescriptorTable(3, cubeMapHandle);
+	commandList->SetGraphicsRootDescriptorTable(3, TextureManager::GetInstance()->GetSrvHandleGPU(cubeMapFilePath_));
 	// DirectionalLight (b1, PixelShader)
 	commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
 	// Camera (b2, PixelShader)

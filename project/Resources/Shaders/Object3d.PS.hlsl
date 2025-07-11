@@ -177,12 +177,12 @@ PixcelShaderOutput main(VertexShaderOutPut input)
             float3 reflectedVector = reflect(cameraTopPosition, normalize(input.normal));
             float4 environmentColor = gCubeTexture.Sample(gSampler, reflectedVector);
 
-    // 通常のライティング
+        // 通常のライティング
             float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
             float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
             float3 baseColor = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
 
-    // 環境マップ色とベースカラーをenvironmentCoefficientで線形補間
+        // 環境マップ色とベースカラーをenvironmentCoefficientで線形補間
             output.color.rgb = lerp(baseColor, environmentColor.rgb, gMaterial.environmentCoefficient);
             output.color.a = gMaterial.color.a * textureColor.a;
         }
