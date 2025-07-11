@@ -1,8 +1,7 @@
 #include "PSO.h"
 
-void PSO::Initialize()
-{
-	
+void PSO::Initialize() {
+
 	device = DirectXCommon::GetInstance()->GetDevice();
 	commandList = DirectXCommon::GetInstance()->GetCommandList();
 
@@ -12,8 +11,7 @@ void PSO::Initialize()
 
 }
 
-void PSO::DrawSettingsCommon()
-{
+void PSO::DrawSettingsCommon() {
 	/*ルートシグネイチャをセットするコマンド*/
 	 //RootSignatureを設定。
 
@@ -30,8 +28,7 @@ void PSO::DrawSettingsCommon()
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 }
-void PSO::CreateRootSignature()
-{
+void PSO::CreateRootSignature() {
 	// RootSignature作成
 	descriptionRootSignature.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -119,8 +116,7 @@ void PSO::CreateRootSignature()
 	assert(SUCCEEDED(DirectXCommon::GetInstance()->hr));
 }
 
-void PSO::CreateGraphicPipeline()
-{
+void PSO::CreateGraphicPipeline() {
 	//ルートシグネイチャ」の作成
 	CreateRootSignature();
 
@@ -159,44 +155,11 @@ void PSO::CreateGraphicPipeline()
 	blendDesc.RenderTarget[0].RenderTargetWriteMask =
 		D3D12_COLOR_WRITE_ENABLE_ALL;
 	blendDesc.RenderTarget[0].BlendEnable = TRUE;
-	switch (blendMode)
-	{
-	case BlendMode::kBlendModeNone:
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
-		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
-		break;
-	case BlendMode::kBlendModeNormal:
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // provided code
-		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-		break;
-	case BlendMode::kBlendModeAdd:
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // provided code
-		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-		break;
-	case BlendMode::kBlendModeSubtract:
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // provided code
-		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-		break;
-	case BlendMode::kBlendModeMultily:
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
-		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
-		break;
-	case BlendMode::kBlendModeScreen:
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;
-		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-		break;
-	case BlendMode::kCountBlendMode:
-		break;
-	default:
-		break;
-	}
-	
+	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
+
+
 
 	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
