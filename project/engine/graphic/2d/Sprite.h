@@ -35,7 +35,7 @@ public:
 	/// <summary>
 	/// ImGuiで全機能をまとめて操作・確認する関数
 	/// </summary>
-	void DrawImGui();
+	void DrawImGui(const char* windowName);
 
 
 	//getter_Pos
