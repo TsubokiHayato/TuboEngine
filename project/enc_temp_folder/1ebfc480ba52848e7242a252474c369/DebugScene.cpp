@@ -15,7 +15,7 @@ void DebugScene::Initialize() {
 	TextureManager::GetInstance()->LoadTexture(testDDSTextureHandle);
 
 	//モデルファイルパス
-	const std::string modelFileNamePath = "plane.gltf";
+	const std::string modelFileNamePath = "sphere.obj";
 	//モデルファイルパス2
 	const std::string modelFileNamePath2 = "terrain.obj";
 
@@ -189,7 +189,7 @@ void DebugScene::Finalize() {
 
 void DebugScene::Object3DDraw() {
 	
-	object3d2->Draw();
+	//object3d2->Draw();
 
 	skyBox->Draw();
 }

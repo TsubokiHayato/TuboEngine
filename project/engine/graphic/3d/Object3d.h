@@ -118,7 +118,7 @@ public:
 
 
 	void SetLightType(int type) {
-		if (type < 0 || type > 4) {
+		if (type < 0 || type > 5) {
 			type = 0;
 		}
 		lightTypeData->type = type;
@@ -139,6 +139,11 @@ public:
 	Vector3 GetPosition() const { return transform.translate; }
 	//モデルの色
 	Vector4 GetModelColor();
+
+
+	//-------------------------------------------------------------------------------------------------
+	//Material
+
 
 	///-------------------------------------------------------------------------------------------------
 	/// Light

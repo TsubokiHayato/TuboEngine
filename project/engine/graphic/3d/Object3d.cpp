@@ -105,6 +105,8 @@ void Object3d::Initialize(std::string modelFileNamePath) {
 
 #pragma endregion
 
+
+
 	// transform変数を作る
 	transform = {
 	    {1.0f, 1.0f, 1.0f},
@@ -145,18 +147,39 @@ void Object3d::Update() {
 
 void Object3d::Draw() {
 
-	// wvp用のCBufferの場所を設定
+	//// wvp用のCBufferの場所を設定
+	//commandList->SetGraphicsRootConstantBufferView(1, transformMatrixResource->GetGPUVirtualAddress());
+	//// 平行光源用のCBufferの場所を設定
+	//commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+	//// カメラ情報のCBufferの場所を設定
+	//commandList->SetGraphicsRootConstantBufferView(4, cameraForGPUResource->GetGPUVirtualAddress());
+	//// ライトの種類のCBufferの場所を設定
+	//commandList->SetGraphicsRootConstantBufferView(5, lightTypeResource->GetGPUVirtualAddress());
+	//// ポイントライトのCBufferの場所を設定
+	//commandList->SetGraphicsRootConstantBufferView(6, pointLightResource->GetGPUVirtualAddress());
+	//// スポットライトのCBufferの場所を設定
+	//commandList->SetGraphicsRootConstantBufferView(7, spotLightResource->GetGPUVirtualAddress());
+
+	// TransformMatrix (b0, VertexShader)
 	commandList->SetGraphicsRootConstantBufferView(1, transformMatrixResource->GetGPUVirtualAddress());
-	// 平行光源用のCBufferの場所を設定
-	commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
-	// カメラ情報のCBufferの場所を設定
-	commandList->SetGraphicsRootConstantBufferView(4, cameraForGPUResource->GetGPUVirtualAddress());
-	// ライトの種類のCBufferの場所を設定
-	commandList->SetGraphicsRootConstantBufferView(5, lightTypeResource->GetGPUVirtualAddress());
-	// ポイントライトのCBufferの場所を設定
-	commandList->SetGraphicsRootConstantBufferView(6, pointLightResource->GetGPUVirtualAddress());
-	// スポットライトのCBufferの場所を設定
-	commandList->SetGraphicsRootConstantBufferView(7, spotLightResource->GetGPUVirtualAddress());
+	// gTexture (t0, PixelShader)はModelクラスにある。
+	// 例: キューブマップSRVをt1（gCubeTexture）にバインド
+	auto cubeMapHandle = TextureManager::GetInstance()->GetSrvHandleGPU("rostock_laage_airport_4k.dds");
+	// gCubeTexture (t1, PixelShader)
+	commandList->SetGraphicsRootDescriptorTable(3, cubeMapHandle);
+	// DirectionalLight (b1, PixelShader)
+	commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
+	// Camera (b2, PixelShader)
+	commandList->SetGraphicsRootConstantBufferView(5, cameraForGPUResource->GetGPUVirtualAddress());
+	// LightType (b3, PixelShader)
+	commandList->SetGraphicsRootConstantBufferView(6, lightTypeResource->GetGPUVirtualAddress());
+	// PointLight (b4, PixelShader)
+	commandList->SetGraphicsRootConstantBufferView(7, pointLightResource->GetGPUVirtualAddress());
+	// SpotLight (b5, PixelShader)
+	commandList->SetGraphicsRootConstantBufferView(8, spotLightResource->GetGPUVirtualAddress());
+
+	
+
 
 	// 3Dモデルが割り当てられていれば描画
 	if (model_) {
@@ -169,10 +192,18 @@ void Object3d::Draw() {
 
 void Object3d::ShowImGuiLight() {
 
+
+	ImGui::Begin("Model");
+	float environmentCoefficient = model_->GetModelEnvironmentCoefficient();
+	ImGui::DragFloat("environmentCoefficient", &environmentCoefficient, 0.1f, 0.0f, 1.0f);
+	model_->SetModelEnvironmentCoefficient(environmentCoefficient);
+	ImGui::End();
+
+
 	ImGui::Begin("Light");
 	// 光源のタイプ
 
-	ImGui::SliderInt("LightType", &lightTypeData->type, 0, 4);
+	ImGui::SliderInt("LightType", &lightTypeData->type, 0, 5);
 	// 光沢度
 	float shininess = model_->GetModelShininess();
 	ImGui::DragFloat("Shininess", &shininess);
