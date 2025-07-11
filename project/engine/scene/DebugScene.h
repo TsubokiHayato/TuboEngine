@@ -79,15 +79,7 @@ private:
 	
 	///Sprite///
 
-	//左右反転フラグ
-	bool isFlipX_;
-	//上下反転フラグ
-	bool isFlipY_;
-	//テクスチャの左上座標
-	Vector2 textureLeftTop;
-	//テクスチャから初期サイズを得るフラグ
-	bool isAdjustTextureSize;
-
+	
 	std::vector<Sprite*> sprites;
 
 	///Model///
