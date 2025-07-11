@@ -9,6 +9,7 @@
 #include"ModelData.h"
 #include"BlendMode.h"
 #include"CameraForGPU.h"
+#include"SkyBox.h"
 //前方宣言
 class Object3dCommon;
 class ModelCommon;
@@ -87,7 +88,12 @@ public:
 	/// </summary>
 	void Draw();
 
-	void ShowImGuiLight();
+	/// <summary>
+	/// ImGuiで全機能をまとめて操作・確認する関数
+	/// </summary>
+	void DrawImGui(const char* windowName);
+
+	
 
 public:
 
@@ -118,7 +124,7 @@ public:
 
 
 	void SetLightType(int type) {
-		if (type < 0 || type > 4) {
+		if (type < 0 || type > 5) {
 			type = 0;
 		}
 		lightTypeData->type = type;
@@ -139,6 +145,11 @@ public:
 	Vector3 GetPosition() const { return transform.translate; }
 	//モデルの色
 	Vector4 GetModelColor();
+
+
+	//-------------------------------------------------------------------------------------------------
+	//Material
+
 
 	///-------------------------------------------------------------------------------------------------
 	/// Light
@@ -161,6 +172,11 @@ public:
 	float GetSpotLightDecay() { return spotLightData->decay; }
 	float GetSpotLightCosAngle() { return spotLightData->cosAngle; }
 
+
+	void SetCubeMapFilePath(const std::string& filePath) {
+		cubeMapFilePath_ = filePath;
+	}
+	
 private:
 
 	//-------------------------------------------------------------------
@@ -215,8 +231,9 @@ private:
 	//カメラ座標
 	Transform cameraTransform;
 
-
-	
+	// キューブマップのSRVハンドル
+	//デフォルト : ロストック・ラージ空港の4Kキューブマップ
+	std::string cubeMapFilePath_ = "rostock_laage_airport_4k.dds";
 
 };
 
