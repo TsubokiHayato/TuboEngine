@@ -16,7 +16,7 @@ public:
 	/// </summary>
 	/// <param name="filename">Resources/はカットして</param>
 	/// <param name="directoryPath">ディレクトリパス (デフォルト: "Resources/audios/")</param>
-	void Initialize(const std::string& filename, const std::string& directoryPath = "Resources/audios/");
+	void Initialize(const std::string& filename);
 
 	/// <summary>
 	/// 再生
