@@ -81,8 +81,10 @@ void DebugScene::Initialize() {
 
 	object3d = std::make_unique<Object3d>();
 	object3d->Initialize(modelFileNamePath);
+
 	object3d->SetModel(modelFileNamePath);
 	object3d->SetCubeMapFilePath(skyBox->GetTextureFilePath());
+
 
 	////////////////////////////////////////////////////////////////////////
 
@@ -92,8 +94,7 @@ void DebugScene::Initialize() {
 
 	object3d2 = std::make_unique<Object3d>();
 	object3d2->Initialize(modelFileNamePath2);
-
-	object3d2->SetModel(modelFileNamePath2);
+	
 
 #pragma endregion 3Dモデルの初期化
 
@@ -114,30 +115,24 @@ void DebugScene::Initialize() {
 }
 
 void DebugScene::Update() {
-	/*--------------
-	   ゲームの処理
-	--------------*/
+	
+
+	// --- 既存のカメラ・オブジェクト・スプライト更新処理 ---
 	camera->SetTranslate(cameraPosition);
 	camera->setRotation(cameraRotation);
 	camera->setScale(cameraScale);
 	camera->Update();
 
-
-
-	//オブジェクト3Dの更新
 	object3d->Update();
-
 	object3d->SetPosition(modelPosition);
 	object3d->SetRotation(modelRotation);
 	object3d->SetScale(modelScale);
 
 	object3d2->Update();
-
 	object3d2->SetPosition(modelPosition2);
 	object3d2->SetRotation(modelRotation2);
 	object3d2->SetScale(modelScale2);
-
-
+	
 	//スプライトの更新
 	for (Sprite* sprite : sprites) {
 		if (sprite) {
@@ -166,7 +161,7 @@ void DebugScene::Finalize() {
 }
 
 void DebugScene::Object3DDraw() {
-	
+	object3d->Draw();
 	object3d2->Draw();
 
 	skyBox->Draw();
@@ -178,7 +173,7 @@ void DebugScene::SpriteDraw() {
 			sprite->Draw();
 		}
 	}
-	object3d->Draw();
+	
 }
 
 void DebugScene::ImGuiDraw() {
