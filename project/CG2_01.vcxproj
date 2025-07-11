@@ -119,8 +119,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\Blend\AddBlendPSO.cpp" />
     <ClCompile Include="application\BaseCharacter.cpp" />
     <ClCompile Include="application\BaseBullet.cpp" />
-    <ClCompile Include="Collider.cpp" />
-    <ClCompile Include="CollisionManager.cpp" />
+    <ClCompile Include="application\Collider.cpp" />
+    <ClCompile Include="application\CollisionManager.cpp" />
     <ClCompile Include="application\Enemy.cpp" />
     <ClCompile Include="engine\scene\ClearScene.cpp" />
     <ClCompile Include="engine\scene\DebugScene.cpp" />
@@ -147,7 +147,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\FollowTopDownCamera.cpp" />
     <ClCompile Include="Framework\Framework.cpp" />
     <ClCompile Include="Framework\Order.cpp" />
-    <ClCompile Include="HitEffectManager.cpp" />
+    <ClCompile Include="application\HitEffectManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\graphic\3d\Model.cpp" />
     <ClCompile Include="engine\graphic\3d\ModelManager.cpp" />
@@ -198,9 +198,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="application\BaseCharacter.h" />
     <ClInclude Include="application\BaseBullet.h" />
-    <ClInclude Include="Collider.h" />
-    <ClInclude Include="CollisionManager.h" />
-    <ClInclude Include="CollisionTypeId.h" />
+    <ClInclude Include="application\Collider.h" />
+    <ClInclude Include="application\CollisionManager.h" />
+    <ClInclude Include="application\CollisionTypeId.h" />
     <ClInclude Include="application\Enemy.h" />
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\DissolvePSO.h" />
