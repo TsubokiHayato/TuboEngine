@@ -16,12 +16,10 @@ Player::~Player() {}
 //--------------------------------------------------
 // 初期化処理
 //--------------------------------------------------
-void Player::Initialize(Object3dCommon* object3dCommon) {
+void Player::Initialize() {
 
 	// プレイヤーのコライダーの設定
 	Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kPlayer));
-
-	object3dCommon_ = object3dCommon;
 
 	// プレイヤーの初期位置
 	position = Vector3(0.0f, 0.0f, 0.0f);
@@ -39,14 +37,21 @@ void Player::Initialize(Object3dCommon* object3dCommon) {
 
 	// モデルファイルパス
 	const std::string modelFileNamePath = "barrier.obj";
+	// スプライトファイルパス
+	const std::string reticleFileNamePath = "2D_Reticle.png";
 
 	// 3Dオブジェクト生成・初期化
 	object3d = std::make_unique<Object3d>();
-	object3d->Initialize(object3dCommon_, modelFileNamePath);
+	object3d->Initialize(modelFileNamePath);
 
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
 	object3d->SetScale(scale);
+
+	// Reticleの初期化
+	// Reticleはプレイヤーの中心に配置
+	reticleSprite = std::make_unique<Sprite>();
+	reticleSprite->Initialize(reticleFileNamePath);
 }
 
 //--------------------------------------------------
@@ -55,6 +60,7 @@ void Player::Initialize(Object3dCommon* object3dCommon) {
 void Player::Update() {
 	isHit = false;
 	Move();
+	Rotate();
 
 	// 発射タイマー更新
 	if (bulletTimer > 0.0f) {
@@ -76,6 +82,10 @@ void Player::Update() {
 	object3d->SetRotation(rotation);
 	object3d->SetScale(scale);
 	object3d->Update();
+
+	reticleSprite->SetPosition(reticlePosition);
+	reticleSprite->
+	reticleSprite->Update();
 }
 
 //--------------------------------------------------
@@ -85,7 +95,7 @@ void Player::Shoot() {
 	// スペースキーが押され、発射間隔を満たしていれば弾を生成
 	if (Input::GetInstance()->PushKey(DIK_SPACE) && bulletTimer <= 0.0f) {
 		auto bullet = std::make_unique<PlayerBullet>();
-		bullet->Initialize(object3dCommon_, position);
+		bullet->Initialize(position);
 		bullet->SetPlayerRotation(rotation);
 		bullet->SetPlayerPosition(position);
 		bullets.push_back(std::move(bullet));
@@ -123,6 +133,34 @@ void Player::Move() {
 	if (Input::GetInstance()->PushKey(DIK_D)) {
 		position.x += 0.1f;
 	}
+}
+
+///---------------------------------------------------
+// 回転処理
+//---------------------------------------------------
+void Player::Rotate() {
+	// --- マウスの方向に身体を向ける処理 ---
+	int screenWidth = static_cast<int>(WinApp::GetInstance()->GetClientWidth()); // TODO: DirectXから取得するように
+	int screenHeight = static_cast<int>(WinApp::GetInstance()->GetClientHeight());
+
+	int mouseX = static_cast<int>(Input::GetInstance()->GetMousePosition().x);
+	int mouseY = static_cast<int>(Input::GetInstance()->GetMousePosition().y);
+
+	float centerX = static_cast<float>(screenWidth) / 2.0f;
+	float centerY = static_cast<float>(screenHeight) / 2.0f;
+
+	float dx = static_cast<float>(mouseX) - centerX;
+	float dy = static_cast<float>(mouseY) - centerY;
+
+	// Z+前方が0度、X+右方向が+90度
+	float angle = std::atan2(dx, -dy);
+
+	rotation.y = angle;
+
+	reticlePosition = Vector2(centerX, centerY); // Reticleの位置を画面中央に設定
+}
+
+void Player::ReticleDraw() {reticleSprite -> Draw();
 }
 
 //--------------------------------------------------
@@ -167,6 +205,8 @@ void Player::DrawImGui() {
 	ImGui::Text("HP: %d", HP);
 	ImGui::Text("IsHit: %s", isHit ? "Yes" : "No");
 	ImGui::End();
+
+	Input::GetInstance()->ShowInputDebugWindow();
 
 	// プレイヤー弾のグローバルパラメータImGui
 	PlayerBullet::DrawImGuiGlobal();
