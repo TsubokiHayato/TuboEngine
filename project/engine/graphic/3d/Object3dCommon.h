@@ -1,6 +1,5 @@
 #pragma once
 #include"PSO.h"
-#include"NoneBlendPSO.h"
 #include"NormalBlendPSO.h"
 #include"AddBlendPSO.h"
 #include"SubtractBlendPSO.h"
@@ -67,7 +66,6 @@ private:
 
 
 	std::unique_ptr <PSO> pso = nullptr;//PSOのユニークポインタ
-	std::unique_ptr <NoneBlendPSO > noneBlendPSO;//NoneBlendPSOのユニークポインタ
 	std::unique_ptr <NormalBlendPSO > normalBlendPSO;//NormalBlendPSOのユニークポインタ
 	std::unique_ptr <AddBlendPSO > addBlendPSO;//AddBlendPSOのユニークポインタ
 	std::unique_ptr <MultiplyBlendPSO > multiplyBlendPSO;//MultiplyBlendPSOのユニークポインタ
