@@ -66,6 +66,10 @@ public:
 	float GetModelShininess() { return materialData->shininess; }
 	void SetModelShininess(float shininess) { materialData->shininess = shininess; }
 
+	//環境マップ寄与度
+	float GetModelEnvironmentCoefficient() { return materialData->environmentCoefficient; }
+	void SetModelEnvironmentCoefficient(float coefficient) { materialData->environmentCoefficient = coefficient; }
+
 	// rootNodeLocalMatrix
 	Matrix4x4 GetRootNodeLocalMatrix() { return modelData.rootNode.localMatrix; }
 	void SetRootNodeLocalMatrix(const Matrix4x4& matrix) { modelData.rootNode.localMatrix = matrix; }

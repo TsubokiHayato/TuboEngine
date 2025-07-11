@@ -9,10 +9,12 @@ Audio::~Audio()
     Stop();
 }
 
-void Audio::Initialize(const std::string& filename, const std::string& directoryPath)
+void Audio::Initialize(const std::string& filename)
 {
+
+    const std::string audioDirectoryPath = "Resources/Audio/";
     // ディレクトリパスのコピー
-    directoryPath_ = directoryPath;
+    directoryPath_ = audioDirectoryPath;
 
     // WAVファイルを読み込み
     soundDataHandle_ = AudioCommon::GetInstance()->SoundLoadWave(directoryPath_ + filename);
