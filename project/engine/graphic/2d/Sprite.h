@@ -32,6 +32,11 @@ public:
 	/// </summary>
 	void Draw();
 
+	/// <summary>
+	/// ImGuiで全機能をまとめて操作・確認する関数
+	/// </summary>
+	void DrawImGui(const char* windowName);
+
 
 	//getter_Pos
 	const Vector2& GetPosition()const { return position; }
@@ -122,7 +127,7 @@ private:
 	std::string textureFilePath_;
 
 	/*----------
-	　　拡張機能
+	　　 拡張機能
 	-----------*/
 	//アンカーポイント
 	Vector2 anchorPoint = {};
