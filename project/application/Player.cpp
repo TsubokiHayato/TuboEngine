@@ -84,7 +84,9 @@ void Player::Update() {
 	object3d->Update();
 
 	reticleSprite->SetPosition(reticlePosition);
-	reticleSprite->
+	reticleSprite->SetGetIsAdjustTextureSize(true); // レティクルのサイズを調整する
+	// レティクルの位置を画面中央に設定
+	reticleSprite->SetAnchorPoint(Vector2(0.5f, 0.5f)); // アンカーポイントを中央に設定
 	reticleSprite->Update();
 }
 
@@ -156,8 +158,8 @@ void Player::Rotate() {
 	float angle = std::atan2(dx, -dy);
 
 	rotation.y = angle;
-
-	reticlePosition = Vector2(centerX, centerY); // Reticleの位置を画面中央に設定
+	// Reticleの位置を画面中央に設定
+	reticlePosition = Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
 }
 
 void Player::ReticleDraw() {reticleSprite -> Draw();
