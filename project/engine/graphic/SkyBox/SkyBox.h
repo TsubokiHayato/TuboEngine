@@ -27,7 +27,9 @@ public:
 	void SetRotation(const Vector3& rotation) { transform.rotate = rotation; }
 	void SetScale(const Vector3& scale) { transform.scale = scale; }
 
-	
+    void SetTextureFilePath(const std::string& textureFilePath) { textureFilePath_ = textureFilePath; }
+    const std::string& GetTextureFilePath() const { return textureFilePath_; }
+  
 private:
    
    

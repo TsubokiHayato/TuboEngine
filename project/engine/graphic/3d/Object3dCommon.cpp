@@ -9,9 +9,6 @@ void Object3dCommon::Initialize() {
 	---------------------------------------*/
 	pso = std::make_unique<PSO>();
 	pso->Initialize();
-	// NoneBlendPSOの初期化
-	noneBlendPSO = std::make_unique<NoneBlendPSO>();
-	noneBlendPSO->Initialize();
 	// NormalBlendPSOの初期化
 	normalBlendPSO = std::make_unique<NormalBlendPSO>();
 	normalBlendPSO->Initialize();
@@ -45,7 +42,7 @@ void Object3dCommon::DrawSettingsCommon(int blendMode) {
 	switch (blendMode) {
 	case 0:
 		// NoneBlendPSO
-		noneBlendPSO->DrawSettingsCommon();
+		pso->DrawSettingsCommon();
 		break;
 	case 1:
 		// NormalBlendPSO
@@ -68,8 +65,8 @@ void Object3dCommon::DrawSettingsCommon(int blendMode) {
 		screenBlendPSO->DrawSettingsCommon();
 		break;
 	default:
-		// デフォルトはNoneBlendPSO
-		noneBlendPSO->DrawSettingsCommon();
+		// デフォルトはpso
+		pso->DrawSettingsCommon();
 		break;
 	}
 

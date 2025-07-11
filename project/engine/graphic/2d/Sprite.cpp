@@ -244,3 +244,63 @@ void Sprite::AdjustTextureSize()
 	
 	size = textureSize_;
 }
+
+// ImGuiでSpriteの全機能をまとめて操作・確認できる関数
+void Sprite::DrawImGui(const char* windowName) {
+	const char* windowName_ = windowName;
+	ImGui::Begin(windowName_);
+    ImGui::Separator();
+    ImGui::Text("Sprite ImGui コントロール"); // セクションタイトル
+    // 位置
+    Vector2 pos = GetPosition();
+    if (ImGui::DragFloat2("Position", &pos.x, 1.0f)) {
+        SetPosition(pos);
+    }
+    // 回転
+    float rot = GetRotation();
+    if (ImGui::DragFloat("Rotation", &rot, 0.01f)) {
+        SetRotation(rot);
+    }
+    // サイズ
+    Vector2 sz = GetSize();
+    if (ImGui::DragFloat2("Size", &sz.x, 1.0f)) {
+        SetSize(sz);
+    }
+    // アンカーポイント
+    Vector2 anchor = GetAnchorPoint();
+    if (ImGui::DragFloat2("AnchorPoint", &anchor.x, 0.01f, 0.0f, 1.0f)) {
+        SetAnchorPoint(anchor);
+    }
+    // 左右フリップ
+    bool flipX = GetFlipX();
+    if (ImGui::Checkbox("FlipX", &flipX)) {
+        SetFlipX(flipX);
+    }
+    // 上下フリップ
+    bool flipY = GetFlipY();
+    if (ImGui::Checkbox("FlipY", &flipY)) {
+        SetFlipY(flipY);
+    }
+    // テクスチャ左上座標
+    Vector2 texLT = GetTextureLeftTop();
+    if (ImGui::DragFloat2("TextureLeftTop", &texLT.x, 1.0f)) {
+        SetTextureLeftTop(texLT);
+    }
+    // テクスチャ切り出しサイズ
+    Vector2 texSz = GetTextureSize();
+    if (ImGui::DragFloat2("TextureSize", &texSz.x, 1.0f)) {
+        SetTextureSize(texSz);
+    }
+    // テクスチャ初期サイズ調整フラグ
+    bool adjust = GetIsAdjustTextureSize();
+    if (ImGui::Checkbox("AdjustTextureSize", &adjust)) {
+        SetGetIsAdjustTextureSize(adjust);
+    }
+    // 色
+    Vector4 color = GetColor();
+    if (ImGui::ColorEdit4("Color", &color.x)) {
+        SetColor(color);
+    }
+    // コメント: ここでSpriteの全てのプロパティをImGuiで操作できます
+	ImGui::End(); // ウィンドウ終了
+}
