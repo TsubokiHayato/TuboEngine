@@ -6,6 +6,8 @@ struct Material
     int enableLighting; //ライティングを有効にするかどうか
     float4x4 uvTransform; //UV変換行列
     float shininess; //反射の強さ
+    float environmentCoefficient; // 環境マップ寄与度 [0:無し, 1:全反射]
+
 };
 
 
@@ -48,6 +50,7 @@ struct LightType
 	//2 : Blinn-Phong反射モデル
 	//3 : PointLight
 	//4 : SpotLight
+    //5 : 環境マッピング
     int type;
 };
 
@@ -63,6 +66,8 @@ ConstantBuffer<Camera> gCamera : register(b2);
 ConstantBuffer<LightType> gLightType : register(b3);
 ConstantBuffer<PointLight> gPointLight : register(b4);
 ConstantBuffer<SpotLight> gSpotLight : register(b5);
+
+TextureCube<float4> gCubeTexture : register(t1);
 
 struct PixcelShaderOutput
 {
@@ -164,6 +169,26 @@ PixcelShaderOutput main(VertexShaderOutPut input)
 
             output.color.rgb = diffuseSpotLight + specularSpotLight;
             output.color.a = gMaterial.color.a * textureColor.a;
+        }
+        // 環境マッピング
+        else if (gLightType.type == 5)
+        {
+            float3 cameraTopPosition = normalize(input.worldPosition - gCamera.worldPosition);
+            float3 reflectedVector = reflect(cameraTopPosition, normalize(input.normal));
+            float4 environmentColor = gCubeTexture.Sample(gSampler, reflectedVector);
+
+        // 通常のライティング
+            float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
+            float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+            float3 baseColor = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+
+        // 環境マップ色とベースカラーをenvironmentCoefficientで線形補間
+            output.color.rgb = lerp(baseColor, environmentColor.rgb, gMaterial.environmentCoefficient);
+            output.color.a = gMaterial.color.a * textureColor.a;
+        }
+        else
+        {
+            output.color = gMaterial.color * textureColor;
         }
 
         

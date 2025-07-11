@@ -41,6 +41,7 @@ void Model::Initialize(const std::string& directoryPath, const std::string& file
 	materialData->enableLighting = true;
 	materialData->uvTransform = MakeIdentity4x4();
 	materialData->shininess = 70.0f;
+	materialData->environmentCoefficient = 1.0f;
 
 #pragma endregion Material_Resource
 
