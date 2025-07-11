@@ -1,8 +1,7 @@
 #include "PSO.h"
 
-void PSO::Initialize()
-{
-	
+void PSO::Initialize() {
+
 	device = DirectXCommon::GetInstance()->GetDevice();
 	commandList = DirectXCommon::GetInstance()->GetCommandList();
 
@@ -12,8 +11,7 @@ void PSO::Initialize()
 
 }
 
-void PSO::DrawSettingsCommon()
-{
+void PSO::DrawSettingsCommon() {
 	/*ルートシグネイチャをセットするコマンド*/
 	 //RootSignatureを設定。
 
@@ -30,8 +28,7 @@ void PSO::DrawSettingsCommon()
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 }
-void PSO::CreateRootSignature()
-{
+void PSO::CreateRootSignature() {
 	// RootSignature作成
 	descriptionRootSignature.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -41,6 +38,13 @@ void PSO::CreateRootSignature()
 	descriptorRange[0].NumDescriptors = 1; // 数は1
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV; // SRVをつかう
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // Offsetを自動計算
+
+	// 追加
+	descriptorRange[1].BaseShaderRegister = 1; // t1 (gCubeTexture)
+	descriptorRange[1].NumDescriptors = 1;
+	descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
 
 	// RootParameter作成
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
@@ -54,27 +58,34 @@ void PSO::CreateRootSignature()
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE; // DESCRIPTOR_TABLEを使う
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderでつかう
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
-	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
 
-	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
-	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderでつかう
-	rootParameters[3].Descriptor.ShaderRegister = 1; // レジスタ番号1とバインド
+	// 例: t1用
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[3].DescriptorTable.pDescriptorRanges = &descriptorRange[1];
+	rootParameters[3].DescriptorTable.NumDescriptorRanges = 1;
+
 
 	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
 	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderでつかう
-	rootParameters[4].Descriptor.ShaderRegister = 2; // レジスタ番号2とバインド
+	rootParameters[4].Descriptor.ShaderRegister = 1; // レジスタ番号1とバインド
 
 	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
 	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderでつかう
-	rootParameters[5].Descriptor.ShaderRegister = 3; // レジスタ番号3とバインド
+	rootParameters[5].Descriptor.ShaderRegister = 2; // レジスタ番号2とバインド
 
 	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
 	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderでつかう
-	rootParameters[6].Descriptor.ShaderRegister = 4; // レジスタ番号4とバインド
+	rootParameters[6].Descriptor.ShaderRegister = 3; // レジスタ番号3とバインド
 
 	rootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
 	rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderでつかう
-	rootParameters[7].Descriptor.ShaderRegister = 5; // レジスタ番号5とバインド
+	rootParameters[7].Descriptor.ShaderRegister = 4; // レジスタ番号4とバインド
+
+	rootParameters[8].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // CBVを使う
+	rootParameters[8].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderでつかう
+	rootParameters[8].Descriptor.ShaderRegister = 5; // レジスタ番号5とバインド
 
 
 
@@ -105,8 +116,7 @@ void PSO::CreateRootSignature()
 	assert(SUCCEEDED(DirectXCommon::GetInstance()->hr));
 }
 
-void PSO::CreateGraphicPipeline()
-{
+void PSO::CreateGraphicPipeline() {
 	//ルートシグネイチャ」の作成
 	CreateRootSignature();
 
@@ -145,44 +155,11 @@ void PSO::CreateGraphicPipeline()
 	blendDesc.RenderTarget[0].RenderTargetWriteMask =
 		D3D12_COLOR_WRITE_ENABLE_ALL;
 	blendDesc.RenderTarget[0].BlendEnable = TRUE;
-	switch (blendMode)
-	{
-	case BlendMode::kBlendModeNone:
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
-		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
-		break;
-	case BlendMode::kBlendModeNormal:
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // provided code
-		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-		break;
-	case BlendMode::kBlendModeAdd:
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // provided code
-		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-		break;
-	case BlendMode::kBlendModeSubtract:
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA; // provided code
-		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-		break;
-	case BlendMode::kBlendModeMultily:
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
-		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
-		break;
-	case BlendMode::kBlendModeScreen:
-		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;
-		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-		break;
-	case BlendMode::kCountBlendMode:
-		break;
-	default:
-		break;
-	}
-	
+	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
+
+
 
 	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;

@@ -15,4 +15,6 @@ struct Material {
 	Matrix4x4 uvTransform;
 	//光沢度
 	float shininess;
+	// 環境マップ寄与度 [0:無し, 1:全反射]
+	float environmentCoefficient;
 };

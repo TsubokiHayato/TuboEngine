@@ -46,6 +46,7 @@ void StageScene::Update()
 		enemy->SetCamera(followCamera->GetCamera());
 		enemy->Update();
 	}
+	followCamera->Update();
 
 	collisionManager_->Update();
 	CheckAllCollisions();
@@ -69,9 +70,7 @@ void StageScene::Object3DDraw() {
 	// 当たり判定の可視化
 	collisionManager_->Draw();
 }
-void StageScene::SpriteDraw()
-{
-}
+void StageScene::SpriteDraw() { player_->ReticleDraw(); }
 
 void StageScene::ImGuiDraw()
 {
