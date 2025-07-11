@@ -9,9 +9,6 @@ void SpriteCommon::Initialize()
       ---------------------------------------*/
     pso = std::make_unique<PSO>();
     pso->Initialize();
-    // NoneBlendPSOの初期化
-    noneBlendPSO = std::make_unique<NoneBlendPSO>();
-    noneBlendPSO->Initialize();
     // NormalBlendPSOの初期化
     normalBlendPSO = std::make_unique<NormalBlendPSO>();
     normalBlendPSO->Initialize();
@@ -44,7 +41,7 @@ void SpriteCommon::DrawSettingsCommon(int blendMode)
     switch (blendMode) {
     case 0:
         // NoneBlendPSO
-        noneBlendPSO->DrawSettingsCommon();
+        pso->DrawSettingsCommon();
         break;
     case 1:
         // NormalBlendPSO
@@ -68,7 +65,7 @@ void SpriteCommon::DrawSettingsCommon(int blendMode)
         break;
     default:
         // デフォルトはNoneBlendPSO
-        noneBlendPSO->DrawSettingsCommon();
+       pso->DrawSettingsCommon();
         break;
     }
 }
