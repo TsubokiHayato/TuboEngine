@@ -112,6 +112,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application\ParameterManager.cpp" />
     <ClCompile Include="application\Player.cpp" />
     <ClCompile Include="application\PlayerBullet.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\DissolveEffect.cpp" />
@@ -202,6 +203,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\CollisionManager.h" />
     <ClInclude Include="application\CollisionTypeId.h" />
     <ClInclude Include="application\Enemy.h" />
+    <ClInclude Include="application\FollowTopDownCamera.h" />
+    <ClInclude Include="application\HitEffectManager.h" />
+    <ClInclude Include="application\ParameterManager.h" />
+    <ClInclude Include="application\Player.h" />
+    <ClInclude Include="application\PlayerBullet.h" />
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\DissolvePSO.h" />
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
