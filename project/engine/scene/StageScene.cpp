@@ -28,6 +28,11 @@ void StageScene::Initialize() {
 		enemies.push_back(std::move(enemy));
 	}
 
+	skyBox_ = std::make_unique<SkyBox>();
+	skyBox_->Initialize("rostock_laage_airport_4k.dds"); // dds
+	skyBox_->SetCamera(followCamera->GetCamera());
+
+
 	// 衝突マネージャの生成
 	collisionManager_ = std::make_unique<CollisionManager>();
 	collisionManager_->Initialize();
@@ -47,6 +52,7 @@ void StageScene::Update()
 		enemy->Update();
 	}
 	followCamera->Update();
+	skyBox_->Update();
 
 	collisionManager_->Update();
 	CheckAllCollisions();
@@ -67,6 +73,8 @@ void StageScene::Object3DDraw() {
 	for (auto& enemy : enemies) {
 		enemy->Draw();
 	}
+
+	skyBox_->Draw();
 	// 当たり判定の可視化
 	collisionManager_->Draw();
 }
