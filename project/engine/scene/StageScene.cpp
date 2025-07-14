@@ -28,9 +28,11 @@ void StageScene::Initialize() {
 		enemies.push_back(std::move(enemy));
 	}
 
+	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
+
 	skyBox_ = std::make_unique<SkyBox>();
-	skyBox_->Initialize("rostock_laage_airport_4k.dds"); // dds
-	skyBox_->SetCamera(followCamera->GetCamera());
+	skyBox_->Initialize(testDDSTextureHandle); // dds
+	
 
 
 	// 衝突マネージャの生成
@@ -52,6 +54,8 @@ void StageScene::Update()
 		enemy->Update();
 	}
 	followCamera->Update();
+
+	skyBox_->SetCamera(followCamera->GetCamera());
 	skyBox_->Update();
 
 	collisionManager_->Update();
@@ -94,6 +98,16 @@ void StageScene::ImGuiDraw()
 		enemy->DrawImGui();
 	}
 
+
+
+	// SkyBoxのImGui
+	ImGui::Begin("SkyBox");
+	ImGui::Text("SkyBox Settings");
+	ImGui::Text("Texture: %s", skyBox_->GetTextureFilePath().c_str());
+	ImGui::Text("Position: (%.2f, %.2f, %.2f)", skyBox_->GetTransform().translate.x, skyBox_->GetTransform().translate.y, skyBox_->GetTransform().translate.z);
+	ImGui::Text("Rotation: (%.2f, %.2f, %.2f)", skyBox_->GetTransform().rotate.x, skyBox_->GetTransform().rotate.y, skyBox_->GetTransform().rotate.z);
+	ImGui::Text("Scale: (%.2f, %.2f, %.2f)", skyBox_->GetTransform().scale.x, skyBox_->GetTransform().scale.y, skyBox_->GetTransform().scale.z);
+	ImGui::End();
 
 }
 
