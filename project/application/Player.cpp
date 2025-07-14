@@ -36,7 +36,7 @@ void Player::Initialize() {
 	isDead = false;
 
 	// モデルファイルパス
-	const std::string modelFileNamePath = "barrier.obj";
+	const std::string modelFileNamePath = "sphere.obj";
 	// スプライトファイルパス
 	const std::string reticleFileNamePath = "2D_Reticle.png";
 
@@ -207,6 +207,8 @@ void Player::DrawImGui() {
 	ImGui::Text("HP: %d", HP);
 	ImGui::Text("IsHit: %s", isHit ? "Yes" : "No");
 	ImGui::End();
+
+	object3d->DrawImGui("Player");
 
 	Input::GetInstance()->ShowInputDebugWindow();
 

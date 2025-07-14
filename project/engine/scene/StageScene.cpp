@@ -14,6 +14,11 @@ void StageScene::Initialize() {
 	followCamera = std::make_unique<FollowTopDownCamera>();
 	followCamera->Initialize(player_.get(), Vector3(0.0f, 40.0f, 0.0f), 0.2f);
 
+	camera = std::make_unique<Camera>();
+	camera->SetTranslate(cameraPosition);
+	camera->setRotation(cameraRotation);
+	camera->setScale(cameraScale);
+
 	// プレイヤーにカメラをセット
 	player_->SetCamera(followCamera->GetCamera());
 
@@ -43,7 +48,11 @@ void StageScene::Initialize() {
 
 void StageScene::Update()
 {
-
+	camera->SetTranslate(cameraPosition);
+	camera->setRotation(cameraRotation);
+	camera->setScale(cameraScale);
+	camera->Update();
+	followCamera->Update();
 
 	player_->SetCamera(followCamera->GetCamera());
 	player_->Update();
@@ -53,9 +62,13 @@ void StageScene::Update()
 		enemy->SetCamera(followCamera->GetCamera());
 		enemy->Update();
 	}
-	followCamera->Update();
+
+
 
 	skyBox_->SetCamera(followCamera->GetCamera());
+	skyBox_->SetPosition(followCamera->GetCamera()->GetTranslate());
+	skyBox_->SetRotation(followCamera->GetCamera()->GetRotation());
+
 	skyBox_->Update();
 
 	collisionManager_->Update();

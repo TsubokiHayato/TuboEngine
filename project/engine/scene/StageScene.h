@@ -81,7 +81,7 @@ private:
 
 	/// Camera ///
 	std::unique_ptr<FollowTopDownCamera> followCamera;
-
+	std::unique_ptr<Camera> camera = nullptr;
 	Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
 	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
