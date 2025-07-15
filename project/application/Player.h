@@ -75,6 +75,10 @@ public:
 	// カメラを設定
 	void SetCamera(Camera* camera) { object3d->SetCamera(camera); }
 
+	// 環境マップ設定
+	void CubeMapSet(const std::string& filePath) {
+		object3d->SetCubeMapFilePath(filePath); }
+
 private:
 	///--------------------------------------------------
 	///				引き渡し用変数
