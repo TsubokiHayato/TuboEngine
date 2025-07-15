@@ -149,6 +149,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Framework\Framework.cpp" />
     <ClCompile Include="Framework\Order.cpp" />
     <ClCompile Include="application\HitEffectManager.cpp" />
+    <ClCompile Include="Line.cpp" />
+    <ClCompile Include="LineCommon.cpp" />
+    <ClCompile Include="LineManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\graphic\3d\Model.cpp" />
     <ClCompile Include="engine\graphic\3d\ModelManager.cpp" />
@@ -295,6 +298,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\PSO\SkyBoxPSO.h" />
     <ClInclude Include="Framework\Framework.h" />
     <ClInclude Include="Framework\Order.h" />
+    <ClInclude Include="Line.h" />
+    <ClInclude Include="LineCommon.h" />
+    <ClInclude Include="LineManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\imgui\imgui.vcxproj">
