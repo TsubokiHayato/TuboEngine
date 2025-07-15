@@ -45,9 +45,27 @@ static float NormalizeAngle(float angle) {
 }
 
 void Enemy::Update() {
-	// プレイヤーの方向を向く（一定速度で回転）
+	// プレイヤーがいれば距離と方向を計算
+	float distanceToPlayer = 0.0f;
+	Vector3 toPlayer = {0, 0, 0};
 	if (player_) {
-		Vector3 toPlayer = player_->GetPosition() - position;
+		toPlayer = player_->GetPosition() - position;
+		distanceToPlayer = std::sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y + toPlayer.z * toPlayer.z);
+	}
+
+	// 状態遷移
+	if (player_) {
+		if (distanceToPlayer > moveStartDistance_) {
+			state_ = State::Idle; // 一定以上離れていると待機
+		} else if (distanceToPlayer > shootDistance_) {
+			state_ = State::Move; // 移動範囲内
+		} else {
+			state_ = State::Shoot; // 射撃範囲内
+		}
+	}
+
+	// プレイヤーの方向を向く（一定速度で回転）
+	if (player_ && state_ != State::Idle) {
 		float angleY = std::atan2(toPlayer.x, toPlayer.z); // Y軸回転
 		float diff = NormalizeAngle(angleY - rotation.y);
 		float maxTurn = turnSpeed_;
@@ -59,22 +77,46 @@ void Enemy::Update() {
 		}
 	}
 
-	// 弾発射処理（例: 1秒ごとに発射）
-	static float bulletTimer = 0.0f;
-	bulletTimer += 1.0f / 60.0f; // 60FPS前提
-	if (bulletTimer >= 1.0f) {
-		bulletTimer = 0.0f;
+	// 状態ごとの行動
+	switch (state_) {
+	case State::Idle:
+		// 何もしない
+		break;
+	case State::Move:
 		if (player_) {
-			bullet = std::make_unique<EnemyNormalBullet>();
-			bullet->Initialize(position);
-			bullet->SetEnemyPosition(position);
-			bullet->SetEnemyRotation(rotation);
-			bullet->SetPlayer(player_);
-			bullet->SetCamera(camera_);
+			// Y成分は無視してXZ平面で移動
+			Vector3 dir = toPlayer;
+			dir.y = 0.0f;
+			float len = std::sqrt(dir.x * dir.x + dir.z * dir.z);
+			if (len > 0.001f) {
+				dir.x /= len;
+				dir.z /= len;
+				position.x += dir.x * moveSpeed_;
+				position.z += dir.z * moveSpeed_;
+			}
 		}
-	}
-	if (bullet) {
-		bullet->Update();
+		break;
+	case State::Shoot:
+		// 弾発射処理（例: 1秒ごとに発射）
+		{
+			static float bulletTimer = 0.0f;
+			bulletTimer += 1.0f / 60.0f; // 60FPS前提
+			if (bulletTimer >= 1.0f) {
+				bulletTimer = 0.0f;
+				if (player_) {
+					bullet = std::make_unique<EnemyNormalBullet>();
+					bullet->Initialize(position);
+					bullet->SetEnemyPosition(position);
+					bullet->SetEnemyRotation(rotation);
+					bullet->SetPlayer(player_);
+					bullet->SetCamera(camera_);
+				}
+			}
+			if (bullet) {
+				bullet->Update();
+			}
+		}
+		break;
 	}
 
 	// まず座標・回転・スケールを最新化
