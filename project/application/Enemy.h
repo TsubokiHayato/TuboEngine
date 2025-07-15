@@ -1,7 +1,13 @@
 #pragma once
 #include "BaseCharacter.h"
+#include "EnemyNormalBullet.h"
 #include "Particle.h"
 #include "ParticleEmitter.h"
+
+///---------------------------------------------------
+///				前方宣言
+///---------------------------------------------------
+class Player;
 
 class Enemy : public BaseCharacter {
 	///---------------------------------------
@@ -33,10 +39,8 @@ public:
 	///				ゲッター&セッター
 	///------------------------------------------------------
 public:
-	
 	// カメラ
-	void SetCamera(Camera* camera) { camera_ = camera;
-	}
+	void SetCamera(Camera* camera) { camera_ = camera; }
 
 	// 座標
 	Vector3 GetPosition() const { return position; }
@@ -54,12 +58,13 @@ public:
 	bool GetIsAlive() const { return isAlive; }
 	void SetIsAlive(bool alive) { isAlive = alive; }
 
+	void SetPlayer(Player* player) { player_ = player; }
+
 	///----------------------------------
 	///				受取り変数
 	/// ---------------------------------
 private:
-
-	Camera* camera_ = nullptr;                 // カメラ
+	Camera* camera_ = nullptr; // カメラ
 
 	///---------------------------------------
 	///				メンバ変数
@@ -74,8 +79,14 @@ private:
 	bool isAlive = true;                // 敵が生きているかどうかのフラグ
 	bool isHit = false;                 // 衝突判定フラグ
 	bool wasHit = false;                // 前フレームのisHit
-
+	float turnSpeed_ = 0.1f;            // プレイヤー方向を向く回転補間率（0.0f〜1.0f）
 	std::unique_ptr<Object3d> object3d; // 3Dオブジェクト
+
+	///-----Player-----///
+	Player* player_ = nullptr; // プレイヤーへのポインタ
+
+	///-----Bullet-----///
+	std::unique_ptr<EnemyNormalBullet> bullet; // 敵の弾
 
 	///-----Particle-----///
 

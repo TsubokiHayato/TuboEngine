@@ -3,6 +3,10 @@
 #include "Enemy.h"
 #include "ImGuiManager.h"
 #include "TextureManager.h"
+#include "Player.h"
+#include <cmath>
+
+constexpr float kPI = 3.14159265358979323846f;
 
 Enemy::Enemy() {}
 Enemy::~Enemy() {}
@@ -23,6 +27,8 @@ void Enemy::Initialize() {
 	object3d->SetRotation(rotation);
 	object3d->SetScale(scale);
 
+
+
 	std::string particleTextureHandle = "gradationLine.png";
 	TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
 
@@ -30,8 +36,47 @@ void Enemy::Initialize() {
 	particle = nullptr;
 	particleEmitter_ = nullptr;
 }
+
+// 角度差分を[-π, π]に正規化する関数
+static float NormalizeAngle(float angle) {
+	while (angle > kPI) angle -= 2.0f * kPI;
+	while (angle < -kPI) angle += 2.0f * kPI;
+	return angle;
+}
+
 void Enemy::Update() {
-	
+	// プレイヤーの方向を向く（一定速度で回転）
+	if (player_) {
+		Vector3 toPlayer = player_->GetPosition() - position;
+		float angleY = std::atan2(toPlayer.x, toPlayer.z); // Y軸回転
+		float diff = NormalizeAngle(angleY - rotation.y);
+		float maxTurn = turnSpeed_;
+		if (std::fabs(diff) < maxTurn) {
+			rotation.y = angleY;
+		} else {
+			rotation.y += (diff > 0 ? 1 : -1) * maxTurn;
+			rotation.y = NormalizeAngle(rotation.y);
+		}
+	}
+
+	// 弾発射処理（例: 1秒ごとに発射）
+	static float bulletTimer = 0.0f;
+	bulletTimer += 1.0f / 60.0f; // 60FPS前提
+	if (bulletTimer >= 1.0f) {
+		bulletTimer = 0.0f;
+		if (player_) {
+			bullet = std::make_unique<EnemyNormalBullet>();
+			bullet->Initialize(position);
+			bullet->SetEnemyPosition(position);
+			bullet->SetEnemyRotation(rotation);
+			bullet->SetPlayer(player_);
+			bullet->SetCamera(camera_);
+		}
+	}
+	if (bullet) {
+		bullet->Update();
+	}
+
 	// まず座標・回転・スケールを最新化
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
@@ -87,6 +132,9 @@ void Enemy::Draw() {
 	if (object3d) {
 		object3d->Draw();
 	}
+	if (bullet) {
+		bullet->Draw();
+	}
 }
 
 void Enemy::ParticleDraw() {
@@ -103,6 +151,7 @@ void Enemy::DrawImGui() {
 	ImGui::Text("Enemy Alive: %s", isAlive ? "Yes" : "No");
 	ImGui::Text("Hit: %s", isHit ? "Yes" : "No");
 	ImGui::Text("wasHit: %s", isHit ? "Yes" : "No");
+	ImGui::SliderFloat("Turn Speed", &turnSpeed_, 0.01f, 1.0f, "%.2f");
 	ImGui::End();
 }
 
