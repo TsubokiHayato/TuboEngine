@@ -14,11 +14,6 @@ void StageScene::Initialize() {
 	followCamera = std::make_unique<FollowTopDownCamera>();
 	followCamera->Initialize(player_.get(), Vector3(0.0f, 40.0f, 0.0f), 0.2f);
 
-	camera = std::make_unique<Camera>();
-	camera->SetTranslate(cameraPosition);
-	camera->setRotation(cameraRotation);
-	camera->setScale(cameraScale);
-
 	// プレイヤーにカメラをセット
 	player_->SetCamera(followCamera->GetCamera());
 
@@ -33,13 +28,6 @@ void StageScene::Initialize() {
 		enemies.push_back(std::move(enemy));
 	}
 
-	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
-
-	skyBox_ = std::make_unique<SkyBox>();
-	skyBox_->Initialize(testDDSTextureHandle); // dds
-	
-
-
 	// 衝突マネージャの生成
 	collisionManager_ = std::make_unique<CollisionManager>();
 	collisionManager_->Initialize();
@@ -48,11 +36,7 @@ void StageScene::Initialize() {
 
 void StageScene::Update()
 {
-	camera->SetTranslate(cameraPosition);
-	camera->setRotation(cameraRotation);
-	camera->setScale(cameraScale);
-	camera->Update();
-	followCamera->Update();
+
 
 	player_->SetCamera(followCamera->GetCamera());
 	player_->Update();
@@ -60,16 +44,10 @@ void StageScene::Update()
 	
 	for (auto& enemy : enemies) {
 		enemy->SetCamera(followCamera->GetCamera());
+		enemy->SetPlayer(player_.get());
 		enemy->Update();
 	}
-
-
-
-	skyBox_->SetCamera(followCamera->GetCamera());
-	skyBox_->SetPosition(followCamera->GetCamera()->GetTranslate());
-	skyBox_->SetRotation(followCamera->GetCamera()->GetRotation());
-
-	skyBox_->Update();
+	followCamera->Update();
 
 	collisionManager_->Update();
 	CheckAllCollisions();
@@ -90,8 +68,6 @@ void StageScene::Object3DDraw() {
 	for (auto& enemy : enemies) {
 		enemy->Draw();
 	}
-
-	skyBox_->Draw();
 	// 当たり判定の可視化
 	collisionManager_->Draw();
 }
@@ -111,16 +87,6 @@ void StageScene::ImGuiDraw()
 		enemy->DrawImGui();
 	}
 
-
-
-	// SkyBoxのImGui
-	ImGui::Begin("SkyBox");
-	ImGui::Text("SkyBox Settings");
-	ImGui::Text("Texture: %s", skyBox_->GetTextureFilePath().c_str());
-	ImGui::Text("Position: (%.2f, %.2f, %.2f)", skyBox_->GetTransform().translate.x, skyBox_->GetTransform().translate.y, skyBox_->GetTransform().translate.z);
-	ImGui::Text("Rotation: (%.2f, %.2f, %.2f)", skyBox_->GetTransform().rotate.x, skyBox_->GetTransform().rotate.y, skyBox_->GetTransform().rotate.z);
-	ImGui::Text("Scale: (%.2f, %.2f, %.2f)", skyBox_->GetTransform().scale.x, skyBox_->GetTransform().scale.y, skyBox_->GetTransform().scale.z);
-	ImGui::End();
 
 }
 
