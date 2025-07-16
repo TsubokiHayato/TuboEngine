@@ -152,6 +152,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="LineCommon.cpp" />
     <ClCompile Include="LineManager.cpp" />
+    <ClCompile Include="LinePSO.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\graphic\3d\Model.cpp" />
     <ClCompile Include="engine\graphic\3d\ModelManager.cpp" />
@@ -301,6 +302,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Line.h" />
     <ClInclude Include="LineCommon.h" />
     <ClInclude Include="LineManager.h" />
+    <ClInclude Include="LinePSO.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\imgui\imgui.vcxproj">
