@@ -93,6 +93,7 @@
     <ClCompile Include="LineCommon.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="LineManager.cpp" />
+    <ClCompile Include="LinePSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseCharacter.h" />
@@ -196,6 +197,7 @@
     <ClInclude Include="LineCommon.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="LineManager.h" />
+    <ClInclude Include="LinePSO.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
