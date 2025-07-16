@@ -1,26 +1,32 @@
 #pragma once
-
 #include "Camera.h"
-#include "DirectXCommon.h"
+#include "LinePSO.h"
+#include <memory>
+#include <vector>
+
+///----------------------------------------------------
+/// Line描画の共通処理を管理するクラス
+///----------------------------------------------------
 class LineCommon {
-
 public:
-	void Initialize();
-	void DrawSettingsCommon();
+    ///<summary>初期化処理</summary>
+    void Initialize();
+    ///<summary>描画設定を行う</summary>
+    void DrawSettingsCommon();
+
+    ///<summary>デフォルトカメラの設定</summary>
+    void SetDefaultCamera(Camera* camera) { defaultCamera = camera; }
+    ///<summary>デフォルトカメラの取得</summary>
+    Camera* GetDefaultCamera() const { return defaultCamera; }
 
 private:
-	void CreateRootSignature();
-	void CreateGraphicsPipeline();
+    ///----------------------------------------------------
+    /// Line描画用パイプラインステートオブジェクト
+    ///----------------------------------------------------
+    std::unique_ptr<LinePSO> pso_;
 
-public:
-	void SetDefaultCamera(Camera* camera) { defaultCamera = camera; }
-	Camera* GetDefaultCamera() const { return defaultCamera; }
-
-private:
-	Microsoft::WRL::ComPtr<ID3D12Device> device;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState;
-
-	Camera* defaultCamera = nullptr;
+    ///----------------------------------------------------
+    /// デフォルトカメラ
+    ///----------------------------------------------------
+    Camera* defaultCamera = nullptr;
 };
