@@ -1,7 +1,7 @@
 #include "StageScene.h"
 #include "CollisionManager.h"
 #include"LineManager.h"
-#include "application/FollowTopDownCamera.h"
+#include "FollowTopDownCamera.h"
 
 void StageScene::Initialize() {
 	
@@ -48,6 +48,7 @@ void StageScene::Update()
 	}
 	followCamera->Update();
 
+	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	collisionManager_->Update();
 	CheckAllCollisions();
 }
@@ -62,6 +63,7 @@ void StageScene::Object3DDraw() {
 	// 3Dオブジェクトの描画
 	// プレイヤーの3Dオブジェクトを描画
 	player_->Draw();
+	LineManager::GetInstance()->DrawSphere(player_->GetPosition(), 1.2f, {1.0f, 0.0f, 0.0f, 1.0f}, 16);
 
 	// 敵の3Dオブジェクトを描画
 	for (auto& enemy : enemies) {
