@@ -185,7 +185,7 @@ void Framework::FrameWorkRenderTargetPreDraw() {
 
 	SrvManager::GetInstance()->PreDraw();
 
-	LineManager::GetInstance()->Draw();
+	
 	
 }
 
@@ -208,6 +208,7 @@ void Framework::SpriteCommonDraw() {
 	SpriteCommon::GetInstance()->DrawSettingsCommon(spriteBlendModeNum);
 	SceneManager::GetInstance()->SpriteDraw();
 	
+
 }
 
 void Framework::ParticleCommonDraw() {
