@@ -186,6 +186,7 @@ void Framework::FrameWorkRenderTargetPreDraw() {
 	SrvManager::GetInstance()->PreDraw();
 
 	LineManager::GetInstance()->Draw();
+	
 }
 
 

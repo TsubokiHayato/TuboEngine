@@ -42,9 +42,8 @@ void LineManager::DrawImGui() {
 	ImGui::Checkbox("Grid", &isDrawGrid_);
 	ImGui::SliderFloat("GridSize", &gridSize_, 1.0f, 10000.0f);
 	ImGui::SliderInt("Divisions", &gridDivisions_, 1, 512);
-	ImGui::ColorEdit4("Color", &gridColor_.x);
-	ImGui::Separator();
 	ImGui::Checkbox("Sphere", &isDrawSphere_);
+	ImGui::ColorEdit4("Color", &gridColor_.x);
 	ImGui::End();
 }
 

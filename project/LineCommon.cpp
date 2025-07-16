@@ -6,6 +6,7 @@ void LineCommon::Initialize() {
 void LineCommon::DrawSettingsCommon() {
 	auto commandList = DirectXCommon::GetInstance()->GetCommandList();
 	commandList->SetGraphicsRootSignature(rootSignature.Get());
+	commandList->SetPipelineState(graphicsPipelineState.Get());
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 }
 
