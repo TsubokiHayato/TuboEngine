@@ -198,6 +198,8 @@
     <ClInclude Include="Line.h" />
     <ClInclude Include="LineManager.h" />
     <ClInclude Include="LinePSO.h" />
+    <ClInclude Include="application\FollowTopDownCamera.h" />
+    <ClInclude Include="application\HitEffectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
