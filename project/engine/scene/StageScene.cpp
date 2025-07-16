@@ -1,7 +1,6 @@
 #include "StageScene.h"
-
 #include "CollisionManager.h"
-#include "StageScene.h"
+#include"LineManager.h"
 #include "application/FollowTopDownCamera.h"
 
 void StageScene::Initialize() {
@@ -70,6 +69,8 @@ void StageScene::Object3DDraw() {
 	}
 	// 当たり判定の可視化
 	collisionManager_->Draw();
+
+	LineManager::GetInstance()->DrawLine(player_->GetPosition(), {}, {1.0f, 1.0f, 1.0f, 1.0f});
 }
 void StageScene::SpriteDraw() { player_->ReticleDraw(); }
 
