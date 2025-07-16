@@ -82,6 +82,8 @@ void StageScene::ImGuiDraw()
 	// PlayerのImGui
 	player_->DrawImGui();
 
+	// DrawLineのImGui
+	LineManager::GetInstance()->DrawImGui();
 
 	//EnemyのImgui
 	for (auto& enemy : enemies) {
