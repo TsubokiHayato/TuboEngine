@@ -1,5 +1,6 @@
 #pragma once
 #include"IScene.h"
+#include"LineManager.h"
 class ClearScene :public IScene
 {
 public:
