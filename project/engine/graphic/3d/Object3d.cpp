@@ -12,7 +12,6 @@
 #include "externals/imgui/imgui_impl_win32.h"
 
 void Object3d::Initialize(std::string modelFileNamePath) {
-	// 引数で受け取ってメンバ変数に記録する
 	
 	this->camera = Object3dCommon::GetInstance()->GetDefaultCamera();
 

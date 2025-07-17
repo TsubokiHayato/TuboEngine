@@ -3,6 +3,10 @@
 #include "Enemy.h"
 #include "ImGuiManager.h"
 #include "TextureManager.h"
+#include "Player.h"
+#include <cmath>
+
+constexpr float kPI = 3.14159265358979323846f;
 
 Enemy::Enemy() {}
 Enemy::~Enemy() {}
@@ -23,6 +27,8 @@ void Enemy::Initialize() {
 	object3d->SetRotation(rotation);
 	object3d->SetScale(scale);
 
+
+
 	std::string particleTextureHandle = "gradationLine.png";
 	TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
 
@@ -30,8 +36,89 @@ void Enemy::Initialize() {
 	particle = nullptr;
 	particleEmitter_ = nullptr;
 }
+
+// 角度差分を[-π, π]に正規化する関数
+static float NormalizeAngle(float angle) {
+	while (angle > kPI) angle -= 2.0f * kPI;
+	while (angle < -kPI) angle += 2.0f * kPI;
+	return angle;
+}
+
 void Enemy::Update() {
-	
+	// プレイヤーがいれば距離と方向を計算
+	float distanceToPlayer = 0.0f;
+	Vector3 toPlayer = {0, 0, 0};
+	if (player_) {
+		toPlayer = player_->GetPosition() - position;
+		distanceToPlayer = std::sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y + toPlayer.z * toPlayer.z);
+	}
+
+	// 状態遷移
+	if (player_) {
+		if (distanceToPlayer > moveStartDistance_) {
+			state_ = State::Idle; // 一定以上離れていると待機
+		} else if (distanceToPlayer > shootDistance_) {
+			state_ = State::Move; // 移動範囲内
+		} else {
+			state_ = State::Shoot; // 射撃範囲内
+		}
+	}
+
+	// プレイヤーの方向を向く（一定速度で回転）
+	if (player_ && state_ != State::Idle) {
+		float angleY = std::atan2(toPlayer.x, toPlayer.z); // Y軸回転
+		float diff = NormalizeAngle(angleY - rotation.y);
+		float maxTurn = turnSpeed_;
+		if (std::fabs(diff) < maxTurn) {
+			rotation.y = angleY;
+		} else {
+			rotation.y += (diff > 0 ? 1 : -1) * maxTurn;
+			rotation.y = NormalizeAngle(rotation.y);
+		}
+	}
+
+	// 状態ごとの行動
+	switch (state_) {
+	case State::Idle:
+		// 何もしない
+		break;
+	case State::Move:
+		if (player_) {
+			// Y成分は無視してXZ平面で移動
+			Vector3 dir = toPlayer;
+			dir.y = 0.0f;
+			float len = std::sqrt(dir.x * dir.x + dir.z * dir.z);
+			if (len > 0.001f) {
+				dir.x /= len;
+				dir.z /= len;
+				position.x += dir.x * moveSpeed_;
+				position.z += dir.z * moveSpeed_;
+			}
+		}
+		break;
+	case State::Shoot:
+		// 弾発射処理（例: 1秒ごとに発射）
+		{
+			static float bulletTimer = 0.0f;
+			bulletTimer += 1.0f / 60.0f; // 60FPS前提
+			if (bulletTimer >= 1.0f) {
+				bulletTimer = 0.0f;
+				if (player_) {
+					bullet = std::make_unique<EnemyNormalBullet>();
+					bullet->Initialize(position);
+					bullet->SetEnemyPosition(position);
+					bullet->SetEnemyRotation(rotation);
+					bullet->SetPlayer(player_);
+					bullet->SetCamera(camera_);
+				}
+			}
+			if (bullet) {
+				bullet->Update();
+			}
+		}
+		break;
+	}
+
 	// まず座標・回転・スケールを最新化
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
@@ -87,6 +174,9 @@ void Enemy::Draw() {
 	if (object3d) {
 		object3d->Draw();
 	}
+	if (bullet) {
+		bullet->Draw();
+	}
 }
 
 void Enemy::ParticleDraw() {
@@ -103,6 +193,7 @@ void Enemy::DrawImGui() {
 	ImGui::Text("Enemy Alive: %s", isAlive ? "Yes" : "No");
 	ImGui::Text("Hit: %s", isHit ? "Yes" : "No");
 	ImGui::Text("wasHit: %s", isHit ? "Yes" : "No");
+	ImGui::SliderFloat("Turn Speed", &turnSpeed_, 0.01f, 1.0f, "%.2f");
 	ImGui::End();
 }
 

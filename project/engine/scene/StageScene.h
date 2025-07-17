@@ -17,6 +17,7 @@
 #include"Player.h"
 #include"PlayerBullet.h"
 #include"Enemy.h"
+#include"SkyBox.h"
 
 
 
@@ -80,7 +81,7 @@ private:
 
 	/// Camera ///
 	std::unique_ptr<FollowTopDownCamera> followCamera;
-
+	std::unique_ptr<Camera> camera = nullptr;
 	Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
 	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
@@ -90,4 +91,5 @@ private:
 	/// Enemy ///
 	std::unique_ptr<Enemy> enemy_ = nullptr;
 	std::vector<std::unique_ptr<Enemy>> enemies; // Enemyリスト
+	std::unique_ptr<SkyBox> skyBox_ = nullptr;
 };
