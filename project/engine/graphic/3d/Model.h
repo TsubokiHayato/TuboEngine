@@ -1,11 +1,8 @@
 #pragma once
-
-
-
 #include "Material.h"
 #include "ModelData.h"
 #include "Node.h"
-#include "Transform.h"
+#include "EulerTransform.h"
 #include "TransformationMatrix.h"
 #include "VertexData.h"
 #include"DirectXCommon.h"

@@ -57,7 +57,7 @@ private:
 	std::unique_ptr<Particle> particle;
 	std::unique_ptr<ParticleEmitter> particleEmitter_;
 
-	Transform particleTranslate;
+	EulerTransform particleTranslate;
 	Vector3 particleVelocity = {0.0f, 0.0f, 0.0f};
 	Vector4 particleColor = {1.0f, 1.0f, 1.0f, 1.0f};
 	float particleLifeTime = 1.0f;

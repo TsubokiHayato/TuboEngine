@@ -20,8 +20,8 @@ public:
 public:
 	void SetCamera(Camera* camera) { camera_ = camera; }
 
-	void SetTransform(const Transform& transform) { this->transform = transform; }
-	const Transform& GetTransform() const { return transform; }
+	void SetTransform(const EulerTransform& transform) { this->transform = transform; }
+	const EulerTransform& GetTransform() const { return transform; }
 
 	void SetPosition(const Vector3& position) { transform.translate = position; }
 	void SetRotation(const Vector3& rotation) { transform.rotate = rotation; }
@@ -57,5 +57,5 @@ private:
     Material* materialData = nullptr;
 
 	//大きさ、回転、位置
-    Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+    EulerTransform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 };

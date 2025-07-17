@@ -5,7 +5,7 @@
 #include"Matrix4x4.h"
 #include"Material.h"
 #include"TransformationMatrix.h"
-#include"Transform.h"
+#include "EulerTransform.h"
 
 
 
@@ -107,12 +107,12 @@ private:
 	TransformationMatrix* transformationMatrixData = nullptr;
 
 
-	Transform uvTransFormMatrix{
+	EulerTransform uvTransFormMatrix{
 		{1.0f,1.0f,1.0f},
 		{0.0f,0.0f,0.0f},
 		{0.0f,0.0f,0.0f},
 	};
-	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	EulerTransform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
 

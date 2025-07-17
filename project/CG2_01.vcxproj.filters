@@ -134,7 +134,7 @@
     <ClInclude Include="engine\graphic\2d\SpriteCommon.h" />
     <ClInclude Include="engine\base\Utilities\StringUtility.h" />
     <ClInclude Include="engine\graphic\2d\TextureManager.h" />
-    <ClInclude Include="engine\graphic\data\Transform.h" />
+    <ClInclude Include="engine\graphic\data\EulerTransform.h" />
     <ClInclude Include="engine\graphic\data\TransformationMatrix.h" />
     <ClInclude Include="engine\math\Vector2.h" />
     <ClInclude Include="engine\math\Vector3.h" />
@@ -206,6 +206,7 @@
     <ClInclude Include="engine\graphic\Animation\KeyFrame.h" />
     <ClInclude Include="engine\graphic\Animation\Animation.h" />
     <ClInclude Include="engine\graphic\Animation\Animator.h" />
+    <ClInclude Include="engine\graphic\data\QuaternionTransform.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
