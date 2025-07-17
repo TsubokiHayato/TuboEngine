@@ -20,7 +20,7 @@ public:
 	/// @param frequency 発生頻度
 	/// @param repeat 繰り返し発生させるかどうかのフラグ
 	ParticleEmitter(Particle* particle, const std::string& name, 
-		const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime,
+		const EulerTransform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime,
 		uint32_t count, float frequency, bool repeat = false);
 
 
@@ -61,7 +61,7 @@ public:
 private:
     Particle* particle_; // Particleのインスタンスを保持
     std::string name_;   // パーティクルグループ名
-    Transform transform_;// エミッターの位置・回転・スケール
+    EulerTransform transform_;// エミッターの位置・回転・スケール
 	Vector3 velocity_; // 速度
 	Vector4 color_;    // カラー
 	float lifeTime_;   // 寿命

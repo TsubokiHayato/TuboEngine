@@ -4,7 +4,7 @@
 #include"VertexData.h"
 #include"Material.h"
 #include"TransformationMatrix.h"
-#include"Transform.h"
+#include "EulerTransform.h"
 #include"ModelData.h"
 #include"Camera.h"
 #include"ParticleCommon.h"
@@ -21,7 +21,7 @@ class Camera;
 // パーティクル情報
 struct ParticleInfo
 {
-	Transform transform; // 位置、拡大率、回転
+	EulerTransform transform; // 位置、拡大率、回転
 	Vector3 velocity; // 速度
 	Vector4 color; // カラー
 	float lifeTime; // 寿命
@@ -100,7 +100,7 @@ public:
 	/// <param name="lifeTime">寿命</param>
 	/// <param name="currentTime">経過時間</param>
 	/// <param name="count">生成数</param>
-	void Emit(const std::string name, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime, uint32_t count);
+	void Emit(const std::string name, const EulerTransform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime, uint32_t count);
 
 	/// <summary>
 	/// パーティクルグループの作成
@@ -154,7 +154,7 @@ private:
 	/// <param name="lifeTime">寿命</param>
 	/// <param name="currentTime">経過時間</param>
 	/// <returns>新しいパーティクル情報</returns>
-	ParticleInfo CreateNewParticle(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
+	ParticleInfo CreateNewParticle(std::mt19937& randomEngine, const EulerTransform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
 
 
 	/// <summary>
@@ -167,7 +167,7 @@ private:
 	/// <param name="lifeTime">寿命</param>
 	/// <param name="currentTime">経過時間</param>
 	/// <returns>新しいパーティクル情報</returns>
-	ParticleInfo CreateNewParticleForPrimitive(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
+	ParticleInfo CreateNewParticleForPrimitive(std::mt19937& randomEngine, const EulerTransform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
 
 
 
@@ -181,7 +181,7 @@ private:
 	/// <param name="lifeTime">寿命</param>
 	/// <param name="currentTime">経過時間</param>
 	/// <returns>新しいパーティクル情報</returns>
-	ParticleInfo CreateNewParticleForRing(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
+	ParticleInfo CreateNewParticleForRing(std::mt19937& randomEngine, const EulerTransform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
 
 	/// <summary>
 	/// 新しいパーティクルの作成(円柱)
@@ -193,7 +193,7 @@ private:
 	/// <param name="lifeTime">寿命</param>
 	/// <param name="currentTime">経過時間</param>
 	/// <returns>新しいパーティクル情報</returns>
-	ParticleInfo CreateNewParticleForCylinder(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
+	ParticleInfo CreateNewParticleForCylinder(std::mt19937& randomEngine, const EulerTransform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
 
 
 
@@ -207,7 +207,7 @@ private:
 	/// <param name="lifeTime">寿命</param>
 	/// <param name="currentTime">経過時間</param>
 	/// /// <returns>新しいパーティクル情報</returns>
-	ParticleInfo CreateNewParticleForOriginal(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
+	ParticleInfo CreateNewParticleForOriginal(std::mt19937& randomEngine, const EulerTransform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime);
 
 
 public:
@@ -227,7 +227,7 @@ public:
 	// ビルボード(常にカメラは目線)を有効化するかどうかを設定
 	void SetIsBillBoard(bool isBillBoard) { this->isBillBoard = isBillBoard; }
 
-	void SetTransform(const Transform& transform) { this->transform = transform; } // トランスフォームを設定
+	void SetTransform(const EulerTransform& transform) { this->transform = transform; } // トランスフォームを設定
 
 	void SetCamera(Camera* camera) { assert(camera); this->camera_ = camera; } // カメラを設定
 
@@ -280,8 +280,8 @@ private:
 	DirectionalLight* directionalLightData = nullptr; // 平行光源データ
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList; // コマンドリスト
 
-	Transform transform; // 3Dオブジェクトの座標
-	Transform cameraTransform; // カメラ座標
+	EulerTransform transform; // 3Dオブジェクトの座標
+	EulerTransform cameraTransform; // カメラ座標
 	Camera* camera_ = nullptr; // カメラ
 
 	std::unordered_map<std::string, ParticleGroup> particleGroups; // パーティクルグループ

@@ -165,7 +165,7 @@ void Particle::Draw() {
 /// <param name="name">パーティクル名</param>
 /// <param name="position">生成位置</param>
 /// <param name="count">生成数</param>
-void Particle::Emit(const std::string name, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime, uint32_t count) {
+void Particle::Emit(const std::string name, const EulerTransform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime, uint32_t count) {
 	if (particleGroups.find(name) == particleGroups.end()) {
 		// パーティクルグループが存在しない場合はエラーを出力して終了
 		assert("Specified particle group does not exist!");
@@ -422,7 +422,7 @@ void Particle::CreateMaterialData() {
 /// <param name="currentTime">経過時間</param>
 /// <returns>新しいパーティクル情報</returns>
 /// 
-ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const EulerTransform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
@@ -442,7 +442,7 @@ ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Trans
 	return particle;
 }
 
-ParticleInfo Particle::CreateNewParticleForPrimitive(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo Particle::CreateNewParticleForPrimitive(std::mt19937& randomEngine, const EulerTransform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
 
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
@@ -469,7 +469,7 @@ ParticleInfo Particle::CreateNewParticleForPrimitive(std::mt19937& randomEngine,
 	return particle;
 }
 
-ParticleInfo Particle::CreateNewParticleForRing(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo Particle::CreateNewParticleForRing(std::mt19937& randomEngine, const EulerTransform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
@@ -489,7 +489,7 @@ ParticleInfo Particle::CreateNewParticleForRing(std::mt19937& randomEngine, cons
 	return particle;
 }
 
-ParticleInfo Particle::CreateNewParticleForCylinder(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo Particle::CreateNewParticleForCylinder(std::mt19937& randomEngine, const EulerTransform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
@@ -509,7 +509,7 @@ ParticleInfo Particle::CreateNewParticleForCylinder(std::mt19937& randomEngine, 
 	return particle;
 }
 
-ParticleInfo Particle::CreateNewParticleForOriginal(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo Particle::CreateNewParticleForOriginal(std::mt19937& randomEngine, const EulerTransform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
 	return ParticleInfo();
 }
 

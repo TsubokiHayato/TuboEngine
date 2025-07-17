@@ -1,5 +1,5 @@
 #pragma once
-#include"Transform.h"
+#include "EulerTransform.h"
 #include"Matrix4x4.h"
 class WinApp;
 class Camera
@@ -39,7 +39,7 @@ public:
 	
 private:
 	
-	Transform transform_;//座標変換
+	EulerTransform transform_;//座標変換
 	Matrix4x4 worldMatrix_;//ワールド行列
 	Matrix4x4 viewMatrix_;//ビュー行列
 	

@@ -1,11 +1,10 @@
 #pragma once
 #include"DirectXcommon.h"
 #include"WinApp.h"
-
 #include"VertexData.h"
 #include"Material.h"
 #include"TransformationMatrix.h"
-#include"Transform.h"
+#include "EulerTransform.h"
 #include"ModelData.h"
 #include"BlendMode.h"
 #include"CameraForGPU.h"
@@ -228,9 +227,9 @@ private:
 	LightType* lightTypeData = nullptr;
 
 	//3Dオブジェクトの座標
-	Transform transform;
+	EulerTransform transform;
 	//カメラ座標
-	Transform cameraTransform;
+	EulerTransform cameraTransform;
 
 	// キューブマップのSRVハンドル
 	//デフォルト : ロストック・ラージ空港の4Kキューブマップ

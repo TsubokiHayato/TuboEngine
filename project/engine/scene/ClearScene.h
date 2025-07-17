@@ -46,9 +46,9 @@ public:
 	private:
 
 	std::unique_ptr<Camera> camera;           // カメラ
-	Transform cameraTransform;                      // 変形情報
+	EulerTransform cameraTransform;                      // 変形情報
 
-	Transform transform_;               // 変形情報
+	EulerTransform transform_;               // 変形情報
 	std::unique_ptr<Animator> animator; // アニメーションポインタ
 };
 

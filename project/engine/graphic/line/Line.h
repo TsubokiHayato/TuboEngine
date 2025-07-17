@@ -1,5 +1,5 @@
 #pragma once
-#include "Transform.h"
+#include "EulerTransform.h"
 #include "TransformationMatrix.h"
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -45,9 +45,9 @@ private:
 
 public:
     ///<summary>Transformの設定</summary>
-    void SetTransform(const Transform& transform) { transform_ = transform; }
+    void SetTransform(const EulerTransform& transform) { transform_ = transform; }
     ///<summary>Transformの取得</summary>
-    Transform GetTransform() const { return transform_; }
+    EulerTransform GetTransform() const { return transform_; }
     ///<summary>スケールの設定</summary>
     void SetScale(const Vector3& scale) { transform_.scale = scale; }
     ///<summary>スケールの取得</summary>
@@ -97,7 +97,7 @@ private:
     ///----------------------------------------------------
     /// 座標変換情報
     ///----------------------------------------------------
-    Transform transform_ = {};
+    EulerTransform transform_ = {};
 
     ///----------------------------------------------------
     /// カメラ

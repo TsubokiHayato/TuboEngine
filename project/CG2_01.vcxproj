@@ -213,6 +213,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\EnemyNormalBullet.h" />
     <ClInclude Include="application\FollowTopDownCamera.h" />
     <ClInclude Include="application\HitEffectManager.h" />
+    <ClInclude Include="engine\graphic\data\QuaternionTransform.h" />
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\DissolvePSO.h" />
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
@@ -243,7 +244,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\2d\SpriteCommon.h" />
     <ClInclude Include="engine\base\Utilities\StringUtility.h" />
     <ClInclude Include="engine\graphic\2d\TextureManager.h" />
-    <ClInclude Include="engine\graphic\data\Transform.h" />
+    <ClInclude Include="engine\graphic\data\EulerTransform.h" />
     <ClInclude Include="engine\graphic\data\TransformationMatrix.h" />
     <ClInclude Include="engine\math\Vector2.h" />
     <ClInclude Include="engine\math\Vector3.h" />

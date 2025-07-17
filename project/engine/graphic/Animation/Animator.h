@@ -8,7 +8,7 @@
 #include "Material.h"
 #include "ModelData.h"
 #include "SkyBox.h"
-#include "Transform.h"
+#include "EulerTransform.h"
 #include "TransformationMatrix.h"
 #include "VertexData.h"
 // 前方宣言
@@ -213,9 +213,9 @@ private:
 	LightType* lightTypeData = nullptr;
 
 	// 3Dオブジェクトの座標
-	Transform transform;
+	EulerTransform transform;
 	// カメラ座標
-	Transform cameraTransform;
+	EulerTransform cameraTransform;
 
 	// キューブマップのSRVハンドル
 	// デフォルト : ロストック・ラージ空港の4Kキューブマップ
