@@ -90,10 +90,10 @@
     <ClCompile Include="application\Player.cpp" />
     <ClCompile Include="application\PlayerBullet.cpp" />
     <ClCompile Include="application\EnemyNormalBullet.cpp" />
-    <ClCompile Include="LineCommon.cpp" />
-    <ClCompile Include="Line.cpp" />
-    <ClCompile Include="LineManager.cpp" />
-    <ClCompile Include="LinePSO.cpp" />
+    <ClCompile Include="engine\graphic\line\LineCommon.cpp" />
+    <ClCompile Include="engine\graphic\line\Line.cpp" />
+    <ClCompile Include="engine\graphic\line\LineManager.cpp" />
+    <ClCompile Include="engine\graphic\PSO\LinePSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseCharacter.h" />
@@ -194,10 +194,10 @@
     <ClInclude Include="Framework\Framework.h" />
     <ClInclude Include="Framework\Order.h" />
     <ClInclude Include="application\EnemyNormalBullet.h" />
-    <ClInclude Include="LineCommon.h" />
-    <ClInclude Include="Line.h" />
-    <ClInclude Include="LineManager.h" />
-    <ClInclude Include="LinePSO.h" />
+    <ClInclude Include="engine\graphic\line\LineCommon.h" />
+    <ClInclude Include="engine\graphic\line\Line.h" />
+    <ClInclude Include="engine\graphic\line\LineManager.h" />
+    <ClInclude Include="engine\graphic\PSO\LinePSO.h" />
     <ClInclude Include="application\FollowTopDownCamera.h" />
     <ClInclude Include="application\HitEffectManager.h" />
   </ItemGroup>
