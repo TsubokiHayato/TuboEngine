@@ -1,5 +1,9 @@
 #pragma once
 #include"IScene.h"
+#include"LineManager.h"
+#include"Object3d.h"
+#include "Animator.h"
+#include"Camera.h"
 class ClearScene :public IScene
 {
 public:
@@ -37,5 +41,14 @@ public:
 	/// パーティクル描画
 	/// </summary>
 	void ParticleDraw()override;
+
+
+	private:
+
+	std::unique_ptr<Camera> camera;           // カメラ
+	Transform cameraTransform;                      // 変形情報
+
+	Transform transform_;               // 変形情報
+	std::unique_ptr<Animator> animator; // アニメーションポインタ
 };
 

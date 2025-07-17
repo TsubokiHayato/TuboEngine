@@ -89,6 +89,13 @@
     <ClCompile Include="Framework\Order.cpp" />
     <ClCompile Include="application\Player.cpp" />
     <ClCompile Include="application\PlayerBullet.cpp" />
+    <ClCompile Include="application\EnemyNormalBullet.cpp" />
+    <ClCompile Include="engine\graphic\line\LineCommon.cpp" />
+    <ClCompile Include="engine\graphic\line\Line.cpp" />
+    <ClCompile Include="engine\graphic\line\LineManager.cpp" />
+    <ClCompile Include="engine\graphic\PSO\LinePSO.cpp" />
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Animator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseCharacter.h" />
@@ -188,6 +195,17 @@
     <ClInclude Include="engine\graphic\PSO\SkyBoxPSO.h" />
     <ClInclude Include="Framework\Framework.h" />
     <ClInclude Include="Framework\Order.h" />
+    <ClInclude Include="application\EnemyNormalBullet.h" />
+    <ClInclude Include="engine\graphic\line\LineCommon.h" />
+    <ClInclude Include="engine\graphic\line\Line.h" />
+    <ClInclude Include="engine\graphic\line\LineManager.h" />
+    <ClInclude Include="engine\graphic\PSO\LinePSO.h" />
+    <ClInclude Include="application\FollowTopDownCamera.h" />
+    <ClInclude Include="application\HitEffectManager.h" />
+    <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="KeyFrame.h" />
+    <ClInclude Include="Animation.h" />
+    <ClInclude Include="Animator.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />

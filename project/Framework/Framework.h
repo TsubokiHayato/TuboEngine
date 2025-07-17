@@ -16,6 +16,7 @@
 #include"SkyBoxCommon.h"
 #include"Input.h"
 #include"OffScreenRendering.h"
+#include"LineManager.h"
 
 class OffScreenRenderingPSO;
 

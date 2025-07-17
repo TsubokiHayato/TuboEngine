@@ -28,6 +28,8 @@ void Order::Draw() {
 	Framework::Object3dCommonDraw();
 	//2Dスプライト描画
 	Framework::SpriteCommonDraw();
+	// ライン描画
+	LineManager::GetInstance()->Draw();
 	//パーティクル描画
 	Framework::ParticleCommonDraw();
 	// swapChainのバリアを設定
