@@ -63,8 +63,7 @@ void StageScene::Object3DDraw() {
 	// 3Dオブジェクトの描画
 	// プレイヤーの3Dオブジェクトを描画
 	player_->Draw();
-	LineManager::GetInstance()->DrawSphere(player_->GetPosition(), 1.2f, {1.0f, 0.0f, 0.0f, 1.0f}, 16);
-
+	
 	// 敵の3Dオブジェクトを描画
 	for (auto& enemy : enemies) {
 		enemy->Draw();
@@ -72,7 +71,8 @@ void StageScene::Object3DDraw() {
 	// 当たり判定の可視化
 	collisionManager_->Draw();
 
-	LineManager::GetInstance()->DrawLine(player_->GetPosition(), {}, {1.0f, 1.0f, 1.0f, 1.0f});
+	
+	LineManager::GetInstance()->DrawGrid(10000.0f, 1000, {0.0f, 0.0f, 0.0f, 1.0f});
 }
 void StageScene::SpriteDraw() { player_->ReticleDraw(); }
 
@@ -86,6 +86,7 @@ void StageScene::ImGuiDraw()
 
 	// DrawLineのImGui
 	LineManager::GetInstance()->DrawImGui();
+	
 
 	//EnemyのImgui
 	for (auto& enemy : enemies) {

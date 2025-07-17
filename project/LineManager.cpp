@@ -42,8 +42,7 @@ void LineManager::Finalize() {
 /// LineManager更新処理
 ///----------------------------------------------------
 void LineManager::Update() {
-    // グリッド描画
-    DrawGrid(gridSize_, gridDivisions_, gridColor_);
+   
     // Line描画クラス更新
     line_->Update();
 }
