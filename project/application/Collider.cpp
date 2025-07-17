@@ -1,5 +1,5 @@
 #include "Collider.h"
-//#include "Wireframe.h"
+#include"LineManager.h"
 
 /// -------------------------------------------------------------
 ///						　	初期化処理
@@ -16,5 +16,5 @@ void Collider::Update() {}
 /// -------------------------------------------------------------
 void Collider::Draw() {
 	Vector3 center = GetCenterPosition();
-	//Wireframe::GetInstance()->DrawSphere(center, radius_, defaultColor); // 白色の球で表示
+	LineManager::GetInstance()->DrawSphere(center, radius_, defaultColor, 16);
 }
