@@ -10,7 +10,7 @@ void DebugScene::Initialize() {
 	std::string uvCheckerTextureHandle = "uvChecker.png";
 	std::string monsterBallTextureHandle = "monsterBall.png";
 
-	std::string testDDSTextureHandle = "skybox.dds";
+	std::string testDDSTextureHandle = "snowy_forest_1k.dds";
 
 	//モデルファイルパス
 	const std::string modelFileNamePath = "plane.gltf";
