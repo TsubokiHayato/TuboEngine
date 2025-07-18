@@ -5,9 +5,16 @@
 
 void StageScene::Initialize() {
 	
+	// SkyBoxの生成・初期化
+	skyBox_ = std::make_unique<SkyBox>();
+	std::string skyBoxTexturePath = "skybox.dds"; // SkyBoxのテクスチャファイルパス
+	skyBox_->Initialize(skyBoxTexturePath);
+
+
 	// プレイヤー
 	player_ = std::make_unique<Player>();
 	player_->Initialize();
+	player_->SetSkyBox(skyBox_->GetTextureFilePath()); // SkyBoxをプレイヤーに設定
 
 	// 追従カメラの生成・初期化
 	followCamera = std::make_unique<FollowTopDownCamera>();
@@ -35,7 +42,8 @@ void StageScene::Initialize() {
 
 void StageScene::Update()
 {
-
+	skyBox_->SetCamera(followCamera->GetCamera());
+	skyBox_->Update();
 
 	player_->SetCamera(followCamera->GetCamera());
 	player_->Update();
@@ -63,11 +71,12 @@ void StageScene::Object3DDraw() {
 	// 3Dオブジェクトの描画
 	// プレイヤーの3Dオブジェクトを描画
 	player_->Draw();
-	
-	// 敵の3Dオブジェクトを描画
-	for (auto& enemy : enemies) {
-		enemy->Draw();
-	}
+	skyBox_->Draw();
+
+	//// 敵の3Dオブジェクトを描画
+	//for (auto& enemy : enemies) {
+	//	enemy->Draw();
+	//}
 	// 当たり判定の可視化
 	collisionManager_->Draw();
 

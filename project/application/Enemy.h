@@ -60,6 +60,7 @@ public:
 
 	void SetPlayer(Player* player) { player_ = player; }
 
+	void SetSkyBox(const std::string& filePath) { object3d->SetCubeMapFilePath(filePath); }
 	///----------------------------------
 	///				受取り変数
 	/// ---------------------------------
@@ -71,9 +72,9 @@ private:
 	///---------------------------------------
 public:
 	enum class State {
-		Idle,   // 待機
-		Move,   // 移動
-		Shoot   // 射撃
+		Idle, // 待機
+		Move, // 移動
+		Shoot // 射撃
 	};
 
 private:

@@ -76,7 +76,7 @@ public:
 	void SetCamera(Camera* camera) { object3d->SetCamera(camera); }
 
 	// 環境マップ設定
-	void CubeMapSet(const std::string& filePath) {
+	void SetSkyBox(const std::string& filePath) {
 		object3d->SetCubeMapFilePath(filePath); }
 
 private:
