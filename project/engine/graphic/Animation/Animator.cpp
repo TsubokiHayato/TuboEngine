@@ -12,9 +12,12 @@
 void Animator::Initialize(std::string modelFileNamePath) {
 
 	this->camera = Object3dCommon::GetInstance()->GetDefaultCamera();
-
+	// モデルのファイルパスを設定
 	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
 	SetModel(modelFileNamePath);
+	// defaultのcubeMapFilePath_を設定
+	TextureManager::GetInstance()->LoadTexture(cubeMapFilePath_);
+	
 
 	animation_ = LoadAnimation("Resources/Models", modelFileNamePath);
 	animationNodeName_ = modelFileNamePath; 
