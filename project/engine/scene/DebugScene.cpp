@@ -10,7 +10,7 @@ void DebugScene::Initialize() {
 	std::string uvCheckerTextureHandle = "uvChecker.png";
 	std::string monsterBallTextureHandle = "monsterBall.png";
 
-	std::string testDDSTextureHandle = "skybox.dds";
+	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
 
 	//モデルファイルパス
 	const std::string modelFileNamePath = "plane.gltf";
@@ -82,6 +82,7 @@ void DebugScene::Initialize() {
 	object3d = std::make_unique<Object3d>();
 	object3d->Initialize(modelFileNamePath);
 
+
 	object3d->SetModel(modelFileNamePath);
 	object3d->SetCubeMapFilePath(skyBox->GetTextureFilePath());
 
@@ -95,8 +96,6 @@ void DebugScene::Initialize() {
 	object3d2 = std::make_unique<Object3d>();
 	object3d2->Initialize(modelFileNamePath2);
 	object3d2->SetCubeMapFilePath(skyBox->GetTextureFilePath());
-
-	
 
 #pragma endregion 3Dモデルの初期化
 

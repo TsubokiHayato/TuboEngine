@@ -91,5 +91,4 @@ private:
 	/// Enemy ///
 	std::unique_ptr<Enemy> enemy_ = nullptr;
 	std::vector<std::unique_ptr<Enemy>> enemies; // Enemyリスト
-	std::unique_ptr<SkyBox> skyBox_ = nullptr;
 };
