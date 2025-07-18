@@ -15,8 +15,8 @@ void Object3d::Initialize(std::string modelFileNamePath) {
 	
 	this->camera = Object3dCommon::GetInstance()->GetDefaultCamera();
 
-	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
 	TextureManager::GetInstance()->LoadTexture(cubeMapFilePath_);
+	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
 	SetModel(modelFileNamePath);
 
 #pragma region TransformMatrixResourced
