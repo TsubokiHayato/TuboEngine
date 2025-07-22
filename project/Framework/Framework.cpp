@@ -220,6 +220,8 @@ void Framework::ParticleCommonDraw() {
 void Framework::OffScreenRenderingDraw() {
 	OffScreenRendering::GetInstance()->TransitionRenderTextureToShaderResource();
 
+	OffScreenRendering::GetInstance()->TransitionDepthTo(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
 	//オフスクリーンレンダリングの描画
 	OffScreenRendering::GetInstance()->Draw();
 }

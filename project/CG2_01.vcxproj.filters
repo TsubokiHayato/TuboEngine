@@ -96,6 +96,8 @@
     <ClCompile Include="engine\graphic\PSO\LinePSO.cpp" />
     <ClCompile Include="engine\graphic\Animation\Animation.cpp" />
     <ClCompile Include="engine\graphic\Animation\Animator.cpp" />
+    <ClCompile Include="DepthBasedOutlinePSO.cpp" />
+    <ClCompile Include="DepthBasedOutlineEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseCharacter.h" />
@@ -206,6 +208,8 @@
     <ClInclude Include="engine\graphic\Animation\KeyFrame.h" />
     <ClInclude Include="engine\graphic\Animation\Animation.h" />
     <ClInclude Include="engine\graphic\Animation\Animator.h" />
+    <ClInclude Include="DepthBasedOutlinePSO.h" />
+    <ClInclude Include="DepthBasedOutlineEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />

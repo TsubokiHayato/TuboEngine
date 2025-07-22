@@ -68,6 +68,9 @@ public:
 	/// </summary>
 	void TransitionRenderTextureToRenderTarget();
 
+	 void TransitionDepthTo(D3D12_RESOURCE_STATES newState);
+
+
 	/// <summary>
 	/// 描画処理
 	/// レンダーテクスチャへの描画を行います。
@@ -127,6 +130,9 @@ private:
 
 	// リソースバリア構造体
 	D3D12_RESOURCE_BARRIER renderingBarrier{};
+	D3D12_RESOURCE_BARRIER depthBarrier{};
+	D3D12_RESOURCE_STATES depthResourceState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+   
 
 	///--------------------------------------------------------------------------
 	///                             PSO関連
