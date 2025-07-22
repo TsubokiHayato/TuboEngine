@@ -3,6 +3,7 @@
 #include "MT_Matrix.h"
 #include "ModelManager.h"
 #include "Object3dCommon.h"
+#include "Skeleton.h"
 #include "TextureManager.h"
 #include "numbers"
 #include <cassert>
@@ -17,10 +18,10 @@ void Animator::Initialize(std::string modelFileNamePath) {
 	SetModel(modelFileNamePath);
 	// defaultのcubeMapFilePath_を設定
 	TextureManager::GetInstance()->LoadTexture(cubeMapFilePath_);
-	
 
 	animation_ = LoadAnimation("Resources/Models", modelFileNamePath);
-	animationNodeName_ = modelFileNamePath; 
+
+	rootNode_.name = modelFileNamePath;
 	animationTime_ = 0.0f;
 	animationLoop_ = true;
 
@@ -127,45 +128,52 @@ void Animator::Initialize(std::string modelFileNamePath) {
 	std::vector<std::string> nodeNames = GetAnimationNodeNames("Resources/Models", modelFileNamePath);
 	// 例: 最初のノード名を使う
 	if (!nodeNames.empty()) {
-	    animationNodeName_ = nodeNames[0];
+		rootNode_.name = nodeNames[0];
 	} else {
-	    animationNodeName_ = ""; // アニメーションが無い場合
+		rootNode_.name = ""; // アニメーションが無い場合
 	}
+
+	// skeleton
+	skeletonData_ = skeleton_.CreateSkelton(rootNode_);
 }
+
 void Animator::Update() {
-    animationTime_ += 1.0f / 60.0f; // 60FPS
-    animationTime_ = std::fmod(animationTime_, animation_.duration);
+	animationTime_ += 1.0f / 60.0f; // 60FPS
+	animationTime_ = std::fmod(animationTime_, animation_.duration);
+	ApplyAnimation(skeletonData_, animation_, animationTime_);
+	skeleton_.Update(skeletonData_);
 
-    NodeAnimation& rootNodeAnimation = animation_.nodeAnimations[animationNodeName_];
-    Vector3 translate = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);
-    Quaternion rotate = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
-    Vector3 scale = CalculateValue(rootNodeAnimation.scale.keyframes, animationTime_);
+	NodeAnimation& rootNodeAnimation = animation_.nodeAnimations[rootNode_.name];
+	rootNode_.transform.translate = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);
+	rootNode_.transform.rotate = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
+	rootNode_.transform.scale = CalculateValue(rootNodeAnimation.scale.keyframes, animationTime_);
 
-    // アニメーション値をtransformに反映
-    transform.translate = translate;
-    transform.rotate = rotate.ToEuler();
-    transform.scale = scale;
+	// アニメーション値をtransformに反映
+	transform.translate = rootNode_.transform.translate;
+	transform.rotate = rootNode_.transform.rotate.ToEuler();
+	transform.scale = rootNode_.transform.scale;
 
-    cameraForGPUData->worldPosition = camera->GetTranslate();
+	cameraForGPUData->worldPosition = camera->GetTranslate();
 
-    // 行列を更新する
-    Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-    Matrix4x4 cameraMatrix = MakeAffineMatrix(camera->GetScale(), camera->GetRotation(), camera->GetTranslate());
-    Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-    Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(WinApp::GetInstance()->GetClientWidth()) / float(WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
-    Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+	// 行列を更新する
+	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera->GetScale(), camera->GetRotation(), camera->GetTranslate());
+	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(WinApp::GetInstance()->GetClientWidth()) / float(WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
+	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
-    if (camera) {
-        const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
-        worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
-    } else {
-        worldViewProjectionMatrix = worldMatrix;
-    }
+	if (camera) {
+		const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
+		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
+	} else {
+		worldViewProjectionMatrix = worldMatrix;
+	}
 
-    transformMatrixData->WVP = model_->GetRootNodeLocalMatrix() * worldMatrix * Multiply(viewMatrix, projectionMatrix);
-    transformMatrixData->World = model_->GetRootNodeLocalMatrix() * worldMatrix;
+	rootNode_.localMatrix = model_->GetRootNodeLocalMatrix();
+	transformMatrixData->WVP = rootNode_.localMatrix * worldMatrix * Multiply(viewMatrix, projectionMatrix);
+	transformMatrixData->World = rootNode_.localMatrix * worldMatrix;
 
-    commandList = DirectXCommon::GetInstance()->GetCommandList();
+	commandList = DirectXCommon::GetInstance()->GetCommandList();
 }
 
 // 描画処理
@@ -192,6 +200,8 @@ void Animator::Draw() {
 	if (model_) {
 		model_->Draw();
 	}
+
+	skeleton_.DrawSkeletonLines(skeletonData_, {1.0f, 1.0f, 1.0f, 1.0f}); // スケルトンのラインを描画
 }
 
 // ImGui描画
@@ -329,8 +339,7 @@ void Animator::SetModel(const std::string& filePath) {
 	assert(model_);
 }
 
-
-//Vector3
+// Vector3
 Vector3 Animator::CalculateValue(const std::vector<KeyFrame<Vector3>>& keyframes, float time) {
 	assert(!keyframes.empty());
 	if (keyframes.size() == 1 || time <= keyframes[0].time) {
@@ -345,6 +354,21 @@ Vector3 Animator::CalculateValue(const std::vector<KeyFrame<Vector3>>& keyframes
 	}
 	return keyframes.back().value;
 }
+
+void Animator::ApplyAnimation(Skeleton::SkeletonData& skeleton, const Animation& animation, float time) {
+
+	for (Skeleton::Joint& joint : skeleton.joints) {
+		auto it = animation.nodeAnimations.find(joint.name);
+		if (it != animation.nodeAnimations.end()) {
+			const NodeAnimation& nodeAnimation = it->second;
+			// アニメーションの時間に基づいて変換を適用
+			joint.transform.scale = CalculateValue(nodeAnimation.scale.keyframes, time);
+			joint.transform.rotate = CalculateValue(nodeAnimation.rotate.keyframes, time);
+			joint.transform.translate = CalculateValue(nodeAnimation.translate.keyframes, time);
+		}
+	}
+}
+
 // Quaternion
 Quaternion Animator::CalculateValue(const std::vector<KeyFrame<Quaternion>>& keyframes, float time) {
 	assert(!keyframes.empty());

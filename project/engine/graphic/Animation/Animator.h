@@ -5,19 +5,24 @@
 #include "Animation.h"
 #include "BlendMode.h"
 #include "CameraForGPU.h"
+#include "EulerTransform.h"
 #include "Material.h"
 #include "ModelData.h"
+#include "QuaternionTransform.h"
 #include "SkyBox.h"
-#include "EulerTransform.h"
 #include "TransformationMatrix.h"
 #include "VertexData.h"
+#include <Animator.h>
+#include"Skeleton.h"
 // 前方宣言
 class Object3dCommon;
 class ModelCommon;
 class Model;
 class Camera;
 
+
 class Animator {
+
 public:
 	// 平行光源
 	struct DirectionalLight {
@@ -92,7 +97,8 @@ public:
 	Vector3 CalculateValue(const std::vector<KeyFrameVector3>& keyFrames, float time);
 	Quaternion CalculateValue(const std::vector<KeyFrameQuaternion>& keyFrames, float time);
 
-public:
+	void ApplyAnimation(Skeleton::SkeletonData& skeleton, const Animation& animation, float time);
+	public:
 	// Setter
 	void SetScale(const Vector3& scale) { transform.scale = scale; }
 	void SetRotation(const Vector3& rotation) { transform.rotate = rotation; }
@@ -223,8 +229,12 @@ private:
 
 	// アニメーション
 
-	Animation animation_;           // アニメーションデータ
-	std::string animationNodeName_; // 再生するノード名
-	float animationTime_ = 0.0f;    // 再生時間
-	bool animationLoop_ = true;     // ループ再生
+	Animation animation_;        // アニメーションデータ
+	float animationTime_ = 0.0f; // 再生時間
+	bool animationLoop_ = true;  // ループ再生
+
+	Node rootNode_; // アニメーションのルートノード
+	Skeleton::SkeletonData skeletonData_; // スケルトンデータ
+	Skeleton skeleton_;                   // スケルトン
+
 };
