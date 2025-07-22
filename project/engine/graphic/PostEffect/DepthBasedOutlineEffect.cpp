@@ -10,7 +10,7 @@ void DepthBasedOutlineEffect::Initialize() {
 	materialCB_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(DepthBasedOutlineMaterialCB));
 	materialCB_->Map(0, nullptr, reinterpret_cast<void**>(&materialCBData_));
 	// 初期値（単位行列）
-	materialCBData_->projectionMatrix = MakeIdentity4x4();
+	materialCBData_->projectionInverse = MakeIdentity4x4();
 
 
 	
@@ -28,13 +28,29 @@ void DepthBasedOutlineEffect::Initialize() {
 void DepthBasedOutlineEffect::Update() {
 	// 必要に応じてprojectionMatrixを更新
 	// 例: カメラや画面サイズに応じて行列をセット
-	materialCBData_->projectionMatrix = MakeIdentity4x4();
+	materialCBData_->projectionInverse = Inverse(camera_->GetProjectionMatrix());
 }
 
 void DepthBasedOutlineEffect::DrawImGui() {
 	ImGui::Begin("DepthBasedOutlineEffect");
 	// 必要に応じてImGuiでパラメータ調整
+	ImGui::Text("Projection Inverse:");
+	ImGui::Text("m[0][0]: %f", materialCBData_->projectionInverse.m[0][0]);
+	ImGui::Text("m[1][1]: %f", materialCBData_->projectionInverse.m[1][1]);
+	ImGui::Text("m[2][2]: %f", materialCBData_->projectionInverse.m[2][2]);
+	ImGui::Text("m[3][3]: %f", materialCBData_->projectionInverse.m[3][3]);
+	ImGui::Text("m[0][1]: %f", materialCBData_->projectionInverse.m[0][1]);
+	ImGui::Text("m[1][0]: %f", materialCBData_->projectionInverse.m[1][0]);
 	ImGui::End();
+}
+
+void DepthBasedOutlineEffect::SetMainCamera(Camera* camera) {
+	// カメラの設定を行う
+	camera_ = camera;
+	if (camera) {
+		// ここでカメラのプロジェクション行列を取得し、materialCBData_にセットする
+		materialCBData_->projectionInverse = Inverse(camera->GetProjectionMatrix());
+	}
 }
 
 void DepthBasedOutlineEffect::Draw(ID3D12GraphicsCommandList* commandList) {
