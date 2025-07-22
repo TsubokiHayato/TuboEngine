@@ -12,7 +12,8 @@ void ClearScene::Initialize() {
 	camera->setScale(cameraTransform.scale);
 
 	animator = std::make_unique<Animator>();
-	const std::string modelFileNamePath = "AnimatedCube.gltf"; // モデルファイル名
+	const std::string modelFileNamePath = "human/walk.gltf"; // モデルファイル名
+	//const std::string modelFileNamePath = "AnimatedCube.gltf";    // モデルファイル名
 	animator->Initialize(modelFileNamePath);
 	transform_.translate = {};
 	transform_.scale = {1.0f, 1.0f, 1.0f};
@@ -49,6 +50,8 @@ void ClearScene::ImGuiDraw() {
 	ImGui::DragFloat3("Camera Translate", &cameraTransform.translate.x, 0.1f);
 	ImGui::DragFloat3("Camera Rotate", &cameraTransform.rotate.x, 0.01f);
 	ImGui::DragFloat3("Camera Scale", &cameraTransform.scale.x, 0.01f);
+	ImGui::Text("Camera Position: (%.2f, %.2f, %.2f)", camera->GetTranslate().x, camera->GetTranslate().y, camera->GetTranslate().z);
+
 	ImGui::End();
 
 	ImGui::Begin("Animator");
