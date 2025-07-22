@@ -30,6 +30,8 @@ public:
 	virtual void ImGuiDraw() = 0;
 
 	virtual void ParticleDraw() = 0;
+
+	virtual Camera* GetMainCamera() const = 0;
 	
 	//デストラクタ
 	virtual ~IScene() = 0;

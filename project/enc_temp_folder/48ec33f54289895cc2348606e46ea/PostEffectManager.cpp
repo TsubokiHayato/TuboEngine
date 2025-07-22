@@ -5,11 +5,15 @@ void PostEffectManager::AddEffect(std::unique_ptr<PostEffectBase> effect) {
 }
 
 void PostEffectManager::InitializeAll() {
-    for (auto& e : effects_) e->Initialize();
+	if (currentIndex_ < effects_.size()) {
+		effects_[currentIndex_]->Initialize();
+	}
 }
 
 void PostEffectManager::UpdateAll() {
-    for (auto& e : effects_) e->Update();
+	if (currentIndex_ < effects_.size()) {
+		effects_[currentIndex_]->Update();
+	}
 }
 
 void PostEffectManager::SetCurrentEffect(size_t index) {

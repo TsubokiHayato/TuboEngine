@@ -52,17 +52,17 @@ void OffScreenRendering::Initialize() {
 	///---------------------------------------------------------------------
 
 	// PostEffectの追加
-	 //postEffectManager.AddEffect(std::make_unique<NoneEffect>());              // 何もしないエフェクト
-	 //postEffectManager.AddEffect(std::make_unique<GrayScaleEffect>());         // グレースケールエフェクト
-	 //postEffectManager.AddEffect(std::make_unique<SepiaEffect>());             // セピアエフェクト
-	 //postEffectManager.AddEffect(std::make_unique<VignetteEffect>());          // ビネットエフェクト
-	 //postEffectManager.AddEffect(std::make_unique<SmoothingEffect>());         // スムージングエフェクト
-	 //postEffectManager.AddEffect(std::make_unique<GaussianBlurEffect>());      // ガウスぼかしエフェクト
-	 //postEffectManager.AddEffect(std::make_unique<RadialBlurEffect>());        // ラジアルブラーエフェクト
-	 //postEffectManager.AddEffect(std::make_unique<OutlineEffect>());           // アウトラインエフェクト
+	 postEffectManager.AddEffect(std::make_unique<NoneEffect>());              // 何もしないエフェクト
+	 postEffectManager.AddEffect(std::make_unique<GrayScaleEffect>());         // グレースケールエフェクト
+	 postEffectManager.AddEffect(std::make_unique<SepiaEffect>());             // セピアエフェクト
+	 postEffectManager.AddEffect(std::make_unique<VignetteEffect>());          // ビネットエフェクト
+	 postEffectManager.AddEffect(std::make_unique<SmoothingEffect>());         // スムージングエフェクト
+	 postEffectManager.AddEffect(std::make_unique<GaussianBlurEffect>());      // ガウスぼかしエフェクト
+	 postEffectManager.AddEffect(std::make_unique<RadialBlurEffect>());        // ラジアルブラーエフェクト
+	 postEffectManager.AddEffect(std::make_unique<OutlineEffect>());           // アウトラインエフェクト
 	 postEffectManager.AddEffect(std::make_unique<DepthBasedOutlineEffect>()); // 深度ベースのアウトラインエフェクト
-	 //postEffectManager.AddEffect(std::make_unique<DissolveEffect>());          // ディゾルブエフェクト
-	 //postEffectManager.AddEffect(std::make_unique<randomEffect>());            // ランダムエフェクト
+	 postEffectManager.AddEffect(std::make_unique<DissolveEffect>());          // ディゾルブエフェクト
+	 postEffectManager.AddEffect(std::make_unique<randomEffect>());            // ランダムエフェクト
 
 	// PostEffectManagerの初期化
 	postEffectManager.InitializeAll();

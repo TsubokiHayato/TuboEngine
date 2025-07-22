@@ -69,13 +69,22 @@ void Framework::Update() {
 	}
 	//入力の更新
 	Input::GetInstance()->Update();
-	//
-	LineManager::GetInstance()->Update();
+	
 	//シーンマネージャーの更新
 	SceneManager::GetInstance()->Update();
+
+	Camera* mainCamera = SceneManager::GetInstance()->GetMainCamera();
+
+	if (mainCamera) {
+		// ラインマネージャーのカメラ設定
+		LineManager::GetInstance()->SetDefaultCamera(mainCamera);
+		OffScreenRendering::GetInstance()->SetCamera(mainCamera);
+	}
+
 	//オフスクリーンレンダリングの更新
 	OffScreenRendering::GetInstance()->Update();
-
+//
+	LineManager::GetInstance()->Update();
 }
 void Framework::Finalize() {
 #ifdef _DEBUG

@@ -20,4 +20,6 @@ public:
 
     // 描画
     virtual void Draw(ID3D12GraphicsCommandList* commandList) = 0;
+
+    virtual void SetMainCamera(class Camera* camera) {};
 };

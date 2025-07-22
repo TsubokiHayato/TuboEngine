@@ -201,6 +201,15 @@ void DebugScene::ImGuiDraw() {
 		ImGui::DragFloat3("Position", &cameraPosition.x, 0.1f);
 		ImGui::DragFloat3("Rotation", &cameraRotation.x, 0.1f);
 		ImGui::DragFloat3("Scale", &cameraScale.x, 0.1f);
+	    Matrix4x4 projectionInverse = Inverse(camera->GetProjectionMatrix());
+	    ImGui::Text("Projection Inverse:");
+	    ImGui::Text("m[0][0]: %f", projectionInverse.m[0][0]);
+	    ImGui::Text("m[1][1]: %f", projectionInverse.m[1][1]);
+	    ImGui::Text("m[2][2]: %f", projectionInverse.m[2][2]);
+	    ImGui::Text("m[3][3]: %f", projectionInverse.m[3][3]);
+	    ImGui::Text("m[0][1]: %f", projectionInverse.m[0][1]);
+	    ImGui::Text("m[1][0]: %f", projectionInverse.m[1][0]);
+
 		ImGui::End();
 	
 		//スプライトのImGui
