@@ -20,6 +20,15 @@ public:
     size_t GetEffectCount() const { return effects_.size(); }
     size_t GetCurrentIndex() const { return currentIndex_; }
 
+	template<typename T> T* GetEffect() {
+		for (auto& effect : effects_) {
+			if (auto ptr = dynamic_cast<T*>(effect.get())) {
+				return ptr;
+			}
+		}
+		return nullptr;
+	}
+
 private:
     std::vector<std::unique_ptr<PostEffectBase>> effects_;
     size_t currentIndex_ = 0;
