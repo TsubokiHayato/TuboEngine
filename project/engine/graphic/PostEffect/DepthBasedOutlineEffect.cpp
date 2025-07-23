@@ -7,7 +7,7 @@ void DepthBasedOutlineEffect::Initialize() {
 	pso_->Initialize();
 
 	// 定数バッファ作成（projectionMatrix用）
-	materialCB_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(DepthBasedOutlineMaterialCB));
+	materialCB_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(ToonDepthOutlineParams));
 	materialCB_->Map(0, nullptr, reinterpret_cast<void**>(&materialCBData_));
 	// 初期値（単位行列）
 	materialCBData_->projectionInverse = MakeIdentity4x4();

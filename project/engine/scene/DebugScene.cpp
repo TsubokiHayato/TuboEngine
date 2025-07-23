@@ -13,7 +13,7 @@ void DebugScene::Initialize() {
 	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
 
 	//モデルファイルパス
-	const std::string modelFileNamePath = "plane.gltf";
+	const std::string modelFileNamePath = "sphere.gltf";
 	//モデルファイルパス2
 	const std::string modelFileNamePath2 = "terrain.obj";
 

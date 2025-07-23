@@ -98,6 +98,8 @@
     <ClCompile Include="engine\graphic\Animation\Animator.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\DepthBasedOutlinePSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\ToonEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\ToonPSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseCharacter.h" />
@@ -210,6 +212,8 @@
     <ClInclude Include="engine\graphic\Animation\Animator.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\DepthBasedOutlinePSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.h" />
+    <ClInclude Include="engine\graphic\PostEffect\ToonEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\ToonPSO.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
