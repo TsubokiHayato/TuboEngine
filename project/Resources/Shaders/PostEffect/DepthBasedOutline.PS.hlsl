@@ -1,8 +1,10 @@
 #include "CopyImage.hlsli"
-cbuffer gMaterial: register(b0)
+cbuffer gMaterial : register(b0)
 {
     float4x4 projectionInverce; // プロジェクション逆行列
-    
+    float4 outlineColor;        //　アウトライン色
+    float outlineThickness;     //　アウトライン太さ
+    float outlineThreshold;     // エッジしきい値
 };
 Texture2D<float4> gTexture : register(t0);
 Texture2D<float> gDepthTexture : register(t1);
@@ -46,33 +48,37 @@ float Luminance(float3 v)
 
 
 
-
 PixelShaderOutput main(VertexShaderOutput input)
 {
-     // 畳み込み処理
     float2 difference = float2(0.0f, 0.0f);
     uint width, height;
     gTexture.GetDimensions(width, height);
-    float2 uvStepSize = float2(1.0f / width, 1.0f / height);
+
+    // アウトライン太さに応じてサンプリング間隔を調整
+    float2 uvStepSize = float2(outlineThickness / width, outlineThickness / height);
+
     for (int x = 0; x < 3; ++x)
     {
         for (int y = 0; y < 3; ++y)
         {
             float2 texcoord = input.texcoord + kIndex3x3[x][y] * uvStepSize;
-            
             float ndcDepth = gDepthTexture.Sample(gSamplerPoint, texcoord);
             float4 viewSpace = mul(float4(0.0f, 0.0f, ndcDepth, 1.0f), projectionInverce);
             float viewZ = viewSpace.z * rcp(viewSpace.w);
-          
+
             difference.x += viewZ * kPrewittHorizontalKernel[x][y];
             difference.y += viewZ * kPrewittVerticalKernel[x][y];
         }
     }
-     // エッジ強度の計算と出力
+
     float weight = length(difference);
-    weight = saturate(weight);
+
+    // しきい値でエッジ判定
+    float edge = step(outlineThreshold, weight);
+
     PixelShaderOutput output;
-    output.color.rgb = (1.0f - weight) * gTexture.Sample(gSampler, input.texcoord).rgb;
+    float3 baseColor = gTexture.Sample(gSampler, input.texcoord).rgb;
+    output.color.rgb = lerp(baseColor, outlineColor.rgb, edge);
     output.color.a = 1.0f;
     return output;
 }

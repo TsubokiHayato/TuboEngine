@@ -8,6 +8,9 @@
 // 定数バッファ構造体（projectionMatrix用）
 struct DepthBasedOutlineMaterialCB {
 	Matrix4x4 projectionInverse;
+	Vector4 outlineColor; // アウトラインの色
+	float outlineThickness; // アウトラインの太さ
+	float outlineDepthThreshold; // アウトラインの深度しきい値
 };
 
 class DepthBasedOutlineEffect : public PostEffectBase {
