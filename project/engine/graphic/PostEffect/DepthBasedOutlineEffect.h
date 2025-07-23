@@ -6,7 +6,7 @@
 #include "PostEffectBase.h"
 
 // 定数バッファ構造体（projectionMatrix用）
-struct DepthBasedOutlineMaterialCB {
+struct ToonDepthOutlineParams {
 	Matrix4x4 projectionInverse;
 	Vector4 outlineColor; // アウトラインの色
 	float outlineThickness; // アウトラインの太さ
@@ -29,5 +29,5 @@ private:
 	Camera* camera_ = nullptr; // メインカメラへのポインタ
 	std::unique_ptr<DepthBasedOutlinePSO> pso_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialCB_; // 定数バッファ
-	DepthBasedOutlineMaterialCB* materialCBData_ = nullptr;
+	ToonDepthOutlineParams* materialCBData_ = nullptr;
 };
