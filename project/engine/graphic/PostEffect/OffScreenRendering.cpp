@@ -58,9 +58,9 @@ void OffScreenRendering::Initialize() {
 	 postEffectManager.AddEffect(std::make_unique<VignetteEffect>());          // ビネットエフェクト
 	 postEffectManager.AddEffect(std::make_unique<SmoothingEffect>());         // スムージングエフェクト
 	 postEffectManager.AddEffect(std::make_unique<GaussianBlurEffect>());      // ガウスぼかしエフェクト
-	 postEffectManager.AddEffect(std::make_unique<RadialBlurEffect>());        // ラジアルブラーエフェクト
 	 postEffectManager.AddEffect(std::make_unique<OutlineEffect>());           // アウトラインエフェクト
 	 postEffectManager.AddEffect(std::make_unique<DepthBasedOutlineEffect>()); // 深度ベースのアウトラインエフェクト
+	 postEffectManager.AddEffect(std::make_unique<RadialBlurEffect>());        // ラジアルブラーエフェクト
 	 postEffectManager.AddEffect(std::make_unique<DissolveEffect>());          // ディゾルブエフェクト
 	 postEffectManager.AddEffect(std::make_unique<randomEffect>());            // ランダムエフェクト
 
@@ -184,9 +184,9 @@ void OffScreenRendering::DrawImGui() {
 	    "Vignette",          // ビネットエフェクト
 	    "Smoothing",         // スムージングエフェクト
 	    "GaussianBlur",      // ガウスぼかしエフェクト
-	    "RadialBlur",        // ラジアルブラーエフェクト
 	    "Outline",           // アウトラインエフェクト
 	    "DepthBasedOutline", // 深度ベースのアウトラインエフェクト
+	    "RadialBlur",        // ラジアルブラーエフェクト
 	    "Dissolve",          // ディゾルブエフェクト
 	    "Random"             // ランダムエフェクト
 	                         // 他のエフェクトを追加する場合はここに追加
