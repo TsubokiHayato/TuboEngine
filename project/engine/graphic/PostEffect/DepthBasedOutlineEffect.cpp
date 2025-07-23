@@ -11,6 +11,9 @@ void DepthBasedOutlineEffect::Initialize() {
 	materialCB_->Map(0, nullptr, reinterpret_cast<void**>(&materialCBData_));
 	// 初期値（単位行列）
 	materialCBData_->projectionInverse = MakeIdentity4x4();
+	materialCBData_->outlineColor = {0.0f, 0.0f, 0.0f, 1.0f}; // アウトラインの色（黒)
+	materialCBData_->outlineThickness = 1.0f;                 // アウトラインの太さ
+	materialCBData_->outlineDepthThreshold = 1.0f;           // アウトラインの深度しきい値
 
 
 	
@@ -34,13 +37,10 @@ void DepthBasedOutlineEffect::Update() {
 void DepthBasedOutlineEffect::DrawImGui() {
 	ImGui::Begin("DepthBasedOutlineEffect");
 	// 必要に応じてImGuiでパラメータ調整
-	ImGui::Text("Projection Inverse:");
-	ImGui::Text("m[0][0]: %f", materialCBData_->projectionInverse.m[0][0]);
-	ImGui::Text("m[1][1]: %f", materialCBData_->projectionInverse.m[1][1]);
-	ImGui::Text("m[2][2]: %f", materialCBData_->projectionInverse.m[2][2]);
-	ImGui::Text("m[3][3]: %f", materialCBData_->projectionInverse.m[3][3]);
-	ImGui::Text("m[0][1]: %f", materialCBData_->projectionInverse.m[0][1]);
-	ImGui::Text("m[1][0]: %f", materialCBData_->projectionInverse.m[1][0]);
+	ImGui::ColorEdit4("Outline Color", &materialCBData_->outlineColor.x);
+	ImGui::SliderFloat("Outline Thickness", &materialCBData_->outlineThickness, 0.0f, 10.0f);
+	ImGui::SliderFloat("Outline Depth Threshold", &materialCBData_->outlineDepthThreshold, 0.0f, 1.0f);
+
 	ImGui::End();
 }
 
