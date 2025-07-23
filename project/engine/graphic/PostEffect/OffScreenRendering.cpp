@@ -9,6 +9,7 @@
 #include "RadialBlurEffect.h"
 #include "SepiaEffect.h"
 #include "SmoothingEffect.h"
+#include "ToonEffect.h"
 #include "VignetteEffect.h"
 #include "WinApp.h"
 #include "randomEffect.h"
@@ -52,18 +53,18 @@ void OffScreenRendering::Initialize() {
 	///---------------------------------------------------------------------
 
 	// PostEffectの追加
-	 postEffectManager.AddEffect(std::make_unique<NoneEffect>());              // 何もしないエフェクト
-	 postEffectManager.AddEffect(std::make_unique<GrayScaleEffect>());         // グレースケールエフェクト
-	 postEffectManager.AddEffect(std::make_unique<SepiaEffect>());             // セピアエフェクト
-	 postEffectManager.AddEffect(std::make_unique<VignetteEffect>());          // ビネットエフェクト
-	 postEffectManager.AddEffect(std::make_unique<SmoothingEffect>());         // スムージングエフェクト
-	 postEffectManager.AddEffect(std::make_unique<GaussianBlurEffect>());      // ガウスぼかしエフェクト
-	 postEffectManager.AddEffect(std::make_unique<OutlineEffect>());           // アウトラインエフェクト
-	 postEffectManager.AddEffect(std::make_unique<DepthBasedOutlineEffect>()); // 深度ベースのアウトラインエフェクト
-	 postEffectManager.AddEffect(std::make_unique<RadialBlurEffect>());        // ラジアルブラーエフェクト
-	 postEffectManager.AddEffect(std::make_unique<DissolveEffect>());          // ディゾルブエフェクト
-	 postEffectManager.AddEffect(std::make_unique<randomEffect>());            // ランダムエフェクト
-
+	postEffectManager.AddEffect(std::make_unique<NoneEffect>());              // 何もしないエフェクト
+	postEffectManager.AddEffect(std::make_unique<GrayScaleEffect>());         // グレースケールエフェクト
+	postEffectManager.AddEffect(std::make_unique<SepiaEffect>());             // セピアエフェクト
+	postEffectManager.AddEffect(std::make_unique<VignetteEffect>());          // ビネットエフェクト
+	postEffectManager.AddEffect(std::make_unique<SmoothingEffect>());         // スムージングエフェクト
+	postEffectManager.AddEffect(std::make_unique<GaussianBlurEffect>());      // ガウスぼかしエフェクト
+	postEffectManager.AddEffect(std::make_unique<OutlineEffect>());           // アウトラインエフェクト
+	postEffectManager.AddEffect(std::make_unique<DepthBasedOutlineEffect>()); // 深度ベースのアウトラインエフェクト
+	postEffectManager.AddEffect(std::make_unique<RadialBlurEffect>());        // ラジアルブラーエフェクト
+	postEffectManager.AddEffect(std::make_unique<DissolveEffect>());          // ディゾルブエフェクト
+	postEffectManager.AddEffect(std::make_unique<randomEffect>());            // ランダムエフェクト
+	postEffectManager.AddEffect(std::make_unique<ToonEffect>());              // トゥーンエフェクト
 	// PostEffectManagerの初期化
 	postEffectManager.InitializeAll();
 }
@@ -81,14 +82,14 @@ void OffScreenRendering::Update() {
 /// </summary>
 void OffScreenRendering::PreDraw() {
 
-//	TransitionDepthTo(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	//	TransitionDepthTo(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	// ばりあ
 	renderingBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	renderingBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	renderingBarrier.Transition.pResource = renderTextureResource_.Get();
 
-	 auto depthResource = DirectXCommon::GetInstance()->GetDepthStencliResouece();
+	auto depthResource = DirectXCommon::GetInstance()->GetDepthStencliResouece();
 	depthBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	depthBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	depthBarrier.Transition.pResource = depthResource.Get();
@@ -129,19 +130,19 @@ void OffScreenRendering::TransitionRenderTextureToShaderResource() {
 /// レンダーテクスチャをレンダーターゲット用にバリア遷移します。
 /// </summary>
 void OffScreenRendering::TransitionRenderTextureToRenderTarget() {
-    renderingBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-    renderingBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	renderingBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	renderingBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
-    // 深度バッファの直前の状態を正しく指定
-    depthBarrier.Transition.StateBefore = depthResourceState_;
-    depthBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+	// 深度バッファの直前の状態を正しく指定
+	depthBarrier.Transition.StateBefore = depthResourceState_;
+	depthBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE;
 
-    // バリア発行
-    commandList->ResourceBarrier(1, &renderingBarrier);
-    commandList->ResourceBarrier(1, &depthBarrier);
+	// バリア発行
+	commandList->ResourceBarrier(1, &renderingBarrier);
+	commandList->ResourceBarrier(1, &depthBarrier);
 
-    // 状態管理変数を更新
-    depthResourceState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+	// 状態管理変数を更新
+	depthResourceState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
 }
 
 /// <summary>
@@ -165,10 +166,8 @@ void OffScreenRendering::Draw() {
 	// 7. 全画面三角形を描画
 	commandList->DrawInstanced(3, 1, 0, 0); // 全画面三角形
 
-		
 	// ポストエフェクト描画
 	postEffectManager.DrawCurrent(commandList.Get());
-
 }
 
 void OffScreenRendering::DrawImGui() {
@@ -188,8 +187,9 @@ void OffScreenRendering::DrawImGui() {
 	    "DepthBasedOutline", // 深度ベースのアウトラインエフェクト
 	    "RadialBlur",        // ラジアルブラーエフェクト
 	    "Dissolve",          // ディゾルブエフェクト
-	    "Random"             // ランダムエフェクト
-	                         // 他のエフェクトを追加する場合はここに追加
+	    "Random"  ,           // ランダムエフェクト
+	    "Toon"               // トゥーンエフェクト
+	           //  他のエフェクトを追加する場合はここに追加
 	};
 
 	int effectIndex = static_cast<int>(postEffectManager.GetCurrentIndex());
@@ -265,18 +265,11 @@ Microsoft::WRL::ComPtr<ID3D12Resource>
 }
 
 void OffScreenRendering::TransitionDepthTo(D3D12_RESOURCE_STATES newState) {
-    auto depthResource = DirectXCommon::GetInstance()->GetDepthStencliResouece();
-    if (!depthResource)
-        return;
-    if (depthResourceState_ == newState)
-        return; // すでに同じ状態なら何もしない
 
-	
-    
 	depthBarrier.Transition.StateBefore = depthResourceState_;
 	depthBarrier.Transition.StateAfter = newState;
 	depthBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	commandList->ResourceBarrier(1, &depthBarrier);
 
-    depthResourceState_ = newState; // 必ずここで更新
+	depthResourceState_ = newState; // 必ずここで更新
 }
