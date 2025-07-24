@@ -1,4 +1,5 @@
 #include "OffscreenRendering.h"
+#include "BloomEffect.h"
 #include "DirectXCommon.h"
 #include "DissolveEffect.h"
 #include "GaussianBlurEffect.h"
@@ -65,6 +66,7 @@ void OffScreenRendering::Initialize() {
 	postEffectManager.AddEffect(std::make_unique<DissolveEffect>());          // ディゾルブエフェクト
 	postEffectManager.AddEffect(std::make_unique<randomEffect>());            // ランダムエフェクト
 	postEffectManager.AddEffect(std::make_unique<ToonEffect>());              // トゥーンエフェクト
+	postEffectManager.AddEffect(std::make_unique<BloomEffect>());             // ブルームエフェクト
 	// PostEffectManagerの初期化
 	postEffectManager.InitializeAll();
 }
@@ -187,9 +189,10 @@ void OffScreenRendering::DrawImGui() {
 	    "DepthBasedOutline", // 深度ベースのアウトラインエフェクト
 	    "RadialBlur",        // ラジアルブラーエフェクト
 	    "Dissolve",          // ディゾルブエフェクト
-	    "Random"  ,           // ランダムエフェクト
-	    "Toon"               // トゥーンエフェクト
-	           //  他のエフェクトを追加する場合はここに追加
+	    "Random",            // ランダムエフェクト
+	    "Toon",              // トゥーンエフェクト
+	    "Bloom",             // ブルームエフェクト
+	                         //  他のエフェクトを追加する場合はここに追加
 	};
 
 	int effectIndex = static_cast<int>(postEffectManager.GetCurrentIndex());
