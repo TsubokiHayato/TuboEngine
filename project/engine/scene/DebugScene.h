@@ -72,6 +72,11 @@ public:
 	/// </summary>
 	void ParticleDraw()override;
 
+	/// <summary>
+	/// Camera取得
+	/// </summary>
+	Camera* GetMainCamera() const { return camera.get(); }
+
 private:
 
 	///Audio///
