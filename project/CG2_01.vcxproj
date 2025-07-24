@@ -112,8 +112,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BloomEffect.cpp" />
-    <ClCompile Include="BloomPSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\BloomEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\BloomPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\ToonEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\DepthBasedOutlinePSO.cpp" />
@@ -209,8 +209,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\SkyBoxPSO.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BloomEffect.h" />
-    <ClInclude Include="BloomPSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\BloomEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\BloomPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.h" />
     <ClInclude Include="engine\graphic\PostEffect\ToonEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\DepthBasedOutlinePSO.h" />
