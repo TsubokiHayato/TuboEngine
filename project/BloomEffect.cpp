@@ -7,7 +7,7 @@ void BloomEffect::Initialize() {
 	pso_->Initialize();
 
 	// 定数バッファ作成
-	cbResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(GaussianParams));
+	cbResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(BloomParams));
 	cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&params_));
 	// デフォルト値
 	params_->threshold = 1.0f; // 明るさの閾値
