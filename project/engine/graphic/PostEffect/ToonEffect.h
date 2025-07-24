@@ -8,9 +8,10 @@
 
 struct ToonParams {
 	int stepCount = 3;
-	float padding[3]; // HLSLと同じサイズになるように
-	// Outline
-	Matrix4x4 projectionInverse; // Projection逆行列
+	float toonRate;
+	Vector3 shadowColor;
+	Vector3 highlightColor;
+	float padding[2]; // HLSLと同じサイズになるように
 };
 
 class ToonEffect : public PostEffectBase {
