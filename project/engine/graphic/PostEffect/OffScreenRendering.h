@@ -1,9 +1,11 @@
 #pragma once
-#include <d3d12.h>
-#include <wrl.h>
-#include <memory>
 #include "DirectXCommon.h"
 #include "PostEffectManager.h"
+#include <d3d12.h>
+#include <memory>
+#include <wrl.h>
+#include "Camera.h"
+#include"DepthBasedOutlineEffect.h"
 
 // 前方宣言
 class WinApp;
@@ -14,8 +16,7 @@ class VignettePSO;
 
 // オフスクリーンレンダリングを管理するクラス
 // レンダーテクスチャへの描画やリソースバリアの制御などを担当します。
-class OffScreenRendering
-{
+class OffScreenRendering {
 public:
 	/// <summary>
 	/// シングルトンインスタンス取得
@@ -26,7 +27,6 @@ public:
 		}
 		return instance;
 	}
-
 
 private:
 	// コンストラクタ・デストラクタ・コピー禁止
@@ -68,6 +68,8 @@ public:
 	/// </summary>
 	void TransitionRenderTextureToRenderTarget();
 
+	void TransitionDepthTo(D3D12_RESOURCE_STATES newState);
+
 	/// <summary>
 	/// 描画処理
 	/// レンダーテクスチャへの描画を行います。
@@ -75,7 +77,6 @@ public:
 	void Draw();
 
 	void DrawImGui();
-
 
 	void Finalize();
 
@@ -89,26 +90,22 @@ public:
 	/// <param name="format">フォーマット</param>
 	/// <param name="clearColor">クリアカラー</param>
 	/// <returns>作成されたリソース</returns>
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTargetResource(
-		Microsoft::WRL::ComPtr<ID3D12Device>& device,
-		int32_t width,
-		int32_t height,
-		DXGI_FORMAT format,
-		const Vector4& clearColor
-	);
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTargetResource(Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, DXGI_FORMAT format, const Vector4& clearColor);
+
+public:
+	void SetCamera(Camera* camera) { this->camera_ = camera; }
 
 private:
-
 	///-----------------------------------------------------------------------
 	///                             メンバ変数
 	///-----------------------------------------------------------------------
+	Camera* camera_ = nullptr; // カメラオブジェクトへのポインタ
 
 	// D3D12デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device;
 
 	// コマンドリスト
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
-
 
 	// オフスクリーン用RTVヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> offscreenRtvDescriptorHeap;
@@ -127,9 +124,11 @@ private:
 
 	// リソースバリア構造体
 	D3D12_RESOURCE_BARRIER renderingBarrier{};
+	D3D12_RESOURCE_BARRIER depthBarrier{};
+	D3D12_RESOURCE_STATES depthResourceState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
 
 	///--------------------------------------------------------------------------
-	///                             PSO関連
+	///                             PSO
 	///---------------------------------------------------------------------------
 
 	// オフスクリーン用PSOクラス
@@ -141,8 +140,8 @@ private:
 	///                             リソース
 	///------------------------------------------------------------------------
 
-	Microsoft::WRL::ComPtr <ID3D12Resource> vignetteResource;
-	//VignetteParams* vignetteData = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vignetteResource;
+	// VignetteParams* vignetteData = nullptr;
 
 	///-----------------------------------------------------------------------
 	///                             PostEffectManager
