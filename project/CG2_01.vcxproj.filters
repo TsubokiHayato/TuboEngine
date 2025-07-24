@@ -96,6 +96,12 @@
     <ClCompile Include="engine\graphic\PSO\LinePSO.cpp" />
     <ClCompile Include="engine\graphic\Animation\Animation.cpp" />
     <ClCompile Include="engine\graphic\Animation\Animator.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\DepthBasedOutlinePSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\ToonEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\ToonPSO.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\BloomPSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\BloomEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseCharacter.h" />
@@ -206,6 +212,12 @@
     <ClInclude Include="engine\graphic\Animation\KeyFrame.h" />
     <ClInclude Include="engine\graphic\Animation\Animation.h" />
     <ClInclude Include="engine\graphic\Animation\Animator.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\DepthBasedOutlinePSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.h" />
+    <ClInclude Include="engine\graphic\PostEffect\ToonEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\ToonPSO.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\BloomPSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\BloomEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
