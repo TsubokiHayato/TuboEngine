@@ -18,8 +18,10 @@ void ToonEffect::Initialize() {
 	toonCB_->Map(0, nullptr, reinterpret_cast<void**>(&toonParams_));
 	// デフォルト値
 	toonParams_->stepCount = 3;
-	toonParams_->projectionInverse = MakeIdentity4x4();
-	
+	toonParams_->toonRate = 0.5f; // トゥーンレートの初期値
+	toonParams_->shadowColor = Vector3(0.0f, 0.0f, 0.0f); // シャドウカラーの初期値
+	toonParams_->highlightColor = Vector3(0.0f, 0.0f, 0.0f); // シャドウカラーの初期値
+
 	// SRV作成（インデックス1にSRVを作成）
 	D3D12_SHADER_RESOURCE_VIEW_DESC depthTextureSRVDesc{};
 	depthTextureSRVDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
@@ -32,16 +34,16 @@ void ToonEffect::Initialize() {
 }
 
 void ToonEffect::Update() {
-	// 必要に応じてprojectionMatrixを更新
-	// 例: カメラや画面サイズに応じて行列をセット
-	toonParams_->projectionInverse = Inverse(camera_->GetProjectionMatrix());
+	
 }
 
 void ToonEffect::DrawImGui() {
 
 	ImGui::Begin("ToonEffect");
-	ImGui::SliderInt("Step Count", &toonParams_->stepCount,2, 100);
-	
+	ImGui::SliderInt("Step Count", &toonParams_->stepCount,1, 20);
+	ImGui::DragFloat("Toon Rate", &toonParams_->toonRate, 0.01f, 0.0f, 1.0f, "%.2f");
+	ImGui::ColorEdit3("Shadow Color", &toonParams_->shadowColor.x);
+	ImGui::ColorEdit3("Highlight Color", &toonParams_->highlightColor.x);
 	ImGui::End();
 }
 void ToonEffect::Draw(ID3D12GraphicsCommandList* commandList) {
@@ -55,8 +57,4 @@ void ToonEffect::SetMainCamera(Camera* camera) {
 
 // カメラの設定を行う
 	camera_ = camera;
-	if (camera) {
-		// ここでカメラのプロジェクション行列を取得し、materialCBData_にセットする
-		toonParams_->projectionInverse = Inverse(camera->GetProjectionMatrix());
-	}
 }
