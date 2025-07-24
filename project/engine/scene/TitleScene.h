@@ -41,6 +41,11 @@ public:
 	/// </summary>
 	void ParticleDraw() override;
 
+	/// <summary>
+	/// カメラの取得
+	/// </summary>
+	Camera* GetMainCamera() const { return camera.get(); }
+
 private:
 	Object3dCommon* object3dCommon;
 	SpriteCommon* spriteCommon;

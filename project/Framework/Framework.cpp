@@ -69,13 +69,22 @@ void Framework::Update() {
 	}
 	//入力の更新
 	Input::GetInstance()->Update();
-	//
-	LineManager::GetInstance()->Update();
+	
 	//シーンマネージャーの更新
 	SceneManager::GetInstance()->Update();
+
+	Camera* mainCamera = SceneManager::GetInstance()->GetMainCamera();
+
+	if (mainCamera) {
+		// ラインマネージャーのカメラ設定
+		LineManager::GetInstance()->SetDefaultCamera(mainCamera);
+		OffScreenRendering::GetInstance()->SetCamera(mainCamera);
+	}
+
 	//オフスクリーンレンダリングの更新
 	OffScreenRendering::GetInstance()->Update();
-
+//
+	LineManager::GetInstance()->Update();
 }
 void Framework::Finalize() {
 #ifdef _DEBUG
@@ -219,6 +228,8 @@ void Framework::ParticleCommonDraw() {
 
 void Framework::OffScreenRenderingDraw() {
 	OffScreenRendering::GetInstance()->TransitionRenderTextureToShaderResource();
+
+	OffScreenRendering::GetInstance()->TransitionDepthTo(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	//オフスクリーンレンダリングの描画
 	OffScreenRendering::GetInstance()->Draw();
