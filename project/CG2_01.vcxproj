@@ -112,6 +112,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BloomEffect.cpp" />
+    <ClCompile Include="BloomPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\ToonEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\DepthBasedOutlinePSO.cpp" />
@@ -207,6 +209,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PSO\SkyBoxPSO.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BloomEffect.h" />
+    <ClInclude Include="BloomPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.h" />
     <ClInclude Include="engine\graphic\PostEffect\ToonEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\DepthBasedOutlinePSO.h" />
@@ -341,6 +345,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </None>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Resources\Shaders\PostEffect\Bloom.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Object3d.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

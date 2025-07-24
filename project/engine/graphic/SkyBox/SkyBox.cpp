@@ -154,7 +154,7 @@ void SkyBox::Draw() {
 
 	commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureFilePath_));
 	//描画
-	commandList->DrawIndexedInstanced(24, 1, 0, 0, 0);
+	commandList->DrawIndexedInstanced(36, 1, 0, 0, 0);
 
 
 }

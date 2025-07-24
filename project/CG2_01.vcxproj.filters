@@ -5,6 +5,7 @@
     <FxCompile Include="Resources\Shaders\Object3d.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\Particle.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Particle.VS.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\Bloom.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="engine\graphic\PostEffect\DissolveEffect.cpp" />
@@ -100,6 +101,8 @@
     <ClCompile Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\ToonEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\ToonPSO.cpp" />
+    <ClCompile Include="BloomPSO.cpp" />
+    <ClCompile Include="BloomEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseCharacter.h" />
@@ -214,6 +217,8 @@
     <ClInclude Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.h" />
     <ClInclude Include="engine\graphic\PostEffect\ToonEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\ToonPSO.h" />
+    <ClInclude Include="BloomPSO.h" />
+    <ClInclude Include="BloomEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
