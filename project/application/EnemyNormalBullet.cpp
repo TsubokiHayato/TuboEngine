@@ -55,9 +55,9 @@ void EnemyNormalBullet::Update() {
 	scale = s_scale;
 	rotation = s_rotation;
 	// 弾の進行方向を計算（敵の回転に依存）
-	velocity.x = sinf(enemyRotation_.y) * bulletSpeed;
-	velocity.y = 0.0f;
-	velocity.z = cosf(enemyRotation_.y) * bulletSpeed;
+	velocity.x = -sinf(enemyRotation_.z) * bulletSpeed;
+	velocity.y = -cosf(enemyRotation_.z) * bulletSpeed;
+	velocity.z = 0.0f;
 	// 位置を更新
 	position += velocity;
 	// プレイヤーからの距離が一定以上なら消滅

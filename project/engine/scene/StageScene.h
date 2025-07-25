@@ -18,7 +18,8 @@
 #include"PlayerBullet.h"
 #include"Enemy.h"
 #include"SkyBox.h"
-
+#include"MapChipField.h"
+#include"Block.h"
 
 
 class StageScene : public IScene {
@@ -92,4 +93,9 @@ private:
 	std::unique_ptr<Enemy> enemy_ = nullptr;
 	std::vector<std::unique_ptr<Enemy>> enemies; // Enemyリスト
 	std::unique_ptr<SkyBox> skyBox_ = nullptr;
+
+	/// MapChipField ///
+	std::unique_ptr<MapChipField> mapChipField_ = nullptr;
+	std::string mapChipCsvFilePath_ = "Resources/MapChip.csv"; // マップチップCSVファイルパス
+	std::vector<std::unique_ptr<Block>> blocks_;
 };
