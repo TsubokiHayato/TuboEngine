@@ -193,6 +193,9 @@ public:
 		const wchar_t* profile);
 
 
+	//depthStencilResorceの取得
+	Microsoft::WRL::ComPtr<ID3D12Resource> GetDepthStencliResouece() { return depthStencilResource;}
+
 	///<summary>
 	///バッファリソースの生成
 	///</summary>
