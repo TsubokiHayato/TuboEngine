@@ -74,9 +74,9 @@ void PlayerBullet::Update() {
 	rotation = s_rotation;
 
 	// 弾の進行方向を計算（プレイヤーの回転に依存）
-	velocity.x = sinf(playerRotation.y) * bulletSpeed;
-	velocity.y = 0.0f;
-	velocity.z = cosf(playerRotation.y) * bulletSpeed;
+	velocity.x = -sinf(playerRotation.z) * bulletSpeed;
+	velocity.y = cosf(playerRotation.z) * bulletSpeed;
+	velocity.z = 0.0f;
 
 	// 位置を更新
 	position += velocity;
