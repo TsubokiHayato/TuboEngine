@@ -127,16 +127,16 @@ void Player::Move() {
 	// 移動量
 	Vector3 moveDelta = {0.0f, 0.0f, 0.0f};
 	if (Input::GetInstance()->PushKey(DIK_W)) {
-		moveDelta.y += 0.1f;
-	}
-	if (Input::GetInstance()->PushKey(DIK_S)) {
 		moveDelta.y -= 0.1f;
 	}
+	if (Input::GetInstance()->PushKey(DIK_S)) {
+		moveDelta.y += 0.1f;
+	}
 	if (Input::GetInstance()->PushKey(DIK_A)) {
-		moveDelta.x += 0.1f;
+		moveDelta.x -= 0.1f;
 	}
 	if (Input::GetInstance()->PushKey(DIK_D)) {
-		moveDelta.x -= 0.1f;
+		moveDelta.x += 0.1f;
 	}
 
 	// 仮移動
