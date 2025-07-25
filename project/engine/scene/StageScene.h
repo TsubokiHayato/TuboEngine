@@ -60,6 +60,14 @@ public:
 	/// </summary>
 	void ParticleDraw() override;
 
+	/// <summary>
+	/// メインカメラ取得
+	/// </summary>
+	Camera* GetMainCamera() const {
+		return camera.get();
+	}
+
+
 	void CheckAllCollisions();
 
 private:

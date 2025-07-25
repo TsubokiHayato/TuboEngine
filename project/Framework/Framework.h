@@ -16,6 +16,7 @@
 #include"SkyBoxCommon.h"
 #include"Input.h"
 #include"OffScreenRendering.h"
+#include"LineManager.h"
 
 class OffScreenRenderingPSO;
 
@@ -100,6 +101,8 @@ public:
 	/// 描画後処理（スワップチェーン）
 	/// </summary>
 	void FrameworkSwapChainPostDraw();
+
+
 
 public:
 
