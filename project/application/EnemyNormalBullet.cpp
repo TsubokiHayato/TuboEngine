@@ -55,8 +55,9 @@ void EnemyNormalBullet::Update() {
 	scale = s_scale;
 	rotation = s_rotation;
 	// 弾の進行方向を計算（敵の回転に依存）
-	velocity.x = -sinf(enemyRotation_.z) * bulletSpeed;
-	velocity.y = -cosf(enemyRotation_.z) * bulletSpeed;
+	float angle = enemyRotation_.z - DirectX::XM_PIDIV2; // -90度オフセット
+	velocity.x = -sinf(angle) * bulletSpeed;
+	velocity.y =  cosf(angle) * bulletSpeed;
 	velocity.z = 0.0f;
 	// 位置を更新
 	position += velocity;
@@ -112,5 +113,6 @@ Vector3 EnemyNormalBullet::GetCenterPosition() const {
 	Vector3 worldPosition = position + offset;
 	return worldPosition;
 }
+
 
 
