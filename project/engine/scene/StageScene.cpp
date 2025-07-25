@@ -77,6 +77,7 @@ void StageScene::Update() {
 	for (auto& enemy : enemies) {
 		enemy->SetCamera(followCamera->GetCamera());
 		enemy->SetPlayer(player_.get());
+		enemy->SetMapChipField(mapChipField_.get());
 		enemy->Update();
 	}
 	followCamera->Update();
