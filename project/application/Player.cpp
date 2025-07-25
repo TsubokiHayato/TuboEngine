@@ -145,8 +145,8 @@ void Player::Move() {
 	// プレイヤーの大きさ（スケール）を考慮した当たり判定
 	if (mapChipField) {
 		// プレイヤーの幅・高さ（スケール×ブロックサイズ基準で調整）
-		float playerWidth = scale.x * MapChipField::GetBlockWidth();
-		float playerHeight = scale.y * MapChipField::GetBlockHeight();
+		float playerWidth = scale.x * MapChipField::GetBlockWidth()-0.1f;
+		float playerHeight = scale.y * MapChipField::GetBlockHeight()-0.1f;
 
 		// 四隅判定（矩形領域がBlockに重なっていないか）
 		if (!mapChipField->IsRectBlocked(tryPosition, playerWidth, playerHeight)) {
