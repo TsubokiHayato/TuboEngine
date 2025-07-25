@@ -37,8 +37,16 @@ public:
 	void SpriteDraw();
 	//ImGui描画
 	void ImGuiDraw();
-
+	// パーティクル描画
 	void ParticleDraw();
+
+	// MainCamera取得
+	Camera* GetMainCamera() const {
+		if (currentScene) {
+			return currentScene->GetMainCamera();
+		}
+		return nullptr;
+	}
 
 private:
 
