@@ -121,19 +121,38 @@ void Player::Draw() {
 // 移動処理
 //--------------------------------------------------
 void Player::Move() {
+	// 移動前の座標を保存
+	Vector3 prevPosition = position;
 
-	// プレイヤーの移動処理
+	// 移動量
+	Vector3 moveDelta = {0.0f, 0.0f, 0.0f};
 	if (Input::GetInstance()->PushKey(DIK_W)) {
-		position.z += 0.1f;
+		moveDelta.y += 0.1f;
 	}
 	if (Input::GetInstance()->PushKey(DIK_S)) {
-		position.z -= 0.1f;
+		moveDelta.y -= 0.1f;
 	}
 	if (Input::GetInstance()->PushKey(DIK_A)) {
-		position.x -= 0.1f;
+		moveDelta.x += 0.1f;
 	}
 	if (Input::GetInstance()->PushKey(DIK_D)) {
-		position.x += 0.1f;
+		moveDelta.x -= 0.1f;
+	}
+
+	// 仮移動
+	Vector3 tryPosition = position + moveDelta;
+
+	// プレイヤーの大きさ（スケール）を考慮した当たり判定
+	if (mapChipField) {
+		// プレイヤーの幅・高さ（スケール×ブロックサイズ基準で調整）
+		float playerWidth = scale.x * MapChipField::GetBlockWidth();
+		float playerHeight = scale.y * MapChipField::GetBlockHeight();
+
+		// 四隅判定（矩形領域がBlockに重なっていないか）
+		if (!mapChipField->IsRectBlocked(tryPosition, playerWidth, playerHeight)) {
+			// 衝突がなければ位置を更新
+			position = tryPosition;
+		}
 	}
 }
 
@@ -157,13 +176,12 @@ void Player::Rotate() {
 	// Z+前方が0度、X+右方向が+90度
 	float angle = std::atan2(dx, -dy);
 
-	rotation.y = angle;
+	rotation.z = angle;
 	// Reticleの位置を画面中央に設定
 	reticlePosition = Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
 }
 
-void Player::ReticleDraw() {reticleSprite -> Draw();
-}
+void Player::ReticleDraw() { reticleSprite->Draw(); }
 
 //--------------------------------------------------
 // 当たり判定の中心座標を取得
@@ -195,23 +213,31 @@ void Player::OnCollision(Collider* other) {
 // ImGuiの描画処理
 //--------------------------------------------------
 void Player::DrawImGui() {
-	// 3Dオブジェクトのパラメータを取得
 	position = object3d->GetPosition();
 	rotation = object3d->GetRotation();
 	scale = object3d->GetScale();
 
 	ImGui::Begin("Player");
-	ImGui::DragFloat3("Position", &position.x, 0.1f);
-	ImGui::DragFloat3("Rotation", &rotation.x, 0.1f);
-	ImGui::DragFloat3("Scale", &scale.x, 0.1f);
 	ImGui::Text("HP: %d", HP);
 	ImGui::Text("IsHit: %s", isHit ? "Yes" : "No");
+
+	// --- 追加: マップチップ種別表示 ---
+	if (mapChipField) {
+		if (mapChipField) {
+			MapChipField::IndexSet index = mapChipField->GetMapChipIndexSetByPosition(position);
+			MapChipType type = mapChipField->GetMapChipTypeByIndex(index.xIndex, index.yIndex);
+			const char* typeStr = "Unknown";
+			if (type == MapChipType::kBlank)
+				typeStr = "Blank";
+			else if (type == MapChipType::kBlock)
+				typeStr = "Block";
+			ImGui::Separator();
+			ImGui::Text("MapChip: %s", typeStr);
+		}
+	}
+
 	ImGui::End();
 
 	object3d->DrawImGui("Player");
-
-	Input::GetInstance()->ShowInputDebugWindow();
-
-	// プレイヤー弾のグローバルパラメータImGui
 	PlayerBullet::DrawImGuiGlobal();
 }
