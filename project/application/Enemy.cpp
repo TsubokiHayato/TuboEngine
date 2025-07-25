@@ -37,13 +37,13 @@ void Enemy::Initialize() {
 	particleEmitter_ = nullptr;
 }
 
+
 // 角度差分を[-π, π]に正規化する関数
 static float NormalizeAngle(float angle) {
 	while (angle > kPI) angle -= 2.0f * kPI;
 	while (angle < -kPI) angle += 2.0f * kPI;
 	return angle;
 }
-
 void Enemy::Update() {
 	// プレイヤーがいれば距離と方向を計算
 	float distanceToPlayer = 0.0f;
@@ -53,9 +53,14 @@ void Enemy::Update() {
 		distanceToPlayer = std::sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y + toPlayer.z * toPlayer.z);
 	}
 
+	// --- 視覚ギミック追加 ---
+	bool canSeePlayer = CanSeePlayer();
+
 	// 状態遷移
 	if (player_) {
-		if (distanceToPlayer > moveStartDistance_) {
+		if (!canSeePlayer) {
+			state_ = State::Idle; // 見えなければ待機
+		} else if (distanceToPlayer > moveStartDistance_) {
 			state_ = State::Idle; // 一定以上離れていると待機
 		} else if (distanceToPlayer > shootDistance_) {
 			state_ = State::Move; // 移動範囲内
@@ -65,7 +70,6 @@ void Enemy::Update() {
 	}
 	// プレイヤーの方向を向く（一定速度で回転）
 	if (player_ && state_ != State::Idle) {
-		// atan2(toPlayer.y, toPlayer.x)で「右が0度、上が+90度」基準
 		float angleZ = std::atan2(toPlayer.y, toPlayer.x);
 		float diff = NormalizeAngle(angleZ - rotation.z);
 		float maxTurn = turnSpeed_;
@@ -84,7 +88,6 @@ void Enemy::Update() {
 		break;
 	case State::Move:
 		if (player_) {
-			// Z軸は無視してXY平面で移動
 			Vector3 dir = toPlayer;
 			dir.z = 0.0f;
 			float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
@@ -96,44 +99,38 @@ void Enemy::Update() {
 			}
 		}
 		break;
-	case State::Shoot:
-		// 弾発射処理（例: 1秒ごとに発射）
-		{
-			static float bulletTimer = 0.0f;
-			bulletTimer += 1.0f / 60.0f; // 60FPS前提
-			if (bulletTimer >= 1.0f) {
-				bulletTimer = 0.0f;
-				if (player_) {
-					bullet = std::make_unique<EnemyNormalBullet>();
-					bullet->Initialize(position);
-					bullet->SetEnemyPosition(position);
-					bullet->SetEnemyRotation(rotation);
-					bullet->SetPlayer(player_);
-					bullet->SetCamera(camera_);
-				}
-			}
-			if (bullet) {
-				bullet->Update();
+	case State::Shoot: {
+		static float bulletTimer = 0.0f;
+		bulletTimer += 1.0f / 60.0f;
+		if (bulletTimer >= 1.0f) {
+			bulletTimer = 0.0f;
+			if (player_) {
+				bullet = std::make_unique<EnemyNormalBullet>();
+				bullet->Initialize(position);
+				bullet->SetEnemyPosition(position);
+				bullet->SetEnemyRotation(rotation);
+				bullet->SetPlayer(player_);
+				bullet->SetCamera(camera_);
 			}
 		}
-		break;
+		if (bullet) {
+			bullet->Update();
+		}
+	} break;
 	}
 
-	// まず座標・回転・スケールを最新化
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
 	object3d->SetScale(scale);
 	object3d->SetCamera(camera_);
 	object3d->Update();
 
-	// ヒット演出のトリガー判定
 	if (!wasHit && isHit) {
 		EmitHitParticle();
 	}
-	isHit = false;  // 今フレームのヒット状態をリセット
-	wasHit = isHit; // 状態を保存
+	isHit = false;
+	wasHit = isHit;
 
-	// Particle
 	if (particle) {
 		particle->SetCamera(camera_);
 		particle->Update();
@@ -198,6 +195,38 @@ void Enemy::DrawImGui() {
 }
 
 void Enemy::Move() {}
+
+bool Enemy::CanSeePlayer() {
+	if (!player_ || !mapChipField)
+		return false;
+
+	Vector3 from = position;
+	Vector3 to = player_->GetPosition();
+
+	// XY平面で判定（Zは無視）
+	Vector2 start = {from.x, from.y};
+	Vector2 end = {to.x, to.y};
+
+	// 線分上を一定間隔でサンプリング
+	const float step = 0.5f; // サンプリング間隔（ブロックサイズより小さめ推奨）
+	Vector2 dir = end - start;
+	float length = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+	if (length < 0.001f)
+		return true; // 同じ位置なら見える
+
+	dir.x /= length;
+	dir.y /= length;
+
+	for (float t = 0.0f; t <= length; t += step) {
+		Vector2 pos = start + dir * t;
+		Vector3 checkPos = {pos.x, pos.y, from.z};
+		// ブロック判定
+		if (mapChipField->IsBlocked(checkPos)) {
+			return false; // ブロックに遮られた
+		}
+	}
+	return true; // 遮蔽物なし
+}
 
 Vector3 Enemy::GetCenterPosition() const {
 	const Vector3 offset = {0.0f, 0.0f, 0.0f};
