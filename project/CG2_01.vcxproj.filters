@@ -90,6 +90,8 @@
     <ClCompile Include="application\Player.cpp" />
     <ClCompile Include="application\PlayerBullet.cpp" />
     <ClCompile Include="application\EnemyNormalBullet.cpp" />
+    <ClCompile Include="MapChipField.cpp" />
+    <ClCompile Include="Block.cpp" />
     <ClCompile Include="engine\graphic\line\LineCommon.cpp" />
     <ClCompile Include="engine\graphic\line\Line.cpp" />
     <ClCompile Include="engine\graphic\line\LineManager.cpp" />
@@ -202,6 +204,8 @@
     <ClInclude Include="Framework\Framework.h" />
     <ClInclude Include="Framework\Order.h" />
     <ClInclude Include="application\EnemyNormalBullet.h" />
+    <ClInclude Include="MapChipField.h" />
+    <ClInclude Include="Block.h" />
     <ClInclude Include="engine\graphic\line\LineCommon.h" />
     <ClInclude Include="engine\graphic\line\Line.h" />
     <ClInclude Include="engine\graphic\line\LineManager.h" />

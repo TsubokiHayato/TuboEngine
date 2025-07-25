@@ -3,7 +3,7 @@
 #include "PlayerBullet.h"
 #include "Object3d.h"
 #include "Sprite.h"
-
+#include"MapChipField.h"
 ///--------------------------------------------------
 /// プレイヤークラス
 ///--------------------------------------------------
@@ -76,14 +76,16 @@ public:
 	void SetCamera(Camera* camera) { object3d->SetCamera(camera); }
 
 	// 環境マップ設定
-	void CubeMapSet(const std::string& filePath) {
-		object3d->SetCubeMapFilePath(filePath); }
+	void CubeMapSet(const std::string& filePath) {object3d->SetCubeMapFilePath(filePath); }
+
+	// マップチップフィールドを設定
+	void SetMapChipField(MapChipField* mapChipField) { this->mapChipField = mapChipField; }
 
 private:
 	///--------------------------------------------------
 	///				引き渡し用変数
 	///--------------------------------------------------
-	
+	MapChipField* mapChipField = nullptr; // マップチップフィールド
 private:
 	///--------------------------------------------------
 	///				メンバ変数
@@ -108,4 +110,5 @@ private:
 	Vector2 reticlePosition = {0.0f, 0.0f}; // レティクルの位置（画面中央）
 	Vector2 reticleSize = {50.0f, 50.0f};   // レティクルのサイズ
 
+	
 };
