@@ -115,6 +115,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Player.cpp" />
     <ClCompile Include="application\PlayerBullet.cpp" />
     <ClCompile Include="application\EnemyNormalBullet.cpp" />
+    <ClCompile Include="Block.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\DissolveEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\DissolvePSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\Blend\AddBlendPSO.cpp" />
@@ -195,6 +196,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\SkyBox\SkyBox.cpp" />
     <ClCompile Include="engine\graphic\SkyBox\SkyBoxCommon.cpp" />
     <ClCompile Include="engine\graphic\PSO\SkyBoxPSO.cpp" />
+    <ClCompile Include="MapChipField.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseCharacter.h" />
@@ -204,6 +206,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\CollisionTypeId.h" />
     <ClInclude Include="application\Enemy.h" />
     <ClInclude Include="application\EnemyNormalBullet.h" />
+    <ClInclude Include="Block.h" />
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\DissolvePSO.h" />
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
@@ -295,6 +298,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\PSO\SkyBoxPSO.h" />
     <ClInclude Include="Framework\Framework.h" />
     <ClInclude Include="Framework\Order.h" />
+    <ClInclude Include="MapChipField.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\imgui\imgui.vcxproj">

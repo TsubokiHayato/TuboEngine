@@ -90,6 +90,8 @@
     <ClCompile Include="application\Player.cpp" />
     <ClCompile Include="application\PlayerBullet.cpp" />
     <ClCompile Include="application\EnemyNormalBullet.cpp" />
+    <ClCompile Include="MapChipField.cpp" />
+    <ClCompile Include="Block.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseCharacter.h" />
@@ -190,6 +192,8 @@
     <ClInclude Include="Framework\Framework.h" />
     <ClInclude Include="Framework\Order.h" />
     <ClInclude Include="application\EnemyNormalBullet.h" />
+    <ClInclude Include="MapChipField.h" />
+    <ClInclude Include="Block.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
