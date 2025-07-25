@@ -1,4 +1,6 @@
 #include "PostEffectManager.h"
+#include "DepthBasedOutlineEffect.h"
+#include "DissolveEffect.h"
 
 void PostEffectManager::AddEffect(std::unique_ptr<PostEffectBase> effect) {
     effects_.emplace_back(std::move(effect));
@@ -13,7 +15,16 @@ void PostEffectManager::UpdateAll() {
 }
 
 void PostEffectManager::SetCurrentEffect(size_t index) {
-    if (index < effects_.size()) {
+    if (index < effects_.size() && index != currentIndex_) {
+        // DepthBasedOutlineEffectからDissolveEffectへの切り替えを禁止
+        auto* current = effects_[currentIndex_].get();
+        auto* next = effects_[index].get();
+        if (dynamic_cast<DepthBasedOutlineEffect*>(current) && dynamic_cast<DissolveEffect*>(next)) {
+            // 切り替え禁止
+            return;
+        }
+        // 新しいエフェクトをInitialize
+        effects_[index]->Initialize();
         currentIndex_ = index;
     }
 }
@@ -27,6 +38,12 @@ void PostEffectManager::DrawCurrent(ID3D12GraphicsCommandList* commandList) {
 void PostEffectManager::DrawImGui() {
     if (currentIndex_ < effects_.size()) {
         effects_[currentIndex_]->DrawImGui();
+    }
+}
+
+void PostEffectManager::SetMainCamera(Camera* camera) {
+    for (auto& e : effects_) {
+        e->SetMainCamera(camera);
     }
 }
 

@@ -1,6 +1,5 @@
 #include "Framework.h"
 #include"WinApp.h"
-#include"OffScreenRenderingPSO.h"
 #include <dxcapi.h>
 
 
@@ -56,6 +55,9 @@ void Framework::Initialize() {
 	//オフスクリーンレンダリングの初期化
 	OffScreenRendering::GetInstance()->Initialize();
 
+	//ラインマネージャーの初期化
+	LineManager::GetInstance()->Initialize();
+
 	//シーンマネージャーの初期化
 	SceneManager::GetInstance()->Initialize();
 
@@ -67,11 +69,22 @@ void Framework::Update() {
 	}
 	//入力の更新
 	Input::GetInstance()->Update();
+	
 	//シーンマネージャーの更新
 	SceneManager::GetInstance()->Update();
+
+	Camera* mainCamera = SceneManager::GetInstance()->GetMainCamera();
+
+	if (mainCamera) {
+		// ラインマネージャーのカメラ設定
+		LineManager::GetInstance()->SetDefaultCamera(mainCamera);
+		OffScreenRendering::GetInstance()->SetCamera(mainCamera);
+	}
+
 	//オフスクリーンレンダリングの更新
 	OffScreenRendering::GetInstance()->Update();
-
+//
+	LineManager::GetInstance()->Update();
 }
 void Framework::Finalize() {
 #ifdef _DEBUG
@@ -91,6 +104,7 @@ void Framework::Finalize() {
 	SpriteCommon::GetInstance()->Finalize();
 	Object3dCommon::GetInstance()->Finalize();
 	SkyBoxCommon::GetInstance()->Finalize();
+	LineManager::GetInstance()->Finalize();
 	
 	AudioCommon::GetInstance()->Finalize();
 	DirectXCommon::GetInstance()->Finalize();
@@ -179,6 +193,9 @@ void Framework::FrameWorkRenderTargetPreDraw() {
 	OffScreenRendering::GetInstance()->PreDraw();
 
 	SrvManager::GetInstance()->PreDraw();
+
+	
+	
 }
 
 
@@ -200,6 +217,7 @@ void Framework::SpriteCommonDraw() {
 	SpriteCommon::GetInstance()->DrawSettingsCommon(spriteBlendModeNum);
 	SceneManager::GetInstance()->SpriteDraw();
 	
+
 }
 
 void Framework::ParticleCommonDraw() {
@@ -210,6 +228,8 @@ void Framework::ParticleCommonDraw() {
 
 void Framework::OffScreenRenderingDraw() {
 	OffScreenRendering::GetInstance()->TransitionRenderTextureToShaderResource();
+
+	OffScreenRendering::GetInstance()->TransitionDepthTo(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	//オフスクリーンレンダリングの描画
 	OffScreenRendering::GetInstance()->Draw();
