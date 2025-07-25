@@ -1,0 +1,225 @@
+#include "MapChipField.h"
+#include <assert.h>
+#include <fstream>
+#include <map>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <array>
+#include"ImGuiManager.h"
+
+//--------------------------------------------------
+// マップチップ種別テーブル（CSV値→MapChipType）
+//--------------------------------------------------
+namespace {
+std::map<std::string, MapChipType> mapChipTable = {
+    {"0", MapChipType::kBlank},
+    {"1", MapChipType::kBlock},
+    {"2", MapChipType::Player},
+    {"3", MapChipType::Enemy },
+};
+}
+
+//--------------------------------------------------
+// 座標からマップチップインデックスセットを取得
+//--------------------------------------------------
+MapChipField::IndexSet MapChipField::GetMapChipIndexSetByPosition(const Vector3& position) const {
+    IndexSet indexSet = {};
+    indexSet.xIndex = static_cast<uint32_t>((position.x + kBlockWidth_ / 2) / kBlockWidth_);
+    indexSet.yIndex = static_cast<uint32_t>((position.y + kBlockHeight_ / 2) / kBlockHeight_);
+    return indexSet;
+}
+
+//--------------------------------------------------
+// インデックスから矩形領域を取得
+//--------------------------------------------------
+MapChipField::Rect MapChipField::GetRectByIndex(uint32_t xIndex, uint32_t yIndex) {
+	Vector3 center = GetMapChipPositionByIndex(xIndex, yIndex);
+
+	Rect rect;
+	rect.left = center.x - kBlockWidth_ / 2.0f;
+	rect.right = center.x + kBlockWidth_ / 2.0f;
+	rect.top = center.y + kBlockHeight_ / 2.0f;
+	rect.bottom = center.y - kBlockHeight_ / 2.0f;
+
+	return rect;
+}
+
+//--------------------------------------------------
+// マップチップデータをリセット
+//--------------------------------------------------
+void MapChipField::ResetMapChipData() {
+
+	// マップチップデータをクリア
+	mapChipData_.data.clear();
+
+	mapChipData_.data.resize(kNumBlockVirtical);
+
+	for (std::vector<MapChipType>& mapChipDataLine : mapChipData_.data) {
+		mapChipDataLine.resize(kNumBlockHorizontal);
+	}
+}
+
+//--------------------------------------------------
+// CSVからマップチップデータを読み込む
+//--------------------------------------------------
+void MapChipField::LoadMapChipCsv(const std::string& filePath) {
+    ResetMapChipData();
+    std::ifstream file(filePath);
+    if (!file.is_open()) return;
+    std::stringstream mapChipCsv;
+    mapChipCsv << file.rdbuf();
+    file.close();
+
+    for (uint32_t i = 0; i < kNumBlockVirtical; ++i) {
+        std::string line;
+        if (!std::getline(mapChipCsv, line)) break;
+        std::istringstream line_stream(line);
+        for (uint32_t j = 0; j < kNumBlockHorizontal; ++j) {
+            std::string word;
+            if (!std::getline(line_stream, word, ',')) break;
+            mapChipData_.data[i][j] = mapChipTable.contains(word) ? mapChipTable[word] : MapChipType::kBlank;
+        }
+    }
+}
+
+//--------------------------------------------------
+// インデックスからマップチップ種別を取得
+//--------------------------------------------------
+MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex) const {
+
+	if (xIndex < 0 || kNumBlockHorizontal - 1 < xIndex) {
+		return MapChipType::kBlank;
+	}
+
+	if (yIndex < 0 || kNumBlockVirtical - 1 < yIndex) {
+		return MapChipType::kBlank;
+	}
+
+	return mapChipData_.data[yIndex][xIndex];
+}
+
+//--------------------------------------------------
+// インデックスからマップチップの座標を取得
+//--------------------------------------------------
+Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex) {
+    return Vector3(
+        kBlockWidth_ * xIndex,      // X: 右へ+
+        kBlockHeight_ * yIndex,     // Y: 上へ+
+        0.0f                        // Z: 高さ（固定）
+    );
+}
+
+//--------------------------------------------------
+// インデックスでマップチップ種別を設定
+//--------------------------------------------------
+void MapChipField::SetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex, MapChipType mapChipType) {
+	// インデックスの範囲チェック
+	if (xIndex >= 0 && xIndex < kNumBlockHorizontal && yIndex >= 0 && yIndex < kNumBlockVirtical) {
+		// マップチップの種類を設定
+		mapChipData_.data[yIndex][xIndex] = mapChipType;
+	}
+}
+
+//--------------------------------------------------
+// 指定座標が通行可能か判定
+//--------------------------------------------------
+bool MapChipField::IsWalkable(const Vector3& position) const {
+    IndexSet index = GetMapChipIndexSetByPosition(position);
+    MapChipType type = GetMapChipTypeByIndex(index.xIndex, index.yIndex);
+    // kBlockは通行不可
+    return type != MapChipType::kBlock;
+}
+
+//--------------------------------------------------
+// 指定座標が通行不可（壁など）か判定
+//--------------------------------------------------
+bool MapChipField::IsBlocked(const Vector3& position) const {
+    IndexSet index = GetMapChipIndexSetByPosition(position);
+    MapChipType type = GetMapChipTypeByIndex(index.xIndex, index.yIndex);
+    // kBlockは通行不可
+    switch (type) {
+        case MapChipType::kBlock:
+            return true;
+        default:
+            return false;
+    }
+}
+
+//--------------------------------------------------
+// 指定矩形領域（プレイヤーの四隅など）が衝突しているか判定
+//--------------------------------------------------
+bool MapChipField::IsRectBlocked(const Vector3& center, float width, float height) const {
+    // 四隅の座標を計算
+    std::array<Vector3, 4> corners = {
+        Vector3(center.x + width / 2.0f, center.y - height / 2.0f, center.z), // 右下
+        Vector3(center.x - width / 2.0f, center.y - height / 2.0f, center.z), // 左下
+        Vector3(center.x + width / 2.0f, center.y + height / 2.0f, center.z), // 右上
+        Vector3(center.x - width / 2.0f, center.y + height / 2.0f, center.z)  // 左上
+    };
+    for (const auto& pos : corners) {
+        if (IsBlocked(pos)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+//--------------------------------------------------
+// static変数の定義（ブロックサイズ）
+//--------------------------------------------------
+float MapChipField::kBlockWidth_ = 2.0f;
+float MapChipField::kBlockHeight_ = 2.0f;
+
+//--------------------------------------------------
+// ImGuiの描画処理
+//--------------------------------------------------
+void MapChipField::DrawImGui(const char* windowName) {
+	ImGui::Begin(windowName);
+	ImGui::SliderFloat("Block Width", &kBlockWidth_, 0.1f, 5.0f);
+	ImGui::SliderFloat("Block Height", &kBlockHeight_, 0.1f, 5.0f);
+
+    // --- ImGuiテーブル表示を必要な範囲だけに制限する例 ---
+    const int showWidth = 20;   // 表示する横の最大数
+    const int showHeight = 20;  // 表示する縦の最大数
+    const int offsetX = 0;      // スクロールや表示開始位置に応じて調整
+    const int offsetY = 0;
+
+    if (ImGui::BeginTable("MapChipTable", showWidth, ImGuiTableFlags_Borders)) {
+        for (int yIndex = offsetY; yIndex < offsetY + showHeight && yIndex < (int)kNumBlockVirtical; ++yIndex) {
+            ImGui::TableNextRow();
+            for (int xIndex = offsetX; xIndex < offsetX + showWidth && xIndex < (int)kNumBlockHorizontal; ++xIndex) {
+                ImGui::TableSetColumnIndex(xIndex - offsetX);
+                MapChipType mapChipType = GetMapChipTypeByIndex(xIndex, yIndex);
+                const char* label = nullptr;
+                ImVec4 color;
+                switch (mapChipType) {
+                    case MapChipType::kBlank:  label = ""; color = ImVec4(0.8f, 0.8f, 0.8f, 1.0f); break;
+                    case MapChipType::kBlock:  label = "B"; color = ImVec4(0.3f, 0.3f, 0.8f, 1.0f); break;
+                    case MapChipType::Player:  label = "P"; color = ImVec4(0.2f, 0.8f, 0.2f, 1.0f); break;
+                    case MapChipType::Enemy:   label = "E"; color = ImVec4(0.8f, 0.2f, 0.2f, 1.0f); break;
+                    default:                   label = "?"; color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); break;
+                }
+                ImGui::PushStyleColor(ImGuiCol_Button, color);
+                ImGui::PushID(yIndex * kNumBlockHorizontal + xIndex);
+                if (ImGui::Button(label, ImVec2(24, 18))) {
+                    // クリックで種類を順番に切り替え
+                    MapChipType nextType = MapChipType::kBlank;
+                    switch (mapChipType) {
+                        case MapChipType::kBlank:  nextType = MapChipType::kBlock;  break;
+                        case MapChipType::kBlock:  nextType = MapChipType::Player;  break;
+                        case MapChipType::Player:  nextType = MapChipType::Enemy;   break;
+                        case MapChipType::Enemy:   nextType = MapChipType::kBlank;  break;
+                        default:                   nextType = MapChipType::kBlank;  break;
+                    }
+                    SetMapChipTypeByIndex(xIndex, yIndex, nextType);
+                }
+                ImGui::PopID();
+                ImGui::PopStyleColor();
+            }
+        }
+        ImGui::EndTable();
+	}
+
+	ImGui::End();
+}

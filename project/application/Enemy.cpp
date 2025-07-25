@@ -63,17 +63,17 @@ void Enemy::Update() {
 			state_ = State::Shoot; // 射撃範囲内
 		}
 	}
-
 	// プレイヤーの方向を向く（一定速度で回転）
 	if (player_ && state_ != State::Idle) {
-		float angleY = std::atan2(toPlayer.x, toPlayer.z); // Y軸回転
-		float diff = NormalizeAngle(angleY - rotation.y);
+		// atan2(toPlayer.y, toPlayer.x)で「右が0度、上が+90度」基準
+		float angleZ = std::atan2(toPlayer.y, toPlayer.x);
+		float diff = NormalizeAngle(angleZ - rotation.z);
 		float maxTurn = turnSpeed_;
 		if (std::fabs(diff) < maxTurn) {
-			rotation.y = angleY;
+			rotation.z = angleZ;
 		} else {
-			rotation.y += (diff > 0 ? 1 : -1) * maxTurn;
-			rotation.y = NormalizeAngle(rotation.y);
+			rotation.z += (diff > 0 ? 1 : -1) * maxTurn;
+			rotation.z = NormalizeAngle(rotation.z);
 		}
 	}
 
@@ -84,15 +84,15 @@ void Enemy::Update() {
 		break;
 	case State::Move:
 		if (player_) {
-			// Y成分は無視してXZ平面で移動
+			// Z軸は無視してXY平面で移動
 			Vector3 dir = toPlayer;
-			dir.y = 0.0f;
-			float len = std::sqrt(dir.x * dir.x + dir.z * dir.z);
+			dir.z = 0.0f;
+			float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
 			if (len > 0.001f) {
 				dir.x /= len;
-				dir.z /= len;
+				dir.y /= len;
 				position.x += dir.x * moveSpeed_;
-				position.z += dir.z * moveSpeed_;
+				position.y += dir.y * moveSpeed_;
 			}
 		}
 		break;
