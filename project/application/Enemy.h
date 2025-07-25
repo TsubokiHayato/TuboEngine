@@ -3,6 +3,7 @@
 #include "EnemyNormalBullet.h"
 #include "Particle.h"
 #include "ParticleEmitter.h"
+#include"MapChipField.h"
 
 ///---------------------------------------------------
 ///				前方宣言
@@ -24,6 +25,10 @@ public:
 	void DrawImGui();
 
 	void Move();
+
+	// プレイヤーの方向を向く
+	bool CanSeePlayer();
+
 	// ヒット演出のトリガー
 	void EmitHitParticle();
 
@@ -60,11 +65,15 @@ public:
 
 	void SetPlayer(Player* player) { player_ = player; }
 
+	// マップチップフィールド
+	void SetMapChipField(MapChipField* field) { mapChipField = field; }
+
 	///----------------------------------
 	///				受取り変数
 	/// ---------------------------------
 private:
 	Camera* camera_ = nullptr; // カメラ
+	MapChipField* mapChipField = nullptr; // マップチップフィールドへのポインタ
 
 	///---------------------------------------
 	///				メンバ変数
