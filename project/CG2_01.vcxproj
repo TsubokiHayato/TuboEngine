@@ -211,6 +211,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\MapChipField.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application\Player.h" />
+    <ClInclude Include="application\PlayerBullet.h" />
     <ClInclude Include="engine\graphic\PostEffect\BloomEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\BloomPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.h" />
