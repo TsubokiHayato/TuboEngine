@@ -127,16 +127,16 @@ void Player::Move() {
 	// 移動量
 	Vector3 moveDelta = {0.0f, 0.0f, 0.0f};
 	if (Input::GetInstance()->PushKey(DIK_W)) {
-		moveDelta.y += 0.1f;
-	}
-	if (Input::GetInstance()->PushKey(DIK_S)) {
 		moveDelta.y -= 0.1f;
 	}
+	if (Input::GetInstance()->PushKey(DIK_S)) {
+		moveDelta.y += 0.1f;
+	}
 	if (Input::GetInstance()->PushKey(DIK_A)) {
-		moveDelta.x += 0.1f;
+		moveDelta.x -= 0.1f;
 	}
 	if (Input::GetInstance()->PushKey(DIK_D)) {
-		moveDelta.x -= 0.1f;
+		moveDelta.x += 0.1f;
 	}
 
 	// 仮移動
@@ -145,8 +145,8 @@ void Player::Move() {
 	// プレイヤーの大きさ（スケール）を考慮した当たり判定
 	if (mapChipField) {
 		// プレイヤーの幅・高さ（スケール×ブロックサイズ基準で調整）
-		float playerWidth = scale.x * MapChipField::GetBlockWidth();
-		float playerHeight = scale.y * MapChipField::GetBlockHeight();
+		float playerWidth = scale.x * MapChipField::GetBlockWidth()-0.1f;
+		float playerHeight = scale.y * MapChipField::GetBlockHeight()-0.1f;
 
 		// 四隅判定（矩形領域がBlockに重なっていないか）
 		if (!mapChipField->IsRectBlocked(tryPosition, playerWidth, playerHeight)) {
