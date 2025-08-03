@@ -222,6 +222,8 @@
     <ClInclude Include="engine\graphic\PSO\PostEffect\ToonPSO.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\BloomPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\BloomEffect.h" />
+    <ClInclude Include="application\PlayerBullet.h" />
+    <ClInclude Include="application\Player.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
