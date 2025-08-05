@@ -14,6 +14,14 @@ constexpr std::string_view kObjExtension = ".obj";
 
 // 子オブジェクトも含めて再帰的にパース
 void ParseObject(const nlohmann::json& object, LevelData& levelData) {
+    // 無効化フラグ対応
+    if (object.contains("Disabled")) {
+        bool disabled = object["Disabled"].get<bool>();
+        if (disabled) {
+            return;
+        }
+    }
+
     if (!object.contains("type")) return;
     const std::string& type = object["type"];
 
