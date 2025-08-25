@@ -40,6 +40,9 @@ public:
 	// パーティクル描画
 	void ParticleDraw();
 
+	// シーン切り替え
+	void ChangeScene(int sceneNo);
+
 	// MainCamera取得
 	Camera* GetMainCamera() const {
 		if (currentScene) {

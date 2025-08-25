@@ -84,6 +84,13 @@ void StageScene::Update() {
 
 	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	collisionManager_->Update();
+
+	if (!player_->GetIsAllive()) {
+		// プレイヤーが死亡したらシーンを切り替える
+		SceneManager::GetInstance()->ChangeScene(CLEAR);
+		return;
+	}
+
 	CheckAllCollisions();
 }
 
