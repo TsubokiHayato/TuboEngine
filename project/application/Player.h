@@ -99,6 +99,16 @@ private:
 	float damageCooldownTimer = 0.0f;                   // ダメージクールダウンタイマー
 	float damageCooldownTime = 1.0f;                    // ダメージクールダウン時間（秒）
 
+	// 回避行動
+	bool isDodging = false;                             // 回避中フラグ
+	float dodgeTimer = 0.0f;                            // 回避残り時間
+	float dodgeCooldownTimer = 0.0f;                    // 回避クールダウンタイマー
+	float dodgeDuration = 0.2f;                         // 回避時間（秒）
+	float dodgeCooldown = 1.0f;                         // 回避クールダウン（秒）
+	float dodgeSpeed = 0.5f;                            // 回避速度
+
+	Vector3 dodgeDirection = {0.0f, 0.0f, 0.0f};        // 回避方向
+
 	Vector3 position; // プレイヤーの位置
 	Vector3 rotation; // プレイヤーの回転
 	Vector3 scale;    // プレイヤーのスケール
