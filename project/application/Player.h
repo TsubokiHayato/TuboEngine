@@ -42,6 +42,13 @@ public:
 
 	void ReticleDraw();
 
+private:
+	// --- 回避関連 ---
+	void StartDodge();
+	void UpdateDodge();
+	bool CanDodge() const;
+	Vector3 GetDodgeInputDirection() const;
+
 public:
 	///-----------------------------------
 	///				ゲッター
