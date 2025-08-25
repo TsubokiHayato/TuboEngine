@@ -56,7 +56,7 @@ public:
 	// プレイヤーのHPを取得
 	int GetHP() const { return HP; }
 	// プレイヤーの死亡状態を取得
-	bool IsDead() const { return isDead; }
+	bool GetIsAllive() const { return isAllive; }
 	// プレイヤーの弾のリストを取得
 	const std::vector<std::unique_ptr<PlayerBullet>>& GetBullets() const { return bullets; }
 
@@ -71,7 +71,7 @@ public:
 	// プレイヤーのHPを設定
 	void SetHP(int HP) { this->HP = HP; }
 	// プレイヤーの死亡状態を設定
-	void SetIsDead(bool isDead) { this->isDead = isDead; }
+	void SetIsDead(bool isAllive) { this->isAllive = isAllive; }
 	// カメラを設定
 	void SetCamera(Camera* camera) { object3d->SetCamera(camera); }
 
@@ -88,12 +88,16 @@ private:
 	MapChipField* mapChipField = nullptr; // マップチップフィールド
 private:
 	///--------------------------------------------------
-	///				メンバ変数
+	///			メンバ変数
 	///--------------------------------------------------
 
 	std::unique_ptr<Object3d> object3d;                 // 3Dオブジェクト
 	std::vector<std::unique_ptr<PlayerBullet>> bullets; // プレイヤーの弾のリスト
 	float bulletTimer = 0.0f;                           // 発射間隔タイマー
+	float cooldownTime = 0.2f;                          // クールダウン時間（秒）
+
+	float damageCooldownTimer = 0.0f;                   // ダメージクールダウンタイマー
+	float damageCooldownTime = 1.0f;                    // ダメージクールダウン時間（秒）
 
 	Vector3 position; // プレイヤーの位置
 	Vector3 rotation; // プレイヤーの回転
@@ -102,7 +106,7 @@ private:
 	Vector3 velocity; // プレイヤーの速度
 	int HP;           // プレイヤーのHP
 	bool isHit;       // プレイヤーがヒットしたかどうか
-	bool isDead;      // プレイヤーの死亡状態
+	bool isAllive;      // プレイヤーの死亡状態
 
 	//Reticle
 

@@ -117,6 +117,14 @@ void SceneManager::ImGuiDraw() {
 
 }
 
+void SceneManager::ChangeScene(int sceneNo) {
+	//現在のシーンがnullptrでない場合
+	if (currentScene) {
+		//シーン番号を設定
+		currentScene->SetSceneNo(sceneNo);
+	}
+}
+
 void SceneManager::ParticleDraw() {
 	//現在のシーンがnullptrでない場合
 	if (currentScene) {
