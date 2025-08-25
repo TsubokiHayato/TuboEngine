@@ -20,6 +20,7 @@
 #include"SkyBox.h"
 #include"MapChipField.h"
 #include"Block.h"
+#include "SceneManager.h"
 
 
 class StageScene : public IScene {
@@ -67,7 +68,11 @@ public:
 		return camera.get();
 	}
 
+	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
 
+	/// <summary>
+	/// 全ての衝突をチェック
+	/// </summary>
 	void CheckAllCollisions();
 
 private:
