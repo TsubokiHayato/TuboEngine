@@ -6,7 +6,8 @@
 //--------------------------------------------------
 // コンストラクタ
 //--------------------------------------------------
-Player::Player() : cooldownTime(0.2f), damageCooldownTimer(0.0f), damageCooldownTime(1.0f) {}
+Player::Player() : cooldownTime(0.2f), damageCooldownTimer(0.0f), damageCooldownTime(1.0f),
+	isDodging(false), dodgeTimer(0.0f), dodgeCooldownTimer(0.0f), dodgeDuration(0.2f), dodgeCooldown(1.0f), dodgeSpeed(0.5f), dodgeDirection(0.0f, 0.0f, 0.0f) {}
 
 //--------------------------------------------------
 // デストラクタ
@@ -55,6 +56,13 @@ void Player::Initialize() {
 
 	bulletTimer = 0.0f;
 	damageCooldownTimer = 0.0f;
+	isDodging = false;
+	dodgeTimer = 0.0f;
+	dodgeCooldownTimer = 0.0f;
+	dodgeDuration = 0.2f;
+	dodgeCooldown = 1.0f;
+	dodgeSpeed = 0.5f;
+	dodgeDirection = Vector3(0.0f, 0.0f, 0.0f);
 }
 
 //--------------------------------------------------
@@ -66,6 +74,44 @@ void Player::Update() {
 	if (damageCooldownTimer > 0.0f) {
 		damageCooldownTimer -= 1.0f / 60.0f;
 		if (damageCooldownTimer < 0.0f) damageCooldownTimer = 0.0f;
+	}
+	// 回避クールダウンタイマー更新
+	if (dodgeCooldownTimer > 0.0f) {
+		dodgeCooldownTimer -= 1.0f / 60.0f;
+		if (dodgeCooldownTimer < 0.0f) dodgeCooldownTimer = 0.0f;
+	}
+	// 回避中タイマー
+	if (isDodging) {
+		dodgeTimer -= 1.0f / 60.0f;
+		if (dodgeTimer <= 0.0f) {
+			isDodging = false;
+			dodgeCooldownTimer = dodgeCooldown;
+		}
+	}
+	// 回避入力（Zキー）
+	if (!isDodging && dodgeCooldownTimer <= 0.0f && Input::GetInstance()->PushKey(DIK_Z)) {
+		isDodging = true;
+		dodgeTimer = dodgeDuration;
+		// WASD入力方向を優先
+		Vector3 inputDir(0.0f, 0.0f, 0.0f);
+		if (Input::GetInstance()->PushKey(DIK_W)) inputDir.y -= 1.0f;
+		if (Input::GetInstance()->PushKey(DIK_S)) inputDir.y += 1.0f;
+		if (Input::GetInstance()->PushKey(DIK_A)) inputDir.x -= 1.0f;
+		if (Input::GetInstance()->PushKey(DIK_D)) inputDir.x += 1.0f;
+		if (inputDir.x != 0.0f || inputDir.y != 0.0f) {
+			float len = std::sqrt(inputDir.x * inputDir.x + inputDir.y * inputDir.y);
+			if (len > 0.0f) {
+				inputDir.x /= len;
+				inputDir.y /= len;
+			}
+			dodgeDirection = inputDir;
+		} else {
+			// 向いている方向に回避
+			float angle = rotation.z;
+			dodgeDirection.x = std::sin(angle);
+			dodgeDirection.y = -std::cos(angle);
+			dodgeDirection.z = 0.0f;
+		}
 	}
 	Move();
 	Rotate();
@@ -135,6 +181,18 @@ void Player::Draw() {
 // 移動処理
 //--------------------------------------------------
 void Player::Move() {
+	if (isDodging) {
+		// 回避中は向いている方向に高速移動
+		Vector3 tryPosition = position + dodgeDirection * dodgeSpeed;
+		if (mapChipField) {
+			float playerWidth = scale.x * MapChipField::GetBlockWidth() - 0.1f;
+			float playerHeight = scale.y * MapChipField::GetBlockHeight() - 0.1f;
+			if (!mapChipField->IsRectBlocked(tryPosition, playerWidth, playerHeight)) {
+				position = tryPosition;
+			}
+		}
+		return;
+	}
 	// 移動前の座標を保存
 	Vector3 prevPosition = position;
 
@@ -246,6 +304,13 @@ void Player::DrawImGui() {
 	ImGui::Text("Damage Cooldown: %.2f / %.2f", damageCooldownTimer, damageCooldownTime);
 	ImGui::Text("%s", (damageCooldownTimer > 0.0f ? "Invincible" : "Vulnerable"));
 	ImGui::SliderFloat("Damage Cooldown Time", &damageCooldownTime, 0.1f, 3.0f, "%.2f sec");
+	ImGui::Separator();
+	ImGui::Text("Dodge: %s", isDodging ? "Dodging" : (dodgeCooldownTimer > 0.0f ? "Cooldown" : "Ready"));
+	ImGui::Text("Dodge Timer: %.2f / %.2f", dodgeTimer, dodgeDuration);
+	ImGui::Text("Dodge Cooldown: %.2f / %.2f", dodgeCooldownTimer, dodgeCooldown);
+	ImGui::SliderFloat("Dodge Duration", &dodgeDuration, 0.05f, 0.5f, "%.2f sec");
+	ImGui::SliderFloat("Dodge Cooldown", &dodgeCooldown, 0.2f, 3.0f, "%.2f sec");
+	ImGui::SliderFloat("Dodge Speed", &dodgeSpeed, 0.2f, 2.0f, "%.2f");
 	// --- 追加: マップチップ種別表示 ---
 	if (mapChipField) {
 		MapChipField::IndexSet index = mapChipField->GetMapChipIndexSetByPosition(position);
