@@ -1,6 +1,7 @@
 #pragma once
 #include "Camera.h"
 #include "IScene.h"
+#include"SceneManager.h"
 #include "Particle.h"
 #include "ParticleEmitter.h"
 #include <random>
@@ -46,6 +47,8 @@ public:
 	/// </summary>
 	Camera* GetMainCamera() const { return camera.get(); }
 
+	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
+
 private:
 	Object3dCommon* object3dCommon;
 	SpriteCommon* spriteCommon;
@@ -58,15 +61,4 @@ private:
 	Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
 	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
-
-	std::unique_ptr<Particle> particle;
-	std::unique_ptr<ParticleEmitter> particleEmitter_;
-
-	Transform particleTranslate;
-	Vector3 particleVelocity = {0.0f, 0.0f, 0.0f};
-	Vector4 particleColor = {1.0f, 1.0f, 1.0f, 1.0f};
-	float particleLifeTime = 1.0f;
-	float particleCurrentTime = 0.0f;
-
-	
 };

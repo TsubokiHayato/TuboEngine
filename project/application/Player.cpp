@@ -6,7 +6,7 @@
 //--------------------------------------------------
 // コンストラクタ
 //--------------------------------------------------
-Player::Player() {}
+Player::Player() : cooldownTime(0.2f), damageCooldownTimer(0.0f), damageCooldownTime(1.0f) {}
 
 //--------------------------------------------------
 // デストラクタ
@@ -31,9 +31,9 @@ void Player::Initialize() {
 	// プレイヤーの初期速度
 	velocity = Vector3(0.0f, 0.0f, 0.0f);
 	// プレイヤーのHP
-	HP = 100;
+	HP = 5;
 	// プレイヤーの死亡状態
-	isDead = false;
+	isAllive = true;
 
 	// モデルファイルパス
 	const std::string modelFileNamePath = "sphere.obj";
@@ -52,6 +52,9 @@ void Player::Initialize() {
 	// Reticleはプレイヤーの中心に配置
 	reticleSprite = std::make_unique<Sprite>();
 	reticleSprite->Initialize(reticleFileNamePath);
+
+	bulletTimer = 0.0f;
+	damageCooldownTimer = 0.0f;
 }
 
 //--------------------------------------------------
@@ -59,8 +62,15 @@ void Player::Initialize() {
 //--------------------------------------------------
 void Player::Update() {
 	isHit = false;
+	// ダメージクールダウンタイマー更新
+	if (damageCooldownTimer > 0.0f) {
+		damageCooldownTimer -= 1.0f / 60.0f;
+		if (damageCooldownTimer < 0.0f) damageCooldownTimer = 0.0f;
+	}
 	Move();
 	Rotate();
+
+	
 
 	// 発射タイマー更新
 	if (bulletTimer > 0.0f) {
@@ -77,6 +87,10 @@ void Player::Update() {
 
 	// isAlive==false のバレットを削除
 	bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const std::unique_ptr<PlayerBullet>& bullet) { return !bullet->GetIsAlive(); }), bullets.end());
+
+	if (HP <= 0) {
+		isAllive = false; // HPが0以下なら死亡状態にする
+	}
 
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
@@ -101,7 +115,7 @@ void Player::Shoot() {
 		bullet->SetPlayerRotation(rotation);
 		bullet->SetPlayerPosition(position);
 		bullets.push_back(std::move(bullet));
-		bulletTimer = PlayerBullet::s_fireInterval; // 発射間隔をセット
+		bulletTimer = cooldownTime; // クールダウン時間をセット
 	}
 }
 
@@ -198,14 +212,18 @@ Vector3 Player::GetCenterPosition() const {
 void Player::OnCollision(Collider* other) {
 	// 衝突相手のタイプIDを取得
 	uint32_t typeID = other->GetTypeID();
-	if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy)) {
-		// 敵との衝突処理
-		isHit = true; // 衝突したらヒットフラグを立てる
-	} else if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
-		// 武器との衝突処理
-		isHit = true; // 衝突したらヒットフラグを立てる
-	} else {
-		// その他の衝突
+	if (damageCooldownTimer <= 0.0f) {
+		if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy)) {
+			// 敵との衝突処理
+			HP -= 1;      // HPを減らす
+			isHit = true; // 衝突したらヒットフラグを立てる
+			damageCooldownTimer = damageCooldownTime; // ダメージクールダウン開始
+		} else if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
+			// 武器との衝突処理
+			isHit = true; // 衝突したらヒットフラグを立てる
+			damageCooldownTimer = damageCooldownTime; // ダメージクールダウン開始
+		}
+		// その他の衝突は無敵でも通す
 	}
 }
 
@@ -220,24 +238,27 @@ void Player::DrawImGui() {
 	ImGui::Begin("Player");
 	ImGui::Text("HP: %d", HP);
 	ImGui::Text("IsHit: %s", isHit ? "Yes" : "No");
-
+	ImGui::Separator();
+	ImGui::Text("Cooldown: %.2f / %.2f", bulletTimer, cooldownTime);
+	ImGui::Text("%s", (bulletTimer > 0.0f ? "Cooling Down" : "Ready"));
+	ImGui::SliderFloat("Cooldown Time", &cooldownTime, 0.05f, 1.0f, "%.2f sec");
+	ImGui::Separator();
+	ImGui::Text("Damage Cooldown: %.2f / %.2f", damageCooldownTimer, damageCooldownTime);
+	ImGui::Text("%s", (damageCooldownTimer > 0.0f ? "Invincible" : "Vulnerable"));
+	ImGui::SliderFloat("Damage Cooldown Time", &damageCooldownTime, 0.1f, 3.0f, "%.2f sec");
 	// --- 追加: マップチップ種別表示 ---
 	if (mapChipField) {
-		if (mapChipField) {
-			MapChipField::IndexSet index = mapChipField->GetMapChipIndexSetByPosition(position);
-			MapChipType type = mapChipField->GetMapChipTypeByIndex(index.xIndex, index.yIndex);
-			const char* typeStr = "Unknown";
-			if (type == MapChipType::kBlank)
-				typeStr = "Blank";
-			else if (type == MapChipType::kBlock)
-				typeStr = "Block";
-			ImGui::Separator();
-			ImGui::Text("MapChip: %s", typeStr);
-		}
+		MapChipField::IndexSet index = mapChipField->GetMapChipIndexSetByPosition(position);
+		MapChipType type = mapChipField->GetMapChipTypeByIndex(index.xIndex, index.yIndex);
+		const char* typeStr = "Unknown";
+		if (type == MapChipType::kBlank)
+			typeStr = "Blank";
+		else if (type == MapChipType::kBlock)
+			typeStr = "Block";
+		ImGui::Separator();
+		ImGui::Text("MapChip: %s", typeStr);
 	}
-
 	ImGui::End();
-
 	object3d->DrawImGui("Player");
 	PlayerBullet::DrawImGuiGlobal();
 }
