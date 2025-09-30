@@ -13,6 +13,9 @@ Camera::Camera()
 	, projectionMatrix_(MakePerspectiveMatrix(fovY_, aspect_, nearClip_, farClip_))
 	, viewProjectionMatrix_(Multiply(viewMatrix_, projectionMatrix_))
 {
+	// 例: BlenderのカメラFOVが50度の場合
+	constexpr float kBlenderFovY = 50.0f * 3.14159265358979323846f / 180.0f; // 50度→ラジアン
+	fovY_ = kBlenderFovY;
 }
 
 
