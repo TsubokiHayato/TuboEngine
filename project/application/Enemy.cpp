@@ -37,7 +37,7 @@ void Enemy::Initialize() {
 	particleEmitter_ = nullptr;
 
 	// スプライト初期化
-	exclamationSprite_ = std::make_unique<Sprite>();
+	/*exclamationSprite_ = std::make_unique<Sprite>();
 	exclamationSprite_->Initialize("exclamation.png");
 	exclamationSprite_->SetSize({ stateIconSize * 100.0f, stateIconSize * 100.0f });
 	exclamationSprite_->SetColor(stateIconColor);
@@ -47,7 +47,7 @@ void Enemy::Initialize() {
 	questionSprite_->Initialize("question.png");
 	questionSprite_->SetSize({ stateIconSize * 100.0f, stateIconSize * 100.0f });
 	questionSprite_->SetColor(stateIconColor);
-	questionSprite_->SetAnchorPoint({0.5f, 0.0f});
+	questionSprite_->SetAnchorPoint({0.5f, 0.0f});*/
 }
 
 // 角度差分を[-π, π]に正規化する関数
@@ -424,35 +424,35 @@ void Enemy::DrawLastSeenMark() {
 }
 
 void Enemy::DrawStateIcon() {
-    Vector3 base = position + Vector3{0, 0, stateIconHeight};
-    float size = stateIconSize;
-    Vector4 color = stateIconColor;
+    //Vector3 base = position + Vector3{0, 0, stateIconHeight};
+    //float size = stateIconSize;
+    //Vector4 color = stateIconColor;
 
-    if (showSurpriseIcon_) {
-        // 左に「？」、右に「！」
-        if (questionSprite_) {
-            questionSprite_->SetPosition({ base.x - 0.4f * size * 100.0f, base.y + base.z * 20.0f });
-            questionSprite_->SetColor(color);
-            questionSprite_->Draw();
-        }
-        if (exclamationSprite_) {
-            exclamationSprite_->SetPosition({ base.x + 0.4f * size * 100.0f, base.y + base.z * 20.0f });
-            exclamationSprite_->SetColor(color);
-            exclamationSprite_->Draw();
-        }
-    } else if (state_ == State::Chase) {
-        if (exclamationSprite_) {
-            exclamationSprite_->SetPosition({ base.x, base.y + base.z * 20.0f });
-            exclamationSprite_->SetColor(color);
-            exclamationSprite_->Draw();
-        }
-    } else if (state_ == State::Alert || state_ == State::LookAround) {
-        if (questionSprite_) {
-            questionSprite_->SetPosition({ base.x, base.y + base.z * 20.0f });
-            questionSprite_->SetColor(color);
-            questionSprite_->Draw();
-        }
-    }
+    //if (showSurpriseIcon_) {
+    //    // 左に「？」、右に「！」
+    //    if (questionSprite_) {
+    //        questionSprite_->SetPosition({ base.x - 0.4f * size * 100.0f, base.y + base.z * 20.0f });
+    //        questionSprite_->SetColor(color);
+    //        questionSprite_->Draw();
+    //    }
+    //    if (exclamationSprite_) {
+    //        exclamationSprite_->SetPosition({ base.x + 0.4f * size * 100.0f, base.y + base.z * 20.0f });
+    //        exclamationSprite_->SetColor(color);
+    //        exclamationSprite_->Draw();
+    //    }
+    //} else if (state_ == State::Chase) {
+    //    if (exclamationSprite_) {
+    //        exclamationSprite_->SetPosition({ base.x, base.y + base.z * 20.0f });
+    //        exclamationSprite_->SetColor(color);
+    //        exclamationSprite_->Draw();
+    //    }
+    //} else if (state_ == State::Alert || state_ == State::LookAround) {
+    //    if (questionSprite_) {
+    //        questionSprite_->SetPosition({ base.x, base.y + base.z * 20.0f });
+    //        questionSprite_->SetColor(color);
+    //        questionSprite_->Draw();
+    //    }
+    //}
 }
 
 // 太いビックリマーク

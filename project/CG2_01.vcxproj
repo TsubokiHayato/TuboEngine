@@ -112,6 +112,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="StageState\GameOverState.cpp" />
+    <ClCompile Include="StageState\GameClearState.cpp" />
+    <ClCompile Include="StageState\BossState.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\BloomEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\BloomPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.cpp" />
@@ -162,6 +165,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\line\LineCommon.cpp" />
     <ClCompile Include="engine\graphic\line\LineManager.cpp" />
     <ClCompile Include="engine\graphic\PSO\LinePSO.cpp" />
+    <ClCompile Include="StageState\RewardSelectState.cpp" />
+    <ClCompile Include="StageState\StageClearState.cpp" />
+    <ClCompile Include="StageState\StagePlayingState.cpp" />
+    <ClCompile Include="StageState\IStageState.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\graphic\3d\Model.cpp" />
     <ClCompile Include="engine\graphic\3d\ModelManager.cpp" />
@@ -209,10 +216,15 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\SkyBox\SkyBoxCommon.cpp" />
     <ClCompile Include="engine\graphic\PSO\SkyBoxPSO.cpp" />
     <ClCompile Include="application\MapChipField.cpp" />
+    <ClCompile Include="StageState\StageReadyState.cpp" />
+    <ClCompile Include="StageState\StageStateManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\Player.h" />
     <ClInclude Include="application\PlayerBullet.h" />
+    <ClInclude Include="StageState\GameOverState.h" />
+    <ClInclude Include="StageState\GameClearState.h" />
+    <ClInclude Include="StageState\BossState.h" />
     <ClInclude Include="engine\graphic\PostEffect\BloomEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\BloomPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.h" />
@@ -329,6 +341,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\Animation\KeyFrame.h" />
     <ClInclude Include="engine\graphic\Animation\Animation.h" />
     <ClInclude Include="engine\math\Quaternion.h" />
+    <ClInclude Include="StageState\RewardSelectState.h" />
+    <ClInclude Include="StageState\StageClearState.h" />
+    <ClInclude Include="StageState\StagePlayingState.h" />
+    <ClInclude Include="StageState\IStageState.h" />
+    <ClInclude Include="StageState\StageReadyState.h" />
+    <ClInclude Include="StageState\StageStateManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\imgui\imgui.vcxproj">
