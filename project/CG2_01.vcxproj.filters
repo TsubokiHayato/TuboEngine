@@ -104,6 +104,15 @@
     <ClCompile Include="engine\graphic\PSO\PostEffect\ToonPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\BloomPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\BloomEffect.cpp" />
+    <ClCompile Include="StageState\StageStateManager.cpp" />
+    <ClCompile Include="StageState\IStageState.cpp" />
+    <ClCompile Include="StageState\StageReadyState.cpp" />
+    <ClCompile Include="StageState\StagePlayingState.cpp" />
+    <ClCompile Include="StageState\StageClearState.cpp" />
+    <ClCompile Include="StageState\RewardSelectState.cpp" />
+    <ClCompile Include="StageState\BossState.cpp" />
+    <ClCompile Include="StageState\GameClearState.cpp" />
+    <ClCompile Include="StageState\GameOverState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseCharacter.h" />
@@ -224,6 +233,15 @@
     <ClInclude Include="engine\graphic\PostEffect\BloomEffect.h" />
     <ClInclude Include="application\PlayerBullet.h" />
     <ClInclude Include="application\Player.h" />
+    <ClInclude Include="StageState\StageStateManager.h" />
+    <ClInclude Include="StageState\IStageState.h" />
+    <ClInclude Include="StageState\StageReadyState.h" />
+    <ClInclude Include="StageState\StagePlayingState.h" />
+    <ClInclude Include="StageState\StageClearState.h" />
+    <ClInclude Include="StageState\RewardSelectState.h" />
+    <ClInclude Include="StageState\BossState.h" />
+    <ClInclude Include="StageState\GameClearState.h" />
+    <ClInclude Include="StageState\GameOverState.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />

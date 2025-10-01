@@ -20,8 +20,9 @@
 #include"SkyBox.h"
 #include"MapChipField.h"
 #include"Block.h"
-#include "SceneManager.h"
-
+#include"SceneManager.h"
+#include <memory>
+#include "StageState/StageStateManager.h"
 
 class StageScene : public IScene {
 public:
@@ -75,12 +76,20 @@ public:
 	/// </summary>
 	void CheckAllCollisions();
 
-private:
+public:
 	///----------------------------------------------------------------------------------------
 	///				引き渡し用変数
 	///-----------------------------------------------------------------------------------------
 
-	
+	Player* GetPlayer() const { return player_.get(); }
+	MapChipField* GetMapChipField() const { return mapChipField_.get(); }
+	std::vector<std::unique_ptr<Block>>& GetBlocks() { return blocks_; }
+	std::vector<std::unique_ptr<Enemy>>& GetEnemies() { return enemies; }
+
+	FollowTopDownCamera* GetFollowCamera() const { return followCamera.get(); }
+	std::string& GetMapChipCsvFilePath() { return mapChipCsvFilePath_; }
+
+
 private:
 	///----------------------------------------------------------------------------------------
 	///				メンバ変数
@@ -105,10 +114,18 @@ private:
 	/// Enemy ///
 	std::unique_ptr<Enemy> enemy_ = nullptr;
 	std::vector<std::unique_ptr<Enemy>> enemies; // Enemyリスト
+
+	/// SkyBox ///
 	std::unique_ptr<SkyBox> skyBox_ = nullptr;
 
 	/// MapChipField ///
 	std::unique_ptr<MapChipField> mapChipField_ = nullptr;
 	std::string mapChipCsvFilePath_ = "Resources/MapChip.csv"; // マップチップCSVファイルパス
+
+	/// Block ///
 	std::vector<std::unique_ptr<Block>> blocks_;
+
+	/// StageStateManager ///
+	std::unique_ptr<StageStateManager> stateManager_;
+
 };

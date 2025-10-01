@@ -160,7 +160,7 @@ private:
 	float stateIconHeight = 3.0f;          // アイコン高さ
 	float stateIconLineWidth = 0.08f; // アイコンの線の太さ
 
-	///----- スプライト -----///
-	std::unique_ptr<Sprite> exclamationSprite_; // ！スプライト
-	std::unique_ptr<Sprite> questionSprite_;    // ？スプライト
+	/////----- スプライト -----///
+	//std::unique_ptr<Sprite> exclamationSprite_; // ！スプライト
+	//std::unique_ptr<Sprite> questionSprite_;    // ？スプライト
 };
