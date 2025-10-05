@@ -1,9 +1,11 @@
 #pragma once
 #include "Camera.h"
 #include "IScene.h"
-#include"SceneManager.h"
+#include "Object3d.h"
 #include "Particle.h"
 #include "ParticleEmitter.h"
+#include "SceneManager.h"
+#include "TitleUI.h"
 #include <random>
 class TitleScene : public IScene {
 public:
@@ -50,15 +52,10 @@ public:
 	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
 
 private:
-	Object3dCommon* object3dCommon;
-	SpriteCommon* spriteCommon;
-	ParticleCommon* particleCommon;
-	WinApp* winApp;
-	DirectXCommon* dxCommon;
-
-private:
 	std::unique_ptr<Camera> camera;
 	Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
 	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
+
+	std::unique_ptr<TitleUI> titleUI;
 };
