@@ -232,11 +232,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\SkyBox\SkyBox.cpp" />
     <ClCompile Include="engine\graphic\SkyBox\SkyBoxCommon.cpp" />
     <ClCompile Include="engine\graphic\PSO\SkyBoxPSO.cpp" />
-    <ClCompile Include="application\MapChip\MapChipField.cpp" />
-    <ClCompile Include="application\Animation\SceneChangeAnimation.cpp" />
-    <ClCompile Include="application\Tile\Tile.cpp" />
-    <ClCompile Include="engine\scene\OverScene.cpp" />
-    <ClCompile Include="application\SkyDome\SkyDome.cpp" />
+    <ClCompile Include="application\MapChipField.cpp" />
+    <ClCompile Include="TitleUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\Character\Player\Player.h" />
@@ -371,10 +368,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\Animation\KeyFrame.h" />
     <ClInclude Include="engine\graphic\Animation\Animation.h" />
     <ClInclude Include="engine\math\Quaternion.h" />
-    <ClInclude Include="application\Animation\SceneChangeAnimation.h" />
-    <ClInclude Include="application\Tile\Tile.h" />
-    <ClInclude Include="engine\scene\OverScene.h" />
-    <ClInclude Include="application\SkyDome\SkyDome.h" />
+    <ClInclude Include="SceneType.h" />
+    <ClInclude Include="TitleUI.h" />
+    <ClInclude Include="TitleUIButton.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">

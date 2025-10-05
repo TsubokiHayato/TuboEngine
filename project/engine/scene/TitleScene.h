@@ -1,8 +1,11 @@
 #pragma once
 #include "Camera.h"
 #include "IScene.h"
+#include "Object3d.h"
 #include "Particle.h"
 #include "ParticleEmitter.h"
+#include "SceneManager.h"
+#include "TitleUI.h"
 #include <random>
 #include "Animation/SceneChangeAnimation.h"
 
@@ -49,19 +52,10 @@ public:
 	Camera* GetMainCamera() const { return camera.get(); }
 
 private:
-	Object3dCommon* object3dCommon;
-	SpriteCommon* spriteCommon;
-	ParticleCommon* particleCommon;
-	WinApp* winApp;
-	DirectXCommon* dxCommon;
-
-private:
 	std::unique_ptr<Camera> camera;
 	Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
 	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
 
-	// --- ここを追加 ---
-	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation;
-	bool isRequestSceneChange = false;
+	std::unique_ptr<TitleUI> titleUI;
 };
