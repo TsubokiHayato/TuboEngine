@@ -1,16 +1,17 @@
 #include "SceneChangeAnimation.h"
 #include "ImGuiManager.h"
+#include "SceneChangeAnimation.h"
 #include "TextureManager.h"
 
 SceneChangeAnimation::SceneChangeAnimation(int screenWidth, int screenHeight, int blockSize, float duration, const std::string& blockTexturePath)
     : m_screenWidth(screenWidth), m_screenHeight(screenHeight), m_blockSize(blockSize), m_duration(duration), m_elapsed(0.0f), m_rng(std::random_device{}()), m_blockTexturePath(blockTexturePath),
-      m_phase(Phase::Appearing) {
+      m_phase(Phase::Disappearing) {
 	InitializeBlocks();
 }
 
 void SceneChangeAnimation::Initialize() {
 	m_elapsed = 0.0f;
-	m_phase = Phase::Appearing;
+	m_phase = Phase::Disappearing;
 	InitializeBlocks();
 }
 
@@ -26,7 +27,12 @@ void SceneChangeAnimation::InitializeBlocks() {
 			Block block;
 			block.x = x * m_blockSize;
 			block.y = y * m_blockSize;
-			block.alpha = 0.0f;
+			// フェーズによって初期アルファを切り替え
+			if (m_phase == Phase::Disappearing) {
+				block.alpha = 1.0f; // 覆いがある状態から消す
+			} else {
+				block.alpha = 0.0f; // 覆いがない状態から出す
+			}
 			float progress = (x + y) / maxIndexSum;
 			float randomOffset = (static_cast<float>(m_rng() % 1000) / 1000.0f) * 0.15f;
 			block.delay = (m_duration * 0.7f) * (progress + randomOffset * (1.0f - progress));
@@ -43,7 +49,7 @@ void SceneChangeAnimation::InitializeBlocks() {
 			float r = 1.0f - progress;
 			float g = 0.0f;
 			float b = progress;
-			block.sprite->SetColor({ r, g, b, 0.0f });
+			block.sprite->SetColor({ r, g, b, block.alpha }); // ←ここもblock.alphaをセット
 
 			m_blocks.push_back(std::move(block));
 		}
@@ -52,62 +58,65 @@ void SceneChangeAnimation::InitializeBlocks() {
 
 void SceneChangeAnimation::Update(float deltaTime) {
 	m_elapsed += deltaTime;
-	bool allAppeared = true;
-	bool allDisappeared = true;
 
-	for (auto& block : m_blocks) {
-		float t = 0.0f;
-		if (m_phase == Phase::Appearing) {
-			if (m_elapsed > block.delay && block.alpha < 1.0f) {
-				// イージングを使って滑らかに
-				t = (m_elapsed - block.delay) / (m_duration * 0.3f);
-				if (t > 1.0f)
-					t = 1.0f;
-				block.alpha = EaseInOut(t);
-				if (block.alpha > 1.0f)
-					block.alpha = 1.0f;
-				auto color = block.sprite->GetColor();
-				color.w = block.alpha;
-				block.sprite->SetColor(color);
+    if (m_phase == Phase::Appearing) {
+        UpdateAppearing(deltaTime);
+    } else if (m_phase == Phase::Disappearing) {
+        UpdateDisappearing(deltaTime);
+    }
+}
 
-				// フェードイン時
-				float appearScale = m_appearScaleMin + (m_appearScaleMax - m_appearScaleMin) * EaseInOut(t);
-				float appearRot = m_appearRotMax * (1.0f - EaseInOut(t));
-				block.sprite->SetSize({m_blockSize * appearScale, m_blockSize * appearScale});
-				block.sprite->SetRotation(appearRot);
-			}
-			if (block.alpha < 1.0f)
-				allAppeared = false;
-		} else if (m_phase == Phase::Disappearing) {
-			if (m_elapsed > block.delay && block.alpha > 0.0f) {
-				t = (m_elapsed - block.delay) / (m_duration * 0.3f);
-				if (t > 1.0f)
-					t = 1.0f;
-				block.alpha = 1.0f - EaseInOut(t);
-				if (block.alpha < 0.0f)
-					block.alpha = 0.0f;
-				auto color = block.sprite->GetColor();
-				color.w = block.alpha;
-				block.sprite->SetColor(color);
+void SceneChangeAnimation::UpdateAppearing(float deltaTime) {
+    bool allAppeared = true;
+    for (auto& block : m_blocks) {
+        float t = 0.0f;
+        if (m_elapsed > block.delay && block.alpha < 1.0f) {
+            t = (m_elapsed - block.delay) / (m_duration * 0.3f);
+            if (t > 1.0f) t = 1.0f;
+            block.alpha = EaseInOut(t);
+            if (block.alpha > 1.0f) block.alpha = 1.0f;
+            auto color = block.sprite->GetColor();
+            color.w = block.alpha;
+            block.sprite->SetColor(color);
 
-				// フェードアウト時
-				float disappearScale = m_disappearScaleMax - (m_disappearScaleMax - m_disappearScaleMin) * EaseInOut(t);
-				float disappearRot = m_disappearRotMax * EaseInOut(t);
-				block.sprite->SetSize({m_blockSize * disappearScale, m_blockSize * disappearScale});
-				block.sprite->SetRotation(disappearRot);
-			}
-			if (block.alpha > 0.0f)
-				allDisappeared = false;
-		}
-		block.sprite->Update();
-	}
+            float appearScale = m_appearScaleMin + (m_appearScaleMax - m_appearScaleMin) * EaseInOut(t);
+            float appearRot = m_appearRotMax * (1.0f - EaseInOut(t));
+            block.sprite->SetSize({m_blockSize * appearScale, m_blockSize * appearScale});
+            block.sprite->SetRotation(appearRot);
+        }
+        if (block.alpha < 1.0f) allAppeared = false;
+        block.sprite->Update();
+    }
+    if (allAppeared) {
+        m_phase = Phase::Finished; // ←ここを追加
+        m_elapsed = 0.0f;
+    }
+}
 
-	if (m_phase == Phase::Appearing && allAppeared) {
-		m_phase = Phase::Disappearing;
-		m_elapsed = 0.0f;
-	} else if (m_phase == Phase::Disappearing && allDisappeared) {
-		m_phase = Phase::Finished;
-	}
+void SceneChangeAnimation::UpdateDisappearing(float deltaTime) {
+    bool allDisappeared = true;
+    for (auto& block : m_blocks) {
+        float t = 0.0f;
+        if (m_elapsed > block.delay && block.alpha > 0.0f) {
+            t = (m_elapsed - block.delay) / (m_duration * 0.3f);
+            if (t > 1.0f) t = 1.0f;
+            block.alpha = 1.0f - EaseInOut(t);
+            if (block.alpha < 0.0f) block.alpha = 0.0f;
+            auto color = block.sprite->GetColor();
+            color.w = block.alpha;
+            block.sprite->SetColor(color);
+
+            float disappearScale = m_disappearScaleMax - (m_disappearScaleMax - m_disappearScaleMin) * EaseInOut(t);
+            float disappearRot = m_disappearRotMax * EaseInOut(t);
+            block.sprite->SetSize({m_blockSize * disappearScale, m_blockSize * disappearScale});
+            block.sprite->SetRotation(disappearRot);
+        }
+        if (block.alpha > 0.0f) allDisappeared = false;
+        block.sprite->Update();
+    }
+    if (allDisappeared) {
+        m_phase = Phase::Finished;
+    }
 }
 
 // S字イージング関数
@@ -177,4 +186,10 @@ void SceneChangeAnimation::DrawImGui() {
 	ImGui::Text("IsFinished: %s", IsFinished() ? "Yes" : "No");
 
 	ImGui::End();
+}
+
+void SceneChangeAnimation::SetPhase(Phase phase) {
+    m_phase = phase;
+    m_elapsed = 0.0f;
+    InitializeBlocks();
 }
