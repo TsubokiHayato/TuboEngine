@@ -5,12 +5,14 @@
 #include "Particle.h"
 #include "ParticleEmitter.h"
 #include <random>
+#include "SceneChangeAnimation.h"
+
 class TitleScene : public IScene {
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize();
+	void Initialize() override;
 
 	/// <summary>
 	/// 更新
@@ -61,4 +63,8 @@ private:
 	Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
 	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
+
+	// --- ここを追加 ---
+	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation;
+	bool isRequestSceneChange = false;
 };
