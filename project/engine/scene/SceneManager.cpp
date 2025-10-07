@@ -17,7 +17,7 @@ void SceneManager::Initialize() {
 	currentSceneNo = 0;
 	//前のシーン番号を設定
 	prevSceneNo = -1;
-}
+}	
 
 void SceneManager::Update() {
 	//現在のシーンがnullptrでない場合

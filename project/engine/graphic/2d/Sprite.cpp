@@ -114,7 +114,7 @@ void Sprite::Initialize(std::string textureFilePath)
 
 	textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFilePath);
 
-
+	AdjustTextureSize();
 }
 
 void Sprite::Update()
@@ -160,10 +160,6 @@ void Sprite::Update()
 	//テクスチャの初期サイズを呼び出す関数
 	if (isAdjustTextureSize) {
 		AdjustTextureSize();
-	}
-	else {
-		textureSize_ = { 100.0f,100.0f };
-		size = textureSize_;
 	}
 
 	/*---------------------------------------
