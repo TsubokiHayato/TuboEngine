@@ -67,11 +67,10 @@ public:
 	/// <summary>
 	/// グリッド描画
 	/// </summary>
-	/// <param name="size">グリッドのサイズ</param>
-	/// <param name="split">分割数</param>
+	/// <param name="gridSize">グリッドのサイズ</param>
+	/// <param name="divisions">分割数</param>
 	/// <param name="color">グリッドの色</param>
-	/// <param name="rotation">グリッドの回転</param>
-	void DrawGrid(float size, int split, const Vector3& rotation = {0.0f, 0.0f, 0.0f}, const Vector4& color = {0.0f, 0.0f, 0.0f, 1.0f} );
+	void DrawGrid(float gridSize, int divisions, const Vector4& color);
 
 	/// <summary>
 	/// 球描画
