@@ -1,7 +1,6 @@
 #pragma once
 #include "BaseCharacter.h"
 #include "EnemyNormalBullet.h"
-#include "MapChipField.h"
 #include "Particle.h"
 #include "ParticleEmitter.h"
 
@@ -25,14 +24,6 @@ public:
 	void DrawImGui();
 
 	void Move();
-
-	// プレイヤーの方向を向く
-	bool CanSeePlayer();
-	// 視野扇形の描画
-	void DrawViewCone();
-
-	void DrawLastSeenMark();
-
 	// ヒット演出のトリガー
 	void EmitHitParticle();
 
@@ -69,59 +60,41 @@ public:
 
 	void SetPlayer(Player* player) { player_ = player; }
 
-	// マップチップフィールド
-	void SetMapChipField(MapChipField* field) { mapChipField = field; }
-
 	///----------------------------------
 	///				受取り変数
 	/// ---------------------------------
 private:
-	Camera* camera_ = nullptr;            // カメラ
-	MapChipField* mapChipField = nullptr; // マップチップフィールドへのポインタ
-	Player* player_ = nullptr;            // プレイヤーへのポインタ
+	Camera* camera_ = nullptr; // カメラ
 
 	///---------------------------------------
 	///				メンバ変数
 	///---------------------------------------
 public:
 	enum class State {
-		Idle, // 待機
-		Move, // 移動
-		Shoot // 射撃
+		Idle,   // 待機
+		Move,   // 移動
+		Shoot   // 射撃
 	};
 
 private:
+	///-----Enemy-----///
+	Vector3 position;                   // 初期位置
+	Vector3 rotation;                   // 初期回転
+	Vector3 scale = {1.0f, 1.0f, 1.0f}; // 初期スケール
+	Vector3 velocity;                   // プレイヤーの速度
+	int HP = 100;                       // 敵のHP
+	bool isAlive = true;                // 敵が生きているかどうかのフラグ
+	bool isHit = false;                 // 衝突判定フラグ
+	bool wasHit = false;                // 前フレームのisHit
+	float turnSpeed_ = 0.1f;            // プレイヤー方向を向く回転補間率（0.0f〜1.0f）
+	std::unique_ptr<Object3d> object3d; // 3Dオブジェクト
+	State state_ = State::Move;         // 行動状態（移動/射撃）
+	float shootDistance_ = 7.0f;        // プレイヤーに近づく距離の閾値（例: 7.0f）
+	float moveSpeed_ = 0.08f;           // 移動速度
+	float moveStartDistance_ = 15.0f;   // 移動開始距離（これより遠いとIdle）
 
-	///-------トランスフォーム------///
-	Vector3 position;                              // 初期位置
-	Vector3 rotation;                              // 初期回転
-	Vector3 scale = {1.0f, 1.0f, 1.0f};            // 初期スケール
-
-
-	Vector3 velocity;                              // プレイヤーの速度
-	float turnSpeed_ = 0.1f;                       // プレイヤー方向を向く回転補間率（0.0f〜1.0f）
-	float moveSpeed_ = 0.08f;                      // 移動速度
-	float shootDistance_ = 7.0f;                   // プレイヤーに近づく距離の閾値（例: 7.0f）
-	float moveStartDistance_ = 15.0f;              // 移動開始距離（これより遠いとIdle）
-
-	int HP = 100;                                  // 敵のHP
-	bool isAlive = true;                           // 敵が生きているかどうかのフラグ
-	bool isHit = false;                            // 衝突判定フラグ
-	bool wasHit = false;                           // 前フレームのisHit
-	
-	std::unique_ptr<Object3d> object3d;            // 3Dオブジェクト
-	State state_ = State::Move;                    // 行動状態（移動/射撃）
-	
-
-	///--視野--///
-	float kViewAngleDeg = 90.0f;                   // 視野角（度）
-	float kViewDistance = 10.0f;                   // 視認距離
-	int kViewLineDiv = 16;                         // 視野扇形の分割数
-	Vector4 kViewColor = {1.0f, 1.0f, 0.0f, 0.7f}; // 視野ライン色
-	Vector3 lastSeenPlayerPos = {0.0f, 0.0f, 0.0f};
-	float lastSeenTimer = 0.0f;
-	float kLastSeenDuration = 3.0f; // 見失ってから追跡する秒数
-
+	///-----Player-----///
+	Player* player_ = nullptr; // プレイヤーへのポインタ
 
 	///-----Bullet-----///
 	std::unique_ptr<EnemyNormalBullet> bullet; // 敵の弾
