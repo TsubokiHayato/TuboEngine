@@ -295,7 +295,7 @@ void Enemy::DrawImGui() {
 	ImGui::Text("Enemy Position: (%.2f, %.2f, %.2f)", position.x, position.y, position.z);
 	ImGui::Text("Enemy Velocity: (%.2f, %.2f, %.2f)", velocity.x, velocity.y, velocity.z);
 	ImGui::Text("Enemy HP: %d", HP);
-	ImGui::Text("Enemy Alive: %s", isAlive ? "Yes" : "No");
+	ImGui::Text("Enemy Alive: %s", isAllive ? "Yes" : "No");
 	ImGui::Text("Hit: %s", isHit ? "Yes" : "No");
 	ImGui::Text("wasHit: %s", isHit ? "Yes" : "No");
 	ImGui::SliderFloat("Turn Speed", &turnSpeed_, 0.01f, 1.0f, "%.2f");

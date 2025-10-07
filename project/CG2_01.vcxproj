@@ -347,6 +347,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="StageState\IStageState.h" />
     <ClInclude Include="StageState\StageReadyState.h" />
     <ClInclude Include="StageState\StageStateManager.h" />
+    <ClInclude Include="StageState\StageType.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\imgui\imgui.vcxproj">

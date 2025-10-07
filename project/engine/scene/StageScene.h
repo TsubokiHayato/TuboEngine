@@ -89,6 +89,8 @@ public:
 	FollowTopDownCamera* GetFollowCamera() const { return followCamera.get(); }
 	std::string& GetMapChipCsvFilePath() { return mapChipCsvFilePath_; }
 
+	StageStateManager* GetStageStateManager() { return stateManager_.get(); }
+
 
 private:
 	///----------------------------------------------------------------------------------------
