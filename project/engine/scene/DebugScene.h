@@ -82,26 +82,7 @@ private:
 	///Audio///
 	std::unique_ptr<Audio> audio = nullptr;
 	
-	///Sprite///
-
 	
-	std::vector<Sprite*> sprites;
-
-	///Model///
-
-	std::unique_ptr<Object3d> object3d;
-	Vector3 modelPosition = { 0.0f,0.0f,0.0f };
-	Vector3 modelRotation = { 0.0f,0.0f,0.0f };
-	Vector3 modelScale = { 1.0f,1.0f,1.0f };
-
-
-
-	std::unique_ptr <Object3d> object3d2;
-	Vector3 modelPosition2 = { 0.0f,0.0f,0.0f };
-	Vector3 modelRotation2 = { 0.0f,0.0f,0.0f };
-	Vector3 modelScale2 = { 1.0f,1.0f,1.0f };
-
-
 	//Camera///
 
 	std::unique_ptr <Camera> camera = nullptr;
@@ -125,6 +106,9 @@ private:
 	///SkyBox
 	
 	std::unique_ptr<SkyBox> skyBox = nullptr;
-	
+
+	/// SceneChangeAnimation
+	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation = nullptr;
+	bool isRequestSceneChange = false;
 };
 
