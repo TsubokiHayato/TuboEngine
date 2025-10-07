@@ -4,6 +4,7 @@
 #include "ImGuiManager.h"
 #include "TextureManager.h"
 #include "Player.h"
+#include "LineManager.h"
 #include <cmath>
 
 constexpr float kPI = 3.14159265358979323846f;
@@ -37,13 +38,13 @@ void Enemy::Initialize() {
 	particleEmitter_ = nullptr;
 }
 
+
 // 角度差分を[-π, π]に正規化する関数
 static float NormalizeAngle(float angle) {
 	while (angle > kPI) angle -= 2.0f * kPI;
 	while (angle < -kPI) angle += 2.0f * kPI;
 	return angle;
 }
-
 void Enemy::Update() {
 	// プレイヤーがいれば距離と方向を計算
 	float distanceToPlayer = 0.0f;
@@ -53,20 +54,39 @@ void Enemy::Update() {
 		distanceToPlayer = std::sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y + toPlayer.z * toPlayer.z);
 	}
 
+	// --- 視覚ギミック追加 ---
+	bool canSeePlayer = CanSeePlayer();
+
+	// --- 追加: 発見記憶ロジック ---
+	if (canSeePlayer) {
+		lastSeenPlayerPos = player_->GetPosition();
+		lastSeenTimer = kLastSeenDuration;
+	} else if (lastSeenTimer > 0.0f) {
+		lastSeenTimer -= 1.0f / 60.0f; // 60FPS前提
+	}
+
 	// 状態遷移
 	if (player_) {
-		if (distanceToPlayer > moveStartDistance_) {
-			state_ = State::Idle; // 一定以上離れていると待機
-		} else if (distanceToPlayer > shootDistance_) {
-			state_ = State::Move; // 移動範囲内
+		if (canSeePlayer) {
+			if (distanceToPlayer > moveStartDistance_) {
+				state_ = State::Idle;
+			} else if (distanceToPlayer > shootDistance_) {
+				state_ = State::Move;
+			} else {
+				state_ = State::Shoot;
+			}
+		} else if (lastSeenTimer > 0.0f) {
+			state_ = State::Move; // 見失ってもラストスポットへ移動
 		} else {
-			state_ = State::Shoot; // 射撃範囲内
+			state_ = State::Idle;
 		}
 	}
+
 	// プレイヤーの方向を向く（一定速度で回転）
-	if (player_ && state_ != State::Idle) {
-		// atan2(toPlayer.y, toPlayer.x)で「右が0度、上が+90度」基準
-		float angleZ = std::atan2(toPlayer.y, toPlayer.x);
+	if (player_ && (state_ == State::Move || state_ == State::Shoot)) {
+		Vector3 targetPos = (canSeePlayer) ? player_->GetPosition() : lastSeenPlayerPos;
+		Vector3 toTarget = targetPos - position;
+		float angleZ = std::atan2(toTarget.y, toTarget.x);
 		float diff = NormalizeAngle(angleZ - rotation.z);
 		float maxTurn = turnSpeed_;
 		if (std::fabs(diff) < maxTurn) {
@@ -82,58 +102,54 @@ void Enemy::Update() {
 	case State::Idle:
 		// 何もしない
 		break;
-	case State::Move:
-		if (player_) {
-			// Z軸は無視してXY平面で移動
-			Vector3 dir = toPlayer;
-			dir.z = 0.0f;
-			float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-			if (len > 0.001f) {
-				dir.x /= len;
-				dir.y /= len;
-				position.x += dir.x * moveSpeed_;
-				position.y += dir.y * moveSpeed_;
+	case State::Move: {
+		Vector3 targetPos = (canSeePlayer) ? player_->GetPosition() : lastSeenPlayerPos;
+		Vector3 dir = targetPos - position;
+		dir.z = 0.0f;
+		float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+		if (len > 0.1f) {
+			dir.x /= len;
+			dir.y /= len;
+			position.x += dir.x * moveSpeed_;
+			position.y += dir.y * moveSpeed_;
+		}
+		// ラストスポット到達で記憶解除
+		if (!canSeePlayer && len < 0.2f) {
+			lastSeenTimer = 0.0f;
+		}
+	} break;
+	case State::Shoot: {
+		static float bulletTimer = 0.0f;
+		bulletTimer += 1.0f / 60.0f;
+		if (bulletTimer >= 1.0f) {
+			bulletTimer = 0.0f;
+			if (player_) {
+				bullet = std::make_unique<EnemyNormalBullet>();
+				bullet->Initialize(position);
+				bullet->SetEnemyPosition(position);
+				bullet->SetEnemyRotation(rotation);
+				bullet->SetPlayer(player_);
+				bullet->SetCamera(camera_);
 			}
 		}
-		break;
-	case State::Shoot:
-		// 弾発射処理（例: 1秒ごとに発射）
-		{
-			static float bulletTimer = 0.0f;
-			bulletTimer += 1.0f / 60.0f; // 60FPS前提
-			if (bulletTimer >= 1.0f) {
-				bulletTimer = 0.0f;
-				if (player_) {
-					bullet = std::make_unique<EnemyNormalBullet>();
-					bullet->Initialize(position);
-					bullet->SetEnemyPosition(position);
-					bullet->SetEnemyRotation(rotation);
-					bullet->SetPlayer(player_);
-					bullet->SetCamera(camera_);
-				}
-			}
-			if (bullet) {
-				bullet->Update();
-			}
+		if (bullet) {
+			bullet->Update();
 		}
-		break;
+	} break;
 	}
 
-	// まず座標・回転・スケールを最新化
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
 	object3d->SetScale(scale);
 	object3d->SetCamera(camera_);
 	object3d->Update();
 
-	// ヒット演出のトリガー判定
 	if (!wasHit && isHit) {
 		EmitHitParticle();
 	}
-	isHit = false;  // 今フレームのヒット状態をリセット
-	wasHit = isHit; // 状態を保存
+	isHit = false;
+	wasHit = isHit;
 
-	// Particle
 	if (particle) {
 		particle->SetCamera(camera_);
 		particle->Update();
@@ -169,6 +185,8 @@ void Enemy::EmitHitParticle() {
 	particleEmitter_ = std::make_unique<ParticleEmitter>(particle.get(), "Particle", particleTranslate, particleVelocity, particleColor, particleLifeTime, particleCurrentTime, 1, 1.0f, false);
 }
 
+void Enemy::OnCollision(Collider* other) {}
+
 
 void Enemy::Draw() {
 	if (object3d) {
@@ -177,6 +195,8 @@ void Enemy::Draw() {
 	if (bullet) {
 		bullet->Draw();
 	}
+	DrawViewCone();
+	DrawLastSeenMark(); 
 }
 
 void Enemy::ParticleDraw() {
@@ -199,18 +219,98 @@ void Enemy::DrawImGui() {
 
 void Enemy::Move() {}
 
+bool Enemy::CanSeePlayer() {
+	if (!player_ || !mapChipField)
+		return false;
+
+	Vector3 from = position;
+	Vector3 to = player_->GetPosition();
+	Vector3 dirToPlayer = to - from;
+	dirToPlayer.z = 0.0f;
+
+	// プレイヤーまでの距離
+	float distance = std::sqrt(dirToPlayer.x * dirToPlayer.x + dirToPlayer.y * dirToPlayer.y);
+	if (distance > kViewDistance) return false; // 視認距離外
+
+	// 視野角判定
+	Vector3 forward = { std::cos(rotation.z), std::sin(rotation.z), 0.0f }; // Z軸回転
+	float dot = Vector3::Dot(Vector3::Normalize(forward), Vector3::Normalize(dirToPlayer));
+	float angleToPlayer = std::acos(dot) * 180.0f / kPI;
+	if (angleToPlayer > kViewAngleDeg / 2.0f) return false; // 視野外
+
+	// ブロック越し判定（従来通り）
+	Vector2 start = {from.x, from.y};
+	Vector2 end = {to.x, to.y};
+	const float step = 0.5f;
+	Vector2 dir = end - start;
+	float length = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+	if (length < 0.001f) return true;
+	dir.x /= length; dir.y /= length;
+	for (float t = 0.0f; t <= length; t += step) {
+		Vector2 pos = start + dir * t;
+		Vector3 checkPos = {pos.x, pos.y, from.z};
+		if (mapChipField->IsBlocked(checkPos)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+void Enemy::DrawViewCone() {
+	float halfRad = (kViewAngleDeg / 2.0f) * kPI / 180.0f;
+	float baseAngle = rotation.z;
+	Vector3 center = position;
+	// 中心から端への線はそのまま
+	for (int i = 0; i < kViewLineDiv; ++i) {
+		float a0 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i) / kViewLineDiv);
+		Vector3 p0 = center + Vector3{ std::cos(a0) * kViewDistance, std::sin(a0) * kViewDistance, 0.0f };
+		LineManager::GetInstance()->DrawLine(center, p0, kViewColor);
+	}
+	// 外周の弧は分割数-1回だけ描画
+	for (int i = 0; i < kViewLineDiv - 1; ++i) {
+		float a0 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i) / kViewLineDiv);
+		float a1 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i + 1) / kViewLineDiv);
+		Vector3 p0 = center + Vector3{ std::cos(a0) * kViewDistance, std::sin(a0) * kViewDistance, 0.0f };
+		Vector3 p1 = center + Vector3{ std::cos(a1) * kViewDistance, std::sin(a1) * kViewDistance, 0.0f };
+		LineManager::GetInstance()->DrawLine(p0, p1, kViewColor);
+	}
+}
+
+
+
 Vector3 Enemy::GetCenterPosition() const {
 	const Vector3 offset = {0.0f, 0.0f, 0.0f};
 	Vector3 worldPosition = position + offset;
 	return worldPosition;
 }
 
-void Enemy::OnCollision(Collider* other) {
-	
-	uint32_t typeID = other->GetTypeID();
-	if (typeID == static_cast<uint32_t>(CollisionTypeId::kPlayer)) {
-		isHit = true;
-	} else if (typeID == static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon)) {
-		isHit = true;
-	}
+// --- 追加: ラストスポット描画関数 ---
+void Enemy::DrawLastSeenMark() {
+    if (lastSeenTimer <= 0.0f) return;
+
+    constexpr Vector4 kLastSeenColor = {1.0f, 0.2f, 0.2f, 1.0f}; // 赤色
+    constexpr float kLastSeenMarkSize = 0.5f; // マークの大きさ
+    const Vector3& center = lastSeenPlayerPos;
+
+    // 十字マーク
+    LineManager::GetInstance()->DrawLine(
+        center + Vector3{-kLastSeenMarkSize, 0.0f, 0.0f},
+        center + Vector3{ kLastSeenMarkSize, 0.0f, 0.0f},
+        kLastSeenColor
+    );
+    LineManager::GetInstance()->DrawLine(
+        center + Vector3{0.0f, -kLastSeenMarkSize, 0.0f},
+        center + Vector3{0.0f,  kLastSeenMarkSize, 0.0f},
+        kLastSeenColor
+    );
+
+    // 円（ターゲットマーク外周）
+    constexpr int circleDiv = 16;
+    for (int i = 0; i < circleDiv; ++i) {
+        float a0 = (2.0f * kPI) * (float(i) / circleDiv);
+        float a1 = (2.0f * kPI) * (float(i + 1) / circleDiv);
+        Vector3 p0 = center + Vector3{ std::cos(a0) * kLastSeenMarkSize, std::sin(a0) * kLastSeenMarkSize, 0.0f };
+        Vector3 p1 = center + Vector3{ std::cos(a1) * kLastSeenMarkSize, std::sin(a1) * kLastSeenMarkSize, 0.0f };
+        LineManager::GetInstance()->DrawLine(p0, p1, kLastSeenColor);
+    }
 }
