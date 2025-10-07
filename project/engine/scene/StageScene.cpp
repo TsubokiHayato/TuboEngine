@@ -5,6 +5,10 @@
 
 void StageScene::Initialize() {
 
+	///--------------------------------------------------------
+	///				メンバ変数の生成
+	///--------------------------------------------------------
+
 	mapChipField_ = std::make_unique<MapChipField>();
 	player_ = std::make_unique<Player>();
 	followCamera = std::make_unique<FollowTopDownCamera>();
@@ -12,97 +16,65 @@ void StageScene::Initialize() {
 	stateManager_ = std::make_unique<StageStateManager>();
 
 	// 衝突マネージャの生成
-
 	collisionManager_->Initialize();
-
+	// ステートマネージャの生成
 	stateManager_->Initialize(this);
 }
 
 void StageScene::Update() {
 
-	// 現在の状態のUpdateを呼ぶだけ
+
+
+	// ステートマネージャの更新
 	if (stateManager_) {
 		stateManager_->Update(this);
 	}
-
-	for (auto& block : blocks_) {
-
-		block->SetCamera(followCamera->GetCamera());
-		block->Update();
-	}
-
-	player_->SetCamera(followCamera->GetCamera());
-	player_->Update();
-
-	for (auto& enemy : enemies) {
-		enemy->SetCamera(followCamera->GetCamera());
-		enemy->SetPlayer(player_.get());
-		enemy->SetMapChipField(mapChipField_.get());
-		enemy->Update();
-	}
-	followCamera->Update();
-
+	// デフォルトカメラをFollowCameraに設定
 	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
+	// 衝突マネージャの更新
 	collisionManager_->Update();
-
-	if (!player_->GetIsAllive()) {
-		// プレイヤーが死亡したらシーンを切り替える
-		SceneManager::GetInstance()->ChangeScene(CLEAR);
-		return;
-	}
-
+	// 全ての衝突をチェック
 	CheckAllCollisions();
 }
 
 void StageScene::Finalize() {}
 
 void StageScene::Object3DDraw() {
-	// 3Dオブジェクトの描画
-	// ブロック描画
-	for (auto& block : blocks_) {
-		block->Draw();
+
+	// ステートマネージャの3Dオブジェクト描画
+	if (stateManager_) {
+		stateManager_->Object3DDraw(this);
 	}
 
-	// プレイヤーの3Dオブジェクトを描画
-	player_->Draw();
 
-	// 敵の3Dオブジェクトを描画
-	for (auto& enemy : enemies) {
-		enemy->Draw();
-	}
 	// 当たり判定の可視化
 	collisionManager_->Draw();
 
 	// グリッド描画（回転対応）
 	LineManager::GetInstance()->DrawGrid(10000.0f, 1000, {DirectX::XM_PIDIV2, 0.0f, 0.0f});
 }
-void StageScene::SpriteDraw() { player_->ReticleDraw(); }
+void StageScene::SpriteDraw() {
+	
+	// ステートマネージャのスプライト描画
+	if (stateManager_) {
+		stateManager_->SpriteDraw(this);
+	}
+	
+	
+	 }
 
 void StageScene::ImGuiDraw() {
-	// CameraのImGui
-	followCamera->DrawImGui();
 
-	// PlayerのImGui
-	player_->DrawImGui();
 
-	// DrawLineのImGui
+// DrawLineのImGui
 	LineManager::GetInstance()->DrawImGui();
-	// EnemyのImgui
-	for (auto& enemy : enemies) {
-		enemy->DrawImGui();
-	}
-
-	// ブロックのImGui
-	for (auto& block : blocks_) {
-		block->DrawImGui();
-	}
-
-	mapChipField_->DrawImGui();
+	stateManager_->DrawImGui(this);
 }
 
 void StageScene::ParticleDraw() {
-	for (auto& enemy : enemies) {
-		enemy->ParticleDraw();
+	
+	if (stateManager_) {
+		stateManager_->ParticleDraw(this);
 	}
 }
 

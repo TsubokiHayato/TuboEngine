@@ -242,6 +242,7 @@
     <ClInclude Include="StageState\BossState.h" />
     <ClInclude Include="StageState\GameClearState.h" />
     <ClInclude Include="StageState\GameOverState.h" />
+    <ClInclude Include="StageState\StageType.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />

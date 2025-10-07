@@ -69,8 +69,8 @@ public:
 	void SetScale(const Vector3& scl) { scale = scl; }
 
 	// 生存フラグ
-	bool GetIsAlive() const { return isAlive; }
-	void SetIsAlive(bool alive) { isAlive = alive; }
+	bool GetIsAllive() const { return isAllive; }
+	void SetIsAlive(bool alive) { isAllive = alive; }
 
 	void SetPlayer(Player* player) { player_ = player; }
 
@@ -112,7 +112,7 @@ private:
 	float moveStartDistance_ = 15.0f;              // 移動開始距離（これより遠いとIdle）
 
 	int HP = 100;                                  // 敵のHP
-	bool isAlive = true;                           // 敵が生きているかどうかのフラグ
+	bool isAllive = true;                           // 敵が生きているかどうかのフラグ
 	bool isHit = false;                            // 衝突判定フラグ
 	bool wasHit = false;                           // 前フレームのisHit
 	
