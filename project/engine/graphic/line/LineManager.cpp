@@ -2,7 +2,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "ImGuiManager.h"
-#include"MT_Matrix.h"
 
 ///----------------------------------------------------
 /// シングルトンインスタンス初期化
@@ -92,38 +91,20 @@ void LineManager::DrawLine(const Vector3& start, const Vector3& end, const Vecto
     line_->DrawLine(start, end, color);
 }
 
-
-
 ///----------------------------------------------------
 /// グリッド描画
 ///----------------------------------------------------
-void LineManager::DrawGrid(float size, int split, const Vector3& rotation, const Vector4& color) { 
-    // グリッドの中心座標
-	Vector3 center = {0.0f, 0.0f, 0.0f};
-
-	// 回転行列を生成
-	Matrix4x4 rotMat = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotation, {0.0f, 0.0f, 0.0f});
-
-	float half = size / 2.0f;
-	float step = size / split;
-
-	for (int i = 0; i <= split; ++i) {
-		float pos = -half + i * step;
-
-		// X軸方向の線
-		Vector3 startX = {pos, 0.0f, -half};
-		Vector3 endX = {pos, 0.0f, half};
-		startX = TransformCoord(startX, rotMat);
-		endX = TransformCoord(endX, rotMat);
-		DrawLine(startX, endX, color);
-
-		// Z軸方向の線
-		Vector3 startZ = {-half, 0.0f, pos};
-		Vector3 endZ = {half, 0.0f, pos};
-		startZ = TransformCoord(startZ, rotMat);
-		endZ = TransformCoord(endZ, rotMat);
-		DrawLine(startZ, endZ, color);
-	}
+void LineManager::DrawGrid(float gridSize, int divisions, const Vector4& color) {
+    if (!isDrawGrid_ || divisions <= 0) {
+        return;
+    }
+    float halfSize = gridSize * 0.5f;
+    float step = gridSize / divisions;
+    for (int i = 0; i <= divisions; ++i) {
+        float offset = -halfSize + (i * step);
+        DrawLine(Vector3(-halfSize, 0.0f, offset), Vector3(halfSize, 0.0f, offset), color);
+        DrawLine(Vector3(offset, 0.0f, -halfSize), Vector3(offset, 0.0f, halfSize), color);
+    }
 }
 
 ///----------------------------------------------------
