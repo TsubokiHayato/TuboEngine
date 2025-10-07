@@ -4,12 +4,14 @@
 #include "Particle.h"
 #include "ParticleEmitter.h"
 #include <random>
+#include "SceneChangeAnimation.h"
+
 class TitleScene : public IScene {
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize();
+	void Initialize() override;
 
 	/// <summary>
 	/// 更新
@@ -59,14 +61,7 @@ private:
 	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
 
-	std::unique_ptr<Particle> particle;
-	std::unique_ptr<ParticleEmitter> particleEmitter_;
-
-	Transform particleTranslate;
-	Vector3 particleVelocity = {0.0f, 0.0f, 0.0f};
-	Vector4 particleColor = {1.0f, 1.0f, 1.0f, 1.0f};
-	float particleLifeTime = 1.0f;
-	float particleCurrentTime = 0.0f;
-
-	
+	// --- ここを追加 ---
+	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation;
+	bool isRequestSceneChange = false;
 };
