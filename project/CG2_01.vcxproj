@@ -209,11 +209,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\SkyBox\SkyBoxCommon.cpp" />
     <ClCompile Include="engine\graphic\PSO\SkyBoxPSO.cpp" />
     <ClCompile Include="application\MapChipField.cpp" />
-    <ClCompile Include="SceneChangeAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="application\Player.h" />
-    <ClInclude Include="application\PlayerBullet.h" />
     <ClInclude Include="engine\graphic\PostEffect\BloomEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\BloomPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.h" />
@@ -330,7 +327,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\Animation\KeyFrame.h" />
     <ClInclude Include="engine\graphic\Animation\Animation.h" />
     <ClInclude Include="engine\math\Quaternion.h" />
-    <ClInclude Include="SceneChangeAnimation.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\imgui\imgui.vcxproj">

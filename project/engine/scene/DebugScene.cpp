@@ -112,12 +112,6 @@ void DebugScene::Initialize() {
 #pragma endregion cameraの初期化
 
 
-	//シーンチェンジアニメーション
-	sceneChangeAnimation = std::make_unique<SceneChangeAnimation>(1280, 720, 80, 1.5f, "barrier.png");
-	sceneChangeAnimation->Initialize();
-	showSceneChangeAnimation = false;
-
-
 }
 
 void DebugScene::Update() {
@@ -151,7 +145,7 @@ void DebugScene::Update() {
 	skyBox->SetCamera(camera.get());
 	skyBox->Update();
 
-	sceneChangeAnimation->Update(1.0f / 60.0f);
+
 
 }
 
@@ -180,31 +174,11 @@ void DebugScene::SpriteDraw() {
 		}
 	}
 	
-	if (showSceneChangeAnimation) {
-		sceneChangeAnimation->Draw();
-		if (sceneChangeAnimation->IsFinished()) {
-			showSceneChangeAnimation = false;
-		}
-	}
-	
 }
 
 void DebugScene::ImGuiDraw() {
 	ImGui::Begin("DebugScene");
 	ImGui::Text("Hello, DebugScene!");
-
-	// シーンチェンジアニメーション ImGui
-	if (ImGui::Button("Start SceneChangeAnimation")) {
-		if (sceneChangeAnimation) {
-			sceneChangeAnimation->Initialize();
-			showSceneChangeAnimation = true;
-		}
-	}
-	ImGui::Checkbox("Show SceneChangeAnimation", &showSceneChangeAnimation);
-	if (sceneChangeAnimation) {
-		ImGui::Text("Animation Finished: %s", sceneChangeAnimation->IsFinished() ? "Yes" : "No");
-	}
-
 	ImGui::End();
 
 	//skyBoxのImGui
@@ -291,7 +265,6 @@ void DebugScene::ImGuiDraw() {
 	
 	#endif // DEBUG
 
-		sceneChangeAnimation->DrawImGui();
 }
 
 void DebugScene::ParticleDraw() {

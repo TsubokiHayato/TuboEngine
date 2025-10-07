@@ -21,7 +21,6 @@
 #include"ImGuiManager.h"
 
 #include"SkyBox.h"
-#include"SceneChangeAnimation.h"
 
 
 #undef min//minマクロを無効化
@@ -126,12 +125,6 @@ private:
 	///SkyBox
 	
 	std::unique_ptr<SkyBox> skyBox = nullptr;
-
-	/// SceneChangeAnimation
-	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation = nullptr;
-	bool isSceneChange = false;
-	float sceneChangeTimer = 0.0f;
-	bool showSceneChangeAnimation = false;
 	
 };
 

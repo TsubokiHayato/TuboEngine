@@ -1,7 +1,7 @@
 #include "StageScene.h"
 #include "CollisionManager.h"
+#include"LineManager.h"
 #include "FollowTopDownCamera.h"
-#include "LineManager.h"
 
 void StageScene::Initialize() {
 	// マップチップフィールドの生成・初期化
@@ -77,20 +77,12 @@ void StageScene::Update() {
 	for (auto& enemy : enemies) {
 		enemy->SetCamera(followCamera->GetCamera());
 		enemy->SetPlayer(player_.get());
-		enemy->SetMapChipField(mapChipField_.get());
 		enemy->Update();
 	}
 	followCamera->Update();
 
 	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	collisionManager_->Update();
-
-	if (!player_->GetIsAllive()) {
-		// プレイヤーが死亡したらシーンを切り替える
-		SceneManager::GetInstance()->ChangeScene(CLEAR);
-		return;
-	}
-
 	CheckAllCollisions();
 }
 
@@ -105,7 +97,7 @@ void StageScene::Object3DDraw() {
 
 	// プレイヤーの3Dオブジェクトを描画
 	player_->Draw();
-
+	
 	// 敵の3Dオブジェクトを描画
 	for (auto& enemy : enemies) {
 		enemy->Draw();
@@ -113,9 +105,8 @@ void StageScene::Object3DDraw() {
 	// 当たり判定の可視化
 	collisionManager_->Draw();
 
-	// グリッド描画（回転対応）
-	LineManager::GetInstance()->DrawGrid(10000.0f, 1000, {DirectX::XM_PIDIV2, 0.0f, 0.0f});
-
+	
+	LineManager::GetInstance()->DrawGrid(10000.0f, 1000, {0.0f, 0.0f, 0.0f, 1.0f});
 }
 void StageScene::SpriteDraw() { player_->ReticleDraw(); }
 
@@ -126,9 +117,10 @@ void StageScene::ImGuiDraw() {
 	// PlayerのImGui
 	player_->DrawImGui();
 
+	
 	// DrawLineのImGui
 	LineManager::GetInstance()->DrawImGui();
-	// EnemyのImgui
+  // EnemyのImgui
 	for (auto& enemy : enemies) {
 		enemy->DrawImGui();
 	}
