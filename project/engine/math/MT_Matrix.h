@@ -250,17 +250,3 @@ inline Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, floa
 	return result;
 
 }
-
-// 3Dベクトルを4x4行列で変換する関数
-inline Vector3 TransformCoord(const Vector3& v, const Matrix4x4& m) {
-	float x = v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0] + m.m[3][0];
-	float y = v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1] + m.m[3][1];
-	float z = v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2] + m.m[3][2];
-	float w = v.x * m.m[0][3] + v.y * m.m[1][3] + v.z * m.m[2][3] + m.m[3][3];
-	if (w != 0.0f) {
-		x /= w;
-		y /= w;
-		z /= w;
-	}
-	return Vector3{x, y, z};
-}
