@@ -104,7 +104,7 @@
     <ClCompile Include="engine\graphic\PSO\PostEffect\ToonPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\BloomPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\BloomEffect.cpp" />
-    <ClCompile Include="SceneChangeAnimation.cpp" />
+    <ClCompile Include="application\SceneChangeAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\BaseCharacter.h" />
@@ -225,7 +225,7 @@
     <ClInclude Include="engine\graphic\PostEffect\BloomEffect.h" />
     <ClInclude Include="application\PlayerBullet.h" />
     <ClInclude Include="application\Player.h" />
-    <ClInclude Include="SceneChangeAnimation.h" />
+    <ClInclude Include="application\SceneChangeAnimation.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />

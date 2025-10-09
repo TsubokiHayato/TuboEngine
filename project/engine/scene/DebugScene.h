@@ -111,5 +111,9 @@ private:
 	/// SceneChangeAnimation
 	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation = nullptr;
 	bool isRequestSceneChange = false;
+
+	/// GuideUISprite ///
+	std::unique_ptr<Sprite> guideUISprite = nullptr;
+
 };
 

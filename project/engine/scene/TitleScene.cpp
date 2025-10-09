@@ -17,6 +17,12 @@ void TitleScene::Initialize() {
 	sceneChangeAnimation = std::make_unique<SceneChangeAnimation>(1280, 720, 80, 1.5f, "barrier.png");
 	sceneChangeAnimation->Initialize();
 	isRequestSceneChange = false;
+
+	/// GuideUISprite///
+	guideUISprite = std::make_unique<Sprite>();
+	guideUISprite->Initialize("keyboard_space.png");
+	guideUISprite->SetPosition({640.0f, 650.0f});
+	guideUISprite->SetAnchorPoint({0.5f, 0.5f});
 }
 
 void TitleScene::Update() {
@@ -36,9 +42,14 @@ void TitleScene::Update() {
 
 	// アニメーションが終わったらシーン遷移
 	if (isRequestSceneChange && sceneChangeAnimation->IsFinished()) {
-		SceneManager::GetInstance()->ChangeScene(SCENE::STAGE); // 遷移先は適宜変更
+		SceneManager::GetInstance()->ChangeScene(SCENE::DEBUG); // 遷移先は適宜変更
 		isRequestSceneChange = false;
 	}
+
+	/// GuideUISprite///
+	guideUISprite->SetPosition({WinApp::GetInstance()->GetClientWidth() / 2.0f, 600.0f});
+	guideUISprite->SetGetIsAdjustTextureSize(true);
+	guideUISprite->Update();
 }
 
 void TitleScene::Finalize() {
@@ -50,11 +61,14 @@ void TitleScene::Object3DDraw() {}
 
 void TitleScene::SpriteDraw() {
 	// ...既存のスプライト描画...
-
+// GuideUISprite描画
+	guideUISprite->Draw();
 	// アニメーション描画
 	if (sceneChangeAnimation) {
 		sceneChangeAnimation->Draw();
 	}
+
+	
 }
 
 void TitleScene::ImGuiDraw() {
