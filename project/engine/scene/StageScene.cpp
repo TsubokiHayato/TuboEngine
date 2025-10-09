@@ -4,146 +4,77 @@
 #include "LineManager.h"
 
 void StageScene::Initialize() {
-	// マップチップフィールドの生成・初期化
+
+	///--------------------------------------------------------
+	///				メンバ変数の生成
+	///--------------------------------------------------------
+
 	mapChipField_ = std::make_unique<MapChipField>();
-	mapChipField_->LoadMapChipCsv(mapChipCsvFilePath_);
-
-	// ブロック生成（マップチップ対応）
-	blocks_.clear();
-	for (uint32_t y = 0; y < mapChipField_->GetNumBlockVirtical(); ++y) {
-		for (uint32_t x = 0; x < mapChipField_->GetNumBlockHorizontal(); ++x) {
-			if (mapChipField_->GetMapChipTypeByIndex(x, y) == MapChipType::kBlock) {
-				auto block = std::make_unique<Block>();
-				block->Initialize(mapChipField_->GetMapChipPositionByIndex(x, y));
-				blocks_.push_back(std::move(block));
-			}
-		}
-	}
-
-	// プレイヤー
 	player_ = std::make_unique<Player>();
-	player_->Initialize();
-
-	// プレイヤーの初期位置をマップチップから取得
-	for (uint32_t y = 0; y < mapChipField_->GetNumBlockVirtical(); ++y) {
-		for (uint32_t x = 0; x < mapChipField_->GetNumBlockHorizontal(); ++x) {
-			if (mapChipField_->GetMapChipTypeByIndex(x, y) == MapChipType::Player) {
-				Vector3 pos = mapChipField_->GetMapChipPositionByIndex(x, y);
-				player_->SetPosition(mapChipField_->GetMapChipPositionByIndex(x, y));
-			}
-		}
-	}
-
-	// 追従カメラの生成・初期化
 	followCamera = std::make_unique<FollowTopDownCamera>();
-	followCamera->Initialize(player_.get(), Vector3(0.0f, 0.0f, 40.0f), 0.2f);
-
-	// プレイヤーにカメラをセット
-	player_->SetCamera(followCamera->GetCamera());
-	player_->SetMapChipField(mapChipField_.get());
-
-	// プレイヤー生成後
-	// player_->SetMapChipField(mapChipField_.get());
-	// Enemyリスト
-	enemies.clear();
-	for (uint32_t y = 0; y < mapChipField_->GetNumBlockVirtical(); ++y) {
-		for (uint32_t x = 0; x < mapChipField_->GetNumBlockHorizontal(); ++x) {
-			if (mapChipField_->GetMapChipTypeByIndex(x, y) == MapChipType::Enemy) {
-				auto enemy = std::make_unique<Enemy>();
-				enemy->Initialize();
-				enemy->SetCamera(followCamera->GetCamera());
-				enemy->SetPosition(mapChipField_->GetMapChipPositionByIndex(x, y));
-				enemies.push_back(std::move(enemy));
-			}
-		}
-	}
+	collisionManager_ = std::make_unique<CollisionManager>();
+	stateManager_ = std::make_unique<StageStateManager>();
 
 	// 衝突マネージャの生成
-	collisionManager_ = std::make_unique<CollisionManager>();
 	collisionManager_->Initialize();
+	// ステートマネージャの生成
+	stateManager_->Initialize(this);
 }
 
 void StageScene::Update() {
 
-	for (auto& block : blocks_) {
 
-		block->SetCamera(followCamera->GetCamera());
-		block->Update();
+
+	// ステートマネージャの更新
+	if (stateManager_) {
+		stateManager_->Update(this);
 	}
-
-	player_->SetCamera(followCamera->GetCamera());
-	player_->Update();
-
-	for (auto& enemy : enemies) {
-		enemy->SetCamera(followCamera->GetCamera());
-		enemy->SetPlayer(player_.get());
-		enemy->SetMapChipField(mapChipField_.get());
-		enemy->Update();
-	}
-	followCamera->Update();
-
+	// デフォルトカメラをFollowCameraに設定
 	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
+	// 衝突マネージャの更新
 	collisionManager_->Update();
-
-	if (!player_->GetIsAllive()) {
-		// プレイヤーが死亡したらシーンを切り替える
-		SceneManager::GetInstance()->ChangeScene(CLEAR);
-		return;
-	}
-
+	// 全ての衝突をチェック
 	CheckAllCollisions();
 }
 
 void StageScene::Finalize() {}
 
 void StageScene::Object3DDraw() {
-	// 3Dオブジェクトの描画
-	// ブロック描画
-	for (auto& block : blocks_) {
-		block->Draw();
+
+	// ステートマネージャの3Dオブジェクト描画
+	if (stateManager_) {
+		stateManager_->Object3DDraw(this);
 	}
 
-	// プレイヤーの3Dオブジェクトを描画
-	player_->Draw();
 
-	// 敵の3Dオブジェクトを描画
-	for (auto& enemy : enemies) {
-		enemy->Draw();
-	}
 	// 当たり判定の可視化
 	collisionManager_->Draw();
 
 	// グリッド描画（回転対応）
 	LineManager::GetInstance()->DrawGrid(10000.0f, 1000, {DirectX::XM_PIDIV2, 0.0f, 0.0f});
-
 }
-void StageScene::SpriteDraw() { player_->ReticleDraw(); }
+void StageScene::SpriteDraw() {
+	
+	// ステートマネージャのスプライト描画
+	if (stateManager_) {
+		stateManager_->SpriteDraw(this);
+	}
+	
+	
+	 }
 
 void StageScene::ImGuiDraw() {
-	// CameraのImGui
-	followCamera->DrawImGui();
 
-	// PlayerのImGui
-	player_->DrawImGui();
 
-	// DrawLineのImGui
+// DrawLineのImGui
 	LineManager::GetInstance()->DrawImGui();
-	// EnemyのImgui
-	for (auto& enemy : enemies) {
-		enemy->DrawImGui();
-	}
-
-	// ブロックのImGui
-	for (auto& block : blocks_) {
-		block->DrawImGui();
-	}
-
-	mapChipField_->DrawImGui();
+	stateManager_->DrawImGui(this);
 }
 
 void StageScene::ParticleDraw() {
-	for (auto& enemy : enemies) {
-		enemy->ParticleDraw();
+	
+	if (stateManager_) {
+		stateManager_->ParticleDraw(this);
 	}
 }
 
