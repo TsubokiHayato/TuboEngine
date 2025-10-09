@@ -1,9 +1,9 @@
 #include "Enemy.h"
-#include "CollisionTypeId.h"
-#include "Enemy.h"
+#include "Collider/CollisionTypeId.h"
 #include "ImGuiManager.h"
 #include "TextureManager.h"
-#include "Player.h"
+#include "Character/Player/Player.h"
+#include "LineManager.h"
 #include <cmath>
 
 constexpr float kPI = 3.14159265358979323846f;

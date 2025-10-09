@@ -1,6 +1,6 @@
 #pragma once
 #include "Camera.h"
-#include "application/Player.h"
+#include "Character/Player/Player.h"
 
 class FollowTopDownCamera {
 public:
