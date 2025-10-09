@@ -34,8 +34,11 @@ void TitleScene::Update() {
 
 	// スペースキーで覆いを出すリクエスト
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		sceneChangeAnimation->SetPhase(SceneChangeAnimation::Phase::Appearing); // 覆いを出す
-		isRequestSceneChange = true;
+		// アニメーション中は新たなアニメーションを開始しない
+		if (sceneChangeAnimation->IsFinished()) {
+			sceneChangeAnimation->SetPhase(SceneChangeAnimation::Phase::Appearing);
+			isRequestSceneChange = true;
+		}
 	}
 
 	sceneChangeAnimation->Update(1.0f / 60.0f);

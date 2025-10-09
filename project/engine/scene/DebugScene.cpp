@@ -21,9 +21,9 @@ void DebugScene::Initialize() {
 	const std::string audioFileName = "fanfare.wav";
 
 #pragma region Audioの初期化
-	audio = std::make_unique<Audio>();
-	audio->Initialize(audioFileName);
-	audio->Play(false);
+	//audio = std::make_unique<Audio>();
+	//audio->Initialize(audioFileName);
+	//audio->Play(false);
 
 #pragma endregion Audioの初期化
 
@@ -74,9 +74,11 @@ void DebugScene::Update() {
 
 	// スペースキーで覆いを出すリクエスト
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		
-		sceneChangeAnimation->SetPhase(SceneChangeAnimation::Phase::Appearing); // 覆いを出す
-		isRequestSceneChange = true; // シーン遷移リクエスト
+		// アニメーション中は新たなアニメーションを開始しない
+		if (sceneChangeAnimation->IsFinished()) {
+			sceneChangeAnimation->SetPhase(SceneChangeAnimation::Phase::Appearing);
+			isRequestSceneChange = true;
+		}
 	}
 
 	sceneChangeAnimation->Update(1.0f / 60.0f);
