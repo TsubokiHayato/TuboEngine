@@ -1,7 +1,7 @@
 #pragma once
-#include "BaseCharacter.h"
-#include "EnemyNormalBullet.h"
-#include "MapChipField.h"
+#include "Character/BaseCharacter.h"
+#include "Bullet/Enemy/EnemyNormalBullet.h"
+#include "MapChip/MapChipField.h"
 #include "Particle.h"
 #include "ParticleEmitter.h"
 

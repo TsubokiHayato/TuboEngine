@@ -3,8 +3,8 @@
 #include "Input.h"
 #include"Audio.h"
 #include"Camera.h"
-#include"CollisionManager.h"
-#include"FollowTopDownCamera.h"
+#include"Collider/CollisionManager.h"
+#include"Camera/FollowTopDownCamera.h"
 
 #include"SpriteCommon.h"
 #include"Object3dCommon.h"
@@ -12,14 +12,14 @@
 #include"ModelManager.h"
 #include"AudioCommon.h"
 #include"ImGuiManager.h"
-#include "Collider.h"
+#include "Collider/Collider.h"
 
-#include"Player.h"
-#include"PlayerBullet.h"
-#include"Enemy.h"
+#include"Character/Player/Player.h"
+#include"Bullet/Player/PlayerBullet.h"
+#include"Character/Enemy/Enemy.h"
 #include"SkyBox.h"
-#include"MapChipField.h"
-#include"Block.h"
+#include"MapChip/MapChipField.h"
+#include"Block/Block.h"
 #include "SceneManager.h"
 
 

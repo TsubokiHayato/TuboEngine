@@ -1,22 +1,18 @@
 #include "CollisionManager.h"
 #include "Collider.h"
-#include "ParameterManager.h"
 
 /// -------------------------------------------------------------
 ///							初期化処理
 /// -------------------------------------------------------------
 void CollisionManager::Initialize() {
 	isCollider_ = true;
-	//ParameterManager::GetInstance()->CreateGroup("Collider");
-	//ParameterManager::GetInstance()->AddItem("Collider", "isCollider", isCollider_);
+	
 }
 
 /// -------------------------------------------------------------
 ///							更新処理
 /// -------------------------------------------------------------
 void CollisionManager::Update() {
-//	isCollider_ = ParameterManager::GetInstance()->GetValue<bool>("Collider", "isCollider");
-
 	// 非表示なら抜ける
 	if (!isCollider_) {
 		return;
@@ -79,9 +75,7 @@ void CollisionManager::AddCollider(Collider* other) { colliders_.push_back(other
 
 void CollisionManager::RemoveCollider(Collider* other) {
 	colliders_.remove(other);
-	// other->SetTypeID(0u); // コライダーの識別IDをリセット
-	// other->SetRadius(0.0f); // コライダーの半径をリセット
-	// other->SetColor({ 1.0f,1.0f,1.0f,1.0f }); // コライダーの色をリセット
+	
 }
 
 /// -------------------------------------------------------------
