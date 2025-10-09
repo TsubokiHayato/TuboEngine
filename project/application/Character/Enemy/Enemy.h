@@ -9,6 +9,7 @@
 ///				前方宣言
 ///---------------------------------------------------
 class Player;
+class Sprite; // スプライト前方宣言
 
 class Enemy : public BaseCharacter {
 	///---------------------------------------
@@ -32,6 +33,10 @@ public:
 	void DrawViewCone();
 
 	void DrawLastSeenMark();
+
+	void DrawStateIcon();
+	//void DrawExclamationMark(const Vector3& pos, float size, const Vector4& color, float width);
+	//void DrawQuestionMark(const Vector3& pos, float size, const Vector4& color, float width);
 
 	// ヒット演出のトリガー
 	void EmitHitParticle();
@@ -64,8 +69,8 @@ public:
 	void SetScale(const Vector3& scl) { scale = scl; }
 
 	// 生存フラグ
-	bool GetIsAlive() const { return isAlive; }
-	void SetIsAlive(bool alive) { isAlive = alive; }
+	bool GetIsAllive() const { return isAllive; }
+	void SetIsAlive(bool alive) { isAllive = alive; }
 
 	void SetPlayer(Player* player) { player_ = player; }
 
@@ -85,13 +90,15 @@ private:
 	///---------------------------------------
 public:
 	enum class State {
-		Idle, // 待機
-		Move, // 移動
-		Shoot // 射撃
+		Idle,      // 非発見状態（待機）
+		Alert,     // 警戒状態
+		LookAround, // 見回し状態（警戒終了後も見回す）
+		Patrol,    // 巡回モード
+		Chase,     // 発見状態（追跡）
+		Attack,    // 攻撃
 	};
 
 private:
-
 	///-------トランスフォーム------///
 	Vector3 position;                              // 初期位置
 	Vector3 rotation;                              // 初期回転
@@ -105,12 +112,12 @@ private:
 	float moveStartDistance_ = 15.0f;              // 移動開始距離（これより遠いとIdle）
 
 	int HP = 100;                                  // 敵のHP
-	bool isAlive = true;                           // 敵が生きているかどうかのフラグ
+	bool isAllive = true;                           // 敵が生きているかどうかのフラグ
 	bool isHit = false;                            // 衝突判定フラグ
 	bool wasHit = false;                           // 前フレームのisHit
 	
 	std::unique_ptr<Object3d> object3d;            // 3Dオブジェクト
-	State state_ = State::Move;                    // 行動状態（移動/射撃）
+	State state_ = State::Idle;                    // 行動状態（移動/射撃）
 	
 
 	///--視野--///
@@ -127,7 +134,6 @@ private:
 	std::unique_ptr<EnemyNormalBullet> bullet; // 敵の弾
 
 	///-----Particle-----///
-
 	std::unique_ptr<Particle> particle;
 	std::unique_ptr<ParticleEmitter> particleEmitter_;
 
@@ -136,4 +142,25 @@ private:
 	Vector4 particleColor = {1.0f, 1.0f, 1.0f, 1.0f};
 	float particleLifeTime = 1.0f;
 	float particleCurrentTime = 0.0f;
+
+	///-----見回し-----///
+	float lookAroundBaseAngle = 0.0f; // 見回しの基準角
+	float lookAroundTargetAngle = 0.0f; // 目標角
+	int lookAroundDirection = 1; // 1:右, -1:左
+	float lookAroundAngleWidth = 1.25f; // 見回し角度幅（ラジアン、デフォルト約70度）
+	float lookAroundSpeed = 0.06f; // 見回し速度（ラジアン/フレーム）
+	int lookAroundCount = 0; // 現在の見回し回数
+	int lookAroundMaxCount = 4; // 最大見回し回数
+	bool lookAroundInitialized = false; // 見回し状態の初期化フラグ
+
+	bool showSurpriseIcon_ = false; // ！と？のアイコンを表示するかどうかのフラグ
+
+	Vector4 stateIconColor = {1, 0, 0, 1}; // アイコン色
+	float stateIconSize = 0.8f;            // アイコン大きさ
+	float stateIconHeight = 3.0f;          // アイコン高さ
+	float stateIconLineWidth = 0.08f; // アイコンの線の太さ
+
+	/////----- スプライト -----///
+	//std::unique_ptr<Sprite> exclamationSprite_; // ！スプライト
+	//std::unique_ptr<Sprite> questionSprite_;    // ？スプライト
 };
