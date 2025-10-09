@@ -1,5 +1,5 @@
 #include "Player.h"
-#include "CollisionTypeId.h"
+#include "Collider/CollisionTypeId.h"
 #include "ImGuiManager.h"
 #include "Input.h"
 

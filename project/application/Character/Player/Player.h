@@ -1,9 +1,9 @@
 #pragma once
-#include "BaseCharacter.h"
-#include "PlayerBullet.h"
+#include "Character/BaseCharacter.h"
+#include "Bullet/Player/PlayerBullet.h"
 #include "Object3d.h"
 #include "Sprite.h"
-#include"MapChipField.h"
+#include"MapChip/MapChipField.h"
 ///--------------------------------------------------
 /// プレイヤークラス
 ///--------------------------------------------------

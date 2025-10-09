@@ -1,8 +1,7 @@
 #include "PlayerBullet.h"
-#include "CollisionTypeId.h"
+#include "Collider/CollisionTypeId.h"
 #include "ImGuiManager.h"
-#include "Player.h"
-#include "PlayerBullet.h"
+#include "Character/Player/Player.h"
 
 // --- 追加: デフォルト値を定数で定義 ---
 namespace {

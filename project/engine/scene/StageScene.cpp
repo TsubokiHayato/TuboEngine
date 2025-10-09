@@ -1,7 +1,7 @@
 #include "StageScene.h"
-#include "CollisionManager.h"
-#include"LineManager.h"
-#include "FollowTopDownCamera.h"
+#include "Collider/CollisionManager.h"
+#include "Camera/FollowTopDownCamera.h"
+#include "LineManager.h"
 
 void StageScene::Initialize() {
 	// マップチップフィールドの生成・初期化
