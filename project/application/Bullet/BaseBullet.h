@@ -2,7 +2,7 @@
 #include "Object3d.h"
 #include "Object3dCommon.h"
 #include "Vector3.h"
-#include "Collider.h"
+#include "Collider/Collider.h"
 
 class BaseBullet :public Collider {
 public:

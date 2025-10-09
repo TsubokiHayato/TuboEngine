@@ -1,6 +1,6 @@
 #include "StageScene.h"
-#include "CollisionManager.h"
-#include "FollowTopDownCamera.h"
+#include "Collider/CollisionManager.h"
+#include "Camera/FollowTopDownCamera.h"
 #include "LineManager.h"
 
 void StageScene::Initialize() {
