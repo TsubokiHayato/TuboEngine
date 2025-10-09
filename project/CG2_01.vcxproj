@@ -209,7 +209,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\SkyBox\SkyBoxCommon.cpp" />
     <ClCompile Include="engine\graphic\PSO\SkyBoxPSO.cpp" />
     <ClCompile Include="application\MapChipField.cpp" />
-    <ClCompile Include="SceneChangeAnimation.cpp" />
+    <ClCompile Include="application\SceneChangeAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\Player.h" />
@@ -330,7 +330,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\Animation\KeyFrame.h" />
     <ClInclude Include="engine\graphic\Animation\Animation.h" />
     <ClInclude Include="engine\math\Quaternion.h" />
-    <ClInclude Include="SceneChangeAnimation.h" />
+    <ClInclude Include="application\SceneChangeAnimation.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\imgui\imgui.vcxproj">

@@ -46,6 +46,11 @@ void DebugScene::Initialize() {
 	// シーンチェンジアニメーション
 	sceneChangeAnimation = std::make_unique<SceneChangeAnimation>(1280, 720, 80, 1.5f, "barrier.png");
 	sceneChangeAnimation->Initialize(); 
+
+	guideUISprite = std::make_unique<Sprite>();
+	guideUISprite->Initialize("keyboard_space.png");
+	guideUISprite->SetPosition({640.0f, 650.0f});
+	guideUISprite->SetAnchorPoint({0.5f, 0.5f});
 }
 
 void DebugScene::Update() {
@@ -56,9 +61,16 @@ void DebugScene::Update() {
 	camera->setScale(cameraScale);
 	camera->Update();
 
+	/// SkyBox 
+
 
 	skyBox->SetCamera(camera.get());
 	skyBox->Update();
+
+	/// GuideUISprite///
+	guideUISprite->SetPosition({WinApp::GetInstance()->GetClientWidth() / 2.0f, 600.0f});
+	guideUISprite->SetGetIsAdjustTextureSize(true);
+	guideUISprite->Update();
 
 	// スペースキーで覆いを出すリクエスト
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
@@ -83,12 +95,12 @@ void DebugScene::Finalize() {
 
 void DebugScene::Object3DDraw() {
 	
-	skyBox->Draw();
+	//skyBox->Draw();
 }
 
 void DebugScene::SpriteDraw() {
 	
-
+	guideUISprite->Draw();
 	// アニメーション描画
 
 	sceneChangeAnimation->Draw();

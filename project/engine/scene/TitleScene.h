@@ -64,7 +64,10 @@ private:
 	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
 
-	// --- ここを追加 ---
+	// Scene Change Animation
 	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation;
 	bool isRequestSceneChange = false;
+
+	// GuideUISprite
+	std::unique_ptr<Sprite> guideUISprite;
 };
