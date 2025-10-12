@@ -18,8 +18,6 @@ TitleUI::~TitleUI() {
 	StartButtonSprite_.reset();
 	QuitButtonSprite_.reset();
 
-	ChoiceSprite_.reset();
-	DecideSprite_.reset();
 }
 
 ///-------------------------------------------///
@@ -58,32 +56,35 @@ void TitleUI::Initialize() {
 	///texture
 	///----------------------------
 	
-	TextureManager::GetInstance()->LoadTexture("uvChecker.png");
+	TextureManager::GetInstance()->LoadTexture("TitleUI/Start.png");
+	TextureManager::GetInstance()->LoadTexture("TitleUI/Exit.png");
 	//-----------------------------
 	// 各種スプライトの生成・初期化
 	//-----------------------------
 	// Startボタン用スプライト
 	StartButtonSprite_ = std::make_unique<Sprite>();
-	StartButtonSprite_->Initialize("uvChecker.png");
+	StartButtonSprite_->Initialize("TitleUI/Start.png");
 	StartButtonSprite_->SetAnchorPoint({0.5f, 0.5f}); // 中心揃え
 	StartButtonSprite_->SetPosition({centerX, buttonYPositions_[0]});
+	StartButtonSprite_->SetGetIsAdjustTextureSize(true);
 	StartButtonSprite_->Update();
 
 	// Exitボタン用スプライト
 	QuitButtonSprite_ = std::make_unique<Sprite>();
-	QuitButtonSprite_->Initialize("uvChecker.png");
+	QuitButtonSprite_->Initialize("TitleUI/Exit.png");
 	QuitButtonSprite_->SetAnchorPoint({0.5f, 0.5f});
 	QuitButtonSprite_->SetPosition({centerX, buttonYPositions_[1]});
+	QuitButtonSprite_->SetGetIsAdjustTextureSize(true);
 	QuitButtonSprite_->Update();
 
 	//-----------------------------
 	// ロゴスプライト生成・初期化
 	//-----------------------------
 	LogoSprite_ = std::make_unique<Sprite>();
-	LogoSprite_->Initialize("uvChecker.png");
+	LogoSprite_->Initialize("TitleUI/Title.png");
 	LogoSprite_->SetAnchorPoint({0.5f, 0.0f});
 	LogoSprite_->SetPosition({centerX, 100.0f});
-	LogoSprite_->SetSize({512.0f, 128.0f});
+	LogoSprite_->SetGetIsAdjustTextureSize(true);
 	LogoSprite_->Update();
 
 	//-----------------------------
@@ -93,30 +94,10 @@ void TitleUI::Initialize() {
 	selectorOffsets_.resize(buttons_.size(), {-150.0f, 0.0f});
 
 	//-----------------------------
-	// ボタン位置の再計算
+	// 入力確認ボタン
 	//-----------------------------
 	UpdateButtonPositions();
 
-	// 左下UI用スプライト生成・初期化
-	ChoiceSprite_ = std::make_unique<Sprite>();
-	ChoiceSprite_->Initialize("uvChecker.png");
-	ChoiceSprite_->SetAnchorPoint({0.0f, 1.0f});       // 左下基準
-	ChoiceSprite_->SetPosition({20.0f, 700.0f});       // 画面左下（例: 20, 700）
-	ChoiceSprite_->SetColor({1.0f, 1.0f, 1.0f, 0.8f}); // 少し透明
-	ChoiceSprite_->Update();
-
-	// ChoiceSprite_の幅を取得して右隣に配置
-	float choiceWidth = ChoiceSprite_->GetSize().x;
-	float baseX = 20.0f;
-	float baseY = 700.0f;
-	float interval = 20.0f; // スプライト間の余白
-
-	DecideSprite_ = std::make_unique<Sprite>();
-	DecideSprite_->Initialize("uvChecker.png");
-	DecideSprite_->SetAnchorPoint({0.0f, 1.0f}); // 左下基準
-	DecideSprite_->SetPosition({baseX + choiceWidth + interval, baseY});
-	DecideSprite_->SetColor({1.0f, 1.0f, 1.0f, 0.8f});
-	DecideSprite_->Update();
 }
 
 ///-------------------------------------------///
@@ -157,10 +138,7 @@ void TitleUI::Update() {
 	UpdateButtonSprites();
 
 	LogoSprite_->Update();
-	if (ChoiceSprite_)
-		ChoiceSprite_->Update();
-	if (DecideSprite_)
-		DecideSprite_->Update();
+	
 }
 
 ///-------------------------------------------///
@@ -197,15 +175,15 @@ bool TitleUI::HandleDecisionAnimation(float deltaTime) {
 ///-------------------------------------------///
 void TitleUI::HandleInput() {
     // 上キー：選択インデックスを1つ上へ
-    if (Input::GetInstance()->PushKey(DIK_UP) || Input::GetInstance()->TriggerKey(DIK_W)) {
+    if (Input::GetInstance()->TriggerKey(DIK_UP) || Input::GetInstance()->TriggerKey(DIK_W)) {
         selectedIndex_ = (selectedIndex_ + static_cast<int>(buttons_.size()) - 1) % static_cast<int>(buttons_.size());
     }
     // 下キー：選択インデックスを1つ下へ
-    if (Input::GetInstance()->PushKey(DIK_DOWN) || Input::GetInstance()->PushKey(DIK_S)) {
-        selectedIndex_ = (selectedIndex_ + 1) % static_cast<int>(buttons_.size());
-    }
-    // 決定ボタン：決定アニメーション開始
-    if (Input::GetInstance()->PushKey(DIK_RETURN) || Input::GetInstance()->PushKey(DIK_SPACE)) {
+	if (Input::GetInstance()->TriggerKey(DIK_DOWN) || Input::GetInstance()->TriggerKey(DIK_S)) {
+		selectedIndex_ = (selectedIndex_ + 1) % static_cast<int>(buttons_.size());
+	}
+	// 決定ボタン：決定アニメーション開始
+	if (Input::GetInstance()->TriggerKey(DIK_RETURN) || Input::GetInstance()->TriggerKey(DIK_SPACE)) {
         selectorDecisionAnim_ = true;
         selectorDecisionAnimTime_ = 0.0f;
         decisionIndex_ = selectedIndex_;
@@ -234,29 +212,28 @@ void TitleUI::UpdateSelectorSprite() {
 /// 各ボタンのスプライト更新
 ///-------------------------------------------///
 void TitleUI::UpdateButtonSprites() {
-	// 拡大率（選択中は大きく、他は通常サイズ）
-	constexpr float selectedScale = 1.2f;
-	constexpr float normalScale = 1.0f;
-	constexpr Vector2 baseSize = {256.0f, 64.0f}; // お好みで調整
+    // 色定義
+    const Vector4 selectedColor = {1.0f, 0.8f, 0.2f, 1.0f}; // 選択中（黄色系）
+    const Vector4 normalColor   = {1.0f, 1.0f, 1.0f, 1.0f}; // 通常（白）
 
-	// Startボタン
-	if (StartButtonSprite_) {
-		if (selectedIndex_ == 0) {
-			StartButtonSprite_->SetSize({baseSize.x * selectedScale, baseSize.y * selectedScale});
-		} else {
-			StartButtonSprite_->SetSize(baseSize);
-		}
-		StartButtonSprite_->Update();
-	}
-	// Quitボタン
-	if (QuitButtonSprite_) {
-		if (selectedIndex_ == 1) {
-			QuitButtonSprite_->SetSize({baseSize.x * selectedScale, baseSize.y * selectedScale});
-		} else {
-			QuitButtonSprite_->SetSize(baseSize);
-		}
-		QuitButtonSprite_->Update();
-	}
+    // Startボタン
+    if (StartButtonSprite_) {
+        if (selectedIndex_ == 0) {
+            StartButtonSprite_->SetColor(selectedColor);
+        } else {
+            StartButtonSprite_->SetColor(normalColor);
+        }
+        StartButtonSprite_->Update();
+    }
+    // Quitボタン
+    if (QuitButtonSprite_) {
+        if (selectedIndex_ == 1) {
+            QuitButtonSprite_->SetColor(selectedColor);
+        } else {
+            QuitButtonSprite_->SetColor(normalColor);
+        }
+        QuitButtonSprite_->Update();
+    }
 }
 
 ///-------------------------------------------///
@@ -289,11 +266,6 @@ void TitleUI::Draw() {
 	if (!isActive_)
 		return;
 
-	// 左下UI
-	if (ChoiceSprite_)
-		ChoiceSprite_->Draw();
-	if (DecideSprite_)
-		DecideSprite_->Draw();
 
 	// ロゴ
 	if (LogoSprite_) {
