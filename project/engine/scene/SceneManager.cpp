@@ -10,7 +10,7 @@ SceneManager* SceneManager::instance = nullptr; // シングルトンインス�
 void SceneManager::Initialize() {
 	
 	//初期シーンを設定
-	currentScene = std::make_unique<DebugScene>();
+	currentScene = std::make_unique<TitleScene>();
 	currentScene->Initialize();
 
 	//シーン番号を設定

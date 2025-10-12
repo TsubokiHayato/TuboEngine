@@ -161,10 +161,7 @@ void Sprite::Update()
 	if (isAdjustTextureSize) {
 		AdjustTextureSize();
 	}
-	else {
-		textureSize_ = { 100.0f,100.0f };
-		size = textureSize_;
-	}
+
 
 	/*---------------------------------------
 	テクスチャの位置、画像位置, 法線ベクトル, 大きさ
