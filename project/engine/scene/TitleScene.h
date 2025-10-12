@@ -7,7 +7,8 @@
 #include "SceneManager.h"
 #include "TitleUI.h"
 #include <random>
-#include "Animation/SceneChangeAnimation.h"
+#include <memory>
+#include "Sprite.h"
 
 class TitleScene : public IScene {
 public:
@@ -58,4 +59,14 @@ private:
 	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
 
 	std::unique_ptr<TitleUI> titleUI;
+
+	// フェード用スプライト
+	std::unique_ptr<Sprite> fadeSprite_;
+
+	// シーンチェンジアニメーション
+	bool isSceneChanging_ = false;
+	float sceneChangeTimer_ = 0.0f;
+	const float sceneChangeDuration_ = 1.0f; // 1秒でフェードアウト
+
+	float time_ = 0.0f; // 背景アニメーション用タイマー
 };
