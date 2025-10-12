@@ -94,8 +94,6 @@ private:
 	std::unique_ptr<Sprite> LogoSprite_;
 	std::unique_ptr<Sprite> StartButtonSprite_;
 	std::unique_ptr<Sprite> QuitButtonSprite_;
-	std::unique_ptr<Sprite> ChoiceSprite_;
-	std::unique_ptr<Sprite> DecideSprite_;
 
 	// オプション表示中フラグ
 	bool showOption_ = false;
