@@ -21,7 +21,7 @@
 #include"ImGuiManager.h"
 
 #include"SkyBox.h"
-#include"SceneChangeAnimation.h"
+#include"Animation/SceneChangeAnimation.h"
 
 
 #undef min//minマクロを無効化
