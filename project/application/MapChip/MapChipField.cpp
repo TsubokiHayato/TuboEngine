@@ -9,6 +9,14 @@
 #include"ImGuiManager.h"
 
 //--------------------------------------------------
+// static変数の定義（ブロックサイズ）
+//--------------------------------------------------
+float MapChipField::kBlockWidth_ = 2.0f;
+float MapChipField::kBlockHeight_ = 2.0f;
+float MapChipField::kBlockSize_ = (kBlockWidth_ + kBlockHeight_) / 2.0f;
+
+
+//--------------------------------------------------
 // マップチップ種別テーブル（CSV値→MapChipType）
 //--------------------------------------------------
 namespace {
@@ -165,11 +173,6 @@ bool MapChipField::IsRectBlocked(const Vector3& center, float width, float heigh
     return false;
 }
 
-//--------------------------------------------------
-// static変数の定義（ブロックサイズ）
-//--------------------------------------------------
-float MapChipField::kBlockWidth_ = 2.0f;
-float MapChipField::kBlockHeight_ = 2.0f;
 
 //--------------------------------------------------
 // ImGuiの描画処理
