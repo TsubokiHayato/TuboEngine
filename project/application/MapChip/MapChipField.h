@@ -87,8 +87,12 @@ public:
 	///--------------------------------------------------
 	static float GetBlockWidth() { return kBlockWidth_; }
 	static float GetBlockHeight() { return kBlockHeight_; }
+	static float GetBlockSize() { return kBlockSize_; }
+
 	static void SetBlockWidth(float w) { kBlockWidth_ = w; }
 	static void SetBlockHeight(float h) { kBlockHeight_ = h; }
+	static void SetBlockSize(float s) { kBlockSize_ = s; }
+
 
 private:
 	///--------------------------------------------------
@@ -98,6 +102,8 @@ private:
 	// 1ブロックのサイズ（static変数に変更）
 	static float kBlockWidth_;
 	static float kBlockHeight_;
+	static float kBlockSize_; // kBlockWidth_とkBlockHeight_の平均値
+
 	// ブロックの個数
 	static inline const uint32_t kNumBlockVirtical = 20;
 	static inline const uint32_t kNumBlockHorizontal = 100;
