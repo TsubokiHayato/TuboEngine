@@ -5,7 +5,7 @@
 #include "Particle.h"
 #include "ParticleEmitter.h"
 #include <random>
-#include "SceneChangeAnimation.h"
+#include "Animation/SceneChangeAnimation.h"
 
 class TitleScene : public IScene {
 public:
