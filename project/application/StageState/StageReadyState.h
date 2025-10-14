@@ -49,9 +49,7 @@ public:
 
 private:
 	// --- アニメーション制御用 ---
-	float dropTimer_ = 0.0f;                         ///< アニメーション全体タイマー
 	int currentDroppingLayer_ = 0;                   ///< 現在落下中のレイヤー
-	float layerDropTimer_ = 0.0f;                    ///< 現在レイヤーのタイマー
 	bool isDropFinished_ = false;                    ///< アニメーション終了フラグ
 	std::chrono::steady_clock::time_point prevTime_; ///< 前フレーム時刻
 
@@ -59,11 +57,20 @@ private:
 	std::vector<Vector3> blockTargetPositions_;
 	Vector3 playerTargetPosition_;
 	std::vector<Vector3> enemyTargetPositions_;
+	std::vector<Vector3> tileTargetPositions_;      // Tileの目標座標
+	std::vector<Vector3> allDropTargetPositions_;
 
 	// --- 各オブジェクトのレイヤー番号（チェビシェフ距離） ---
 	std::vector<float> blockRippleLayers_;
 	std::vector<float> enemyRippleLayers_;
+	std::vector<float> tileRippleLayers_;           // Tileのレイヤー
 
 	const float kDropDuration = 0.5f;
 	const float kDropOffsetZ = 30.0f;
+	
+	float dropDuration_ = 0.3f; // 落下1レイヤーの所要時間
+	float dropOffsetZ_ = 20.0f; // 落下開始時のZオフセット
+	float dropTimer_ = 0.0f;
+
+	float layerDropTimer_ = 0.0f; // 現在のレイヤーの落下下アニメーションタイマー
 };
