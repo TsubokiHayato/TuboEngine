@@ -12,6 +12,7 @@ void StageScene::Initialize() {
 	mapChipField_ = std::make_unique<MapChipField>();
 	player_ = std::make_unique<Player>();
 	followCamera = std::make_unique<FollowTopDownCamera>();
+	camera = std::make_unique<Camera>();
 	collisionManager_ = std::make_unique<CollisionManager>();
 	stateManager_ = std::make_unique<StageStateManager>();
 
@@ -30,7 +31,7 @@ void StageScene::Update() {
 		stateManager_->Update(this);
 	}
 	// デフォルトカメラをFollowCameraに設定
-	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
+	//LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	// 衝突マネージャの更新
 	collisionManager_->Update();
 	// 全ての衝突をチェック
