@@ -72,25 +72,37 @@ void MapChipField::ResetMapChipData() {
 // CSVからマップチップデータを読み込む
 //--------------------------------------------------
 void MapChipField::LoadMapChipCsv(const std::string& filePath) {
-    ResetMapChipData();
-    std::ifstream file(filePath);
-    if (!file.is_open()) return;
-    std::stringstream mapChipCsv;
-    mapChipCsv << file.rdbuf();
-    file.close();
+	std::ifstream file(filePath);
+	std::string line;
+	mapChipData_.data.clear();
 
-    for (uint32_t i = 0; i < kNumBlockVirtical; ++i) {
-        std::string line;
-        if (!std::getline(mapChipCsv, line)) break;
-        std::istringstream line_stream(line);
-        for (uint32_t j = 0; j < kNumBlockHorizontal; ++j) {
-            std::string word;
-            if (!std::getline(line_stream, word, ',')) break;
-            mapChipData_.data[i][j] = mapChipTable.contains(word) ? mapChipTable[word] : MapChipType::kBlank;
-        }
-    }
+	while (std::getline(file, line)) {
+		std::vector<MapChipType> row;
+		std::stringstream ss(line);
+		std::string cell;
+		while (std::getline(ss, cell, ',')) {
+			int value = std::stoi(cell);
+			switch (value) {
+			case 0:
+				row.push_back(MapChipType::kBlank);
+				break;
+			case 1:
+				row.push_back(MapChipType::kBlock);
+				break;
+			case 2:
+				row.push_back(MapChipType::Player);
+				break;
+			case 3:
+				row.push_back(MapChipType::Enemy);
+				break;
+			default:
+				row.push_back(MapChipType::kBlank);
+				break;
+			}
+		}
+		mapChipData_.data.push_back(row);
+	}
 }
-
 //--------------------------------------------------
 // インデックスからマップチップ種別を取得
 //--------------------------------------------------
