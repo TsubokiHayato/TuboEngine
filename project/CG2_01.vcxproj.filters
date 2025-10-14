@@ -115,7 +115,7 @@
     <ClCompile Include="application\HitEffect\HitEffectManager.cpp" />
     <ClCompile Include="application\MapChip\MapChipField.cpp" />
     <ClCompile Include="application\Animation\DropWaveAnimation.cpp" />
-    <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="application\Tile\Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
@@ -249,7 +249,7 @@
     <ClInclude Include="application\MapChip\MapChipField.h" />
     <ClInclude Include="application\Animation\DropWaveAnimation.h" />
     <ClInclude Include="application\StageState\DropWaveAnimator.h" />
-    <ClInclude Include="Tile.h" />
+    <ClInclude Include="application\Tile\Tile.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
