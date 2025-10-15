@@ -39,10 +39,9 @@ public:
 	MapChipType GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex) const ;
 	// インデックスからマップチップの座標を取得
 	Vector3 GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex);
-	// 縦方向のブロック数を取得
-	uint32_t GetNumBlockVirtical() { return kNumBlockVirtical; }
-	// 横方向のブロック数を取得
-	uint32_t GetNumBlockHorizontal() { return kNumBlockHorizontal; }
+	
+	uint32_t GetNumBlockVirtical() { return static_cast<uint32_t>(mapChipData_.data.size()); }
+	uint32_t GetNumBlockHorizontal() { return mapChipData_.data.empty() ? 0 : static_cast<uint32_t>(mapChipData_.data[0].size()); }
 
 	///--------------------------------------------------
 	///				構造体
@@ -102,6 +101,7 @@ private:
 	// 1ブロックのサイズ（static変数に変更）
 	static float kBlockWidth_;
 	static float kBlockHeight_;
+
 	static float kBlockSize_; // kBlockWidth_とkBlockHeight_の平均値
 
 	// ブロックの個数
