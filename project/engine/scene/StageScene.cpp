@@ -15,7 +15,7 @@ void StageScene::Initialize() {
 	camera = std::make_unique<Camera>();
 	collisionManager_ = std::make_unique<CollisionManager>();
 	stateManager_ = std::make_unique<StageStateManager>();
-
+	
 	// 衝突マネージャの生成
 	collisionManager_->Initialize();
 	// ステートマネージャの生成

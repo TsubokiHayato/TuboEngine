@@ -1,6 +1,4 @@
 #include "DirectXcommon.h"
-
-
 #include<cassert>
 #include <thread>
 #include<SrvManager.h>
