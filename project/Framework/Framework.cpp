@@ -59,7 +59,7 @@ void Framework::Initialize() {
 	LineManager::GetInstance()->Initialize();
 
 	//シーンマネージャーの初期化
-	SceneManager::GetInstance()->Initialize();
+	SceneManager::GetInstance()->Initialize(STAGE); // タイトルシーンから開始
 
 }
 void Framework::Update() {
