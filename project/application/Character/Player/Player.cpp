@@ -69,42 +69,47 @@ void Player::Initialize() {
 // 更新処理
 //--------------------------------------------------
 void Player::Update() {
-	isHit = false;
-	// ダメージクールダウンタイマー更新
-	if (damageCooldownTimer > 0.0f) {
-		damageCooldownTimer -= 1.0f / 60.0f;
-		if (damageCooldownTimer < 0.0f) damageCooldownTimer = 0.0f;
+	if (isAllive == false) {
+		return;
+	}// 死亡状態なら更新しない
+
+	if (!isDontMove) {
+
+		isHit = false;
+		// ダメージクールダウンタイマー更新
+		if (damageCooldownTimer > 0.0f) {
+			damageCooldownTimer -= 1.0f / 60.0f;
+			if (damageCooldownTimer < 0.0f)
+				damageCooldownTimer = 0.0f;
+		}
+		UpdateDodge();
+		// 回避入力（Zキー）
+		if (CanDodge() && Input::GetInstance()->PushKey(DIK_Z)) {
+			StartDodge();
+		}
+		Move();
+		Rotate();
+
+		// 発射タイマー更新
+		if (bulletTimer > 0.0f) {
+			bulletTimer -= 1.0f / 60.0f; // 60FPS前提
+		}
+
+		Shoot();
+
+		// 弾の更新
+		for (auto& bullet : bullets) {
+			bullet->SetCamera(object3d->GetCamera());
+			bullet->Update();
+		}
+
+		// isAlive==false のバレットを削除
+		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const std::unique_ptr<PlayerBullet>& bullet) { return !bullet->GetIsAlive(); }), bullets.end());
+
+		if (HP <= 0) {
+			isAllive = false; // HPが0以下なら死亡状態にする
+		}
 	}
-	UpdateDodge();
-	// 回避入力（Zキー）
-	if (CanDodge() && Input::GetInstance()->PushKey(DIK_Z)) {
-		StartDodge();
-	}
-	Move();
-	Rotate();
-
-	
-
-	// 発射タイマー更新
-	if (bulletTimer > 0.0f) {
-		bulletTimer -= 1.0f / 60.0f; // 60FPS前提
-	}
-
-	Shoot();
-
-	// 弾の更新
-	for (auto& bullet : bullets) {
-		bullet->SetCamera(object3d->GetCamera());
-		bullet->Update();
-	}
-
-	// isAlive==false のバレットを削除
-	bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const std::unique_ptr<PlayerBullet>& bullet) { return !bullet->GetIsAlive(); }), bullets.end());
-
-	if (HP <= 0) {
-		isAllive = false; // HPが0以下なら死亡状態にする
-	}
-
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
 	object3d->SetScale(scale);

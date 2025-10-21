@@ -54,6 +54,7 @@ void StageScene::Object3DDraw() {
 	// グリッド描画（回転対応）
 	LineManager::GetInstance()->DrawGrid(10000.0f, 1000, {DirectX::XM_PIDIV2, 0.0f, 0.0f});
 }
+
 void StageScene::SpriteDraw() {
 	
 	// ステートマネージャのスプライト描画
