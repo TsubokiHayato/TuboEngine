@@ -7,16 +7,24 @@
 
 
 SceneManager* SceneManager::instance = nullptr; // シングルトンインスタンス
-void SceneManager::Initialize() {
-	
-	//初期シーンを設定
-	currentScene = std::make_unique<DebugScene>();
-	currentScene->Initialize();
+void SceneManager::Initialize(int startSceneNo) {
+    // 初期シーンを設定
+    currentSceneNo = startSceneNo;
+    prevSceneNo = -1;
 
-	//シーン番号を設定
-	currentSceneNo = 0;
-	//前のシーン番号を設定
-	prevSceneNo = -1;
+    // シーン番号によってシーンを設定
+    if (currentSceneNo == DEBUG) {
+        currentScene = std::make_unique<DebugScene>();
+    } else if (currentSceneNo == TITLE) {
+        currentScene = std::make_unique<TitleScene>();
+    } else if (currentSceneNo == STAGE) {
+        currentScene = std::make_unique<StageScene>();
+    } else if (currentSceneNo == CLEAR) {
+        currentScene = std::make_unique<ClearScene>();
+    }
+    if (currentScene) {
+        currentScene->Initialize();
+    }
 }	
 
 void SceneManager::Update() {
