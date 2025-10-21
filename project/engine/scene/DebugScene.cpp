@@ -23,7 +23,7 @@ void DebugScene::Initialize() {
 #pragma region Audioの初期化
 	audio = std::make_unique<Audio>();
 	audio->Initialize(audioFileName);
-	audio->Play(false);
+	//audio->Play(false);
 
 #pragma endregion Audioの初期化
 

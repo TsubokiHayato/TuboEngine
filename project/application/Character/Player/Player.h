@@ -42,6 +42,15 @@ public:
 
 	void ReticleDraw();
 
+	
+
+private:
+	// --- 回避関連 ---
+	void StartDodge();
+	void UpdateDodge();
+	bool CanDodge() const;
+	Vector3 GetDodgeInputDirection() const;
+
 public:
 	///-----------------------------------
 	///				ゲッター
@@ -81,11 +90,14 @@ public:
 	// マップチップフィールドを設定
 	void SetMapChipField(MapChipField* mapChipField) { this->mapChipField = mapChipField; }
 
+	void SetIsDontMove(bool flag) { isDontMove = flag; }
+
 private:
 	///--------------------------------------------------
 	///				引き渡し用変数
 	///--------------------------------------------------
 	MapChipField* mapChipField = nullptr; // マップチップフィールド
+
 private:
 	///--------------------------------------------------
 	///				メンバ変数
@@ -110,5 +122,6 @@ private:
 	Vector2 reticlePosition = {0.0f, 0.0f}; // レティクルの位置（画面中央）
 	Vector2 reticleSize = {50.0f, 50.0f};   // レティクルのサイズ
 
+	bool isDontMove=false;
 	
 };
