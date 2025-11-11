@@ -193,6 +193,8 @@ void Animator::Draw() {
 
 // ImGui描画
 void Animator::DrawImGui(const char* windowName) {
+
+#ifdef USE_IMGUI
 	ImGui::Begin(windowName);
 
 	ImGui::Separator();
@@ -288,6 +290,7 @@ void Animator::DrawImGui(const char* windowName) {
 		}
 	}
 	ImGui::End();
+#endif // USE_IMGUI
 }
 
 // モデルの色設定
