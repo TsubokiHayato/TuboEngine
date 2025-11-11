@@ -12,13 +12,12 @@ void StageStateManager::Initialize(StageScene* scene) {
     states_[StageType::GameClear]    = std::make_unique<GameClearState>();
     states_[StageType::GameOver]     = std::make_unique<GameOverState>();
 
-    // 各ステートのInitializeを呼ぶ（必要なら）
-    for (auto& [state, ptr] : states_) {
-        ptr->Enter(scene);
+    // 最初のステートをセットしてEnterのみ呼ぶ
+    state_ = StageType::GameOver;
+	currentState_ = states_[StageType::GameOver].get();
+    if (currentState_) {
+        currentState_->Enter(scene);
     }
-
-    // 最初のステートをセット
-    currentState_ = states_[StageType::Ready].get();
 }
 
 void StageStateManager::Update(StageScene* scene) {
@@ -30,7 +29,6 @@ void StageStateManager::Update(StageScene* scene) {
     // デバッグ用：ImGuiからのステート遷移要求を処理
     if (pendingState_ != static_cast<StageType>(-1)) {
         ChangeState(pendingState_, scene);
-        state_ = pendingState_;
         pendingState_ = static_cast<StageType>(-1);
     }
 }
@@ -54,10 +52,16 @@ void StageStateManager::ParticleDraw(StageScene* scene) {
 }
 
 void StageStateManager::ChangeState(StageType nextType, StageScene* scene) {
+    // 次のステートが生成済みかチェック
+    auto it = states_.find(nextType);
+    if (it == states_.end()) {
+        return;
+    }
+
     if (currentState_) {
         currentState_->Exit(scene);
     }
-    currentState_ = states_[nextType].get();
+    currentState_ = it->second.get();
     state_ = nextType;
     if (currentState_) {
         currentState_->Enter(scene);
