@@ -111,6 +111,8 @@ void SceneManager::SpriteDraw() {
 }
 
 void SceneManager::ImGuiDraw() {
+
+#ifdef USE_IMGUI
 	//現在のシーンがnullptrでない場合
 	if (currentScene) {
 		//ImGui描画
@@ -136,6 +138,7 @@ void SceneManager::ImGuiDraw() {
 	};
 	ImGui::End();
 
+	#endif // USE_IMGUI
 }
 
 void SceneManager::ParticleDraw() {

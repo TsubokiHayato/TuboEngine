@@ -28,9 +28,12 @@ void GaussianBlurEffect::Initialize() {
 void GaussianBlurEffect::Update() {}
 
 void GaussianBlurEffect::DrawImGui() {
+
+#ifdef USE_IMGUI
     ImGui::Begin("Vignette Effect");
     ImGui::SliderFloat("Vignette Scale", &params_->sigma, 0.0f, 32.0f);
     ImGui::End();
+#endif // USE_IMGUI
 }
 
 void GaussianBlurEffect::Draw(ID3D12GraphicsCommandList* commandList) {
