@@ -232,7 +232,7 @@ void StageReadyState::Update(StageScene* scene) {
 		readyAppearAnim_ = 0.0f;
 	}
 
-	// --- START!!アニメーション（拡大しながらフェードアウト） ---
+	// --- START!!アニメーション（フェードアウト） ---
 	if (readyPhase_ == ReadyStatePhase::Start) {
 		startAppearAnim_ += deltaTime * 1.5f; // 0.67秒で1.0f
 		if (startAppearAnim_ > 1.0f)
@@ -244,7 +244,14 @@ void StageReadyState::Update(StageScene* scene) {
 		// フェードアウト
 		float alpha = 1.0f - ease;
 
+
+
 		startSprite_->SetColor({1, 1, 1, alpha});
+
+		if (ease >= 1.0f) {
+			// STARTアニメーション終了でPlayingへ遷移
+			scene->GetStageStateManager()->ChangeState(StageType::Playing, scene);
+		}
 	} else {
 		startAppearAnim_ = 0.0f;
 	}
@@ -354,15 +361,6 @@ void StageReadyState::Update(StageScene* scene) {
 		readyTimer_ = 0.0f;
 	}
 
-	// START!!表示
-	if (readyPhase_ == ReadyStatePhase::Start) {
-		readyTimer_ += deltaTime;
-		if (readyTimer_ > 0.7f) {
-			readyPhase_ = ReadyStatePhase::None;
-			readyTimer_ = 0.0f;
-		}
-	}
-
 	readySprite_->Update();
 	startSprite_->Update();
 	restartSprite_->Update();
@@ -427,6 +425,8 @@ void StageReadyState::ImGuiDraw(StageScene* scene) {
 		}
 	}
 
+	
+
 	// 落下アニメーション制御UI
 	if (ImGui::CollapsingHeader("Drop Animation")) {
 		auto easeOutQuad = [](float t) { return 1.0f - (1.0f - t) * (1.0f - t); };
@@ -455,6 +455,23 @@ void StageReadyState::ImGuiDraw(StageScene* scene) {
 		}
 
 		ImGui::Text("isDropFinished: %s", isDropFinished_ ? "true" : "false");
+
+		//現在のPhase状態
+		const char* phaseStr = "";
+		switch (readyPhase_) {
+		case ReadyStatePhase::Ready:
+			phaseStr = "Ready";
+			break;
+		case ReadyStatePhase::Start:
+			phaseStr = "Start";
+			break;
+		case ReadyStatePhase::None:
+			phaseStr = "None";
+			break;
+		}
+		ImGui::Text("Current Phase: %s", phaseStr);
+
+
 	}
 #endif // USE_IMGUI
 }

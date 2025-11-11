@@ -20,6 +20,10 @@ void StagePlayingState::Update(StageScene* scene) {
 	/// 各オブジェクトの更新
 	///------------------------------------------------
 
+
+	/// MapChipField///
+	
+
 	/// ブロック ///
 	for (auto& block : blocks_) {
 		// カメラ設定
@@ -32,6 +36,7 @@ void StagePlayingState::Update(StageScene* scene) {
 	// カメラ設定
 	player_->SetCamera(followCamera->GetCamera());
 	player_->SetIsDontMove(false);
+	player_->SetMapChipField(mapChipField_);
 	// 更新
 	player_->Update();
 
@@ -73,7 +78,7 @@ void StagePlayingState::Update(StageScene* scene) {
 		}
 	}
 	if (allEnemiesDefeated && !enemies.empty()) {
-		scene->GetStageStateManager()->ChangeState(StageType::GameClear, scene);
+		scene->GetStageStateManager()->ChangeState(StageType::StageClear, scene);
 		return;
 	}
 
