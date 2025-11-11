@@ -19,11 +19,13 @@ void BloomEffect::Initialize() {
 void BloomEffect::Update() {}
 
 void BloomEffect::DrawImGui() {
+#ifdef USE_IMGUI
 	ImGui::Begin("Bloom Effect Settings");
 	ImGui::SliderFloat("Threshold", &params_->threshold, 0.0f, 5.0f, "%.2f");
 	ImGui::SliderFloat("Intensity", &params_->intensity, 0.0f, 5.0f, "%.2f");
 	ImGui::End();
 
+#endif // USE_IMGUI
 }
 
 void BloomEffect::Draw(ID3D12GraphicsCommandList* commandList) {

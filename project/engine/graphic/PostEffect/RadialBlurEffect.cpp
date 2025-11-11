@@ -29,11 +29,14 @@ void RadialBlurEffect::Initialize() {
 void RadialBlurEffect::Update() {}
 
 void RadialBlurEffect::DrawImGui() {
+
+#ifdef USE_IMGUI
     ImGui::Begin("Radial Effect");
 	
 	ImGui::DragFloat("Radial Blur Power", &params_->radialBlurPower, 0.01f,0.0f, 10.0f);
 	ImGui::SliderFloat2("Radial Blur Center X", &params_->radialBlurCenter.x, 0.0f, 1.0f);
     ImGui::End();
+#endif // USE_IMGUI
 }
 
 void RadialBlurEffect::Draw(ID3D12GraphicsCommandList* commandList) {

@@ -418,6 +418,8 @@ void StageReadyState::SpriteDraw(StageScene* scene) {
 }
 
 void StageReadyState::ImGuiDraw(StageScene* scene) {
+
+#ifdef USE_IMGUI
 	// カメラ操作用UI（FollowCamera）
 	if (scene->GetFollowCamera()) {
 		if (ImGui::CollapsingHeader("FollowCamera")) {
@@ -454,6 +456,7 @@ void StageReadyState::ImGuiDraw(StageScene* scene) {
 
 		ImGui::Text("isDropFinished: %s", isDropFinished_ ? "true" : "false");
 	}
+#endif // USE_IMGUI
 }
 
 void StageReadyState::ParticleDraw(StageScene* scene) {}
