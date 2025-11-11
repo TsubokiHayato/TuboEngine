@@ -36,6 +36,8 @@ void Enemy::Initialize() {
 	particle = nullptr;
 	particleEmitter_ = nullptr;
 
+	HP = 10;
+
 	// スプライト初期化
 	/*exclamationSprite_ = std::make_unique<Sprite>();
 	exclamationSprite_->Initialize("exclamation.png");
@@ -60,6 +62,12 @@ static float NormalizeAngle(float angle) {
 }
 
 void Enemy::Update() {
+
+	if (HP <= 0) {
+		isAllive = false;
+		return;
+	}
+
 	// プレイヤーがいれば距離と方向を計算
 	float distanceToPlayer = 0.0f;
 	Vector3 toPlayer = {0, 0, 0};
@@ -255,6 +263,7 @@ void Enemy::OnCollision(Collider* other) {
 	// ここで攻撃を受けたかどうかを判定（例: プレイヤーの弾かどうか）
 	// 今回は単純に攻撃を受けたら発見状態（Chase）に遷移する例
 	isHit = true;
+	HP -= 1;
 	if (state_ == State::Idle || state_ == State::Alert) {
 		// プレイヤーの位置が分かる場合はそこに向かう
 		if (player_) {
