@@ -113,8 +113,8 @@ private:
 	// オフスクリーン用RTVハンドル
 	D3D12_CPU_DESCRIPTOR_HANDLE offscreenRtvHandle{};
 
-	// レンダーターゲットのクリアカラー（赤色）
-	const Vector4 kRenderTargetClearValue = {0.1f, 0.25f, 0.5f, 1.0f}; // RGBの値。青っぽい色;
+	// レンダーターゲットのクリアカラー
+	const Vector4 kRenderTargetClearValue = {0.0f,0.0f,0.0f, 1.0f}; // RGBの値。青っぽい色;
 
 	// レンダーテクスチャリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_;

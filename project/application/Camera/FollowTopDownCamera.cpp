@@ -88,6 +88,7 @@ void FollowTopDownCamera::DrawImGui() {
 	ImGui::End();
 }
 
+void FollowTopDownCamera::SetRotation(const Vector3& rotation) { rotation_ = rotation; }
 void FollowTopDownCamera::SetTarget(Player* target) { target_ = target; }
 void FollowTopDownCamera::SetOffset(const Vector3& offset) { offset_ = offset; }
 void FollowTopDownCamera::SetFollowSpeed(float speed) { followSpeed_ = speed; }

@@ -19,7 +19,6 @@
     <ClCompile Include="engine\base\Common\DirectXCommon.cpp" />
     <ClCompile Include="engine\input\Input.cpp" />
     <ClCompile Include="engine\base\Utilities\Logger.cpp" />
-    <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
     <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp" />
@@ -116,6 +115,9 @@
     <ClCompile Include="application\MapChip\MapChipField.cpp" />
     <ClCompile Include="application\Animation\DropWaveAnimation.cpp" />
     <ClCompile Include="application\Tile\Tile.cpp" />
+    <ClCompile Include="engine\scene\OverScene.cpp" />
+    <ClCompile Include="application\SkyDome\SkyDome.cpp" />
+    <ClCompile Include="externals\imgui\imgui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
@@ -250,6 +252,8 @@
     <ClInclude Include="application\Animation\DropWaveAnimation.h" />
     <ClInclude Include="application\StageState\DropWaveAnimator.h" />
     <ClInclude Include="application\Tile\Tile.h" />
+    <ClInclude Include="engine\scene\OverScene.h" />
+    <ClInclude Include="application\SkyDome\SkyDome.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />

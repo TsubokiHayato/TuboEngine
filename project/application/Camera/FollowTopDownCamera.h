@@ -11,6 +11,7 @@ public:
 	void Update();
 	void DrawImGui();
 
+	void SetRotation(const Vector3& rotation);
 	void SetTarget(Player* target);
 	void SetOffset(const Vector3& offset);
 	void SetFollowSpeed(float speed);
@@ -20,6 +21,8 @@ public:
 	void Shake(float intensity, float duration);
 
 	Camera* GetCamera() const { return camera_; }
+	Vector3 GetOffset() const { return offset_; }
+	Vector3 GetRotation() const { return rotation_; }
 
 private:
 	Player* target_ = nullptr;
