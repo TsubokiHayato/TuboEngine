@@ -2,6 +2,7 @@
 #include "Bullet/BaseBullet.h"
 #include "Object3d.h"
 #include "Vector3.h"
+#include"MapChip/MapChipField.h"
 
 ///---------------------------------------------------
 //				前方宣言
@@ -43,6 +44,9 @@ public:
 	/// </summary>
 	// 当たり判定の中心座標を返す
 	virtual Vector3 GetCenterPosition() const override;
+
+	// 追加: マップチップフィールド設定
+	void SetMapChipField(MapChipField* field) { mapChipField_ = field; }
 
 	///--------------------------------------------------
 	///				ゲッター&セッター
@@ -99,9 +103,9 @@ private:
 
 private:
 	// 弾の速度
-	float bulletSpeed = 2.0f;
+	float bulletSpeed = 0.0f;
 	// 消滅するZ座標
-	float disappearZ = 100.0f;
+	float disappearZ = 0.0f;
 
 	// 生存フラグ
 	bool isAlive = true;
@@ -114,7 +118,9 @@ private:
 	/// Enemy ///
 	Vector3 enemyPosition_; // 敵の位置
 	Vector3 enemyRotation_; // 敵の回転
-	
+
+	// 参照用
+	MapChipField* mapChipField_ = nullptr;
 
 public:
 	///--------------------------------------------------
