@@ -182,11 +182,6 @@ void StageReadyState::Update(StageScene* scene) {
 		restartWaitTimer_ = 0.0f;
 	}
 
-	// Rキーで全アニメーションをリスタート
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		Enter(scene);
-		return;
-	}
 
 	// 常にフォローカメラをデフォルトに
 	if (scene->GetFollowCamera()) {

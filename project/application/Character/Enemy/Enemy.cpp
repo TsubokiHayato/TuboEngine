@@ -366,6 +366,9 @@ void Enemy::OnCollision(Collider* other) {
 }
 
 void Enemy::Draw() {
+	if (isAllive == false) {
+        return;
+	}
 	if (object3d) {
 		object3d->Draw();
 	}
