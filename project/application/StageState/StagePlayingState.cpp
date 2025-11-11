@@ -91,6 +91,11 @@ void StagePlayingState::Update(StageScene* scene) {
 		scene->GetStageStateManager()->ChangeState(StageType::GameOver, scene);
 		return;
 	}
+
+
+
+
+
 }
 
 void StagePlayingState::Exit(StageScene* scene) {}
