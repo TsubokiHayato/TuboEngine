@@ -1,4 +1,5 @@
 #include "StagePlayingState.h"
+#include "LineManager.h"
 #include "StageScene.h"
 
 // StagePlayingState
@@ -20,9 +21,6 @@ void StagePlayingState::Update(StageScene* scene) {
 	/// 各オブジェクトの更新
 	///------------------------------------------------
 
-
-	/// MapChipField///
-	
 
 	/// ブロック ///
 	for (auto& block : blocks_) {
@@ -65,6 +63,10 @@ void StagePlayingState::Update(StageScene* scene) {
 	// 更新
 	followCamera->Update();
 
+	
+	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
+	LineManager::GetInstance()->Update();
+
 	///------------------------------------------------
 	/// ゲームクリア判定
 	///------------------------------------------------
@@ -91,18 +93,21 @@ void StagePlayingState::Update(StageScene* scene) {
 		scene->GetStageStateManager()->ChangeState(StageType::GameOver, scene);
 		return;
 	}
-
-
-
-
-
 }
 
 void StagePlayingState::Exit(StageScene* scene) {}
 
 void StagePlayingState::Object3DDraw(StageScene* scene) {
-
 	// 3Dオブジェクトの描画
+	// スカイドーム描画
+	scene->GetSkyDome()->Draw();
+
+	// タイル描画
+	std::vector<std::unique_ptr<Tile>>& tiles_ = scene->GetTiles();
+	for (auto& tile : tiles_) {
+		tile->Draw();
+	}
+
 	// ブロック描画
 	std::vector<std::unique_ptr<Block>>& blocks_ = scene->GetBlocks();
 	for (auto& block : blocks_) {
@@ -117,13 +122,6 @@ void StagePlayingState::Object3DDraw(StageScene* scene) {
 	for (auto& enemy : enemies) {
 		enemy->Draw();
 	}
-	// タイル描画
-	std::vector<std::unique_ptr<Tile>>& tiles_ =scene->GetTiles();
-	for (auto& tile : tiles_) {
-		tile->Draw();
-	}
-	// スカイドーム描画
-	scene->GetSkyDome()->Draw();
 }
 
 void StagePlayingState::SpriteDraw(StageScene* scene) { scene->GetPlayer()->ReticleDraw(); }
