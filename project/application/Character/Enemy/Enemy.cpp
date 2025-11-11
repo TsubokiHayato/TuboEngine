@@ -7,6 +7,8 @@
 #include "TextureManager.h"
 #include "Sprite.h"
 #include <cmath>
+// 追加: プレイヤー弾のダメージを使いたい場合
+#include "Bullet/Player/PlayerBullet.h"
 
 constexpr float kPI = 3.14159265358979323846f;
 
@@ -331,12 +333,30 @@ void Enemy::EmitHitParticle() {
 }
 
 void Enemy::OnCollision(Collider* other) {
-	// ここで攻撃を受けたかどうかを判定（例: プレイヤーの弾かどうか）
-	// 今回は単純に攻撃を受けたら発見状態（Chase）に遷移する例
+	// null 安全
+	if (!other) { return; }
+
+	// 相手がプレイヤーの武器以外なら無視
+	const uint32_t typeID = other->GetTypeID();
+	if (typeID != static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon)) {
+		return;
+	}
+
+	// ここからダメージ処理（プレイヤー武器のみ）
 	isHit = true;
-	HP -= 1;
+
+	// 固定ダメージにしたい場合:
+	// HP -= 1;
+
+	// 弾のグローバルダメージを使う場合:
+	HP -= PlayerBullet::s_damage;
+
+	if (HP <= 0) {
+		isAllive = false;
+	}
+
+	// 発見状態へ（元の挙動を維持）
 	if (state_ == State::Idle || state_ == State::Alert) {
-		// プレイヤーの位置が分かる場合はそこに向かう
 		if (player_) {
 			lastSeenPlayerPos = player_->GetPosition();
 			lastSeenTimer = kLastSeenDuration;
