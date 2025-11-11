@@ -72,20 +72,37 @@ void PlayerBullet::Update() {
 	scale = s_scale;
 	rotation = s_rotation;
 
-	// 弾の進行方向を計算（プレイヤーの回転に依存）
-	velocity.x = -sinf(playerRotation.z) * bulletSpeed;
-	velocity.y = cosf(playerRotation.z) * bulletSpeed;
+	// プレイヤー向きから進行方向決定
+	velocity.x = std::sinf(playerRotation.z) * bulletSpeed;
+	velocity.y = -std::cosf(playerRotation.z) * bulletSpeed;
 	velocity.z = 0.0f;
 
-	// 位置を更新
-	position += velocity;
+	// 今フレームの移動量
+	Vector3 desiredMove = velocity; // dt(=1) 前提
+	float moveLen2D = std::sqrt(desiredMove.x * desiredMove.x + desiredMove.y * desiredMove.y);
 
-	// プレイヤーからの距離が一定以上なら消滅
-	if (Distance(position, playerPostion_) > s_disappearRadius) {
+	// ブロック貫通防止用サブステップ
+	float tileSize = (mapChipField_) ? MapChipField::GetBlockSize() : 1.0f;
+	int subSteps = std::max(1, int(std::ceil(moveLen2D / (tileSize * 0.5f))));
+	Vector3 stepMove = desiredMove / float(subSteps);
+
+	for (int i = 0; i < subSteps; ++i) {
+		Vector3 nextPos = position + stepMove;
+		if (mapChipField_ && mapChipField_->IsBlocked(nextPos)) {
+			isAlive = false;
+			break;
+		}
+		position = nextPos;
+		if (!isAlive) break;
+	}
+
+	// プレイヤーから離れすぎたら消滅
+	if (isAlive && Distance(position, playerPostion_) > s_disappearRadius) {
 		isAlive = false;
 	}
 
-	// 3Dオブジェクトのパラメータを更新
+	if (!isAlive) { return; }
+
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
 	object3d->SetScale(scale);
