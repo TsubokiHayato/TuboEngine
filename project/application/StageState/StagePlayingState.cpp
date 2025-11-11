@@ -31,6 +31,7 @@ void StagePlayingState::Update(StageScene* scene) {
 	/// プレイヤー ///
 	// カメラ設定
 	player_->SetCamera(followCamera->GetCamera());
+	player_->SetIsDontMove(false);
 	// 更新
 	player_->Update();
 
@@ -44,6 +45,15 @@ void StagePlayingState::Update(StageScene* scene) {
 		enemy->SetMapChipField(mapChipField_);
 		// 更新
 		enemy->Update();
+	}
+
+	/// Tile///
+	std::vector<std::unique_ptr<Tile>>& tiles_ = scene->GetTiles();
+	for (auto& tile : tiles_) {
+		// カメラ設定
+		tile->SetCamera(followCamera->GetCamera());
+		// 更新
+		tile->Update();
 	}
 
 	/// カメラ ///
@@ -97,6 +107,13 @@ void StagePlayingState::Object3DDraw(StageScene* scene) {
 	for (auto& enemy : enemies) {
 		enemy->Draw();
 	}
+	// タイル描画
+	std::vector<std::unique_ptr<Tile>>& tiles_ =scene->GetTiles();
+	for (auto& tile : tiles_) {
+		tile->Draw();
+	}
+	// スカイドーム描画
+	scene->GetSkyDome()->Draw();
 }
 
 void StagePlayingState::SpriteDraw(StageScene* scene) { scene->GetPlayer()->ReticleDraw(); }
