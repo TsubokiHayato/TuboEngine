@@ -72,8 +72,15 @@ public:
 	/// <summary>
 	/// メインカメラ取得
 	/// </summary>
-	Camera* GetMainCamera() const { return camera.get(); }
+	Camera* GetMainCamera() const { return followCamera->GetCamera(); }
 
+	
+
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="sceneNo"></param>
 	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
 
 	/// <summary>
