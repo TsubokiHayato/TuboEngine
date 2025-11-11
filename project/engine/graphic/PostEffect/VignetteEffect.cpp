@@ -29,10 +29,13 @@ void VignetteEffect::Update() {
 }
 
 void VignetteEffect::DrawImGui() {
+
+#ifdef USE_IMGUI
 	ImGui::Begin("Vignette Effect");
 	ImGui::SliderFloat("Vignette Scale", &params_->vignetteScale, 0.0f, 32.0f);
 	ImGui::SliderFloat("Vignette Power", &params_->vignettePower, 0.0f, 10.0f);
 	ImGui::End();
+#endif // USE_IMGUI
 }
 
 void VignetteEffect::Draw(ID3D12GraphicsCommandList* commandList) {

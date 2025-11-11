@@ -42,11 +42,14 @@ void Order::Draw() {
 	//SwapChainの描画
 
 	//ループ前処理
-	
-	//ImGuiの受付開始
+#ifdef USE_IMGUI
+//ImGuiの受付開始
 	Framework::ImguiPreDraw();
 	//ImGuiの受付終了
 	Framework::ImguiPostDraw();
+#endif // USE_IMGUI
+
+	
 	//ループ後処理
 	Framework::FrameworkSwapChainPostDraw();
 }

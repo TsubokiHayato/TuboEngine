@@ -141,6 +141,8 @@ void OverScene::SpriteDraw() {
 }
 
 void OverScene::ImGuiDraw() {
+
+#ifdef USE_IMGUI
 	ImGui::Begin("OVERScene");
 	ImGui::Text("OVERScene");
 	ImGui::Checkbox("Loop", &loopBounce_);
@@ -169,6 +171,7 @@ void OverScene::ImGuiDraw() {
 	ImGui::DragFloat3("Camera Rotate", &cameraTransform.rotate.x, 0.01f);
 	ImGui::DragFloat3("Camera Scale", &cameraTransform.scale.x, 0.01f);
 	ImGui::End();
+#endif // USE_IMGUI
 }
 
 void OverScene::ParticleDraw() {}

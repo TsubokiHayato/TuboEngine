@@ -85,12 +85,15 @@ void EnemyNormalBullet::Draw() {
 // ImGui描画処理
 //--------------------------------------------------
 void EnemyNormalBullet::DrawImGuiGlobal() {
+
+#ifdef USE_IMGUI
 	ImGui::Begin("Enemy Normal Bullet");
 	ImGui::Text("Enemy Normal Bullet Settings");
 	ImGui::DragFloat3("Position", &s_scale.x, 0.1f);
 	ImGui::DragFloat3("Rotation", &s_rotation.x, 0.1f);
 	ImGui::DragFloat3("Scale", &s_scale.x, 0.1f);
 	ImGui::End();
+#endif // USE_IMGUI
 }
 
 //--------------------------------------------------
