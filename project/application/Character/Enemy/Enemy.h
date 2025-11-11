@@ -74,6 +74,13 @@ public:
 
 	void SetPlayer(Player* player) { player_ = player; }
 
+	// マップチップフィールド
+	void SetMapChipField(MapChipField* field) { mapChipField = field; }
+
+	// 既存のゲッター・セッターの後に追加
+	int GetHP() const { return HP; }
+	int GetMaxHP() const { return 10; } // 既定値（必要に応じて調整）
+
 	///----------------------------------
 	///				受取り変数
 	/// ---------------------------------
