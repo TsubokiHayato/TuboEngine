@@ -163,4 +163,8 @@ private:
 	/////----- スプライト -----///
 	//std::unique_ptr<Sprite> exclamationSprite_; // ！スプライト
 	//std::unique_ptr<Sprite> questionSprite_;    // ？スプライト
+
+	// 追加: 射撃クールダウン用
+	float bulletTimer_ = 0.0f; // 経過時間
+	bool wantShoot_ = false;   // このフレーム撃つ条件を満たしたか
 };

@@ -2,6 +2,7 @@
 #include "Bullet/BaseBullet.h"
 #include "Object3d.h"
 #include "Vector3.h"
+#include "MapChip/MapChipField.h" // 追加
 
 class Player;
 
@@ -75,6 +76,9 @@ public:
 	// プレイヤーの回転を設定
 	void SetPlayerRotation(const Vector3& rotation) { playerRotation = rotation; }
 
+	// 追加: マップチップフィールド設定
+	void SetMapChipField(MapChipField* field) { mapChipField_ = field; }
+
 private:
 	///--------------------------------------------------
 	///				メンバ変数
@@ -83,13 +87,13 @@ private:
 	
 	///  弾のパラメータ ///
 	// 弾の位置
-	Vector3 position;
+	Vector3 position{};
 	// 弾の回転
-	Vector3 rotation;
+	Vector3 rotation{};
 	// 弾のスケール
-	Vector3 scale;
+	Vector3 scale{};
 	// 弾の速度
-	Vector3 velocity;
+	Vector3 velocity{};
 
 private:
 	// 弾の速度
@@ -107,6 +111,9 @@ private:
 	Vector3 playerPostion_ = {};
 	// プレイヤーの回転
 	Vector3 playerRotation = {};
+
+	// 追加: マップチップフィールド
+	MapChipField* mapChipField_ = nullptr;
 
 public:
 	///--------------------------------------------------
