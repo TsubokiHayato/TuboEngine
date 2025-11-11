@@ -70,6 +70,7 @@ void StageStateManager::ChangeState(StageType nextType, StageScene* scene) {
 
 void StageStateManager::DrawImGui(StageScene* scene) {
 
+#ifdef USE_IMGUI
     // 各々のStateのImGui描画
     if (currentState_) {
         currentState_->ImGuiDraw(scene);
@@ -134,4 +135,5 @@ void StageStateManager::DrawImGui(StageScene* scene) {
 	}
 
     ImGui::End();
+#endif // USE_IMGUI
 }
