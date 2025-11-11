@@ -200,14 +200,7 @@ PixcelShaderOutput main(VertexShaderOutPut input)
     }
     
     
-    if (textureColor.a <= 0.5f)
-    {
-        discard;
-    }
-    if (textureColor.a == 0.0f)
-    {
-        discard;
-    }
+    // 半透明もしっかりブレンドするため、完全に透明な場合のみ破棄
     if (output.color.a == 0.0f)
     {
         discard;
@@ -216,6 +209,9 @@ PixcelShaderOutput main(VertexShaderOutPut input)
     
     return output;
 };
+
+
+
 
 
 

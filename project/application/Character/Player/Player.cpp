@@ -36,7 +36,7 @@ void Player::Initialize() {
 	isDead = false;
 
 	// モデルファイルパス
-	const std::string modelFileNamePath = "block.gltf";
+	const std::string modelFileNamePath = "player/Player.obj";
 	// スプライトファイルパス
 	const std::string reticleFileNamePath = "2D_Reticle.png";
 
