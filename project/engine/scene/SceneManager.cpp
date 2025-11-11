@@ -4,6 +4,7 @@
 #include"TitleScene.h"
 #include"StageScene.h"
 #include"ClearScene.h"
+#include"OverScene.h"
 
 
 SceneManager* SceneManager::instance = nullptr; // シングルトンインスタンス
@@ -21,7 +22,11 @@ void SceneManager::Initialize(int startSceneNo) {
         currentScene = std::make_unique<StageScene>();
     } else if (currentSceneNo == CLEAR) {
         currentScene = std::make_unique<ClearScene>();
-    }
+	} else if (currentSceneNo == OVER) {
+		currentScene = std::make_unique<OverScene>();
+	}
+
+
     if (currentScene) {
         currentScene->Initialize();
     }
@@ -62,7 +67,12 @@ void SceneManager::Update() {
 			//クリアシーンを設定
 			currentScene = std::make_unique<ClearScene>();
 			currentScene->Initialize();
+		} else if (currentSceneNo == OVER) {
+			//クリアシーンを設定
+			currentScene = std::make_unique<OverScene>();
+			currentScene->Initialize();
 		}
+
 		//初期化
 		currentScene->Initialize();
 	}
@@ -121,6 +131,9 @@ void SceneManager::ImGuiDraw() {
 	if (ImGui::Button("Clear")) {
 		currentScene->SetSceneNo(CLEAR);
 	}
+	if (ImGui::Button("Over")) {
+		currentScene->SetSceneNo(OVER);
+	};
 	ImGui::End();
 
 }
