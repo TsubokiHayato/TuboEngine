@@ -21,6 +21,8 @@ void StageScene::Initialize() {
 	collisionManager_->Initialize();
 	// ステートマネージャの生成
 	stateManager_->Initialize(this);
+
+	
 }
 
 void StageScene::Update() {
@@ -32,7 +34,7 @@ void StageScene::Update() {
 		stateManager_->Update(this);
 	}
 	// デフォルトカメラをFollowCameraに設定
-	//LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
+	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	// 衝突マネージャの更新
 	collisionManager_->Update();
 	// 全ての衝突をチェック
@@ -50,10 +52,10 @@ void StageScene::Object3DDraw() {
 
 
 	// 当たり判定の可視化
-	collisionManager_->Draw();
+	//collisionManager_->Draw();
 
 	// グリッド描画（回転対応）
-	LineManager::GetInstance()->DrawGrid(10000.0f, 1000, {DirectX::XM_PIDIV2, 0.0f, 0.0f});
+	//LineManager::GetInstance()->DrawGrid(10000.0f, 1000, {DirectX::XM_PIDIV2, 0.0f, 0.0f});
 }
 
 void StageScene::SpriteDraw() {
