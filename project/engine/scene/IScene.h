@@ -6,7 +6,7 @@
 #include"ParticleCommon.h"
 #include"ImGuiManager.h"
 //シーン番号
-enum SCENE{DEBUG,TITLE,STAGE,CLEAR};
+enum SCENE{DEBUG,TITLE,STAGE,CLEAR,OVER};
 
 class IScene
 {
