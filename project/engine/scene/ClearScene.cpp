@@ -41,6 +41,8 @@ void ClearScene::Object3DDraw() { animator->Draw(); }
 void ClearScene::SpriteDraw() {}
 
 void ClearScene::ImGuiDraw() {
+
+#ifdef USE_IMGUI
 	ImGui::Begin("ClearScene");
 	ImGui::Text("Clear Scene");
 	ImGui::End();
@@ -55,6 +57,7 @@ void ClearScene::ImGuiDraw() {
 	ImGui::Text("Animator Object");
 	animator->DrawImGui("Animator Object");
 	ImGui::End();
+#endif // USE_IMGUI
 }
 
 void ClearScene::ParticleDraw() {}

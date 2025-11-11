@@ -190,6 +190,8 @@ bool MapChipField::IsRectBlocked(const Vector3& center, float width, float heigh
 // ImGuiの描画処理
 //--------------------------------------------------
 void MapChipField::DrawImGui(const char* windowName) {
+
+#ifdef USE_IMGUI
 	ImGui::Begin(windowName);
 	ImGui::SliderFloat("Block Width", &kBlockWidth_, 0.1f, 5.0f);
 	ImGui::SliderFloat("Block Height", &kBlockHeight_, 0.1f, 5.0f);
@@ -237,4 +239,5 @@ void MapChipField::DrawImGui(const char* windowName) {
 	}
 
 	ImGui::End();
+#endif // USE_IMGUI
 }

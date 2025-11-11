@@ -97,6 +97,8 @@ void DebugScene::SpriteDraw() {
 }
 
 void DebugScene::ImGuiDraw() {
+
+#ifdef USE_IMGUI
 	ImGui::Begin("DebugScene");
 	ImGui::Text("Hello, DebugScene!");
 
@@ -176,6 +178,8 @@ void DebugScene::ImGuiDraw() {
 #endif // DEBUG
 
 	sceneChangeAnimation->DrawImGui();
+
+	#endif // USE_IMGUI	
 }
 
 void DebugScene::ParticleDraw() {}

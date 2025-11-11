@@ -1,10 +1,11 @@
 #pragma once
 #include "WinApp.h"
 #include "DirectXCommon.h"
+#ifdef USE_IMGUI
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_win32.h"
 #include "externals/imgui/imgui_impl_dx12.h"
-
+#endif // USE_IMGUI
 
 class ImGuiManager
 {
@@ -54,8 +55,9 @@ public:
 
 private:
 	
-	
+#ifdef USE_IMGUI
 	//SRVディスクリプタヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
+#endif // USE_IMGUI
 };
 

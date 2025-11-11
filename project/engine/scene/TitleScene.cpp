@@ -62,6 +62,8 @@ void TitleScene::SpriteDraw() {
 }
 
 void TitleScene::ImGuiDraw() {
+
+#ifdef USE_IMGUI
 	//カメラ
 	ImGui::Begin("camera");
 	ImGui::DragFloat3("Position", &cameraPosition.x,0.01f);
@@ -72,6 +74,7 @@ void TitleScene::ImGuiDraw() {
 	if (sceneChangeAnimation) {
 		sceneChangeAnimation->DrawImGui();
 	}
+#endif // USE_IMGUI
 }
 
 void TitleScene::ParticleDraw() {

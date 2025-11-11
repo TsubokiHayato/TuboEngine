@@ -71,6 +71,8 @@ void FollowTopDownCamera::Update() {
 }
 
 void FollowTopDownCamera::DrawImGui() {
+
+#ifdef USE_IMGUI
 	ImGui::Begin("Follow Top Down Camera");
 	ImGui::DragFloat3("Offset", &offset_.x, 0.1f);
 	ImGui::DragFloat3("LookAtOffset", &lookAtOffset_.x, 0.1f);
@@ -86,6 +88,7 @@ void FollowTopDownCamera::DrawImGui() {
 	ImGui::Text("Camera Position: (%.2f, %.2f, %.2f)", camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z);
 	ImGui::Text("Camera Rotation: (%.2f, %.2f, %.2f)", rotation_.x, rotation_.y, rotation_.z);
 	ImGui::End();
+#endif // USE_IMGUI
 }
 
 void FollowTopDownCamera::SetRotation(const Vector3& rotation) { rotation_ = rotation; }
