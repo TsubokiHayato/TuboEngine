@@ -19,8 +19,6 @@ void GameOverState::Enter(StageScene* scene) {
 	initialYaw_ = player_ ? player_->GetRotation().z : 0.0f;
 	camAnimTime_ = 0.0f;
 
-
-	
 	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
 	TextureManager::GetInstance()->LoadTexture(testDDSTextureHandle);
 
@@ -34,7 +32,6 @@ void GameOverState::Enter(StageScene* scene) {
 		player_->SetRotation({5.0f, 3.14f, 3.14f});
 	}
 
-	
 	// フォローカメラ初期化（プレイヤー追従）
 	scene->GetFollowCamera()->Initialize(player_, Vector3{0.0f, 0.0f, 70.0f}, 0.25f);
 	scene->GetFollowCamera()->Update();
@@ -96,11 +93,9 @@ void GameOverState::Update(StageScene* scene) {
 	constexpr float dt = 1.0f / 60.0f;
 	elapsed_ += dt;
 
-	
-	if (phase_ ==Phase::None) {
-		if (Input::GetInstance()->TriggerKey(DIK_SPACE) ){
-			phase_ = Phase::CameraMove;
-		}
+	if (phase_ == Phase::None) {
+
+		phase_ = Phase::CameraMove;
 
 		return;
 	}
@@ -130,9 +125,7 @@ void GameOverState::Update(StageScene* scene) {
 		player_->SetCamera(scene->GetFollowCamera()->GetCamera());
 		player_->Update();
 
-		
-
-	scene->GetSkyDome()->SetCamera(scene->GetFollowCamera()->GetCamera());
+		scene->GetSkyDome()->SetCamera(scene->GetFollowCamera()->GetCamera());
 		scene->GetSkyDome()->Update();
 		return;
 	}
@@ -176,7 +169,7 @@ void GameOverState::Update(StageScene* scene) {
 			phase_ = Phase::Blackout;
 		}
 	} else if (phase_ == Phase::Blackout) {
-		 // staticをやめ、スプライトの現在アルファを元に進行度を管理する
+		// staticをやめ、スプライトの現在アルファを元に進行度を管理する
 		float alpha = blackoutSprite_->GetColor().w;
 		const float maxAlpha = 1.0f;
 		alpha += 0.01f;
@@ -212,23 +205,20 @@ void GameOverState::Object3DDraw(StageScene* scene) {
 	}
 }
 
-void GameOverState::SpriteDraw(StageScene* scene) { 
-	
-	
-	if (phase_ == Phase::Blackout||phase_ == Phase::Done) {
-			blackoutSprite_->Draw();
+void GameOverState::SpriteDraw(StageScene* scene) {
+
+	if (phase_ == Phase::Blackout || phase_ == Phase::Done) {
+		blackoutSprite_->Draw();
 	}
 	if (phase_ == Phase::None) {
 		restartSprite_->Draw();
 	}
-
-
 }
 
 void GameOverState::ImGuiDraw(StageScene* scene) {
 
 #ifdef USE_IMGUI
-	//alpha
+	// alpha
 	ImGui::Begin("Sprite Draw");
 	ImGui::Text("blackOutAlpha: %.2f", blackoutSprite_->GetColor().w);
 	ImGui::End();
@@ -243,7 +233,6 @@ void GameOverState::ImGuiDraw(StageScene* scene) {
 	player_->SetRotation(rot);
 
 	ImGui::End();
-
 
 	if (scene->GetFollowCamera())
 		scene->GetFollowCamera()->DrawImGui();
