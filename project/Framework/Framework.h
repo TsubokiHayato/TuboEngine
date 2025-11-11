@@ -132,7 +132,7 @@ protected:
 	bool endRequest = false; // 終了リクエストフラグ
 
 	int objectBlendModeNum = 0; // オブジェクトのブレンドモード
-	int spriteBlendModeNum = 0; // スプライトのブレンドモード
+	int spriteBlendModeNum = 1; // スプライトのブレンドモード
 
 	// 基盤システム
 

@@ -15,6 +15,7 @@ void StageScene::Initialize() {
 	camera = std::make_unique<Camera>();
 	collisionManager_ = std::make_unique<CollisionManager>();
 	stateManager_ = std::make_unique<StageStateManager>();
+	skyDome_ = std::make_unique<SkyDome>();
 	
 	// 衝突マネージャの生成
 	collisionManager_->Initialize();
@@ -69,8 +70,13 @@ void StageScene::ImGuiDraw() {
 
 
 // DrawLineのImGui
+
+	#ifdef _DEBUG
+
 	LineManager::GetInstance()->DrawImGui();
 	stateManager_->DrawImGui(this);
+#endif // _DEBUG
+
 }
 
 void StageScene::ParticleDraw() {

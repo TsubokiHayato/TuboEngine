@@ -26,20 +26,19 @@ void StageReadyState::Enter(StageScene* scene) {
 
 	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
 	TextureManager::GetInstance()->LoadTexture(testDDSTextureHandle);
-
 	// マップチップフィールド初期化
 	scene->GetMapChipField()->LoadMapChipCsv(scene->GetMapChipCsvFilePath());
 
-	// カメラ初期化
-	if (scene->GetMainCamera()) {
-		auto* map = scene->GetMapChipField();
-		float centerX = (map->GetNumBlockHorizontal() * MapChipField::GetBlockWidth()) / 8.0f;
-		float centerY = (map->GetNumBlockVirtical() * MapChipField::GetBlockHeight()) / 2.0f;
-		scene->GetMainCamera()->SetTranslate({9.5f, centerY, 70.0f});
-		scene->GetMainCamera()->setRotation({3.14f, 0.0f, 0.0f});
-		scene->GetMainCamera()->setScale({1.0f, 1.0f, 1.0f});
-		scene->GetMainCamera()->Update();
-	}
+	// プレイヤー初期化
+	scene->GetPlayer()->Initialize();
+	scene->GetPlayer()->SetMapChipField(scene->GetMapChipField());
+	scene->GetPlayer()->SetIsDontMove(true); // 落下中は移動禁止
+
+	// フォローカメラ初期化（プレイヤー追従）
+	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), Vector3 {0.0f, 0.0f, 70.0f}, 0.25f);
+	scene->GetFollowCamera()->Update();
+
+	LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
 
 	// プレイヤーのマップチップ座標取得
 	int playerMapX = -1, playerMapY = -1;
@@ -50,12 +49,6 @@ void StageReadyState::Enter(StageScene* scene) {
 		}
 	});
 
-	// プレイヤー初期化
-	scene->GetPlayer()->Initialize();
-	scene->GetPlayer()->SetCamera(scene->GetMainCamera());
-	scene->GetPlayer()->SetMapChipField(scene->GetMapChipField());
-	scene->GetPlayer()->SetIsDontMove(true); // 落下中は移動禁止
-	scene->GetPlayer()->Update();
 	playerTargetPosition_ = scene->GetMapChipField()->GetMapChipPositionByIndex(playerMapX, playerMapY);
 
 	// ブロック・エネミー・タイルの初期化
@@ -81,7 +74,7 @@ void StageReadyState::Enter(StageScene* scene) {
 			// ブロック生成
 			auto block = std::make_unique<Block>();
 			block->Initialize(pos);
-			block->SetCamera(scene->GetMainCamera());
+			block->SetCamera(scene->GetFollowCamera()->GetCamera());
 			block->Update();
 			blocks.push_back(std::move(block));
 			blockTargetPositions_.push_back(pos);
@@ -90,7 +83,9 @@ void StageReadyState::Enter(StageScene* scene) {
 			// エネミー生成
 			auto enemy = std::make_unique<Enemy>();
 			enemy->Initialize();
-			enemy->SetCamera(scene->GetMainCamera());
+
+			enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
+
 			enemy->SetPlayer(scene->GetPlayer());
 			enemy->SetPosition(pos);
 			enemy->Update();
@@ -103,12 +98,17 @@ void StageReadyState::Enter(StageScene* scene) {
 		Vector3 tilePos = pos;
 		tilePos.z = -1.0f; // ブロックの下に配置
 		tile->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile.obj");
-		tile->SetCamera(scene->GetMainCamera());
+
+		tile->SetCamera(scene->GetFollowCamera()->GetCamera());
+
 		tile->Update();
 		tiles.push_back(std::move(tile));
 		tileTargetPositions_.push_back(tilePos);
 		tileRippleLayers_.push_back((float)layer);
 	});
+
+	scene->GetPlayer()->SetCamera(scene->GetFollowCamera()->GetCamera());
+	scene->GetPlayer()->Update();
 
 	// アニメーション用タイマー初期化
 	currentDroppingLayer_ = 0;
@@ -120,6 +120,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	// READY/START!!スプライト初期化
 	readyPhase_ = ReadyStatePhase::Ready;
 	readyTimer_ = 0.0f;
+	restartWaitTimer_ = 0.0f;
 
 	TextureManager::GetInstance()->LoadTexture("ready.png");
 	TextureManager::GetInstance()->LoadTexture("start.png");
@@ -134,23 +135,31 @@ void StageReadyState::Enter(StageScene* scene) {
 	startSprite_->SetAnchorPoint({0.5f, 0.5f});
 
 	restartSprite_ = std::make_unique<Sprite>();
-	restartSprite_->Initialize("restart.png");
+	restartSprite_->Initialize("SpaceToStart.png");
 	restartSprite_->SetPosition({640.0f, 680.0f});
 	restartSprite_->SetAnchorPoint({0.5f, 0.5f});
 
 	readySprite_->Update();
 	startSprite_->Update();
 	restartSprite_->Update();
-}
 
-// 追加: リスタート画面表示用タイマー
-static float restartWaitTimer = 0.0f;
+	scene->GetSkyDome()->Initialize();
+	scene->GetSkyDome()->SetCamera(scene->GetFollowCamera()->GetCamera());
+	scene->GetSkyDome()->Update();
+
+}
 
 void StageReadyState::Update(StageScene* scene) {
 	using namespace std::chrono;
 	auto now = steady_clock::now();
 	float deltaTime = duration_cast<duration<float>>(now - prevTime_).count();
 	prevTime_ = now;
+
+	// フォローカメラ更新
+	if (scene->GetFollowCamera()) {
+		scene->GetFollowCamera()->Update();
+		LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
+	}
 
 	// --- リスタート画面表示中 ---
 	if (readyPhase_ == ReadyStatePhase::None) {
@@ -168,15 +177,23 @@ void StageReadyState::Update(StageScene* scene) {
 			return;
 		}
 
+		scene->GetFollowCamera()->Update();
 		// 通常のオブジェクト更新
-		for (auto& block : scene->GetBlocks())
+		for (auto& block : scene->GetBlocks()) {
+
+			block->SetCamera(scene->GetFollowCamera()->GetCamera());
 			block->Update();
+		}
+		scene->GetPlayer()->SetCamera(scene->GetFollowCamera()->GetCamera());
 		scene->GetPlayer()->Update();
-		for (auto& enemy : scene->GetEnemies())
+		for (auto& enemy : scene->GetEnemies()) {
+			enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
 			enemy->Update();
-		for (auto& tile : scene->GetTiles())
+		}
+		for (auto& tile : scene->GetTiles()) {
+			tile->SetCamera(scene->GetFollowCamera()->GetCamera());
 			tile->Update();
-		LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
+		}
 		return;
 	} else {
 		restartWaitTimer_ = 0.0f;
@@ -188,7 +205,10 @@ void StageReadyState::Update(StageScene* scene) {
 		return;
 	}
 
-	LineManager::GetInstance()->SetDefaultCamera(scene->GetMainCamera());
+	// 常にフォローカメラをデフォルトに
+	if (scene->GetFollowCamera()) {
+		LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
+	}
 
 	// 落下アニメーション中はREADY表示
 	if (readyPhase_ == ReadyStatePhase::Ready) {
@@ -311,11 +331,21 @@ void StageReadyState::Update(StageScene* scene) {
 		}
 
 		// 各オブジェクトのUpdate
-		for (auto& block : scene->GetBlocks())
+		scene->GetFollowCamera()->Update();
+		for (auto& tile : scene->GetTiles()) {
+			tile->SetCamera(scene->GetFollowCamera()->GetCamera());
+			tile->Update();
+		}
+		for (auto& block : scene->GetBlocks()) {
+			block->SetCamera(scene->GetFollowCamera()->GetCamera());
 			block->Update();
+		}
+		scene->GetPlayer()->SetCamera(scene->GetFollowCamera()->GetCamera());
 		scene->GetPlayer()->Update();
-		for (auto& enemy : scene->GetEnemies())
+		for (auto& enemy : scene->GetEnemies()) {
+			enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
 			enemy->Update();
+		}
 
 		return;
 	} else {
@@ -337,14 +367,29 @@ void StageReadyState::Update(StageScene* scene) {
 	startSprite_->Update();
 	restartSprite_->Update();
 
-	// アニメーション終了後は全オブジェクト通常更新
-	for (auto& block : scene->GetBlocks())
-		block->Update();
-	scene->GetPlayer()->Update();
-	for (auto& enemy : scene->GetEnemies())
-		enemy->Update();
-	for (auto& tile : scene->GetTiles())
+	for (auto& tile : scene->GetTiles()) {
+		tile->SetCamera(scene->GetFollowCamera()->GetCamera());
 		tile->Update();
+	}
+
+	// 通常のオブジェクト更新
+	for (auto& block : scene->GetBlocks()) {
+		block->SetCamera(scene->GetFollowCamera()->GetCamera());
+		block->Update();
+	}
+	scene->GetPlayer()->SetCamera(scene->GetFollowCamera()->GetCamera());
+	scene->GetPlayer()->Update();
+	for (auto& enemy : scene->GetEnemies()) {
+		enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
+		enemy->Update();
+	}
+	for (auto& tile : scene->GetTiles()) {
+		tile->SetCamera(scene->GetFollowCamera()->GetCamera());
+		tile->Update();
+	}
+	scene->GetSkyDome()->SetCamera(scene->GetFollowCamera()->GetCamera());
+	scene->GetSkyDome()->Update();
+
 	LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
 }
 
@@ -359,6 +404,8 @@ void StageReadyState::Object3DDraw(StageScene* scene) {
 		enemy->Draw();
 	for (auto& tile : scene->GetTiles())
 		tile->Draw();
+
+	scene->GetSkyDome()->Draw();
 }
 
 void StageReadyState::SpriteDraw(StageScene* scene) {
@@ -371,25 +418,10 @@ void StageReadyState::SpriteDraw(StageScene* scene) {
 }
 
 void StageReadyState::ImGuiDraw(StageScene* scene) {
-	// カメラ操作用UI
-	if (scene->GetMainCamera()) {
-		if (ImGui::CollapsingHeader("MainCamera")) {
-			Vector3 camPos = scene->GetMainCamera()->GetTranslate();
-			Vector3 camRot = scene->GetMainCamera()->GetRotation();
-			Vector3 camScale = scene->GetMainCamera()->GetScale();
-
-			if (ImGui::DragFloat3("Position", &camPos.x, 0.1f)) {
-				scene->GetMainCamera()->SetTranslate(camPos);
-				scene->GetMainCamera()->Update();
-			}
-			if (ImGui::DragFloat3("Rotation", &camRot.x, 0.1f)) {
-				scene->GetMainCamera()->setRotation(camRot);
-				scene->GetMainCamera()->Update();
-			}
-			if (ImGui::DragFloat3("Scale", &camScale.x, 0.1f)) {
-				scene->GetMainCamera()->setScale(camScale);
-				scene->GetMainCamera()->Update();
-			}
+	// カメラ操作用UI（FollowCamera）
+	if (scene->GetFollowCamera()) {
+		if (ImGui::CollapsingHeader("FollowCamera")) {
+			scene->GetFollowCamera()->DrawImGui();
 		}
 	}
 
