@@ -126,7 +126,7 @@ private:
 
 	///--視野--///
 	float kViewAngleDeg = 90.0f;                   // 視野角（度）
-	float kViewDistance = 10.0f;                   // 視認距離
+	float kViewDistance = 15.0f;                   // 視認距離
 	int kViewLineDiv = 16;                         // 視野扇形の分割数
 	Vector4 kViewColor = {1.0f, 1.0f, 0.0f, 0.7f}; // 視野ライン色
 	Vector3 lastSeenPlayerPos = {0.0f, 0.0f, 0.0f};
