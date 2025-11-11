@@ -3,7 +3,13 @@
 #include "StageScene.h"
 
 // StagePlayingState
-void StagePlayingState::Enter(StageScene* scene) {}
+void StagePlayingState::Enter(StageScene* scene) {
+	ruleSprite_ = std::make_unique<Sprite>();
+	ruleSprite_->Initialize("rule.png");
+	ruleSprite_->SetPosition({0.0f, 0.0f});
+	ruleSprite_->Update();
+
+}
 
 void StagePlayingState::Update(StageScene* scene) {
 
@@ -64,9 +70,7 @@ void StagePlayingState::Update(StageScene* scene) {
 	followCamera->Update();
 
 	
-	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
-	LineManager::GetInstance()->Update();
-
+	
 	///------------------------------------------------
 	/// ゲームクリア判定
 	///------------------------------------------------
@@ -93,6 +97,14 @@ void StagePlayingState::Update(StageScene* scene) {
 		scene->GetStageStateManager()->ChangeState(StageType::GameOver, scene);
 		return;
 	}
+
+
+
+	ruleSprite_->Update();
+	
+	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
+	LineManager::GetInstance()->Update();
+
 }
 
 void StagePlayingState::Exit(StageScene* scene) {}
@@ -122,9 +134,16 @@ void StagePlayingState::Object3DDraw(StageScene* scene) {
 	for (auto& enemy : enemies) {
 		enemy->Draw();
 	}
+
+	// 追加: ライン描画（フォローカメラで）
+	LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
+	LineManager::GetInstance()->Draw();
 }
 
-void StagePlayingState::SpriteDraw(StageScene* scene) { scene->GetPlayer()->ReticleDraw(); }
+void StagePlayingState::SpriteDraw(StageScene* scene) { 
+	scene->GetPlayer()->ReticleDraw();
+	ruleSprite_->Draw();
+}
 
 void StagePlayingState::ImGuiDraw(StageScene* scene) {
 
@@ -142,6 +161,8 @@ void StagePlayingState::ImGuiDraw(StageScene* scene) {
 	for (auto& block : blocks_) {
 		block->DrawImGui();
 	}
+
+	
 }
 
 void StagePlayingState::ParticleDraw(StageScene* scene) {
