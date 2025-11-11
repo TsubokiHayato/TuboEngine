@@ -38,11 +38,14 @@ void randomEffect::Update() {
 
 
 void randomEffect::DrawImGui() {
+
+#ifdef USE_IMGUI
     ImGui::Begin("Random Effect");
     // timeは自動で進むので表示のみ
     ImGui::Text("Time: %.2f", params_->time);
    
     ImGui::End();
+#endif // USE_IMGUI
 }
 
 void randomEffect::Draw(ID3D12GraphicsCommandList* commandList) {

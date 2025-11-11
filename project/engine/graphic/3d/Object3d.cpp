@@ -179,6 +179,7 @@ void Object3d::Draw() {
 }
 
 void Object3d::DrawImGui(const char* windowName) {
+#ifdef USE_IMGUI
     ImGui::Begin(windowName);
 
     ImGui::Separator();
@@ -276,6 +277,7 @@ void Object3d::DrawImGui(const char* windowName) {
         }
     }
     ImGui::End();
+#endif // USE_IMGUI
 }
 
 void Object3d::SetLightShininess(float shininess) { model_->SetModelShininess(shininess); }

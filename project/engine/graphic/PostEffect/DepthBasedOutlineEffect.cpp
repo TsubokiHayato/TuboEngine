@@ -35,6 +35,8 @@ void DepthBasedOutlineEffect::Update() {
 }
 
 void DepthBasedOutlineEffect::DrawImGui() {
+
+#ifdef USE_IMGUI
 	ImGui::Begin("DepthBasedOutlineEffect");
 	// 必要に応じてImGuiでパラメータ調整
 	ImGui::ColorEdit4("Outline Color", &materialCBData_->outlineColor.x);
@@ -42,6 +44,7 @@ void DepthBasedOutlineEffect::DrawImGui() {
 	ImGui::SliderFloat("Outline Depth Threshold", &materialCBData_->outlineDepthThreshold, 0.0f, 1.0f);
 
 	ImGui::End();
+#endif // USE_IMGUI
 }
 
 void DepthBasedOutlineEffect::SetMainCamera(Camera* camera) {

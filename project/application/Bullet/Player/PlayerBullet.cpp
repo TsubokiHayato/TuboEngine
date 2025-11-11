@@ -124,6 +124,8 @@ void PlayerBullet::OnCollision(Collider* other) {
 // ImGuiによるグローバルパラメータ調整
 //--------------------------------------------------
 void PlayerBullet::DrawImGuiGlobal() {
+
+#ifdef USE_IMGUI
 	ImGui::Begin("PlayerBullet Parameter (Global)");
 	ImGui::SliderFloat("Speed", &s_bulletSpeed, 0.1f, 10.0f, "%.2f");
 	ImGui::SliderFloat("Disappear Radius", &s_disappearRadius, 10.0f, 500.0f, "%.1f");
@@ -132,4 +134,5 @@ void PlayerBullet::DrawImGuiGlobal() {
 	ImGui::SliderInt("Damage", &s_damage, 1, 100);
 	ImGui::SliderFloat("Fire Interval", &s_fireInterval, 0.01f, 1.0f, "%.2f");
 	ImGui::End();
+#endif // USE_IMGUI
 }
