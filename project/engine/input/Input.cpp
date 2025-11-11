@@ -123,6 +123,8 @@ void Input::Finalize() {
 }
 
 void Input::ShowInputDebugWindow() {
+
+#ifdef USE_IMGUI
 	Input* input = Input::GetInstance();
 
 	ImGui::Begin("Input Debug");
@@ -182,6 +184,8 @@ void Input::ShowInputDebugWindow() {
 	}
 
 	ImGui::End();
+
+	#endif // USE_IMGUI
 }
 
 // キーボード

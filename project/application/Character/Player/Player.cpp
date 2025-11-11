@@ -235,6 +235,8 @@ void Player::OnCollision(Collider* other) {
 // ImGuiの描画処理
 //--------------------------------------------------
 void Player::DrawImGui() {
+
+#ifdef USE_IMGUI
 	position = object3d->GetPosition();
 	rotation = object3d->GetRotation();
 	scale = object3d->GetScale();
@@ -262,4 +264,6 @@ void Player::DrawImGui() {
 
 	object3d->DrawImGui("Player");
 	PlayerBullet::DrawImGuiGlobal();
+
+	#endif // USE_IMGUI
 }

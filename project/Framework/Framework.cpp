@@ -18,14 +18,15 @@ void Framework::Initialize() {
 		throw std::runtime_error("DirectXリソースの初期化に失敗しました。");
 	}
 
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 
 	//ImGuiの初期化
 
 
 	ImGuiManager::GetInstance()->Initialize();
 
-#endif // DEBUG
+#endif // USE_IMGUI
+
 	//SRVマネージャーの初期化
 	SrvManager::GetInstance()->Initialize();
 	//スプライト共通部分
@@ -87,9 +88,9 @@ void Framework::Update() {
 	LineManager::GetInstance()->Update();
 }
 void Framework::Finalize() {
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 	ImGuiManager::GetInstance()->Finalize();
-#endif // DEBUG
+#endif // USE_IMGUI
 
 	Input::GetInstance()->Finalize();
 	TextureManager::GetInstance()->Finalize();
@@ -141,10 +142,10 @@ void Framework::FrameworkSwapChainPreDraw() {
 }
 
 void Framework::FrameworkSwapChainPostDraw() {
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 	//ImGuiの描画
 	ImGuiManager::GetInstance()->Draw();
-#endif // _DEBUG
+#endif // _USE_IMGUI
 
 	OffScreenRendering::GetInstance()->TransitionRenderTextureToRenderTarget();
 	//描画
@@ -152,19 +153,19 @@ void Framework::FrameworkSwapChainPostDraw() {
 }
 
 void Framework::ImguiPreDraw() {
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 	//ImGuiの受付開始
 	ImGuiManager::GetInstance()->Begin();
 
 	SceneManager::GetInstance()->ImGuiDraw();
 
 	OffScreenRendering::GetInstance()->DrawImGui();
-#endif // _DEBUG
+#endif // _USE_IMGUI
 
 }
 
 void Framework::ImguiPostDraw() {
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 	//ImGuiの受付終了
 	ImGui::ShowDemoWindow();
 	//BlendMode変更
@@ -183,7 +184,7 @@ void Framework::ImguiPostDraw() {
 
 
 	ImGuiManager::GetInstance()->End();
-#endif // _DEBUG
+#endif // _USE_IMGUI
 
 }
 
