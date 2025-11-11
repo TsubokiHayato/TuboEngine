@@ -134,14 +134,8 @@ void StageReadyState::Enter(StageScene* scene) {
 	startSprite_->SetPosition({640.0f, 360.0f});
 	startSprite_->SetAnchorPoint({0.5f, 0.5f});
 
-	restartSprite_ = std::make_unique<Sprite>();
-	restartSprite_->Initialize("SpaceToStart.png");
-	restartSprite_->SetPosition({640.0f, 680.0f});
-	restartSprite_->SetAnchorPoint({0.5f, 0.5f});
-
 	readySprite_->Update();
 	startSprite_->Update();
-	restartSprite_->Update();
 
 	scene->GetSkyDome()->Initialize();
 	scene->GetSkyDome()->SetCamera(scene->GetFollowCamera()->GetCamera());
@@ -165,17 +159,6 @@ void StageReadyState::Update(StageScene* scene) {
 	if (readyPhase_ == ReadyStatePhase::None) {
 		restartWaitTimer_ += deltaTime;
 
-		// restartSprite_のアニメーション（点滅など）
-		float alpha = 0.5f + 0.5f * std::sin(restartWaitTimer_ * 3.0f);
-		restartSprite_->SetColor({1, 1, 1, alpha});
-		restartSprite_->Update();
-
-		// 1.0秒以上経過してからキー入力を受け付ける
-		if (restartWaitTimer_ > 1.0f && Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-			Enter(scene);
-			restartWaitTimer_ = 0.0f;
-			return;
-		}
 
 		scene->GetFollowCamera()->Update();
 		// 通常のオブジェクト更新
@@ -363,7 +346,6 @@ void StageReadyState::Update(StageScene* scene) {
 
 	readySprite_->Update();
 	startSprite_->Update();
-	restartSprite_->Update();
 
 	for (auto& tile : scene->GetTiles()) {
 		tile->SetCamera(scene->GetFollowCamera()->GetCamera());
@@ -412,7 +394,6 @@ void StageReadyState::SpriteDraw(StageScene* scene) {
 	} else if (readyPhase_ == ReadyStatePhase::Start && startSprite_) {
 		startSprite_->Draw();
 	}
-	restartSprite_->Draw();
 }
 
 void StageReadyState::ImGuiDraw(StageScene* scene) {

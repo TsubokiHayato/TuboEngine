@@ -73,7 +73,7 @@ void Player::Update() {
 		}
 		UpdateDodge();
 		// 回避入力（Zキー）
-		if (CanDodge() && Input::GetInstance()->PushKey(DIK_Z)) {
+		if (CanDodge() && Input::GetInstance()->PushKey(DIK_SPACE)) {
 			StartDodge();
 		}
 		Move();
@@ -116,14 +116,14 @@ void Player::Update() {
 // 弾を撃つ処理
 //--------------------------------------------------
 void Player::Shoot() {
-	// スペースキーが押され、発射間隔を満たしていれば弾を生成
-	if (Input::GetInstance()->PushKey(DIK_SPACE) && bulletTimer <= 0.0f) {
+	if (Input::GetInstance()->IsPressMouse(0) && bulletTimer <= 0.0f) {
 		auto bullet = std::make_unique<PlayerBullet>();
 		bullet->Initialize(position);
 		bullet->SetPlayerRotation(rotation);
 		bullet->SetPlayerPosition(position);
+		bullet->SetMapChipField(mapChipField);
 		bullets.push_back(std::move(bullet));
-		bulletTimer = PlayerBullet::s_fireInterval; // 発射間隔をセット
+		bulletTimer = cooldownTime;
 	}
 }
 
@@ -220,15 +220,28 @@ Vector3 Player::GetCenterPosition() const {
 void Player::OnCollision(Collider* other) {
 	// 衝突相手のタイプIDを取得
 	uint32_t typeID = other->GetTypeID();
-	if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy)) {
-		// 敵との衝突処理
-		isHit = true; // 衝突したらヒットフラグを立てる
-	} else if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
-		// 武器との衝突処理
-		isHit = true; // 衝突したらヒットフラグを立てる
-	} else {
-		// その他の衝突
+	if (damageCooldownTimer <= 0.0f) {
+		if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy)) {
+			// 敵との衝突処理
+			HP -= 1;      // HPを減らす
+			isHit = true; // 衝突したらヒットフラグを立てる
+			damageCooldownTimer = damageCooldownTime; // ダメージクールダウン開始
+		} else if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
+			// 武器との衝突処理
+			isHit = true; // 衝突したらヒットフラグを立てる
+			damageCooldownTimer = damageCooldownTime; // ダメージクールダウン開始
+		}
+		// その他の衝突は無敵でも通す
 	}
+	// 既存の処理がある場合は適宜マージしてください
+
+    // 敵弾と衝突したらHPを減らす（クランプしない）
+    if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
+        HP -= 1;              // これで 0 を下回り -1 にもなる
+        isHit = true;         // ヒットフラグ（必要なら）
+        // 必要に応じて無敵時間を使うならここでタイマーをセット
+        // damageCooldownTimer = 0.3f;  // 例: 0.3秒の無敵（任意）
+    }
 }
 
 //--------------------------------------------------

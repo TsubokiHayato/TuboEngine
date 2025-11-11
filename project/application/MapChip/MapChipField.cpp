@@ -104,19 +104,20 @@ void MapChipField::LoadMapChipCsv(const std::string& filePath) {
 	}
 }
 //--------------------------------------------------
-// インデックスからマップチップ種別を取得
+// インデックスからマップチップ種別を取得（安全版）
 //--------------------------------------------------
 MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex) const {
 
-	if (xIndex < 0 || kNumBlockHorizontal - 1 < xIndex) {
-		return MapChipType::kBlank;
-	}
+    // 実データで境界チェック
+    if (yIndex >= mapChipData_.data.size()) {
+        return MapChipType::kBlank;
+    }
+    const auto& row = mapChipData_.data[yIndex];
+    if (xIndex >= row.size()) {
+        return MapChipType::kBlank;
+    }
 
-	if (yIndex < 0 || kNumBlockVirtical - 1 < yIndex) {
-		return MapChipType::kBlank;
-	}
-
-	return mapChipData_.data[yIndex][xIndex];
+    return row[xIndex];
 }
 
 //--------------------------------------------------
@@ -152,18 +153,22 @@ bool MapChipField::IsWalkable(const Vector3& position) const {
 }
 
 //--------------------------------------------------
-// 指定座標が通行不可（壁など）か判定
+// 指定座標が通行不可（壁など）か判定（境界外は通行不可扱いにする例）
 //--------------------------------------------------
 bool MapChipField::IsBlocked(const Vector3& position) const {
     IndexSet index = GetMapChipIndexSetByPosition(position);
-    MapChipType type = GetMapChipTypeByIndex(index.xIndex, index.yIndex);
-    // kBlockは通行不可
-    switch (type) {
-        case MapChipType::kBlock:
-            return true;
-        default:
-            return false;
+
+    // 実データで境界チェック（範囲外はブロック扱い）
+    if (index.yIndex >= mapChipData_.data.size()) {
+        return true;
     }
+    const auto& row = mapChipData_.data[index.yIndex];
+    if (index.xIndex >= row.size()) {
+        return true;
+    }
+
+    MapChipType type = row[index.xIndex];
+    return type == MapChipType::kBlock;
 }
 
 //--------------------------------------------------
