@@ -13,8 +13,8 @@ void StageStateManager::Initialize(StageScene* scene) {
     states_[StageType::GameOver]     = std::make_unique<GameOverState>();
 
     // 最初のステートをセットしてEnterのみ呼ぶ
-    state_ = StageType::GameOver;
-	currentState_ = states_[StageType::GameOver].get();
+    state_ = StageType::Ready;
+	currentState_ = states_[StageType::Ready].get();
     if (currentState_) {
         currentState_->Enter(scene);
     }
