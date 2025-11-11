@@ -85,7 +85,6 @@ private:
     float readyTimer_ = 0.0f;
     std::unique_ptr<Sprite> readySprite_;
     std::unique_ptr<Sprite> startSprite_;
-	std::unique_ptr<Sprite> restartSprite_;
 	
 
 	// READY/START!!アニメ用
