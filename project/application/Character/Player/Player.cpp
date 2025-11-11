@@ -36,7 +36,7 @@ void Player::Initialize() {
 	isDead = false;
 
 	// モデルファイルパス
-	const std::string modelFileNamePath = "sphere.obj";
+	const std::string modelFileNamePath = "block.gltf";
 	// スプライトファイルパス
 	const std::string reticleFileNamePath = "2D_Reticle.png";
 
@@ -99,6 +99,7 @@ void Player::Update() {
 			isAllive = false; // HPが0以下なら死亡状態にする
 		}
 	}
+
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
 	object3d->SetScale(scale);
