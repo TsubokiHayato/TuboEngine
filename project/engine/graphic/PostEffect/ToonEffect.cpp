@@ -39,12 +39,14 @@ void ToonEffect::Update() {
 
 void ToonEffect::DrawImGui() {
 
+#ifdef USE_IMGUI
 	ImGui::Begin("ToonEffect");
 	ImGui::SliderInt("Step Count", &toonParams_->stepCount,1, 20);
 	ImGui::DragFloat("Toon Rate", &toonParams_->toonRate, 0.01f, 0.0f, 1.0f, "%.2f");
 	ImGui::ColorEdit3("Shadow Color", &toonParams_->shadowColor.x);
 	ImGui::ColorEdit3("Highlight Color", &toonParams_->highlightColor.x);
 	ImGui::End();
+#endif // USE_IMGUI
 }
 void ToonEffect::Draw(ID3D12GraphicsCommandList* commandList) {
 	pso_->DrawSettingsCommon();

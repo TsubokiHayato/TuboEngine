@@ -291,6 +291,8 @@ void Enemy::ParticleDraw() {
 }
 
 void Enemy::DrawImGui() {
+
+#ifdef USE_IMGUI
 	ImGui::Begin("Enemy");
 	ImGui::Text("Enemy Position: (%.2f, %.2f, %.2f)", position.x, position.y, position.z);
 	ImGui::Text("Enemy Velocity: (%.2f, %.2f, %.2f)", velocity.x, velocity.y, velocity.z);
@@ -328,6 +330,7 @@ void Enemy::DrawImGui() {
 	ImGui::SliderFloat("StateIcon Height", &stateIconHeight, 1.0f, 6.0f);
 	ImGui::SliderFloat("StateIcon LineWidth", &stateIconLineWidth, 0.01f, 0.3f);
 	ImGui::End();
+#endif // USE_IMGUI
 }
 
 void Enemy::Move() {}
