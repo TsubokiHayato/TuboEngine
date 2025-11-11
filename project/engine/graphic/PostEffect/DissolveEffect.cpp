@@ -50,12 +50,15 @@ void DissolveEffect::Update() {
 
 }
 void DissolveEffect::DrawImGui() {
+
+#ifdef USE_IMGUI
 	ImGui::Begin("Dissolve Effect");
 	ImGui::SliderFloat("Dissolve Threshold", &params_->dissolveThreshold, 0.0f, 1.0f);
 	ImGui::ColorEdit3("Edge Color", &params_->edgeColor.x);
 	ImGui::SliderFloat("Edge Strength", &params_->edgeStrength, 0.0f, 5.0f);
 	ImGui::SliderFloat("Edge Width", &params_->edgeWidth, 0.0f, 1.0f);
 	ImGui::End();
+#endif // USE_IMGUI
 }
 void DissolveEffect::Draw(ID3D12GraphicsCommandList* commandList) {
 	// PSO・ルートシグネチャ設定

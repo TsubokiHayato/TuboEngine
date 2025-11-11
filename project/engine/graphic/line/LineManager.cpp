@@ -64,6 +64,8 @@ void LineManager::Draw() {
 /// ImGui描画処理
 ///----------------------------------------------------
 void LineManager::DrawImGui() {
+
+#ifdef USE_IMGUI
     ImGui::Begin("LineManager");
     ImGui::Checkbox("Line", &isDrawLine_);
     ImGui::Separator();
@@ -73,6 +75,8 @@ void LineManager::DrawImGui() {
     ImGui::Checkbox("Sphere", &isDrawSphere_);
     ImGui::ColorEdit4("Color", &gridColor_.x);
     ImGui::End();
+#endif //_USE_IMGUI
+    
 }
 
 ///----------------------------------------------------

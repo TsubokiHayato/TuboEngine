@@ -243,6 +243,8 @@ void Sprite::AdjustTextureSize()
 
 // ImGuiでSpriteの全機能をまとめて操作・確認できる関数
 void Sprite::DrawImGui(const char* windowName) {
+#ifdef USE_IMGUI
+
 	const char* windowName_ = windowName;
 	ImGui::Begin(windowName_);
     ImGui::Separator();
@@ -299,4 +301,6 @@ void Sprite::DrawImGui(const char* windowName) {
     }
     // コメント: ここでSpriteの全てのプロパティをImGuiで操作できます
 	ImGui::End(); // ウィンドウ終了
+
+	#endif // USE_IMGUI
 }
