@@ -227,6 +227,7 @@ void GameOverState::SpriteDraw(StageScene* scene) {
 
 void GameOverState::ImGuiDraw(StageScene* scene) {
 
+#ifdef USE_IMGUI
 	//alpha
 	ImGui::Begin("Sprite Draw");
 	ImGui::Text("blackOutAlpha: %.2f", blackoutSprite_->GetColor().w);
@@ -263,6 +264,7 @@ void GameOverState::ImGuiDraw(StageScene* scene) {
 		ImGui::SliderFloat3("CamTargetRot", &camTargetRot_.x, -3.2f, 3.2f);
 		ImGui::SliderFloat("CamAnimDuration", &camAnimDuration_, 0.0f, 3.0f, "%.2f");
 	}
+#endif // USE_IMGUI
 }
 
 void GameOverState::ParticleDraw(StageScene* scene) {}
