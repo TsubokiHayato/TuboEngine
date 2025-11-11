@@ -1,5 +1,11 @@
 #pragma once
 #include "IStageState.h"
+#include "Vector3.h"
+#include <chrono>
+#include <vector>
+#include <memory>
+#include "Sprite.h"
+
 class StageScene;
     /// StageClear状態 （ステージクリア後の状態）///
  class StageClearState : public IStageState {
@@ -11,4 +17,7 @@ class StageScene;
 	void SpriteDraw(StageScene* scene) override;
 	void ImGuiDraw(StageScene* scene) override;
 	void ParticleDraw(StageScene* scene) override;
+
+	private:
+	std::unique_ptr<Sprite> restartSprite_ = nullptr;
  };
