@@ -3,7 +3,7 @@
 #include "Bullet/Player/PlayerBullet.h"
 #include "Object3d.h"
 #include "Sprite.h"
-#include"MapChip/MapChipField.h"
+#include "MapChip/MapChipField.h"
 ///--------------------------------------------------
 /// プレイヤークラス
 ///--------------------------------------------------
@@ -60,6 +60,8 @@ public:
 	Vector3 GetPosition() const { return position; }
 	// プレイヤーの回転を取得
 	Vector3 GetRotation() const { return rotation; }
+	// プレイヤーのスケールを取得
+	Vector3 GetScale() const { return scale; }
 	// プレイヤーの速度を取得
 	Vector3 GetVelocity() const { return velocity; }
 	// プレイヤーのHPを取得
@@ -75,6 +77,10 @@ public:
 
 	// プレイヤーの位置を設定
 	void SetPosition(const Vector3& position) { this->position = position; }
+	// プレイヤーの回転を設定
+	void SetRotation(const Vector3& rotation) { this->rotation = rotation; }
+	// プレイヤーのスケールを設定
+	void SetScale(const Vector3& scale) { this->scale = scale; }
 	// プレイヤーの速度を設定
 	void SetVelocity(const Vector3& velocity) { this->velocity = velocity; }
 	// プレイヤーのHPを設定
@@ -84,8 +90,15 @@ public:
 	// カメラを設定
 	void SetCamera(Camera* camera) { object3d->SetCamera(camera); }
 
+	// モデルのアルファ設定
+	void SetModelAlpha(float alpha) {
+		Vector4 color = object3d->GetModelColor();
+		color.w = alpha;
+		object3d->SetModelColor(color);
+	}
+
 	// 環境マップ設定
-	void CubeMapSet(const std::string& filePath) {object3d->SetCubeMapFilePath(filePath); }
+	void CubeMapSet(const std::string& filePath) { object3d->SetCubeMapFilePath(filePath); }
 
 	// マップチップフィールドを設定
 	void SetMapChipField(MapChipField* mapChipField) { this->mapChipField = mapChipField; }

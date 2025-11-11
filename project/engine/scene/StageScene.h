@@ -28,6 +28,7 @@
 #include "SkyBox.h"
 #include "StageState/StageStateManager.h"
 #include "Tile/Tile.h"
+#include "SkyDome/SkyDome.h"
 
 
 class StageScene : public IScene {
@@ -93,6 +94,7 @@ public:
 
 	FollowTopDownCamera* GetFollowCamera() const { return followCamera.get(); }
 	std::string& GetMapChipCsvFilePath() { return mapChipCsvFilePath_; }
+	std::unique_ptr<SkyDome>& GetSkyDome() { return skyDome_; }
 
 	StageStateManager* GetStageStateManager() { return stateManager_.get(); }
 
@@ -136,6 +138,9 @@ private:
 
 	/// StageStateManager ///
 	std::unique_ptr<StageStateManager> stateManager_;
+
+	/// SkyDome///
+	std::unique_ptr<SkyDome> skyDome_ = nullptr;
 
 
 };
