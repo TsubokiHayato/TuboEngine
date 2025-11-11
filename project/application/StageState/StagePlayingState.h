@@ -1,5 +1,12 @@
 #pragma once
 #include "IStageState.h"
+#include "Vector3.h"
+#include <chrono>
+#include <vector>
+#include <memory>
+#include "Sprite.h"
+
+
 class StageScene;
 
 /// Playing状態 （ステージプレイ中の状態）///
@@ -12,4 +19,9 @@ class StageScene;
 	void SpriteDraw(StageScene* scene) override;
 	void ImGuiDraw(StageScene* scene) override;
 	void ParticleDraw(StageScene* scene) override;
+
+private:
+	std::unique_ptr<Sprite> ruleSprite_ = nullptr;
+
+
  };
