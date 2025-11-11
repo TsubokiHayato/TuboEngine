@@ -21,7 +21,7 @@ float PlayerBullet::s_bulletSpeed = 2.0f;
 float PlayerBullet::s_disappearZ = 100.0f;
 Vector3 PlayerBullet::s_scale = {1.0f, 1.0f, 1.0f};
 Vector3 PlayerBullet::s_rotation = {0.0f, 0.0f, 0.0f};
-int PlayerBullet::s_damage = 10;
+int PlayerBullet::s_damage = 1;
 float PlayerBullet::s_fireInterval = 0.2f;
 
 //--------------------------------------------------
