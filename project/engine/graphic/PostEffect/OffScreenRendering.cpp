@@ -174,6 +174,7 @@ void OffScreenRendering::Draw() {
 
 void OffScreenRendering::DrawImGui() {
 
+#ifdef USE_IMGUI
 	postEffectManager.DrawImGui();
 
 	ImGui::Begin("PostEffect");
@@ -202,6 +203,7 @@ void OffScreenRendering::DrawImGui() {
 	}
 
 	ImGui::End();
+#endif // USE_IMGUI
 }
 
 void OffScreenRendering::Finalize() {

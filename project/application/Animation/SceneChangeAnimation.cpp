@@ -135,6 +135,8 @@ bool SceneChangeAnimation::IsFinished() const { return m_phase == Phase::Finishe
 
 // ImGuiコントロール
 void SceneChangeAnimation::DrawImGui() {
+
+#ifdef USE_IMGUI
 	ImGui::Begin("SceneChangeAnimation");
 
 	static int blockSize = m_blockSize;
@@ -187,6 +189,7 @@ void SceneChangeAnimation::DrawImGui() {
 	ImGui::Text("IsFinished: %s", IsFinished() ? "Yes" : "No");
 
 	ImGui::End();
+#endif // USE_IMGUI
 }
 
 void SceneChangeAnimation::SetPhase(Phase phase) {
