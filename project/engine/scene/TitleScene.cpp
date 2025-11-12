@@ -135,11 +135,6 @@ void TitleScene::SpriteDraw() {
 	// ==== UI描画 ====
 	titleUI->Draw();
 
-	// フェードアウトアニメーション描画
-
-void TitleScene::SpriteDraw() {
-	// ...既存のスプライト描画...
-
 	// アニメーション描画
 	if (sceneChangeAnimation) {
 		sceneChangeAnimation->Draw();
