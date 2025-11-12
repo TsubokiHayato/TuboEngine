@@ -118,6 +118,7 @@
     <ClCompile Include="engine\scene\OverScene.cpp" />
     <ClCompile Include="application\SkyDome\SkyDome.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
+    <ClCompile Include="TitleUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
@@ -254,6 +255,11 @@
     <ClInclude Include="application\Tile\Tile.h" />
     <ClInclude Include="engine\scene\OverScene.h" />
     <ClInclude Include="application\SkyDome\SkyDome.h" />
+    <ClInclude Include="application\PlayerBullet.h" />
+    <ClInclude Include="application\Player.h" />
+    <ClInclude Include="TitleUI.h" />
+    <ClInclude Include="TitleUIButton.h" />
+    <ClInclude Include="SceneType.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
