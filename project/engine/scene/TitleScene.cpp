@@ -115,9 +115,10 @@ void TitleScene::SpriteDraw() {
 	// ==== UI描画 ====
 	titleUI->Draw();
 
-	// フェードアウトアニメーション描画
-
-	fadeSprite_->Draw();
+	// アニメーション描画
+	if (sceneChangeAnimation) {
+		sceneChangeAnimation->Draw();
+	}
 }
 
 void TitleScene::ImGuiDraw() {
