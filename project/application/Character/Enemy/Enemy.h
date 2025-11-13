@@ -95,7 +95,7 @@ private:
 public:
 	enum class State {
 		Idle,      // 非発見状態（待機）
-		Alert,     // 警戒状態
+		Alert,     // 警戒状態（見失い地点へ移動）
 		LookAround, // 見回し状態（警戒終了後も見回す）
 		Patrol,    // 巡回モード
 		Chase,     // 発見状態（追跡）
@@ -171,4 +171,15 @@ private:
 	// 追加: 射撃クールダウン用
 	float bulletTimer_ = 0.0f; // 経過時間
 	bool wantShoot_ = false;   // このフレーム撃つ条件を満たしたか
+
+	///----- 経路追従（タイル対応） -----///
+private:
+	std::vector<Vector3> currentPath_;  // タイル中心のワールド座標列
+	size_t pathCursor_ = 0;             // 今向かっているウェイポイントのインデックス
+	int lastPathGoalIndex_ = -1;        // 直近の経路ゴール（タイルインデックス）
+	float waypointArriveEps_ = 0.15f;   // ウェイポイント到達判定（タイルサイズの割合で加算）
+
+	// 経路ユーティリティ
+	void ClearPath() { currentPath_.clear(); pathCursor_ = 0; lastPathGoalIndex_ = -1; }
+	bool BuildPathTo(const Vector3& worldGoal); // A* で currentPath_ を構築
 };
