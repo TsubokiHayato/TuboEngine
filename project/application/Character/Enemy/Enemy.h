@@ -104,38 +104,35 @@ public:
 
 private:
 	///-------トランスフォーム------///
-	Vector3 position;                              // 初期位置
-	Vector3 rotation;                              // 初期回転
-	Vector3 scale = {1.0f, 1.0f, 1.0f};            // 初期スケール
+	Vector3 position;
+	Vector3 rotation;
+	Vector3 scale = {1.0f, 1.0f, 1.0f};
 
+	Vector3 velocity;
+	float turnSpeed_ = 0.1f;
+	float moveSpeed_ = 0.08f;
+	float shootDistance_ = 7.0f;
+	float moveStartDistance_ = 15.0f;
 
-	Vector3 velocity;                              // プレイヤーの速度
-	float turnSpeed_ = 0.1f;                       // プレイヤー方向を向く回転補間率（0.0f〜1.0f）
-	float moveSpeed_ = 0.08f;                      // 移動速度
-	float shootDistance_ = 7.0f;                   // プレイヤーに近づく距離の閾値（例: 7.0f）
-	float moveStartDistance_ = 15.0f;              // 移動開始距離（これより遠いとIdle）
+	int HP = 100;
+	bool isAllive = true;
+	bool isHit = false;
+	bool wasHit = false;
 
-	int HP = 100;                                  // 敵のHP
-	bool isAllive = true;                           // 敵が生きているかどうかのフラグ
-	bool isHit = false;                            // 衝突判定フラグ
-	bool wasHit = false;                           // 前フレームのisHit
-	
-	std::unique_ptr<Object3d> object3d;            // 3Dオブジェクト
-	State state_ = State::Idle;                    // 行動状態（移動/射撃）
-	
+	std::unique_ptr<Object3d> object3d;
+	State state_ = State::Idle;
 
 	///--視野--///
-	float kViewAngleDeg = 90.0f;                   // 視野角（度）
-	float kViewDistance = 15.0f;                   // 視認距離
-	int kViewLineDiv = 16;                         // 視野扇形の分割数
-	Vector4 kViewColor = {1.0f, 1.0f, 0.0f, 0.7f}; // 視野ライン色
+	float kViewAngleDeg = 90.0f;
+	float kViewDistance = 15.0f;
+	int kViewLineDiv = 16;
+	Vector4 kViewColor = {1.0f, 1.0f, 0.0f, 0.7f};
 	Vector3 lastSeenPlayerPos = {0.0f, 0.0f, 0.0f};
 	float lastSeenTimer = 0.0f;
-	float kLastSeenDuration = 3.0f; // 見失ってから追跡する秒数
-
+	float kLastSeenDuration = 3.0f;
 
 	///-----Bullet-----///
-	std::unique_ptr<EnemyNormalBullet> bullet; // 敵の弾
+	std::unique_ptr<EnemyNormalBullet> bullet;
 
 	///-----Particle-----///
 	std::unique_ptr<Particle> particle;
@@ -147,39 +144,50 @@ private:
 	float particleLifeTime = 1.0f;
 	float particleCurrentTime = 0.0f;
 
-	///-----見回し-----///
-	float lookAroundBaseAngle = 0.0f; // 見回しの基準角
-	float lookAroundTargetAngle = 0.0f; // 目標角
-	int lookAroundDirection = 1; // 1:右, -1:左
-	float lookAroundAngleWidth = 1.25f; // 見回し角度幅（ラジアン、デフォルト約70度）
-	float lookAroundSpeed = 0.06f; // 見回し速度（ラジアン/フレーム）
-	int lookAroundCount = 0; // 現在の見回し回数
-	int lookAroundMaxCount = 4; // 最大見回し回数
-	bool lookAroundInitialized = false; // 見回し状態の初期化フラグ
+	///-----見回し（LookAround状態用）-----///
+	float lookAroundBaseAngle = 0.0f;
+	float lookAroundTargetAngle = 0.0f;
+	int lookAroundDirection = 1;          // 1:右, -1:左
+	float lookAroundAngleWidth = 1.25f;   // ラジアン（約70度）
+	float lookAroundSpeed = 0.06f;        // ラジアン/フレーム
+	int lookAroundCount = 0;
+	int lookAroundMaxCount = 4;
+	bool lookAroundInitialized = false;
 
-	bool showSurpriseIcon_ = false; // ！と？のアイコンを表示するかどうかのフラグ
+	///----- Idle: 一定間隔で後ろを向く -----///
+	// 発動間隔（Idleでの背面確認の開始間隔）
+	float idleLookAroundIntervalSec = 4.0f;
+	float idleLookAroundTimer = 0.0f;
 
-	Vector4 stateIconColor = {1, 0, 0, 1}; // アイコン色
-	float stateIconSize = 0.8f;            // アイコン大きさ
-	float stateIconHeight = 3.0f;          // アイコン高さ
-	float stateIconLineWidth = 0.08f; // アイコンの線の太さ
+	// フェーズ制御
+	enum class IdleBackPhase { None, ToBack, Hold, Return };
+	IdleBackPhase idleBackPhase_ = IdleBackPhase::None;
 
-	/////----- スプライト -----///
-	//std::unique_ptr<Sprite> exclamationSprite_; // ！スプライト
-	//std::unique_ptr<Sprite> questionSprite_;    // ？スプライト
+	// 旋回・保持パラメータ
+	float idleBackTurnSpeed = 0.03f;   // ラジアン/フレーム（ゆっくり）
+	float idleBackHoldSec = 0.5f;      // 背面での保持秒数
+	float idleBackHoldTimer = 0.0f;
+	float idleBackStartAngle = 0.0f;   // 開始時の角度（戻り先）
+	float idleBackTargetAngle = 0.0f;  // 背面の角度（start + π）
 
-	// 追加: 射撃クールダウン用
-	float bulletTimer_ = 0.0f; // 経過時間
-	bool wantShoot_ = false;   // このフレーム撃つ条件を満たしたか
+	bool showSurpriseIcon_ = false;
 
-	///----- 経路追従（タイル対応） -----///
+	Vector4 stateIconColor = {1, 0, 0, 1};
+	float stateIconSize = 0.8f;
+	float stateIconHeight = 3.0f;
+	float stateIconLineWidth = 0.08f;
+
+	// 射撃クールダウン
+	float bulletTimer_ = 0.0f;
+	bool wantShoot_ = false;
+
 private:
-	std::vector<Vector3> currentPath_;  // タイル中心のワールド座標列
-	size_t pathCursor_ = 0;             // 今向かっているウェイポイントのインデックス
-	int lastPathGoalIndex_ = -1;        // 直近の経路ゴール（タイルインデックス）
-	float waypointArriveEps_ = 0.15f;   // ウェイポイント到達判定（タイルサイズの割合で加算）
+	///----- 経路追従（タイル対応） -----///
+	std::vector<Vector3> currentPath_;
+	size_t pathCursor_ = 0;
+	int lastPathGoalIndex_ = -1;
+	float waypointArriveEps_ = 0.15f;
 
-	// 経路ユーティリティ
 	void ClearPath() { currentPath_.clear(); pathCursor_ = 0; lastPathGoalIndex_ = -1; }
-	bool BuildPathTo(const Vector3& worldGoal); // A* で currentPath_ を構築
+	bool BuildPathTo(const Vector3& worldGoal);
 };
