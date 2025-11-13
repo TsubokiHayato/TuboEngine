@@ -87,30 +87,33 @@ void StageScene::ParticleDraw() {
 		stateManager_->ParticleDraw(this);
 	}
 }
-
 void StageScene::CheckAllCollisions() {
 	/// 衝突マネージャのリセット ///
 	collisionManager_->Reset();
 
 	/// コライダーをリストに登録 ///
+	// プレイヤー
 	collisionManager_->AddCollider(player_.get());
 
-	// 複数の敵を登録 ///
+	// 敵（生存中のみ登録）
 	for (const auto& enemy : enemies) {
-		collisionManager_->AddCollider(enemy.get());
+		if (!enemy) {
+			continue;
+		}
+		if (enemy->GetIsAllive() && enemy->GetHP() > 0) {
+			collisionManager_->AddCollider(enemy.get());
+		}
 	}
 
-	// プレイヤーの弾
+	// プレイヤーの弾（生存中のみ登録）
 	for (const auto& bullet : player_->GetBullets()) {
-		collisionManager_->AddCollider(bullet.get());
+		if (!bullet) {
+			continue;
+		}
+		if (bullet->GetIsAlive()) {
+			collisionManager_->AddCollider(bullet.get());
+		}
 	}
-
-	// プレイヤーが死亡したらコライダーを削除または敵が死亡したらコライダーを削除 ///
-	// if (player_->GetHP() <= 0 || enemy_->GetHP() <= 0) {
-	//	collisionManager_->RemoveCollider(player_.get());
-	//	collisionManager_->RemoveCollider(enemy_.get());
-
-	//}
 
 	// 衝突判定と応答
 	collisionManager_->CheckAllCollisions();
