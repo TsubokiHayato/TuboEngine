@@ -122,6 +122,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\StageState\StageReadyState.cpp" />
     <ClCompile Include="application\StageState\StageStateManager.cpp" />
     <ClCompile Include="application\Animation\DropWaveAnimation.cpp" />
+    <ClCompile Include="application\TitleUI.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\BloomEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\BloomPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.cpp" />
@@ -237,12 +238,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Tile\Tile.cpp" />
     <ClCompile Include="engine\scene\OverScene.cpp" />
     <ClCompile Include="application\SkyDome\SkyDome.cpp" />
-    <ClCompile Include="application\MapChipField.cpp" />
-    <ClCompile Include="TitleUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\Character\Player\Player.h" />
     <ClInclude Include="application\Bullet\Player\PlayerBullet.h" />
+    <ClInclude Include="application\SceneType.h" />
     <ClInclude Include="application\StageState\BossState.h" />
     <ClInclude Include="application\StageState\DropWaveAnimator.h" />
     <ClInclude Include="application\StageState\GameClearState.h" />
@@ -255,6 +255,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\StageState\StageStateManager.h" />
     <ClInclude Include="application\StageState\StageType.h" />
     <ClInclude Include="application\Animation\DropWaveAnimation.h" />
+    <ClInclude Include="application\TitleUI.h" />
+    <ClInclude Include="application\TitleUIButton.h" />
     <ClInclude Include="engine\graphic\PostEffect\BloomEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\BloomPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.h" />
@@ -377,9 +379,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Tile\Tile.h" />
     <ClInclude Include="engine\scene\OverScene.h" />
     <ClInclude Include="application\SkyDome\SkyDome.h" />
-    <ClInclude Include="SceneType.h" />
-    <ClInclude Include="TitleUI.h" />
-    <ClInclude Include="TitleUIButton.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
