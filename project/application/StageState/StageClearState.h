@@ -20,8 +20,7 @@ public:
     void ParticleDraw(StageScene* scene) override;
 
 private:
-    std::unique_ptr<Sprite> restartSprite_ = nullptr;
-
+   
     // クリア後自動遷移用タイマー
     bool started_ = false;
     float timer_ = 0.0f;
