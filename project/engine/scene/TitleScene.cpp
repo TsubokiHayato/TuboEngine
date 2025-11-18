@@ -19,14 +19,6 @@ void TitleScene::Initialize() {
 	titleUI = std::make_unique<TitleUI>();
 	titleUI->Initialize();
 
-	// フェード用スプライト生成
-	fadeSprite_ = std::make_unique<Sprite>();
-	fadeSprite_->Initialize("uvChecker.png");
-	fadeSprite_->SetPosition({0.0f, 0.0f});
-	fadeSprite_->SetSize({1280.0f, 720.0f}); // 画面サイズに合わせる
-	fadeSprite_->SetAnchorPoint({0.0f, 0.0f});
-	fadeSprite_->SetColor({0, 0, 0, 0}); // 初期は透明
-	fadeSprite_->Update();
 	// シーンチェンジアニメーション初期化（シーン開始時はDisappearingで覆いを消す）
 	sceneChangeAnimation = std::make_unique<SceneChangeAnimation>(1280, 720, 80, 1.5f, "barrier.png");
 	sceneChangeAnimation->Initialize();
@@ -40,28 +32,10 @@ void TitleScene::Update() {
 	// 背景アニメーション用タイマーを加算
 	time_ += 1.0f / 60.0f; // 仮に60FPS前提。可変フレームならdtを使う
 
-	// フェードイン・アウトアニメーション更新
-	if (isSceneChanging_) {
-		float alpha = 0;
-		alpha += 0.05f; // フェードアウト速度
-		fadeSprite_->SetColor({0, 0, 0, alpha});
-		fadeSprite_->Update();
-	}
-
-
 	LineManager::GetInstance()->SetDefaultCamera(camera.get());
 	LineManager::GetInstance()->Update();
 
-	// スペースキーで覆いを出すリクエスト
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		sceneChangeAnimation->SetPhase(SceneChangeAnimation::Phase::Appearing); // 覆いを出す
-		isRequestSceneChange = true;
-	// シーンチェンジ要求が来たらアニメーション開始
-	if (titleUI->GetrRequestSceneChange_() && !isSceneChanging_) {
-		isSceneChanging_ = true;
-		sceneChangeTimer_ = 0.0f;
-	}
-
+	
 	sceneChangeAnimation->Update(1.0f / 60.0f);
 
 	// アニメーションが終わったらシーン遷移
@@ -73,15 +47,12 @@ void TitleScene::Update() {
 			isRequestSceneChange = true;
 		}
 	}
-}
+
 	// シーンチェンジアニメーション進行
-	if (isSceneChanging_) {
-		sceneChangeTimer_ += 1.0f / 60.0f; // 仮に60FPS前提
-		if (sceneChangeTimer_ >= sceneChangeDuration_) {
-			// アニメーション終了後にシーン遷移
-			//ChangeNextScene(STAGE);
-		}
-		return; // アニメーション中は他の処理をスキップ
+	if (isRequestSceneChange && sceneChangeAnimation->IsFinished()) {
+		// ここでシーン遷移処理を呼ぶ
+		SceneManager::GetInstance()->ChangeScene(SCENE::STAGE);
+		isRequestSceneChange = false; // フラグリセット
 	}
 }
 
@@ -144,7 +115,7 @@ void TitleScene::SpriteDraw() {
 void TitleScene::ImGuiDraw() {
 
 #ifdef USE_IMGUI
-	//カメラ
+	// カメラ
 	ImGui::Begin("camera");
 	ImGui::DragFloat3("Position", &cameraPosition.x, 0.01f);
 	ImGui::DragFloat3("Rotation", &cameraRotation.x, 0.01f);
