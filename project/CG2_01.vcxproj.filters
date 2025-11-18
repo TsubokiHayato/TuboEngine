@@ -118,7 +118,6 @@
     <ClCompile Include="engine\scene\OverScene.cpp" />
     <ClCompile Include="application\SkyDome\SkyDome.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
-    <ClCompile Include="TitleUI.cpp" />
     <ClCompile Include="application\TitleUI.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -256,12 +255,10 @@
     <ClInclude Include="application\Tile\Tile.h" />
     <ClInclude Include="engine\scene\OverScene.h" />
     <ClInclude Include="application\SkyDome\SkyDome.h" />
-    <ClInclude Include="TitleUI.h" />
-    <ClInclude Include="TitleUIButton.h" />
-    <ClInclude Include="SceneType.h" />
     <ClInclude Include="application\SceneType.h" />
     <ClInclude Include="application\TitleUIButton.h" />
     <ClInclude Include="application\TitleUI.h" />
+    <ClInclude Include="application\scene\StageState\ClearState.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
