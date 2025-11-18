@@ -44,11 +44,7 @@ void StageClearState::Enter(StageScene* scene) {
 	// 通常 60fps 前提の更新間隔（例: 0.25倍速なら 1/60 / 0.25 ≒ 0.0667秒 = 15Hz）
 	gWorldIntervalSec = (1.0 / 60.0) / static_cast<double>(kBehaviorSlowScale);
 
-	restartSprite_ = std::make_unique<Sprite>();
-	restartSprite_->Initialize("restart.png");
-	restartSprite_->SetPosition({640.0f, 680.0f});
-	restartSprite_->SetAnchorPoint({0.5f, 0.5f});
-	restartSprite_->Update();
+	
 
 	// 自動シーン遷移タイマー初期化
 	started_ = true;
@@ -57,14 +53,8 @@ void StageClearState::Enter(StageScene* scene) {
 }
 
 void StageClearState::Update(StageScene* scene) {
-	// スペースでステージリスタート（既存動作は残す）
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		scene->GetStageStateManager()->ChangeState(StageType::Ready, scene);
-	}
-
-	// UIは毎フレーム更新
-	restartSprite_->Update();
-
+	
+	
 	// 経過時間計測（スローに関係なく実時間で進行）
 	{
 		const auto now = std::chrono::steady_clock::now();
@@ -153,7 +143,7 @@ void StageClearState::Object3DDraw(StageScene* scene) {
 }
 
 void StageClearState::SpriteDraw(StageScene* scene) {
-	restartSprite_->Draw();
+	
 }
 
 void StageClearState::ImGuiDraw(StageScene* scene) {}
