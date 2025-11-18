@@ -29,27 +29,32 @@ void StageReadyState::Enter(StageScene* scene) {
 	// マップチップフィールド初期化
 	scene->GetMapChipField()->LoadMapChipCsv(scene->GetMapChipCsvFilePath());
 
-	// プレイヤー初期化
+	// 先にプレイヤーのマップチップ座標を取得してワールド座標に変換
+	int playerMapX = -1, playerMapY = -1;
+	ForEachMapChip(scene, [&](uint32_t x, uint32_t y, MapChipType type) {
+		if (type == MapChipType::Player) {
+			playerMapX = static_cast<int>(x);
+			playerMapY = static_cast<int>(y);
+		}
+	});
+	if (playerMapX < 0 || playerMapY < 0) {
+		// 見つからない場合は(0,0)にフォールバック
+		playerMapX = 0;
+		playerMapY = 0;
+	}
+	playerTargetPosition_ = scene->GetMapChipField()->GetMapChipPositionByIndex(playerMapX, playerMapY);
+
+	// プレイヤー初期化（マップ座標へ配置）
 	scene->GetPlayer()->Initialize();
 	scene->GetPlayer()->SetMapChipField(scene->GetMapChipField());
 	scene->GetPlayer()->SetIsDontMove(true); // 落下中は移動禁止
+	scene->GetPlayer()->SetPosition(playerTargetPosition_); // 初期位置をマップチップ座標に設定
 
 	// フォローカメラ初期化（プレイヤー追従）
 	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), Vector3 {0.0f, 0.0f, 70.0f}, 0.25f);
 	scene->GetFollowCamera()->Update();
 
 	LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
-
-	// プレイヤーのマップチップ座標取得
-	int playerMapX = -1, playerMapY = -1;
-	ForEachMapChip(scene, [&](uint32_t x, uint32_t y, MapChipType type) {
-		if (type == MapChipType::Player) {
-			playerMapX = x;
-			playerMapY = y;
-		}
-	});
-
-	playerTargetPosition_ = scene->GetMapChipField()->GetMapChipPositionByIndex(playerMapX, playerMapY);
 
 	// ブロック・エネミー・タイルの初期化
 	auto& blocks = scene->GetBlocks();
@@ -68,7 +73,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	// マップチップを走査して各オブジェクト生成
 	ForEachMapChip(scene, [&](uint32_t x, uint32_t y, MapChipType type) {
 		Vector3 pos = scene->GetMapChipField()->GetMapChipPositionByIndex(x, y);
-		int layer = ChebyshevDistance(x, y, playerMapX, playerMapY);
+		int layer = ChebyshevDistance(static_cast<int>(x), static_cast<int>(y), playerMapX, playerMapY);
 
 		if (type == MapChipType::kBlock) {
 			// ブロック生成
@@ -76,7 +81,7 @@ void StageReadyState::Enter(StageScene* scene) {
 			block->Initialize(pos);
 			block->SetCamera(scene->GetFollowCamera()->GetCamera());
 			block->Update();
-			blocks.push_back(std::move(block));
+			scene->GetBlocks().push_back(std::move(block));
 			blockTargetPositions_.push_back(pos);
 			blockRippleLayers_.push_back((float)layer);
 		} else if (type == MapChipType::Enemy) {
@@ -89,7 +94,7 @@ void StageReadyState::Enter(StageScene* scene) {
 			enemy->SetPlayer(scene->GetPlayer());
 			enemy->SetPosition(pos);
 			enemy->Update();
-			enemies.push_back(std::move(enemy));
+			scene->GetEnemies().push_back(std::move(enemy));
 			enemyTargetPositions_.push_back(pos);
 			enemyRippleLayers_.push_back((float)layer);
 		}
@@ -102,7 +107,7 @@ void StageReadyState::Enter(StageScene* scene) {
 		tile->SetCamera(scene->GetFollowCamera()->GetCamera());
 
 		tile->Update();
-		tiles.push_back(std::move(tile));
+		scene->GetTiles().push_back(std::move(tile));
 		tileTargetPositions_.push_back(tilePos);
 		tileRippleLayers_.push_back((float)layer);
 	});
