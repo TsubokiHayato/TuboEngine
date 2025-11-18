@@ -122,6 +122,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\StageState\StageReadyState.cpp" />
     <ClCompile Include="application\StageState\StageStateManager.cpp" />
     <ClCompile Include="application\Animation\DropWaveAnimation.cpp" />
+    <ClCompile Include="ChargingEnemy.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\BloomEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\BloomPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.cpp" />
@@ -222,6 +223,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Animation\SceneChangeAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application\Character\Enemy\ChargingEnemy.h" />
     <ClInclude Include="application\Character\Player\Player.h" />
     <ClInclude Include="application\Bullet\Player\PlayerBullet.h" />
     <ClInclude Include="application\StageState\BossState.h" />
@@ -236,6 +238,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\StageState\StageStateManager.h" />
     <ClInclude Include="application\StageState\StageType.h" />
     <ClInclude Include="application\Animation\DropWaveAnimation.h" />
+    <ClInclude Include="ChargingEnemy.h" />
     <ClInclude Include="engine\graphic\PostEffect\BloomEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\BloomPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.h" />

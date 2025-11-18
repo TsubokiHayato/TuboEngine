@@ -2,6 +2,8 @@
 #include "LineManager.h"
 #include "StageScene.h"
 #include "StageType.h"
+#include "ChargingEnemy.h" // 追加：ChargingEnemy をスポーンするため
+
 
 
 void StageReadyState::Enter(StageScene* scene) {
@@ -57,27 +59,29 @@ void StageReadyState::Enter(StageScene* scene) {
         }
     }
 
-    // エネミー生成・レイヤー計算（チェビシェフ距離）
-    scene->GetEnemies().clear();
-    enemyTargetPositions_.clear();
-    enemyRippleLayers_.clear();
-    for (uint32_t y = 0; y < scene->GetMapChipField()->GetNumBlockVirtical(); ++y) {
-        for (uint32_t x = 0; x < scene->GetMapChipField()->GetNumBlockHorizontal(); ++x) {
-            if (scene->GetMapChipField()->GetMapChipTypeByIndex(x, y) == MapChipType::Enemy) {
-                auto enemy = std::make_unique<Enemy>();
-                enemy->Initialize();
-                enemy->SetCamera(scene->GetMainCamera());
-                enemy->SetPlayer(scene->GetPlayer());
-                Vector3 pos = scene->GetMapChipField()->GetMapChipPositionByIndex(x, y);
-                enemy->SetPosition(pos);
-                enemy->Update();
-                scene->GetEnemies().push_back(std::move(enemy));
-                enemyTargetPositions_.push_back(pos);
-                int layer = std::max(std::abs((int)x - playerMapX), std::abs((int)y - playerMapY));
-                enemyRippleLayers_.push_back((float)layer);
-            }
-        }
-    }
+	// エネミー生成・レイヤー計算（チェビシェフ距離）
+	scene->GetEnemies().clear();
+	enemyTargetPositions_.clear();
+	enemyRippleLayers_.clear();
+	for (uint32_t y = 0; y < scene->GetMapChipField()->GetNumBlockVirtical(); ++y) {
+		for (uint32_t x = 0; x < scene->GetMapChipField()->GetNumBlockHorizontal(); ++x) {
+			if (scene->GetMapChipField()->GetMapChipTypeByIndex(x, y) == MapChipType::Enemy) {
+				//auto enemy = std::make_unique<Enemy>();
+				// ChargingEnemy に差し替え
+				auto enemy = std::make_unique<ChargingEnemy>();
+				enemy->Initialize();
+				enemy->SetCamera(scene->GetMainCamera());
+				enemy->SetPlayer(scene->GetPlayer());
+				Vector3 pos = scene->GetMapChipField()->GetMapChipPositionByIndex(x, y);
+				enemy->SetPosition(pos);
+				enemy->Update();
+				scene->GetEnemies().push_back(std::move(enemy));
+				enemyTargetPositions_.push_back(pos);
+				int layer = std::max(std::abs((int)x - playerMapX), std::abs((int)y - playerMapY));
+				enemyRippleLayers_.push_back((float)layer);
+			}
+		}
+	}
 
     // アニメーション用タイマー初期化
     currentDroppingLayer_ = 0;
