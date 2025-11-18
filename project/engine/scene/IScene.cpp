@@ -1,7 +1,7 @@
 #include "IScene.h"
 
 //タイトルシーンで初期化
-int IScene::sceneNo = STAGE;
+int IScene::sceneNo = TITLE;
 
 IScene::~IScene()
 {
