@@ -16,22 +16,28 @@ void StageScene::Initialize() {
 	collisionManager_ = std::make_unique<CollisionManager>();
 	stateManager_ = std::make_unique<StageStateManager>();
 	skyDome_ = std::make_unique<SkyDome>();
+	sceneChangeAnimation_ = std::make_unique<SceneChangeAnimation>(1280, 720, 80, 1.5f, "barrier.png");
 	
 	// 衝突マネージャの生成
 	collisionManager_->Initialize();
 	// ステートマネージャの生成
 	stateManager_->Initialize(this);
-
+	// シーンチェンジアニメーション初期化（シーン開始時はDisappearingで覆いを消す）
+	sceneChangeAnimation_->Initialize();
+	isRequestSceneChange = false;
 	
 }
 
 void StageScene::Update() {
 
+	sceneChangeAnimation_->Update(1.0f / 60.0f);
 
-
-	// ステートマネージャの更新
-	if (stateManager_) {
-		stateManager_->Update(this);
+	
+	if (sceneChangeAnimation_->IsFinished()) {
+		// ステートマネージャの更新
+		if (stateManager_) {
+			stateManager_->Update(this);
+		}
 	}
 	// デフォルトカメラをFollowCameraに設定
 	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
@@ -39,6 +45,7 @@ void StageScene::Update() {
 	collisionManager_->Update();
 	// 全ての衝突をチェック
 	CheckAllCollisions();
+
 }
 
 void StageScene::Finalize() {}
@@ -65,6 +72,10 @@ void StageScene::SpriteDraw() {
 		stateManager_->SpriteDraw(this);
 	}
 	
+	// アニメーション描画
+	if (sceneChangeAnimation_) {
+		sceneChangeAnimation_->Draw();
+	}
 	
 	 }
 
