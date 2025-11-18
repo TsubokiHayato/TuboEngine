@@ -30,6 +30,8 @@
 #include "Tile/Tile.h"
 #include "SkyDome/SkyDome.h"
 
+#include "Animation/SceneChangeAnimation.h"
+
 
 class StageScene : public IScene {
 public:
@@ -104,6 +106,9 @@ public:
 	std::unique_ptr<SkyDome>& GetSkyDome() { return skyDome_; }
 
 	StageStateManager* GetStageStateManager() { return stateManager_.get(); }
+	SceneChangeAnimation* GetSceneChangeAnimation() { return sceneChangeAnimation_.get(); }
+	bool GetIsRequestSceneChange() const { return isRequestSceneChange; }
+	void SetIsRequestSceneChange(bool request) { isRequestSceneChange = request; }
 
 private:
 	///----------------------------------------------------------------------------------------
@@ -149,5 +154,9 @@ private:
 	/// SkyDome///
 	std::unique_ptr<SkyDome> skyDome_ = nullptr;
 
+	/// SceneChangeAnimation ///
+
+	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation_ = nullptr;
+	bool isRequestSceneChange = false;
 
 };

@@ -51,7 +51,7 @@ void SceneChangeAnimation::InitializeBlocks() {
 			float g = 0.0f;
 			float b = progress;
 			block.sprite->SetColor({ r, g, b, block.alpha }); // ←ここもblock.alphaをセット
-
+			block.sprite->Update();
 			m_blocks.push_back(std::move(block));
 		}
 	}
