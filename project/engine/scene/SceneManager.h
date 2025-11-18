@@ -26,7 +26,7 @@ private:
 
 public:
 	//初期化
-	void Initialize(int startSceneNo = STAGE);
+	void Initialize(int startSceneNo = TITLE);
 	//更新
 	void Update();
 	//終了処理

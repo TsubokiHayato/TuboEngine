@@ -11,6 +11,7 @@
 
 #include <memory>
 #include "Sprite.h"
+#include "Character/Player/Player.h" // 追加: Player
 
 class TitleScene : public IScene {
 public:
@@ -58,7 +59,7 @@ public:
 
 private:
 	std::unique_ptr<Camera> camera;
-	Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
+	Vector3 cameraPosition = {0.0f, 0.0f, -10.0f};
 	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
 
@@ -68,7 +69,13 @@ private:
 
 	std::unique_ptr<TitleUI> titleUI;
 
+	// Player (タイトル用アニメ)
+	std::unique_ptr<Player> player_;
+	bool playerIntroDone_ = false;
+	float playerIntroTimer_ = 0.0f;
+	float playerIntroDuration_ = 1.6f; // 端から来て止まる時間
 
-	
+	// 呼吸やhopなどのパラメータ
+	float playerIdleTime_ = 0.0f;
 	float time_ = 0.0f; // 背景アニメーション用タイマー
 };

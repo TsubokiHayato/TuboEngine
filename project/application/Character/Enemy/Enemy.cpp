@@ -41,7 +41,7 @@ void Enemy::Initialize() {
 	particle = nullptr;
 	particleEmitter_ = nullptr;
 
-	HP = 10;
+	HP = 1;
 
 	// Idle背面確認タイマー初期化
 	idleLookAroundTimer = idleLookAroundIntervalSec;
