@@ -20,4 +20,10 @@ class StageScene;
 
 	private:
 	std::unique_ptr<Sprite> restartSprite_ = nullptr;
+
+	private:
+	    bool started_ = false;
+	    float timer_ = 0.0f;
+	    float durationSec_ = 1.2f; // 演出時間：終了後にCLEARへ
+
  };
