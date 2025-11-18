@@ -91,7 +91,33 @@
     <ClCompile Include="engine\graphic\PSO\PostEffect\ToonPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\BloomPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\BloomEffect.cpp" />
-    <ClCompile Include="TitleUI.cpp" />
+    <ClCompile Include="application\Animation\SceneChangeAnimation.cpp" />
+    <ClCompile Include="application\StageState\BossState.cpp" />
+    <ClCompile Include="application\StageState\GameClearState.cpp" />
+    <ClCompile Include="application\StageState\GameOverState.cpp" />
+    <ClCompile Include="application\StageState\IStageState.cpp" />
+    <ClCompile Include="application\StageState\RewardSelectState.cpp" />
+    <ClCompile Include="application\StageState\StageClearState.cpp" />
+    <ClCompile Include="application\StageState\StagePlayingState.cpp" />
+    <ClCompile Include="application\StageState\StageReadyState.cpp" />
+    <ClCompile Include="application\StageState\StageStateManager.cpp" />
+    <ClCompile Include="application\Character\Player\Player.cpp" />
+    <ClCompile Include="application\Bullet\Player\PlayerBullet.cpp" />
+    <ClCompile Include="application\Bullet\Enemy\EnemyNormalBullet.cpp" />
+    <ClCompile Include="application\Block\Block.cpp" />
+    <ClCompile Include="application\Character\BaseCharacter.cpp" />
+    <ClCompile Include="application\Bullet\BaseBullet.cpp" />
+    <ClCompile Include="application\Collider\Collider.cpp" />
+    <ClCompile Include="application\Collider\CollisionManager.cpp" />
+    <ClCompile Include="application\Character\Enemy\Enemy.cpp" />
+    <ClCompile Include="application\Camera\FollowTopDownCamera.cpp" />
+    <ClCompile Include="application\HitEffect\HitEffectManager.cpp" />
+    <ClCompile Include="application\MapChip\MapChipField.cpp" />
+    <ClCompile Include="application\Animation\DropWaveAnimation.cpp" />
+    <ClCompile Include="application\Tile\Tile.cpp" />
+    <ClCompile Include="engine\scene\OverScene.cpp" />
+    <ClCompile Include="application\SkyDome\SkyDome.cpp" />
+    <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="application\TitleUI.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -229,12 +255,10 @@
     <ClInclude Include="application\Tile\Tile.h" />
     <ClInclude Include="engine\scene\OverScene.h" />
     <ClInclude Include="application\SkyDome\SkyDome.h" />
-    <ClInclude Include="TitleUI.h" />
-    <ClInclude Include="TitleUIButton.h" />
-    <ClInclude Include="SceneType.h" />
     <ClInclude Include="application\SceneType.h" />
     <ClInclude Include="application\TitleUIButton.h" />
     <ClInclude Include="application\TitleUI.h" />
+    <ClInclude Include="application\scene\StageState\ClearState.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
