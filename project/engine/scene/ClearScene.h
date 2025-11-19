@@ -1,92 +1,126 @@
 #pragma once
-#include"IScene.h"
-#include"LineManager.h"
-#include"Object3d.h"
-#include"Camera.h"
-#include"Animation/SceneChangeAnimation.h"
-#include"Sprite.h"
-#include"Character/Player/Player.h"
-#include <vector>
+#include "IScene.h"
+#include"SceneManager.h"
 #include <memory>
+#include <vector>
 #include <string>
 
-class ClearScene :public IScene
-{
+#include "Vector2.h"
+#include "Vector3.h"
+#include "Transform.h"
+
+class Camera;
+class Player;
+class Sprite;
+class SceneChangeAnimation;
+
+class ClearScene : public IScene {
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize();
+	void Initialize() override;
 
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update()override;
+	void Update() override;
 
 	/// <summary>
 	/// 終了処理
 	/// </summary>
-	void Finalize()override;
+	void Finalize() override;
 
 	/// <summary>
 	/// 3Dオブジェクト描画
 	/// </summary>
-	void Object3DDraw()override;
+	void Object3DDraw() override;
 
 	/// <summary>
 	/// スプライト描画
 	/// </summary>
-	void SpriteDraw()override;
+	void SpriteDraw() override;
 
 	/// <summary>
 	/// ImGui描画
 	/// </summary>
-	void ImGuiDraw()override;
+	void ImGuiDraw() override;
 
 	/// <summary>
 	/// パーティクル描画
 	/// </summary>
-	void ParticleDraw()override;
+	void ParticleDraw() override;
 
 	/// <summary>
 	/// カメラの取得
 	/// </summary>
-	Camera* GetMainCamera() const {
-		return camera.get(); }
+	Camera* GetMainCamera() const { return camera.get(); }
+
+	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
+
 
 private:
+    // カメラ
+    std::unique_ptr<Camera> camera;
+    Transform cameraTransform{};
 
-	std::unique_ptr<Camera> camera;           // カメラ
-	Transform cameraTransform;                      // 変形情報
+    // プレイヤー
+    std::unique_ptr<Player> player_;
 
-	// プレイヤー
-	std::unique_ptr<Player> player_;
+    // 文字スプライト
+    std::vector<std::unique_ptr<Sprite>> letterSprites_;
+    std::vector<Vector2> letterBaseSizes_;
+    std::vector<std::string> letterTextureNames_;
+    float letterSpacing_ = 120.0f;
+    float letterYOffset_ = 0.0f;
+    float letterDelay_ = 0.06f;
+    float fadeDuration_ = 0.6f;
 
-	// CLEAR 文字スプライト
-	std::vector<std::unique_ptr<Sprite>> letterSprites_;
-	std::vector<Vector2> letterBaseSizes_;
-	std::vector<std::string> letterTextureNames_;
+    // 入場演出（シーンチェンジ終了後に開始）
+    bool delayEntranceUntilSceneChangeDone_ = true; // かぶり防止のため既定ON
+    bool lettersEnterActive_ = false;               // 入場演出開始済み
+    float lettersEnterTimer_ = 0.0f;               // 入場演出の経過時間
 
-	// 表示・アニメパラメータ（ImGuiで操作可能)
-	float elapsed_ = 0.0f;
-	float letterDelay_ = 0.12f;
-	float fadeDuration_ = 0.6f;
-	float letterSpacing_ = 120.0f; // ピクセル間隔（ImGuiで変更可）
-	float letterYOffset_ = 0.0f;   // 画面中心からの垂直オフセット
+    // クリア（退場）演出
+    struct LetterClearAnim {
+        Vector2 startPos{};
+        Vector2 velocity{};
+        float delay = 0.0f;
+        float life = 0.6f;
+        float startAlpha = 1.0f;
+    };
+    bool lettersClearActive_ = false;
+    float lettersClearTimer_ = 0.0f;
+    std::vector<LetterClearAnim> letterClearAnims_;
 
-	// スペースで発動するプレイヤー用アニメーション（画面外へ飛ばす）
-	bool spaceAnimActive_ = false;
-	float spaceAnimTimer_ = 0.0f;
-	float spaceAnimDuration_ = 1.2f; // 秒
-	Vector3 spaceOrigPos_{};
-	Vector3 spaceOrigRot_{};
-	Vector3 spaceOrigScale_{};
-	float spaceJumpHeight_ = 3.0f; // ジャンプ高さ(ワールド単位)
-	bool spaceLaunchRight_ = true; // 発射方向を交互にするフラグ
-	                               // シーン遷移管理フラグ
-	bool isRequestSceneChange_ = false;
-	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation_ = nullptr;
+    // クリア演出パラメータ
+    float lettersClearDuration_ = 0.7f;
+    float lettersClearMaxDelay_ = 0.05f;
+    float lettersClearOutwardSpeed_ = 280.0f;
+    float lettersClearUpwardSpeed_ = 180.0f;
+    float lettersClearEndScale_ = 0.55f;
 
-	 std::unique_ptr<Sprite> restartSprite_ = nullptr;
+    // シーンチェンジ
+    std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation_;
+    bool isRequestSceneChange_ = false;
+
+    // 経過時間
+    float elapsed_ = 0.0f;
+
+    // スペースジャンプ演出（既存）
+    bool spaceAnimActive_ = false;
+    float spaceAnimTimer_ = 0.0f;
+    float spaceAnimDuration_ = 1.0f;
+    float spaceJumpHeight_ = 0.5f;
+    bool spaceLaunchRight_ = true;
+    Vector3 spaceOrigPos_{};
+    Vector3 spaceOrigRot_{};
+    Vector3 spaceOrigScale_{};
+
+    // UI
+    std::unique_ptr<Sprite> restartSprite_;
+
+private:
+    void SetupLettersClearAnim(); // 文字のクリア演出初期化
 };
 
