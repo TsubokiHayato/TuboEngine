@@ -119,6 +119,7 @@
     <ClCompile Include="application\SkyDome\SkyDome.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="application\TitleUI.cpp" />
+    <ClCompile Include="engine\graphic\Particle\ParticleManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
@@ -259,6 +260,12 @@
     <ClInclude Include="application\TitleUIButton.h" />
     <ClInclude Include="application\TitleUI.h" />
     <ClInclude Include="application\scene\StageState\ClearState.h" />
+    <ClInclude Include="engine\graphic\Particle\IParticleEmitter.h" />
+    <ClInclude Include="engine\graphic\Particle\RingEmitter.h" />
+    <ClInclude Include="engine\graphic\Particle\PrimitiveEmitter.h" />
+    <ClInclude Include="engine\graphic\Particle\ParticleManager.h" />
+    <ClInclude Include="engine\graphic\Particle\CylinderEmitter.h" />
+    <ClInclude Include="engine\graphic\Particle\OriginalEmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
