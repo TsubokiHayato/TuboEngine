@@ -93,6 +93,10 @@ void Framework::Finalize() {
 #endif // USE_IMGUI
 
 	Input::GetInstance()->Finalize();
+
+	// パーティクルマネージャの明示解放（エミッター内のGPUリソースを先に解放する）
+	ParticleManager::GetInstance()->Finalize();
+
 	TextureManager::GetInstance()->Finalize();
 	ModelManager::GetInstance()->Finalize();
 	CloseHandle(DirectXCommon::GetInstance()->GetFenceEvent());
@@ -145,7 +149,7 @@ void Framework::FrameworkSwapChainPostDraw() {
 #ifdef USE_IMGUI
 	//ImGuiの描画
 	ImGuiManager::GetInstance()->Draw();
-#endif // _USE_IMGUI
+#endif // USE_IMGUI
 
 	OffScreenRendering::GetInstance()->TransitionRenderTextureToRenderTarget();
 	//描画
@@ -160,7 +164,7 @@ void Framework::ImguiPreDraw() {
 	SceneManager::GetInstance()->ImGuiDraw();
 
 	OffScreenRendering::GetInstance()->DrawImGui();
-#endif // _USE_IMGUI
+#endif // USE_IMGUI
 
 }
 
@@ -184,7 +188,7 @@ void Framework::ImguiPostDraw() {
 
 
 	ImGuiManager::GetInstance()->End();
-#endif // _USE_IMGUI
+#endif // USE_IMGUI
 
 }
 
