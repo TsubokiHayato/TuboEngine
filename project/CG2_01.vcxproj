@@ -123,6 +123,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\StageState\StageStateManager.cpp" />
     <ClCompile Include="application\Animation\DropWaveAnimation.cpp" />
     <ClCompile Include="application\TitleUI.cpp" />
+    <ClCompile Include="engine\graphic\Particle\IParticleEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\ParticleManager.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\BloomEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\BloomPSO.cpp" />
