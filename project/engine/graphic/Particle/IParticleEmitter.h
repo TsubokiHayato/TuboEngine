@@ -42,6 +42,7 @@ struct ParticlePreset {
     float lifeMin = 0.5f, lifeMax = 1.5f;
     // Emit
     bool autoEmit = false;
+	float _emitAccum = 0.0f; // 内部用：蓄積時間
     float emitRate = 30.0f; // 個/秒
     uint32_t burstCount = 10;
 };
