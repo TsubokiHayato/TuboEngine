@@ -31,6 +31,9 @@ public:
     void SaveAll(const std::string& filePath);
     void LoadAll(const std::string& filePath);
 
+    // 追加: 明示的解放
+    void Finalize() { emitters_.clear(); }
+
 private:
     std::vector<std::unique_ptr<IParticleEmitter>> emitters_;
 };
