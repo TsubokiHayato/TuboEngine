@@ -2,9 +2,13 @@
 #include"Framework/Order.h"
 #include"D3DResourceLeakChecker.h"
 
+/// <summary>
+/// アプリケーションのエントリーポイント
+/// </summary>
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #ifdef _DEBUG
+	// リソースリークチェッカーのインスタンスを生成
     D3DResourceLeakChecker leakChecker;
 #endif
 
@@ -17,7 +21,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //フレームワークのインスタンスを破棄
     delete framework;
 
-    // ここでleakCheckerのデストラクタが呼ばれる
-
+    // 正常終了
     return 0;
 }
