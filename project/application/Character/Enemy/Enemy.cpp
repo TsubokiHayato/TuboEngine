@@ -38,8 +38,8 @@ void Enemy::Initialize() {
 	TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
 
 	// パーティクル関連は初期化しない（ヒット時に生成）
-	particle = nullptr;
-	particleEmitter_ = nullptr;
+	//particle = nullptr;
+	//particleEmitter_ = nullptr;
 
 	HP = 1;
 
@@ -546,39 +546,39 @@ void Enemy::Update() {
 	isHit = false;
 	wasHit = isHit;
 
-	if (particle) {
+	/*if (particle) {
 		particle->SetCamera(camera_);
 		particle->Update();
 	}
 	if (particleEmitter_) {
 		particleEmitter_->Update();
-	}
+	}*/
 }
 
 void Enemy::EmitHitParticle() {
-	// 既存のパーティクルをクリア
-	particle = nullptr;
-	particleEmitter_ = nullptr;
+	//// 既存のパーティクルをクリア
+	//particle = nullptr;
+	//particleEmitter_ = nullptr;
 
-	std::string particleTextureHandle = "gradationLine.png";
-	TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
+	//std::string particleTextureHandle = "gradationLine.png";
+	//TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
 
-	particle = std::make_unique<Particle>();
-	particle->Initialize(ParticleType::Ring);
-	particle->CreateParticleGroup("Particle", particleTextureHandle);
+	//particle = std::make_unique<Particle>();
+	//particle->Initialize(ParticleType::Ring);
+	//particle->CreateParticleGroup("Particle", particleTextureHandle);
 
-	// 必ず最新のpositionを使う
-	particleTranslate = {
-	    {1.0f, 1.0f, 1.0f},
-        {0.0f, 0.0f, 0.0f},
-        position
-    };
-	particleVelocity = {};
-	particleColor = {1.0f, 1.0f, 1.0f, 1.0f};
-	particleLifeTime = 1.0f;
-	particleCurrentTime = 0.0f;
+	//// 必ず最新のpositionを使う
+	//particleTranslate = {
+	//    {1.0f, 1.0f, 1.0f},
+ //       {0.0f, 0.0f, 0.0f},
+ //       position
+ //   };
+	//particleVelocity = {};
+	//particleColor = {1.0f, 1.0f, 1.0f, 1.0f};
+	//particleLifeTime = 1.0f;
+	//particleCurrentTime = 0.0f;
 
-	particleEmitter_ = std::make_unique<ParticleEmitter>(particle.get(), "Particle", particleTranslate, particleVelocity, particleColor, particleLifeTime, particleCurrentTime, 1, 1.0f, false);
+	//particleEmitter_ = std::make_unique<ParticleEmitter>(particle.get(), "Particle", particleTranslate, particleVelocity, particleColor, particleLifeTime, particleCurrentTime, 1, 1.0f, false);
 }
 
 void Enemy::OnCollision(Collider* other) {
@@ -624,7 +624,7 @@ void Enemy::Draw() {
 }
 
 void Enemy::ParticleDraw() {
-	if (particle) { particle->Draw(); }
+	//if (particle) { particle->Draw(); }
 }
 
 void Enemy::DrawImGui() {
