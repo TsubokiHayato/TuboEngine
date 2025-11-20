@@ -52,7 +52,7 @@ void DebugScene::Initialize() {
 		{
 			ParticlePreset p{};
 			p.name = "Ring";
-			p.texture = "particle.png";
+			p.texture = "gradationLine.png";
 			p.autoEmit = false;
 			p.burstCount = 32;
 			p.lifeMin = 0.6f; p.lifeMax = 1.2f;
@@ -64,7 +64,7 @@ void DebugScene::Initialize() {
 		{
 			ParticlePreset p{};
 			p.name = "Fountain";
-			p.texture = "particle.png";
+			p.texture = "gradationLine.png";
 			p.autoEmit = false;
 			p.emitRate = 25.0f;
 			p.lifeMin = 0.8f; p.lifeMax = 1.8f;
