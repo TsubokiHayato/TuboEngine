@@ -11,6 +11,33 @@
 #include <numbers>
 
 /// <summary>
+/// デストラクタ: 動的確保とマップを解放
+/// </summary>
+Particle::~Particle() {
+	// 各パーティクルグループのマップ解除
+	for (auto& kv : particleGroups) {
+		auto& g = kv.second;
+		if (g.instancingResource && g.instancingDataPtr) {
+			g.instancingResource->Unmap(0, nullptr);
+			g.instancingDataPtr = nullptr;
+		}
+	}
+	// 頂点バッファのマップ解除
+	if (vertexBuffer_ && vertexData_) {
+		vertexBuffer_->Unmap(0, nullptr);
+		vertexData_ = nullptr;
+	}
+	// マテリアルのマップ解除
+	if (materialBuffer_ && materialData_) {
+		materialBuffer_->Unmap(0, nullptr);
+		materialData_ = nullptr;
+	}
+	// カメラの delete
+	delete camera_;
+	camera_ = nullptr;
+}
+
+/// <summary>
 /// 初期化処理
 /// </summary>
 /// <param name="particleSetup">パーティクル共通部分</param>
