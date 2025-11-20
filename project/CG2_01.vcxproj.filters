@@ -120,6 +120,7 @@
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="application\TitleUI.cpp" />
     <ClCompile Include="engine\graphic\Particle\ParticleManager.cpp" />
+    <ClCompile Include="engine\graphic\Particle\IParticleEmitter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
