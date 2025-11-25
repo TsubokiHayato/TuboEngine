@@ -71,8 +71,8 @@ private:
 	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation = nullptr;
 	bool isRequestSceneChange = false;
 
-	// 複数エミッター
-	std::vector<IParticleEmitter*> emitters_;
+	// 変更: 生ポインタ配列 → 名前配列
+	std::vector<std::string> emitterNames_;
 	bool particleInitialized_ = false;
 };
 
