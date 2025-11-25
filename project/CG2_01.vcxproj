@@ -123,6 +123,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\StageState\StageStateManager.cpp" />
     <ClCompile Include="application\Animation\DropWaveAnimation.cpp" />
     <ClCompile Include="application\TitleUI.cpp" />
+    <ClCompile Include="engine\graphic\Particle\ClearConfettiEmitter.cpp" />
+    <ClCompile Include="engine\graphic\Particle\ClearFireworkEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\IParticleEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\ParticleManager.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\BloomEffect.cpp" />
@@ -260,6 +262,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Animation\DropWaveAnimation.h" />
     <ClInclude Include="application\TitleUI.h" />
     <ClInclude Include="application\TitleUIButton.h" />
+    <ClInclude Include="engine\graphic\Particle\ClearConfettiEmitter.h" />
+    <ClInclude Include="engine\graphic\Particle\ClearFireworkEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\CylinderEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\IParticleEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\OrbitTrailEmitter.h" />
