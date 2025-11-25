@@ -262,6 +262,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\TitleUIButton.h" />
     <ClInclude Include="engine\graphic\Particle\CylinderEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\IParticleEmitter.h" />
+    <ClInclude Include="engine\graphic\Particle\OrbitTrailEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\OriginalEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\ParticleManager.h" />
     <ClInclude Include="engine\graphic\Particle\PrimitiveEmitter.h" />

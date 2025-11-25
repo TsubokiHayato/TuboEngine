@@ -9,6 +9,7 @@
 #include "RingEmitter.h"
 #include "CylinderEmitter.h"
 #include "OriginalEmitter.h"
+#include "OrbitTrailEmitter.h" // 追加: 軌道トレイルエミッター
 
 
 static void ApplyParticleManagerTheme(int themeId = 0) {
@@ -163,7 +164,7 @@ void ParticleManager::DrawTemplatesSection() {
 	ImGui::Separator();
 	ImGui::Text("Templates");
 	static int tmplIndex = 0;
-	const char* items = "Smoke\0RingBurst\0Fountain\0Radial\0";
+	const char* items = "Smoke\0RingBurst\0Fountain\0Radial\0OrbitTrail\0"; // 追加
 	ImGui::Combo("Template", &tmplIndex, items);
 	if (ImGui::Button("Add Template")) {
 		ParticlePreset p{};
@@ -210,6 +211,17 @@ void ParticleManager::DrawTemplatesSection() {
 			p.colorStart = {1.0f,0.8f,0.5f,0.7f}; p.colorEnd = {1.0f,1.0f,0.8f,0.0f};
 			CreateEmitter<OriginalEmitter>(p);
 			break;
+		case 4: // OrbitTrail (Player trail)
+			p.name = "OrbitTrail";
+			p.texture = "particle.png"; // 適宜変更
+			p.emitRate = 60.0f;
+			p.autoEmit = true;
+			p.lifeMin = 0.4f; p.lifeMax = 0.8f;
+			p.scaleStart = {0.15f,0.15f,0.15f}; p.scaleEnd = {0.05f,0.05f,0.05f};
+			p.colorStart = {0.6f,0.8f,1.0f,0.9f}; p.colorEnd = {0.2f,0.4f,1.0f,0.0f};
+			// radius と angularSpeed は OrbitTrailEmitter 内部でデフォルト利用 (必要なら後で SetRadius 等呼び出し)
+			CreateEmitter<OrbitTrailEmitter>(p);
+			break;
 		}
 	}
 #endif
@@ -222,7 +234,7 @@ void ParticleManager::DrawEmittersSection() {
 
     // --- 新規生成 UI ---
     static int newType = 0;
-    ImGui::Combo("New Type", &newType, "Primitive\0Ring\0Cylinder\0Original\0");
+    ImGui::Combo("New Type", &newType, "Primitive\0Ring\0Cylinder\0Original\0OrbitTrail\0"); // 追加
     static char nameBuf[64] = "Emitter";
     static char texBuf[128] = "particle.png";
     static ParticlePreset tmp{};
@@ -243,48 +255,36 @@ void ParticleManager::DrawEmittersSection() {
     ImGui::DragFloat3("ScaleEnd", &tmp.scaleEnd.x, 0.01f);
     ImGui::ColorEdit4("ColorStart", &tmp.colorStart.x);
     ImGui::ColorEdit4("ColorEnd", &tmp.colorEnd.x);
-	if (ImGui::Button("Create")) {
-		FixPresetRanges(tmp);
-		switch (newType) {
-		case 0:
-			CreateEmitter<PrimitiveEmitter>(tmp);
-			break;
-		case 1:
-			CreateEmitter<RingEmitter>(tmp);
-			break;
-		case 2:
-			CreateEmitter<CylinderEmitter>(tmp);
-			break;
-		case 3:
-			CreateEmitter<OriginalEmitter>(tmp);
-			break;
-		}
-	}
-	ImGui::SameLine();
-	ImGui::Checkbox("Live Preview", &previewEnabled_);
-	ImGui::SameLine();
-	if (ImGui::Button("Burst Preview") && previewEnabled_) {
-		if (previewEmitter_)
-			previewEmitter_->Emit(tmp.burstCount);
-	}
-	if (previewEnabled_) {
-		// パラメータを毎フレーム反映
-		ApplyPreviewPreset(tmp, newType);
-		ImGui::TextDisabled("Preview running...");
-		ImGui::SameLine();
-		if (ImGui::Button("Reset Preview")) {
-			if (previewEmitter_) {
-				previewEmitter_->ClearAll();
-				previewEmitter_->GetPreset()._emitAccum = 0.0f;
-			}
-		}
-	} else {
-		// 無効化されたら破棄
-		if (previewEmitter_) {
-			previewEmitter_.reset();
-			previewType_ = -1;
-		}
-	}
+    if (ImGui::Button("Create")) {
+        FixPresetRanges(tmp);
+        switch (newType) {
+        case 0: CreateEmitter<PrimitiveEmitter>(tmp); break;
+        case 1: CreateEmitter<RingEmitter>(tmp); break;
+        case 2: CreateEmitter<CylinderEmitter>(tmp); break;
+        case 3: CreateEmitter<OriginalEmitter>(tmp); break;
+        case 4: CreateEmitter<OrbitTrailEmitter>(tmp); break; // 追加
+        }
+    }
+    ImGui::SameLine();
+    ImGui::Checkbox("Live Preview", &previewEnabled_);
+    ImGui::SameLine();
+    if (ImGui::Button("Burst Preview") && previewEnabled_) {
+        if (previewEmitter_)
+            previewEmitter_->Emit(tmp.burstCount);
+    }
+    if (previewEnabled_) {
+        ApplyPreviewPreset(tmp, newType);
+        ImGui::TextDisabled("Preview running...");
+        ImGui::SameLine();
+        if (ImGui::Button("Reset Preview")) {
+            if (previewEmitter_) {
+                previewEmitter_->ClearAll();
+                previewEmitter_->GetPreset()._emitAccum = 0.0f;
+            }
+        }
+    } else {
+        if (previewEmitter_) { previewEmitter_.reset(); previewType_ = -1; }
+    }
     ImGui::Separator();
     // --- 保存 / 読込 ---
     if (ImGui::Button("Save Selected") && !selectedEmitter_.empty()) {
@@ -437,7 +437,7 @@ std::string ParticleManager::BuildSnapshotJson() const {
 		if (dynamic_cast<RingEmitter*>(e.get())) type = "Ring";
 		else if (dynamic_cast<CylinderEmitter*>(e.get())) type = "Cylinder";
 		else if (dynamic_cast<OriginalEmitter*>(e.get())) type = "Original";
-
+		else if (dynamic_cast<OrbitTrailEmitter*>(e.get())) type = "OrbitTrail"; // 追加
 		nlohmann::json j{
 			{"type", type},
 			{"name", p.name},
@@ -540,6 +540,8 @@ void ParticleManager::ApplySnapshot(const std::string& jsonStr) {
 			CreateEmitter<CylinderEmitter>(p);
 		} else if (type == "Original") {
 			CreateEmitter<OriginalEmitter>(p);
+		} else if (type == "OrbitTrail") {
+			CreateEmitter<OrbitTrailEmitter>(p); // 追加
 		} else {
 			CreateEmitter<PrimitiveEmitter>(p);
 		}
@@ -648,6 +650,8 @@ void ParticleManager::LoadAll(const std::string& path) {
 			CreateEmitter<CylinderEmitter>(p);
 		} else if (type == "Original") {
 			CreateEmitter<OriginalEmitter>(p);
+		} else if (type == "OrbitTrail") {
+			CreateEmitter<OrbitTrailEmitter>(p); // 追加
 		} else {
 			CreateEmitter<PrimitiveEmitter>(p);
 		}
@@ -666,6 +670,7 @@ void ParticleManager::SaveSelected(const std::string& path, const std::vector<st
 		if (dynamic_cast<RingEmitter*>(e)) type = "Ring";
 		else if (dynamic_cast<CylinderEmitter*>(e)) type = "Cylinder";
 		else if (dynamic_cast<OriginalEmitter*>(e)) type = "Original";
+		else if (dynamic_cast<OrbitTrailEmitter*>(e)) type = "OrbitTrail"; // 追加
 		nlohmann::json j{
 			{"type", type},
 			{"name", p.name},
@@ -749,6 +754,7 @@ void ParticleManager::LoadMerge(const std::string& path) {
 		if (type == "Ring") CreateEmitter<RingEmitter>(p);
 		else if (type == "Cylinder") CreateEmitter<CylinderEmitter>(p);
 		else if (type == "Original") CreateEmitter<OriginalEmitter>(p);
+		else if (type == "OrbitTrail") CreateEmitter<OrbitTrailEmitter>(p); // 追加
 		else CreateEmitter<PrimitiveEmitter>(p);
 		++added;
 	}
@@ -845,6 +851,9 @@ void ParticleManager::ApplyPreviewPreset(const ParticlePreset& src, int type) {
 		case 3:
 			previewEmitter_ = std::make_unique<OriginalEmitter>();
 			break;
+		case 4:
+			previewEmitter_ = std::make_unique<OrbitTrailEmitter>();
+			break; // 追加
 		default:
 			previewEmitter_ = std::make_unique<PrimitiveEmitter>();
 			break;

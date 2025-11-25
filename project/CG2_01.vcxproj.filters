@@ -267,6 +267,7 @@
     <ClInclude Include="engine\graphic\Particle\ParticleManager.h" />
     <ClInclude Include="engine\graphic\Particle\CylinderEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\OriginalEmitter.h" />
+    <ClInclude Include="engine\graphic\Particle\OrbitTrailEmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
