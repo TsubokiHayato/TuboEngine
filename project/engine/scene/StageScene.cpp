@@ -2,6 +2,7 @@
 #include "Collider/CollisionManager.h"
 #include "Camera/FollowTopDownCamera.h"
 #include "LineManager.h"
+#include "ParticleManager.h" // 追加: パーティクル描画/更新
 
 void StageScene::Initialize() {
 
@@ -46,6 +47,8 @@ void StageScene::Update() {
 	// 全ての衝突をチェック
 	CheckAllCollisions();
 
+	// 追加: プレイヤーが存在すればパーティクル更新 (Trail 用)
+	ParticleManager::GetInstance()->Update(1.0f/60.0f, followCamera->GetCamera());
 }
 
 void StageScene::Finalize() {}
@@ -97,6 +100,8 @@ void StageScene::ParticleDraw() {
 	if (stateManager_) {
 		stateManager_->ParticleDraw(this);
 	}
+	// 追加: 全エミッター描画 (PlayerTrail 含む)
+	ParticleManager::GetInstance()->Draw();
 }
 void StageScene::CheckAllCollisions() {
 	/// 衝突マネージャのリセット ///
