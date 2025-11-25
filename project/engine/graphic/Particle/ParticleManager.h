@@ -11,6 +11,8 @@ public:
         return &inst;
     }
 
+    ~ParticleManager() { Finalize(); }
+
     void Update(float dt, Camera* defaultCam);
     void Draw();
     void DrawImGui();
@@ -39,7 +41,7 @@ public:
     void Undo();
     void Redo();
     void InitialLoad(const std::string& filePath);
-    void Finalize() { emitters_.clear(); history_.clear(); historyIndex_ = -1; }
+    void Finalize() { emitters_.clear(); previewEmitter_.reset(); history_.clear(); historyIndex_ = -1; }
 
 private:
     ParticleManager();
@@ -52,17 +54,7 @@ private:
     void DrawStatusBar();
     void DrawTemplatesSection();
     void DrawEmittersSection();
-
-    // 追加: 破壊的操作確認
-    enum class PendingActionType {
-        None,
-        DeleteEmitter,
-        ClearEmitter,
-        LoadAll,
-        LoadMergeSelected,
-        UndoAction,
-        RedoAction
-    };
+    enum class PendingActionType { None, DeleteEmitter, ClearEmitter, LoadAll, LoadMergeSelected, UndoAction, RedoAction };
     PendingActionType pendingAction_ = PendingActionType::None;
     std::string       pendingEmitterName_;
     std::string       confirmMessage_;
@@ -81,4 +73,15 @@ private:
 
     std::string selectedEmitter_;
     bool initialLoaded_ = false;
+
+    // プレビュー用
+    std::unique_ptr<IParticleEmitter> previewEmitter_;
+    int previewType_ = -1;                // 現在のプレビュー型 (newType と比較)
+    ParticlePreset previewCached_;        // 前回適用した値を比較し再生成トリガに使用
+    bool previewEnabled_ = false;
+    bool previewNeedsRecreate_ = false;
+
+    void UpdatePreview(float dt, Camera* cam);
+    void DrawPreview(ID3D12GraphicsCommandList* cmd);
+    void ApplyPreviewPreset(const ParticlePreset& src, int type);
 };
