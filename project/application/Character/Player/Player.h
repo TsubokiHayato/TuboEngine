@@ -4,8 +4,10 @@
 #include "Object3d.h"
 #include "Sprite.h"
 #include "MapChip/MapChipField.h"
+// 前方宣言（ヘッダ依存軽減）
+class IParticleEmitter;
 ///--------------------------------------------------
-/// プレイヤークラス
+// プレイヤークラス
 ///--------------------------------------------------
 class Player : public BaseCharacter {
 public:
@@ -150,5 +152,8 @@ private:
 	Vector2 reticleSize = {50.0f, 50.0f};   // レティクルのサイズ
 
 	bool isDontMove=false;
-	
+
+	// --- 追加: 移動軌跡用パーティクルエミッター ---
+	IParticleEmitter* trailEmitter_ = nullptr; // ParticleManager生成管理。解放はマネージャに委譲
+	Vector3 prevPositionTrail_{};              // 前フレーム位置
 };
