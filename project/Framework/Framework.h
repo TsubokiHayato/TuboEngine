@@ -17,6 +17,7 @@
 #include"Input.h"
 #include"OffScreenRendering.h"
 #include"LineManager.h"
+#include "ParticleManager.h"
 
 class OffScreenRenderingPSO;
 
