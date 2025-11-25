@@ -13,6 +13,7 @@
 
 
 static void ApplyParticleManagerTheme(int themeId = 0) {
+#ifdef USE_IMGUI
     ImGuiStyle& style = ImGui::GetStyle();
     style.WindowRounding = 6.0f;
     style.FrameRounding  = 4.0f;
@@ -58,6 +59,7 @@ static void ApplyParticleManagerTheme(int themeId = 0) {
         colors[ImGuiCol_HeaderActive]  = ImVec4(0.40f,0.45f,0.85f,1.0f);
         colors[ImGuiCol_PlotHistogram] = ImVec4(0.88f,0.70f,0.10f,1.0f);
     }
+#endif // USE_IMGUI
 }
 
 namespace {
