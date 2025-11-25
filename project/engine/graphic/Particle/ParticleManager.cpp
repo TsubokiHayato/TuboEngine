@@ -122,14 +122,8 @@ void ParticleManager::Update(float dt, Camera* cam) {
 			float interval = 1.0f / preset.emitRate;
 			preset._emitAccum += dt;
 			while (preset._emitAccum >= interval) {
-				uint32_t before = preset.maxInstances;
 				e->Emit(1);
-				if (e->GetPreset().maxInstances <= e->GetPreset()._emitAccum) {}
 				preset._emitAccum -= interval;
-				// 容量到達警告
-				if (e->GetPreset().maxInstances == before) {
-					// 既に満杯の場合 Emit 内部でスキップ
-				}
 			}
 		}
 		e->Update(dt, cam);
@@ -138,12 +132,13 @@ void ParticleManager::Update(float dt, Camera* cam) {
 		statusTimer_ -= dt;
 		if (statusTimer_ <= 0.0f) statusMsg_[0] = '\0';
 	}
-
-	// 変更があったフレームのみ履歴取得
 	if (changedThisFrame_) {
 		CaptureHistory();
 		changedThisFrame_ = false;
 	}
+
+	// プレビュー更新
+	UpdatePreview(dt, cam);
 }
 
 void ParticleManager::Draw() {
@@ -151,6 +146,7 @@ void ParticleManager::Draw() {
 	for (auto& e : emitters_) {
 		e->Draw(cmd);
 	}
+	DrawPreview(cmd);
 }
 
 void ParticleManager::DrawStatusBar() {
@@ -247,16 +243,48 @@ void ParticleManager::DrawEmittersSection() {
     ImGui::DragFloat3("ScaleEnd", &tmp.scaleEnd.x, 0.01f);
     ImGui::ColorEdit4("ColorStart", &tmp.colorStart.x);
     ImGui::ColorEdit4("ColorEnd", &tmp.colorEnd.x);
-    if (ImGui::Button("Create")) {
-        FixPresetRanges(tmp);
-        switch (newType) {
-        case 0: CreateEmitter<PrimitiveEmitter>(tmp); break;
-        case 1: CreateEmitter<RingEmitter>(tmp); break;
-        case 2: CreateEmitter<CylinderEmitter>(tmp); break;
-        case 3: CreateEmitter<OriginalEmitter>(tmp); break;
-        }
-    }
-
+	if (ImGui::Button("Create")) {
+		FixPresetRanges(tmp);
+		switch (newType) {
+		case 0:
+			CreateEmitter<PrimitiveEmitter>(tmp);
+			break;
+		case 1:
+			CreateEmitter<RingEmitter>(tmp);
+			break;
+		case 2:
+			CreateEmitter<CylinderEmitter>(tmp);
+			break;
+		case 3:
+			CreateEmitter<OriginalEmitter>(tmp);
+			break;
+		}
+	}
+	ImGui::SameLine();
+	ImGui::Checkbox("Live Preview", &previewEnabled_);
+	ImGui::SameLine();
+	if (ImGui::Button("Burst Preview") && previewEnabled_) {
+		if (previewEmitter_)
+			previewEmitter_->Emit(tmp.burstCount);
+	}
+	if (previewEnabled_) {
+		// パラメータを毎フレーム反映
+		ApplyPreviewPreset(tmp, newType);
+		ImGui::TextDisabled("Preview running...");
+		ImGui::SameLine();
+		if (ImGui::Button("Reset Preview")) {
+			if (previewEmitter_) {
+				previewEmitter_->ClearAll();
+				previewEmitter_->GetPreset()._emitAccum = 0.0f;
+			}
+		}
+	} else {
+		// 無効化されたら破棄
+		if (previewEmitter_) {
+			previewEmitter_.reset();
+			previewType_ = -1;
+		}
+	}
     ImGui::Separator();
     // --- 保存 / 読込 ---
     if (ImGui::Button("Save Selected") && !selectedEmitter_.empty()) {
@@ -269,7 +297,7 @@ void ParticleManager::DrawEmittersSection() {
         OpenConfirmPopup("ConfirmAction", ("Load & Merge '" + pendingEmitterName_ + "' ?").c_str());
     }
     ImGui::SameLine();
-    if (ImGui::Button("Save All")) { SaveAll("Resources/Particles/all.json"); }
+    if (ImGui::Button("Save All") && !emitters_.empty()) { SaveAll("Resources/Particles/all.json"); }
     ImGui::SameLine();
     if (ImGui::Button("Load All")) {
         pendingAction_ = PendingActionType::LoadAll;
@@ -787,3 +815,77 @@ void ParticleManager::ExecutePendingAction() {
     pendingAction_ = PendingActionType::None;
 }
 #endif
+
+
+// プレビュー適用ヘルパー
+void ParticleManager::ApplyPreviewPreset(const ParticlePreset& src, int type) {
+	if (!previewEnabled_)
+		return;
+
+	// 型変更や Texture 変更などで再生成が必要か判定
+	if (previewEmitter_ == nullptr || previewType_ != type || previewCached_.texture != src.texture || previewCached_.billboard != src.billboard) {
+		previewNeedsRecreate_ = true;
+	}
+
+	// プリセット差分（主な数値）の検出 (EmitRate などで即時更新したい)
+	previewCached_ = src;
+
+	if (previewNeedsRecreate_) {
+		previewEmitter_.reset();
+		switch (type) {
+		case 0:
+			previewEmitter_ = std::make_unique<PrimitiveEmitter>();
+			break;
+		case 1:
+			previewEmitter_ = std::make_unique<RingEmitter>();
+			break;
+		case 2:
+			previewEmitter_ = std::make_unique<CylinderEmitter>();
+			break;
+		case 3:
+			previewEmitter_ = std::make_unique<OriginalEmitter>();
+			break;
+		default:
+			previewEmitter_ = std::make_unique<PrimitiveEmitter>();
+			break;
+		}
+		previewType_ = type;
+
+		// コピーして初期化
+		ParticlePreset initPreset = src;
+		initPreset.name = "_Preview"; // 固定名
+		previewEmitter_->Initialize(initPreset);
+		previewNeedsRecreate_ = false;
+	} else {
+		// 既存のプリセットを上書き
+		if (previewEmitter_) {
+			auto& dst = previewEmitter_->GetPreset();
+			dst = src;
+			dst.name = "_Preview";
+		}
+	}
+}
+
+// プレビュー更新 (Emit のシミュレーション)
+void ParticleManager::UpdatePreview(float dt, Camera* cam) {
+	if (!previewEnabled_ || !previewEmitter_)
+		return;
+
+	auto& p = previewEmitter_->GetPreset();
+	if (p.autoEmit && p.emitRate > 0.0f) {
+		float interval = 1.0f / p.emitRate;
+		p._emitAccum += dt;
+		while (p._emitAccum >= interval) {
+			previewEmitter_->Emit(1);
+			p._emitAccum -= interval;
+		}
+	}
+	previewEmitter_->Update(dt, cam);
+}
+
+// プレビュー描画
+void ParticleManager::DrawPreview(ID3D12GraphicsCommandList* cmd) {
+	if (!previewEnabled_ || !previewEmitter_)
+		return;
+	previewEmitter_->Draw(cmd);
+}

@@ -9,6 +9,22 @@
 #undef min
 #undef max
 
+IParticleEmitter::~IParticleEmitter() {
+	// マップ解除（安全性のため）
+	if (vb_) {
+		// VBは初期化時に Map -> Unmap 済みなので不要
+	}
+	if (material_ && materialPtr_) {
+		material_->Unmap(0, nullptr);
+		materialPtr_ = nullptr;
+	}
+	if (instancing_ && instancingPtr_) {
+		instancing_->Unmap(0, nullptr);
+		instancingPtr_ = nullptr;
+	}
+	// ComPtr で自動解放
+}
+
 void IParticleEmitter::Initialize(const ParticlePreset& preset) {
 	preset_ = preset;
 	vertices_.clear();
@@ -111,7 +127,8 @@ void IParticleEmitter::EnsureBuffers() {
 			instancingPtr_[i].World = MakeIdentity4x4();
 			instancingPtr_[i].color = {1,1,1,1};
 		}
-		instancingSrvIndex_ = SrvManager::GetInstance()->Allocate() + 1;
+		// Allocate() の戻り値を直接使用（+1しない）
+		instancingSrvIndex_ = SrvManager::GetInstance()->Allocate();
 		SrvManager::GetInstance()->CreateSRVForStructuredBuffer(
 			instancingSrvIndex_, instancing_.Get(), preset_.maxInstances, sizeof(ParticleForGPU));
 	}
@@ -128,7 +145,6 @@ void IParticleEmitter::EnsureBuffers() {
 void IParticleEmitter::ReallocateInstanceBufferIfNeeded() {
 	if (preset_.maxInstances == allocatedInstances_) return;
 	auto* dx = DirectXCommon::GetInstance();
-	// 古いバッファ解放（ComPtrで自動）。再確保
 	instancing_.Reset();
 	instancing_ = dx->CreateBufferResource(sizeof(ParticleForGPU) * preset_.maxInstances);
 	allocatedInstances_ = preset_.maxInstances;
@@ -138,8 +154,8 @@ void IParticleEmitter::ReallocateInstanceBufferIfNeeded() {
 		instancingPtr_[i].World = MakeIdentity4x4();
 		instancingPtr_[i].color = {1,1,1,1};
 	}
-	// SRV再確保
-	instancingSrvIndex_ = SrvManager::GetInstance()->Allocate() + 1;
+	// 新しい SRV を再確保（古いインデックスを再利用せず新規取得）
+	instancingSrvIndex_ = SrvManager::GetInstance()->Allocate();
 	SrvManager::GetInstance()->CreateSRVForStructuredBuffer(
 		instancingSrvIndex_, instancing_.Get(), preset_.maxInstances, sizeof(ParticleForGPU));
 
