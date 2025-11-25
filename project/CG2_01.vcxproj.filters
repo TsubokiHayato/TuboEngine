@@ -121,6 +121,8 @@
     <ClCompile Include="application\TitleUI.cpp" />
     <ClCompile Include="engine\graphic\Particle\ParticleManager.cpp" />
     <ClCompile Include="engine\graphic\Particle\IParticleEmitter.cpp" />
+    <ClCompile Include="engine\graphic\Particle\ClearConfettiEmitter.cpp" />
+    <ClCompile Include="engine\graphic\Particle\ClearFireworkEmitter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
@@ -268,6 +270,8 @@
     <ClInclude Include="engine\graphic\Particle\CylinderEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\OriginalEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\OrbitTrailEmitter.h" />
+    <ClInclude Include="engine\graphic\Particle\ClearConfettiEmitter.h" />
+    <ClInclude Include="engine\graphic\Particle\ClearFireworkEmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
