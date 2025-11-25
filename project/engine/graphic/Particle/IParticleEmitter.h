@@ -69,13 +69,16 @@ public:
 	virtual ParticlePreset& GetPreset() { return preset_; }
 	virtual const ParticlePreset& GetPreset() const { return preset_; }
 	virtual const std::string& GetName() const { return preset_.name; }
-	virtual void DrawImGui();
+	virtual void DrawImGui(); // 直接呼ばれない（Manager側で統合表示）。残しつつ利用可能。
 
 	// 追加: 全粒子消去（Debug用途）
 	void ClearAll() {
 		particles_.clear();
 		instanceCount_ = 0;
 	}
+
+	// 追加: インスタンスバッファ再確保 (maxInstances 変更対応)
+	void ReallocateInstanceBufferIfNeeded();
 
 protected:
 	// 派生で粒子1個生成
@@ -97,6 +100,7 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancing_;
 	ParticleForGPU* instancingPtr_ = nullptr;
 	uint32_t instanceCount_ = 0;
+	uint32_t allocatedInstances_ = 0; // 現インスタンスバッファ確保数
 	int textureSrvIndex_ = -1;
 	int instancingSrvIndex_ = -1;
 	std::vector<VertexData> vertices_;
