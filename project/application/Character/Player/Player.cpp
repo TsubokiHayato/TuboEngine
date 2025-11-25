@@ -67,11 +67,11 @@ void Player::Initialize() {
 	if (!trailEmitter_) {
 		ParticlePreset p{};
 		p.name = "PlayerTrail";            // 自動で一意名に調整される可能性あり
-		p.texture = "particle.png";        // 好みで変更
+		p.texture = "circle2.png";        // 好みで変更
 		p.autoEmit = true;                  // 自動発生
 		p.emitRate = 60.0f;                 // 毎秒粒子
 		p.lifeMin = 0.35f; p.lifeMax = 0.6f;
-		p.scaleStart = {0.12f,0.12f,0.12f}; p.scaleEnd = {0.04f,0.04f,0.04f};
+		p.scaleStart = {0.7f,0.7f,0.7f}; p.scaleEnd = {0.6f,0.6f,0.6f};
 		p.colorStart = {0.6f,0.8f,1.0f,0.9f}; p.colorEnd = {0.2f,0.4f,1.0f,0.0f};
 		p.maxInstances = 512;               // 移動で多発するので少し多め
 		p.billboard = true;
