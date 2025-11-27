@@ -108,7 +108,7 @@ void StageClearState::Update(StageScene* scene) {
 	scene->GetPlayer()->Update();
 
 	// 敵
-	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
+	std::vector<std::unique_ptr<RushEnemy>>& enemies = scene->GetEnemies();
 	for (auto& enemy : enemies) {
 		enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
 		enemy->Update();
@@ -136,7 +136,7 @@ void StageClearState::Object3DDraw(StageScene* scene) {
 
 	scene->GetPlayer()->Draw();
 
-	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
+	std::vector<std::unique_ptr<RushEnemy>>& enemies = scene->GetEnemies();
 	for (auto& enemy : enemies) {
 		enemy->Draw();
 	}
