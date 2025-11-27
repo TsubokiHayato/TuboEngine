@@ -2,6 +2,8 @@
 #include "Collider/CollisionTypeId.h"
 #include "ImGuiManager.h"
 #include "Input.h"
+#include "ParticleManager.h"              // 追加: パーティクル生成用
+#include "OrbitTrailEmitter.h"            // 追加: 軌道トレイルエミッター
 
 //--------------------------------------------------
 // コンストラクタ
@@ -18,7 +20,6 @@ Player::~Player() {}
 // 初期化処理
 //--------------------------------------------------
 void Player::Initialize() {
-
 	// プレイヤーのコライダーの設定
 	Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kPlayer));
 
@@ -50,7 +51,6 @@ void Player::Initialize() {
 	object3d->SetScale(scale);
 
 	// Reticleの初期化
-	// Reticleはプレイヤーの中心に配置
 	reticleSprite = std::make_unique<Sprite>();
 	reticleSprite->Initialize(reticleFileNamePath);
 
@@ -63,6 +63,24 @@ void Player::Initialize() {
 	dodgeCooldown = 1.0f;
 	dodgeSpeed = 0.5f;
 	dodgeDirection = Vector3(0.0f, 0.0f, 0.0f);
+
+	// --- 追加: 軌道トレイル用パーティクルエミッター生成 ---
+	if (!trailEmitter_) {
+		ParticlePreset p{};
+		p.name = "PlayerTrail";            // 自動で一意名に調整される可能性あり
+		p.texture = "circle2.png";        // 好みで変更
+		p.autoEmit = true;                  // 自動発生
+		p.emitRate = 60.0f;                 // 毎秒粒子
+		p.lifeMin = 0.35f; p.lifeMax = 0.6f;
+		p.scaleStart = {0.7f,0.7f,0.7f}; p.scaleEnd = {0.6f,0.6f,0.6f};
+		p.colorStart = {0.6f,0.8f,1.0f,0.9f}; p.colorEnd = {0.2f,0.4f,1.0f,0.0f};
+		p.maxInstances = 512;               // 移動で多発するので少し多め
+		p.billboard = true;
+		p.simulateInWorldSpace = true;
+		p.center = position;                // 初期中心
+		trailEmitter_ = ParticleManager::GetInstance()->CreateEmitter<OrbitTrailEmitter>(p);
+		prevPositionTrail_ = position;
+	}
 }
 
 //--------------------------------------------------
@@ -74,7 +92,6 @@ void Player::Update() {
 	}// 死亡状態なら更新しない
 
 	if (!isDontMove) {
-
 		isHit = false;
 		// ダメージクールダウンタイマー更新
 		if (damageCooldownTimer > 0.0f) {
@@ -89,23 +106,18 @@ void Player::Update() {
 		}
 		Move();
 		Rotate();
-
 		// 発射タイマー更新
 		if (bulletTimer > 0.0f) {
 			bulletTimer -= 1.0f / 60.0f; // 60FPS前提
 		}
-
 		Shoot();
-
 		// 弾の更新
 		for (auto& bullet : bullets) {
 			bullet->SetCamera(object3d->GetCamera());
 			bullet->Update();
 		}
-
 		// isAlive==false のバレットを削除
 		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const std::unique_ptr<PlayerBullet>& bullet) { return !bullet->GetIsAlive(); }), bullets.end());
-
 		if (HP <= 0) {
 			isAllive = false; // HPが0以下なら死亡状態にする
 		}
@@ -118,9 +130,14 @@ void Player::Update() {
 
 	reticleSprite->SetPosition(reticlePosition);
 	reticleSprite->SetGetIsAdjustTextureSize(true); // レティクルのサイズを調整する
-	// レティクルの位置を画面中央に設定
 	reticleSprite->SetAnchorPoint(Vector2(0.5f, 0.5f)); // アンカーポイントを中央に設定
 	reticleSprite->Update();
+
+	// --- 追加: トレイルエミッター中心更新 (プレイヤー位置) ---
+	if (trailEmitter_) {
+		trailEmitter_->GetPreset().center = position;
+		prevPositionTrail_ = position;
+	}
 }
 
 //--------------------------------------------------
@@ -142,11 +159,7 @@ void Player::Shoot() {
 // 描画処理
 //--------------------------------------------------
 void Player::Draw() {
-	// 弾の描画
-	for (auto& bullet : bullets) {
-		bullet->Draw();
-	}
-	// プレイヤー本体の描画
+	for (auto& bullet : bullets) { bullet->Draw(); }
 	object3d->Draw();
 }
 
@@ -155,7 +168,6 @@ void Player::Draw() {
 //--------------------------------------------------
 void Player::Move() {
 	if (isDodging) {
-		// 回避中は向いている方向に高速移動
 		Vector3 tryPosition = position + dodgeDirection * dodgeSpeed;
 		if (mapChipField) {
 			float playerWidth = scale.x * MapChipField::GetBlockWidth() - 0.1f;
@@ -166,36 +178,17 @@ void Player::Move() {
 		}
 		return;
 	}
-	// 移動前の座標を保存
 	Vector3 prevPosition = position;
-
-	// 移動量
 	Vector3 moveDelta = {0.0f, 0.0f, 0.0f};
-	if (Input::GetInstance()->PushKey(DIK_W)) {
-		moveDelta.y -= 0.1f;
-	}
-	if (Input::GetInstance()->PushKey(DIK_S)) {
-		moveDelta.y += 0.1f;
-	}
-	if (Input::GetInstance()->PushKey(DIK_A)) {
-		moveDelta.x -= 0.1f;
-	}
-	if (Input::GetInstance()->PushKey(DIK_D)) {
-		moveDelta.x += 0.1f;
-	}
-
-	// 仮移動
+	if (Input::GetInstance()->PushKey(DIK_W)) { moveDelta.y -= 0.1f; }
+	if (Input::GetInstance()->PushKey(DIK_S)) { moveDelta.y += 0.1f; }
+	if (Input::GetInstance()->PushKey(DIK_A)) { moveDelta.x -= 0.1f; }
+	if (Input::GetInstance()->PushKey(DIK_D)) { moveDelta.x += 0.1f; }
 	Vector3 tryPosition = position + moveDelta;
-
-	// プレイヤーの大きさ（スケール）を考慮した当たり判定
 	if (mapChipField) {
-		// プレイヤーの幅・高さ（スケール×ブロックサイズ基準で調整）
 		float playerWidth = scale.x * MapChipField::GetBlockWidth()-0.1f;
 		float playerHeight = scale.y * MapChipField::GetBlockHeight()-0.1f;
-
-		// 四隅判定（矩形領域がBlockに重なっていないか）
 		if (!mapChipField->IsRectBlocked(tryPosition, playerWidth, playerHeight)) {
-			// 衝突がなければ位置を更新
 			position = tryPosition;
 		}
 	}
@@ -205,24 +198,16 @@ void Player::Move() {
 // 回転処理
 //---------------------------------------------------
 void Player::Rotate() {
-	// --- マウスの方向に身体を向ける処理 ---
-	int screenWidth = static_cast<int>(WinApp::GetInstance()->GetClientWidth()); // TODO: DirectXから取得するように
+	int screenWidth = static_cast<int>(WinApp::GetInstance()->GetClientWidth());
 	int screenHeight = static_cast<int>(WinApp::GetInstance()->GetClientHeight());
-
 	int mouseX = static_cast<int>(Input::GetInstance()->GetMousePosition().x);
 	int mouseY = static_cast<int>(Input::GetInstance()->GetMousePosition().y);
-
 	float centerX = static_cast<float>(screenWidth) / 2.0f;
 	float centerY = static_cast<float>(screenHeight) / 2.0f;
-
 	float dx = static_cast<float>(mouseX) - centerX;
 	float dy = static_cast<float>(mouseY) - centerY;
-
-	// Z+前方が0度、X+右方向が+90度
 	float angle = std::atan2(dx, -dy);
-
 	rotation.z = angle;
-	// Reticleの位置を画面中央に設定
 	reticlePosition = Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
 }
 
@@ -232,7 +217,7 @@ void Player::ReticleDraw() { reticleSprite->Draw(); }
 // 当たり判定の中心座標を取得
 //--------------------------------------------------
 Vector3 Player::GetCenterPosition() const {
-	const Vector3 offset = {0.0f, 0.0f, 0.0f}; // プレイヤーの中心を考慮
+	const Vector3 offset = {0.0f, 0.0f, 0.0f};
 	Vector3 worldPosition = position + offset;
 	return worldPosition;
 }
@@ -241,46 +226,28 @@ Vector3 Player::GetCenterPosition() const {
 // 衝突時の処理
 //--------------------------------------------------
 void Player::OnCollision(Collider* other) {
-	// 回避中は無敵
-	if (isDodging) {
-		return;
-	}
-	// 衝突相手のタイプIDを取得
+	if (isDodging) { return; }
 	uint32_t typeID = other->GetTypeID();
 	if (damageCooldownTimer <= 0.0f) {
 		if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy)) {
-			// 敵との衝突処理
-			HP -= 1;      // HPを減らす
-			isHit = true; // 衝突したらヒットフラグを立てる
-			damageCooldownTimer = damageCooldownTime; // ダメージクールダウン開始
+			HP -= 1; isHit = true; damageCooldownTimer = damageCooldownTime;
 		} else if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
-			// 武器との衝突処理
-			isHit = true; // 衝突したらヒットフラグを立てる
-			damageCooldownTimer = damageCooldownTime; // ダメージクールダウン開始
+			isHit = true; damageCooldownTimer = damageCooldownTime;
 		}
-		// その他の衝突は無敵でも通す
 	}
-	// 既存の処理がある場合は適宜マージしてください
-
-    // 敵弾と衝突したらHPを減らす（クランプしない）
-    if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
-        HP -= 1;              // これで 0 を下回り -1 にもなる
-        isHit = true;         // ヒットフラグ（必要なら）
-        // 必要に応じて無敵時間を使うならここでタイマーをセット
-        // damageCooldownTimer = 0.3f;  // 例: 0.3秒の無敵（任意）
-    }
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
+		HP -= 1; isHit = true;
+	}
 }
 
 //--------------------------------------------------
 // ImGuiの描画処理
 //--------------------------------------------------
 void Player::DrawImGui() {
-
 #ifdef USE_IMGUI
 	position = object3d->GetPosition();
 	rotation = object3d->GetRotation();
 	scale = object3d->GetScale();
-
 	ImGui::Begin("Player");
 	ImGui::Text("HP: %d", HP);
 	ImGui::Text("IsHit: %s", isHit ? "Yes" : "No");
@@ -301,23 +268,27 @@ void Player::DrawImGui() {
 	ImGui::SliderFloat("Dodge Speed", &dodgeSpeed, 0.2f, 2.0f, "%.2f");
 	ImGui::Separator();
 	ImGui::Text("Dodge Direction: (%.2f, %.2f)", dodgeDirection.x, dodgeDirection.y);
-	// --- 追加: マップチップ種別表示 ---
 	if (mapChipField) {
 		MapChipField::IndexSet index = mapChipField->GetMapChipIndexSetByPosition(position);
 		MapChipType type = mapChipField->GetMapChipTypeByIndex(index.xIndex, index.yIndex);
 		const char* typeStr = "Unknown";
-		if (type == MapChipType::kBlank)
-			typeStr = "Blank";
-		else if (type == MapChipType::kBlock)
-			typeStr = "Block";
+		if (type == MapChipType::kBlank) typeStr = "Blank"; else if (type == MapChipType::kBlock) typeStr = "Block";
 		ImGui::Separator();
 		ImGui::Text("MapChip: %s", typeStr);
+	}
+	// 追加: トレイル調整
+	if (trailEmitter_) {
+		auto& preset = trailEmitter_->GetPreset();
+		ImGui::Separator();
+		ImGui::Text("TrailEmitter Instances: %u", preset.maxInstances);
+		ImGui::DragFloat3("TrailCenter", &preset.center.x, 0.01f);
+		ImGui::DragFloat("TrailEmitRate", &preset.emitRate, 0.1f, 0.0f, 500.0f);
+		ImGui::DragFloat2("TrailLifeRange", &preset.lifeMin, 0.01f, 0.05f, 5.0f);
 	}
 	ImGui::End();
 	object3d->DrawImGui("Player");
 	PlayerBullet::DrawImGuiGlobal();
-
-	#endif // USE_IMGUI
+#endif // USE_IMGUI
 }
 
 // --- 回避開始 ---
@@ -327,10 +298,7 @@ void Player::StartDodge() {
 	Vector3 inputDir = GetDodgeInputDirection();
 	if (inputDir.x != 0.0f || inputDir.y != 0.0f) {
 		float len = std::sqrt(inputDir.x * inputDir.x + inputDir.y * inputDir.y);
-		if (len > 0.0f) {
-			inputDir.x /= len;
-			inputDir.y /= len;
-		}
+		if (len > 0.0f) { inputDir.x /= len; inputDir.y /= len; }
 		dodgeDirection = inputDir;
 	} else {
 		float angle = rotation.z;
@@ -356,9 +324,7 @@ void Player::UpdateDodge() {
 }
 
 // --- 回避可能か ---
-bool Player::CanDodge() const {
-	return !isDodging && dodgeCooldownTimer <= 0.0f;
-}
+bool Player::CanDodge() const { return !isDodging && dodgeCooldownTimer <= 0.0f; }
 
 // --- 回避入力方向取得 ---
 Vector3 Player::GetDodgeInputDirection() const {
