@@ -21,7 +21,7 @@
 #include "Bullet/Player/PlayerBullet.h"
 #include "Character/Player/Player.h"
 
-#include "Character/Enemy/Enemy.h"
+#include "Character/Enemy/RushEnemy.h"
 
 #include "MapChip/MapChipField.h"
 
@@ -96,7 +96,7 @@ public:
 	MapChipField* GetMapChipField() const { return mapChipField_.get(); }
 	std::vector<std::unique_ptr<Block>>& GetBlocks() { return blocks_; }
 	std::vector<std::unique_ptr<Tile>>& GetTiles() { return tiles_; }
-	std::vector<std::unique_ptr<Enemy>>& GetEnemies() { return enemies; }
+	std::vector<std::unique_ptr<RushEnemy>>& GetEnemies() { return enemies; }
 
 	FollowTopDownCamera* GetFollowCamera() const { return followCamera.get(); }
 	std::string& GetMapChipCsvFilePath() { return mapChipCsvFilePath_; }
@@ -130,7 +130,7 @@ private:
 	std::unique_ptr<Player> player_ = nullptr;
 	/// Enemy ///
 	std::unique_ptr<Enemy> enemy_ = nullptr;
-	std::vector<std::unique_ptr<Enemy>> enemies; // Enemyリスト
+	std::vector<std::unique_ptr<RushEnemy>> enemies; // Enemyリスト
 
 	/// SkyBox ///
 	std::unique_ptr<SkyBox> skyBox_ = nullptr;
