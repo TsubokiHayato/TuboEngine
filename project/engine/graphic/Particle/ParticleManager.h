@@ -2,6 +2,8 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <unordered_map>
+#include <functional>
 #include "IParticleEmitter.h"
 
 class ParticleManager {
@@ -16,6 +18,9 @@ public:
     void Update(float dt, Camera* defaultCam);
     void Draw();
     void DrawImGui();
+
+    // Registry-based creation
+    IParticleEmitter* CreateEmitterByType(const std::string& typeName, const ParticlePreset& preset);
 
     template<typename EmitterT>
     EmitterT* CreateEmitter(const ParticlePreset& preset) {
@@ -61,6 +66,17 @@ private:
     void OpenConfirmPopup(const char* popupName, const char* message);
     void ExecutePendingAction();
 
+    // Preview helpers
+    void UpdatePreview(float dt, Camera* cam);
+    void DrawPreview(ID3D12GraphicsCommandList* cmd);
+    void ApplyPreviewPreset(const ParticlePreset& src, int type);
+
+    // Registry
+    using EmitterFactoryFunc = std::function<std::unique_ptr<IParticleEmitter>()>;
+    std::unordered_map<std::string, EmitterFactoryFunc> emitterRegistry_;
+    void RegisterDefaultEmitters();
+    std::string DetectEmitterType(IParticleEmitter* e) const;
+
 private:
     std::vector<std::unique_ptr<IParticleEmitter>> emitters_;
 
@@ -76,12 +92,9 @@ private:
 
     // プレビュー用
     std::unique_ptr<IParticleEmitter> previewEmitter_;
-    int previewType_ = -1;                // 現在のプレビュー型 (newType と比較)
-    ParticlePreset previewCached_;        // 前回適用した値を比較し再生成トリガに使用
+    int previewType_ = -1;                // 現在のプレビュー型
+    ParticlePreset previewCached_;        // 前回適用した値
     bool previewEnabled_ = false;
     bool previewNeedsRecreate_ = false;
-
-    void UpdatePreview(float dt, Camera* cam);
-    void DrawPreview(ID3D12GraphicsCommandList* cmd);
-    void ApplyPreviewPreset(const ParticlePreset& src, int type);
+    bool previewPendingDestroy_ = false;  // LivePreview OFF時の遅延破棄
 };
