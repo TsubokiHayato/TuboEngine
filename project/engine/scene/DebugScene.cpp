@@ -10,6 +10,7 @@
 #include "SceneManager.h"
 #include "TextureManager.h"
 #include "Input.h"
+#include "LineManager.h"
 
 void DebugScene::Initialize() {
 
@@ -131,40 +132,9 @@ void DebugScene::Update() {
 
 	// Particles
 	pm->Update(1.0f/60.0f, camera.get());
+	LineManager::GetInstance()->SetDefaultCamera(camera.get());
 
-	// 操作
-	if (Input::GetInstance()->TriggerKey(DIK_B)) {
-		for (auto& name : emitterNames_) {
-			if (auto* e = pm->Find(name)) e->Emit(e->GetPreset().burstCount);
-		}
-	}
-	if (Input::GetInstance()->TriggerKey(DIK_1) && emitterNames_.size() >= 1) {
-		if (auto* e = pm->Find(emitterNames_[0])) e->GetPreset().autoEmit = !e->GetPreset().autoEmit;
-	}
-	if (Input::GetInstance()->TriggerKey(DIK_2) && emitterNames_.size() >= 2) {
-		if (auto* e = pm->Find(emitterNames_[1])) e->GetPreset().autoEmit = !e->GetPreset().autoEmit;
-	}
-	if (Input::GetInstance()->TriggerKey(DIK_3) && emitterNames_.size() >= 3) {
-		if (auto* e = pm->Find(emitterNames_[2])) e->GetPreset().autoEmit = !e->GetPreset().autoEmit;
-	}
-	if (Input::GetInstance()->TriggerKey(DIK_4) && emitterNames_.size() >= 4) {
-		if (auto* e = pm->Find(emitterNames_[3])) e->GetPreset().autoEmit = !e->GetPreset().autoEmit;
-	}
-
-	if (Input::GetInstance()->TriggerKey(DIK_R)) {
-		for (auto& name : emitterNames_) if (auto* e = pm->Find(name)) e->ClearAll();
-	}
-
-	if (Input::GetInstance()->TriggerKey(DIK_S)) {
-		pm->SaveAll("Resources/Particles/all.json");
-	}
-	if (Input::GetInstance()->TriggerKey(DIK_L)) {
-		pm->LoadAll("Resources/Particles/all.json");
-		// 再構築（重複名は自動リネームされるため Find で再取得）
-		std::vector<std::string> newNames = {"Smoke","Ring","Fountain","Radial"};
-		emitterNames_.clear();
-		for (auto& nm : newNames) if (pm->Find(nm)) emitterNames_.push_back(nm);
-	}
+	
 }
 
 void DebugScene::Finalize() {}
@@ -172,6 +142,7 @@ void DebugScene::Finalize() {}
 void DebugScene::Object3DDraw() {
 	// 必要に応じて
 	// skyBox->Draw();
+	LineManager::GetInstance()->DrawGrid(16.0f, 8, {}, {1.0f, 1.0f, 1.0f, 1.0f});
 }
 
 void DebugScene::SpriteDraw() {
@@ -179,15 +150,8 @@ void DebugScene::SpriteDraw() {
 }
 
 void DebugScene::ImGuiDraw() {
-#ifdef USE_IMGUI
-	ImGui::Begin("DebugScene");
-	ImGui::Text("Particles Test");
-	ImGui::BulletText("B: Burst all, R: Clear all");
-	ImGui::BulletText("1/2/3/4: Toggle AutoEmit (Smoke/Ring/Fountain/Radial)");
-	ImGui::BulletText("S: SaveAll, L: LoadAll (Resources/Particles/all.json)");
-	ImGui::End();
 
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 	ImGui::Begin("Camera");
 	ImGui::DragFloat3("Position", &cameraPosition.x, 0.1f);
 	ImGui::DragFloat3("Rotation", &cameraRotation.x, 0.1f);
@@ -199,7 +163,6 @@ void DebugScene::ImGuiDraw() {
 	ParticleManager::GetInstance()->DrawImGui();
 
 	sceneChangeAnimation->DrawImGui();
-#endif // USE_IMGUI
 }
 
 void DebugScene::ParticleDraw() {
