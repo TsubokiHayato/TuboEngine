@@ -59,7 +59,7 @@ public:
 
 
 private:
-    Particle* particle_; // Particleのインスタンスを保持
+	std::unique_ptr<Particle> particle_; // Particleのインスタンスを保持
     std::string name_;   // パーティクルグループ名
     Transform transform_;// エミッターの位置・回転・スケール
 	Vector3 velocity_; // 速度
