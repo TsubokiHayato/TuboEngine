@@ -275,6 +275,7 @@
     <ClInclude Include="engine\graphic\Particle\ClearConfettiEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\ClearFireworkEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\AuraEmitter.h" />
+    <ClInclude Include="engine\graphic\Particle\DefaultEmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
