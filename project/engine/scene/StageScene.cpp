@@ -109,7 +109,7 @@ void StageScene::CheckAllCollisions() {
 
 	/// コライダーをリストに登録 ///
 	// プレイヤー
-	//collisionManager_->AddCollider(player_.get());
+	collisionManager_->AddCollider(player_.get());
 
 	// 敵（生存中のみ登録）
 	for (const auto& enemy : enemies) {
