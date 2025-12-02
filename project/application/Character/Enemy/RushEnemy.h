@@ -25,6 +25,7 @@ public:
     void SetPrepareMoveSpeed(float s) { prepareMoveSpeed_ = s; }
     void SetRushCooldown(float sec) { rushCooldownDuration_ = sec; }
     void SetExitHysteresis(float d) { exitHysteresis_ = d; }
+    void SetStopDuration(float sec) { stopDuration_ = sec; }
 
 private:
     // 追跡関連
@@ -39,6 +40,10 @@ private:
     float prepareMoveSpeed_ = 0.06f;   // ため中の前進速度(演出用 上げて停滞改善)
     bool  isRushing_ = false;          // 突進中フラグ
     float rushTimer_ = 0.0f;           // 残り突進時間
+    // 停止
+    bool  isStopping_ = false;         // 突進直後の停止中
+    float stopDuration_ = 0.6f;        // 停止秒数
+    float stopTimer_ = 0.0f;
     // クールダウン: 次の突進まで待機し再ポジション
     float rushCooldownDuration_ = 1.5f; // デフォルトのクールダウンを延長（連続防止）
     float rushCooldownTimer_ = 0.0f;
