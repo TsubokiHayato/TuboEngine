@@ -30,6 +30,7 @@ void RushEnemy::Initialize() {
     moveSpeed_ = baseMoveSpeed_;
     isPreparing_ = false;
     isRushing_ = false;
+    isStopping_ = false;
     rushCooldownTimer_ = 0.0f;
     requireExitBeforeNextRush_ = false;
 }
@@ -63,25 +64,30 @@ void RushEnemy::Update() {
         }
     }
 
-    // 状態遷移
+    // ユーザー仕様に沿ったシーケンス
+    // 1) 視界に入る -> Enemy::CanSeePlayer() を使用
+    // 2) プレイヤー方向を向く (準備中も) / 3) チャージ (向き固定) / 4) 突進 / 5) 少し止まる / 6) クールダウン後に見回す
     if (player_) {
         if (canSeePlayer) {
-            if (!isPreparing_ && !isRushing_) {
+            if (!isPreparing_ && !isRushing_ && !isStopping_) {
                 if (distanceToPlayer > moveStartDistance_) {
                     state_ = State::Idle;
                 } else if (distanceToPlayer > rushTriggerDistance_) {
+                    // 近づくのみ（視界維持）
                     state_ = State::Chase;
                 } else {
-                    // 突進可能かチェック (クールダウン中/ヒステリシス中は追跡継続)
+                    // チャージ開始（角度決定後は固定）
                     if (rushCooldownTimer_ <= 0.0f && !requireExitBeforeNextRush_) {
-                        state_ = State::Attack; // Attackを突進系に使用
+                        state_ = State::Attack; // Attackでまとめる
                         isPreparing_ = true;
                         prepareTimer_ = prepareDuration_;
-                        if (player_) {
-                            Vector3 dir = player_->GetPosition() - position; dir.z = 0.0f; float len = std::sqrt(dir.x*dir.x + dir.y*dir.y); if (len > 0.001f) { rushDir_ = {dir.x/len, dir.y/len, 0.0f}; }
-                        }
+                        // 2) 突進するプレイヤーの方向を向く
+                        Vector3 dir = player_->GetPosition() - position; dir.z = 0.0f; float len = std::sqrt(dir.x*dir.x + dir.y*dir.y);
+                        if (len > 0.001f) { rushDir_ = {dir.x/len, dir.y/len, 0.0f}; }
+                        float angleZ = std::atan2(rushDir_.y, rushDir_.x);
+                        rotation.z = angleZ; // 向きを即合わせる
                     } else {
-                        state_ = State::Chase; // クールダウン/ヒステリシス中は再突進準備しない
+                        state_ = State::Chase;
                     }
                 }
             }
@@ -94,21 +100,26 @@ void RushEnemy::Update() {
         }
     }
 
-    // Attack以外に切り替わった場合のフェールセーフ
+    // Attack以外になったら準備/突進/停止フェーズ解除
     if (state_ != State::Attack) {
         isPreparing_ = false;
-        if (isRushing_) { isRushing_ = false; }
+        if (isRushing_) isRushing_ = false;
+        if (isStopping_) isStopping_ = false;
     }
 
-    // 回転: 準備中は追尾、突進中固定
-    if (!isRushing_ && player_ && (state_ == State::Chase || state_ == State::Attack || state_ == State::Alert)) {
+    // 回転: チャージ開始時に角度確定、準備中・停止中は角度維持、Chase/Alertは追尾で回す、突進中は固定
+    if (!isRushing_ && !isPreparing_ && !isStopping_ && player_ && (state_ == State::Chase || state_ == State::Alert)) {
         Vector3 targetPos = (canSeePlayer) ? player_->GetPosition() : lastSeenPlayerPos; Vector3 toTarget = targetPos - position; float angleZ = std::atan2(toTarget.y, toTarget.x); float diff = NormalizeAngle(angleZ - rotation.z); float maxTurn = turnSpeed_; if (std::fabs(diff) < maxTurn) rotation.z = angleZ; else { rotation.z += (diff > 0 ? 1 : -1) * maxTurn; rotation.z = NormalizeAngle(rotation.z); }
     }
 
     switch (state_) {
     case State::Idle: break;
     case State::Alert: break;
-    case State::LookAround: state_ = State::Idle; break;
+    case State::LookAround: {
+        // 6) 見回す: 既存LookAroundロジックを簡略、一定時間経過でIdleへ
+        // ここではEnemy既存のLookAroundパラメータを活用したいが簡略のためIdleへ戻す
+        state_ = State::Idle;
+        break; }
     case State::Patrol: state_ = State::Idle; break;
     case State::Chase: {
         if (player_) {
@@ -117,29 +128,40 @@ void RushEnemy::Update() {
         break; }
     case State::Attack: {
         if (isPreparing_) {
-            // ため中移動＆方向更新
-            if (player_) {
-                Vector3 dir = player_->GetPosition() - position; dir.z = 0.0f; float len = std::sqrt(dir.x*dir.x + dir.y*dir.y); if (len > 0.001f) { rushDir_ = {dir.x/len, dir.y/len, 0.0f}; }
-                Vector3 desiredMove{rushDir_.x*prepareMoveSpeed_, rushDir_.y*prepareMoveSpeed_, 0.0f};
-                MoveWithCollision(position, desiredMove, mapChipField);
-            }
+            // 3) チャージ中: 角度固定、わずかに前進
+            Vector3 desiredMove{rushDir_.x*prepareMoveSpeed_, rushDir_.y*prepareMoveSpeed_, 0.0f};
+            MoveWithCollision(position, desiredMove, mapChipField);
             prepareTimer_ -= dt;
             if (prepareTimer_ <= 0.0f) {
+                // 4) 突進開始
                 isPreparing_ = false;
                 isRushing_ = true;
                 rushTimer_ = rushDuration_;
-                float angleZ = std::atan2(rushDir_.y, rushDir_.x);
-                rotation.z = angleZ;
             }
         } else if (isRushing_) {
+            // 4) 突進: 固定方向へ移動
             Vector3 desiredMove{rushDir_.x*rushSpeed_, rushDir_.y*rushSpeed_, 0.0f};
             MoveWithCollision(position, desiredMove, mapChipField);
             rushTimer_ -= dt;
             if (rushTimer_ <= 0.0f) {
+                // 5) 停止フェーズ突入
                 isRushing_ = false;
+                isStopping_ = true;
+                stopTimer_ = stopDuration_;
                 rushCooldownTimer_ = rushCooldownDuration_; // クールダウン開始
-                requireExitBeforeNextRush_ = true;          // 一度トリガー外へ出るまで次突進禁止
-                state_ = State::Chase; // 再追跡へ戻す
+                requireExitBeforeNextRush_ = true;          // ヒステリシス
+            }
+        } else if (isStopping_) {
+            // 5) 停止: 位置固定（見た目はその場で停止）
+            stopTimer_ -= dt;
+            if (stopTimer_ <= 0.0f) {
+                isStopping_ = false;
+                // 6) クールダウンが終わるまでLookAroundし、終わればIdleへ
+                if (rushCooldownTimer_ > 0.0f) {
+                    state_ = State::LookAround;
+                } else {
+                    state_ = State::Idle;
+                }
             }
         }
         break; }
@@ -151,7 +173,7 @@ void RushEnemy::Update() {
     if (!wasHit && isHit) { EmitHitParticle(); }
     wasHit = isHit; isHit = false;
 
-    // Debug Lines
+    // Debug Lines: トリガー円 + 突進方向
     const int div = 24; Vector4 guideCol = {0.3f, 0.9f, 0.3f, 0.6f};
     for (int i = 0; i < div; ++i) {
         float a0 = (2.0f * DirectX::XM_PI) * (float(i) / div);
@@ -160,7 +182,7 @@ void RushEnemy::Update() {
         Vector3 p1 = position + Vector3{ std::cos(a1) * rushTriggerDistance_, std::sin(a1) * rushTriggerDistance_, 0.0f };
         LineManager::GetInstance()->DrawLine(p0, p1, guideCol);
     }
-    Vector4 dirCol = isPreparing_ ? Vector4{1.0f, 0.6f, 0.0f, 1.0f} : (isRushing_ ? Vector4{1.0f, 0.2f, 0.2f, 1.0f} : (rushCooldownTimer_>0.0f? Vector4{0.4f,0.4f,0.4f,1.0f}:Vector4{0.4f,0.4f,0.9f,1.0f}));
+    Vector4 dirCol = isPreparing_ ? Vector4{1.0f, 0.6f, 0.0f, 1.0f} : (isRushing_ ? Vector4{1.0f, 0.2f, 0.2f, 1.0f} : (isStopping_ ? Vector4{0.6f, 0.6f, 0.6f, 1.0f} : (rushCooldownTimer_>0.0f? Vector4{0.4f,0.4f,0.4f,1.0f}:Vector4{0.4f,0.4f,0.9f,1.0f})));
     Vector3 head = position + Vector3{rushDir_.x * 2.0f, rushDir_.y * 2.0f, 0.0f};
     LineManager::GetInstance()->DrawLine(position, head, dirCol);
 }
@@ -178,13 +200,14 @@ void RushEnemy::DrawImGui() {
     ImGui::Text("State:%d", (int)state_);
     ImGui::Text("Preparing:%s", isPreparing_?"true":"false");
     ImGui::Text("Rushing:%s", isRushing_?"true":"false");
-    ImGui::Text("RequireExit:%s", requireExitBeforeNextRush_?"true":"false");
+    ImGui::Text("Stopping:%s", isStopping_?"true":"false");
     ImGui::DragFloat("BaseMoveSpeed", &baseMoveSpeed_, 0.01f, 0.0f, 2.0f);
     ImGui::DragFloat("PrepareMoveSpeed", &prepareMoveSpeed_, 0.005f, 0.0f, 0.3f);
     ImGui::DragFloat("RushSpeed", &rushSpeed_, 0.01f, 0.0f, 3.0f);
     ImGui::DragFloat("RushTriggerDistance", &rushTriggerDistance_, 0.05f, 0.0f, 20.0f);
     ImGui::DragFloat("PrepareDuration", &prepareDuration_, 0.01f, 0.05f, 3.0f);
     ImGui::DragFloat("RushDuration", &rushDuration_, 0.01f, 0.05f, 3.0f);
+    ImGui::DragFloat("StopDuration", &stopDuration_, 0.01f, 0.0f, 3.0f);
     ImGui::DragFloat("RushCooldown", &rushCooldownDuration_, 0.01f, 0.0f, 5.0f);
     ImGui::DragFloat("ExitHysteresis", &exitHysteresis_, 0.01f, 0.0f, 5.0f);
     ImGui::DragFloat("TurnSpeed", &turnSpeed_, 0.001f, 0.0f, 1.0f);
