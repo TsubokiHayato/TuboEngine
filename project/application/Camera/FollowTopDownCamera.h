@@ -28,7 +28,7 @@ private:
 	Player* target_ = nullptr;
 	Vector3 offset_ = {0, 10, 0};
 	Vector3 lookAtOffset_ = {0, 0, 0};
-	float followSpeed_ = 0.2f;
+	float followSpeed_ = 0.07f;
 	float zoom_ = 1.0f;
 	Vector3 rotation_ = {DirectX::XM_PIDIV2 * 2.0f,0.0f, 0.0f};
 	Camera* camera_ = nullptr;
