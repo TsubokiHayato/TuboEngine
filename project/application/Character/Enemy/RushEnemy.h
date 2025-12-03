@@ -17,6 +17,9 @@ public:
     void DrawImGui();           // パラメータ調整用
     void OnCollision(Collider* other) override; // プレイヤー接触時のノックバック & 追加リアクション
 
+
+
+public:
     // 調整用セッター
     void SetBaseMoveSpeed(float s) { baseMoveSpeed_ = s; moveSpeed_ = baseMoveSpeed_; }
     void SetRushSpeed(float s) { rushSpeed_ = s; }
@@ -32,9 +35,8 @@ public:
     void SetShowDashPreview(bool f) { showDashPreview_ = f; }
 
 private:
-    // 追跡関連
+    // --- Parameters ---
     float baseMoveSpeed_ = 0.08f;      // 通常追跡速度 (少し遅く)
-    // 突進関連
     float rushSpeed_ = 0.30f;          // 突進速度 (やや抑制)
     float rushTriggerDistance_ = 4.5f; // 突進開始距離
     float rushDuration_ = 0.8f;        // 突進持続秒 (少し延長)
@@ -70,11 +72,33 @@ private:
     Vector3 reactionDir_ {0.0f, 0.0f, 0.0f}; // リアクション方向（反射方向）
     bool  endedRushWithoutWall_ = false; // 壁非ヒットで突進タイマー終了した直後フラグ
 
+    // 直前のリアクションソース（振り向き制御用）
+    enum class ReactionSource { None, Wall, Player };
+    ReactionSource lastReactionSource_ = ReactionSource::None;
+
     // プレビュー表示
     bool  showDashPreview_ = true;     // チャージ中に突進到達予測を表示
 
     Vector3 rushDir_ {1.0f, 0.0f, 0.0f}; // 突進の固定進行方向
 
+    // --- Helpers ---
     static float NormalizeAngle(float angle);
     static void MoveWithCollision(Vector3& positionRef, const Vector3& desiredMove, MapChipField* field);
+
+    // Update helpers (readability)
+    void UpdatePerceptionAndTimers(float dt, bool& canSeePlayer, float& distanceToPlayer);
+    void UpdateStateByVision(bool canSeePlayer, float distanceToPlayer);
+    void UpdateFacingWhenNeeded(bool canSeePlayer);
+    void UpdateAttackState(float dt);
+    void HandlePrepare(float dt);
+    void HandleRushing(float dt);
+    void HandleReacting(float dt);
+    bool CheckWallHit(const Vector3& desiredMove, Vector3& outHitNormal) const;
+    void ApplyChargeAndVisuals(float dt);
+    void DrawDebugGizmos();
+
+    // Collision helpers
+    bool HandleReactingEarly(Collider* other, uint32_t typeID);
+    bool HandlePlayerCollision(Collider* other);
+    void HandleWeaponAfterRush(Collider* other, uint32_t typeID);
 };
