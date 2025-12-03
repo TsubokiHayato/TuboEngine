@@ -85,6 +85,12 @@ public:
 	/// <param name="sceneNo"></param>
 	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="sceneNo"></param>
+	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
+
 	void CheckAllCollisions();
 
 public:
