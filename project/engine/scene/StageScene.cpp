@@ -26,6 +26,18 @@ void StageScene::Initialize() {
 	// シーンチェンジアニメーション初期化（シーン開始時はDisappearingで覆いを消す）
 	sceneChangeAnimation_->Initialize();
 	isRequestSceneChange = false;
+
+	// HP UI
+	hpUI_ = std::make_unique<HpUI>();
+	// テクスチャはすでに用意されている前提: 32x32黒枠= "hp_frame.png"、白塗り= "hp_fill.png" と仮定
+	// 実ファイル名に合わせて変更してください
+	TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
+	TextureManager::GetInstance()->LoadTexture("HP.png");
+	int maxHp = 5; // Player 初期HPに合わせる
+	hpUI_->Initialize("HPBarFrame.png", "HP.png", maxHp);
+	hpUI_->SetPosition({20.0f, 20.0f});
+	hpUI_->SetSpacing(36.0f);
+	hpUI_->SetScale(1.0f);
 	
 }
 
@@ -49,6 +61,9 @@ void StageScene::Update() {
 
 	// 追加: プレイヤーが存在すればパーティクル更新 (Trail 用)
 	ParticleManager::GetInstance()->Update(1.0f/60.0f, followCamera->GetCamera());
+
+	// HP UI 更新
+	if (hpUI_) { hpUI_->Update(player_.get()); }
 }
 
 void StageScene::Finalize() {}
@@ -74,6 +89,9 @@ void StageScene::SpriteDraw() {
 	if (stateManager_) {
 		stateManager_->SpriteDraw(this);
 	}
+	
+	// HP UI 描画
+	if (hpUI_) { hpUI_->Draw(); }
 	
 	// アニメーション描画
 	if (sceneChangeAnimation_) {
