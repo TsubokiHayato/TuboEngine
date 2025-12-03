@@ -31,6 +31,7 @@
 #include "SkyDome/SkyDome.h"
 
 #include "Animation/SceneChangeAnimation.h"
+#include "application/UI/HpUI.h"
 
 
 class StageScene : public IScene {
@@ -76,7 +77,7 @@ public:
 	/// </summary>
 	Camera* GetMainCamera() const { return followCamera->GetCamera(); }
 
-	
+
 
 
 	/// <summary>
@@ -158,5 +159,8 @@ private:
 
 	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation_ = nullptr;
 	bool isRequestSceneChange = false;
+
+	/// HpUI ///
+	std::unique_ptr<HpUI> hpUI_;
 
 };
