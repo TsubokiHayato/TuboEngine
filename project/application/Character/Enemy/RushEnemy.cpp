@@ -37,6 +37,10 @@ void RushEnemy::Initialize() {
     rushCooldownTimer_ = 0.0f; requireExitBeforeNextRush_ = false; lookAroundTimer_ = 0.0f;
     isReacting_ = false; reactionTimer_ = 0.0f; reactionDir_ = {0,0,0};
     endedRushWithoutWall_ = false; // 新規追加フラグ初期化
+    rushStretchTimer_ = 0.0f;       // 伸び演出初期化
+    lastReactionSource_ = ReactionSource::None; // 直前の反応元初期化
+    // スタン初期化
+    isStunned_ = false; stunTimer_ = 0.0f;
 }
 
 // -------------------------------------------------
@@ -57,12 +61,31 @@ void RushEnemy::UpdatePerceptionAndTimers(float dt, bool& canSeePlayer, float& d
         lastSeenTimer -= dt;
     }
     if (wasHit && state_ == State::Idle) state_ = State::Alert;
-    if (rushCooldownTimer_ > 0.0f) { rushCooldownTimer_ -= dt; if (rushCooldownTimer_ < 0.0f) rushCooldownTimer_ = 0.0f; }
+
+    // クールダウン更新
+    if (rushCooldownTimer_ > 0.0f) {
+        rushCooldownTimer_ -= dt;
+        if (rushCooldownTimer_ < 0.0f) rushCooldownTimer_ = 0.0f;
+    }
+    // スタン判定: ノックバック(リアクション)が完全に終わってからクールダウン残りの間だけ硬直
+    if (rushCooldownTimer_ > 0.0f) {
+        if (!isReacting_) {
+            isStunned_ = true;
+            stunTimer_ = rushCooldownTimer_;
+        } else {
+            // リアクション中はスタン扱いにしない
+            isStunned_ = false;
+        }
+    } else {
+        if (isStunned_) { isStunned_ = false; stunTimer_ = 0.0f; }
+    }
+
     if (requireExitBeforeNextRush_ && player_) {
         float exitThresh = rushTriggerDistance_ + exitHysteresis_;
         if (distanceToPlayer > exitThresh) requireExitBeforeNextRush_ = false;
     }
-    // scanning sway
+
+    // scanning sway (無効化したいなら早期returnにしても良い)
     if (isScanning_) {
         lookAroundTimer_ -= dt;
         if (lookAroundTimer_ <= 0.0f) { isScanning_ = false; state_ = State::Idle; }
@@ -125,14 +148,25 @@ void RushEnemy::UpdateFacingWhenNeeded(bool canSeePlayer) {
 // -------------------------------------------------
 void RushEnemy::UpdateAttackState(float dt) {
     if (isPreparing_) { HandlePrepare(dt); return; }
-    if (isRushing_)   { HandleRushing(dt); }
-    else if (isStopping_) { stopTimer_ -= dt; if (stopTimer_ <= 0.0f) { isStopping_ = false; isScanning_ = true; lookAroundTimer_ = lookAroundDuration_; } }
+    if (isRushing_)   { HandleRushing(dt); return; }
+    if (isStopping_) {
+        // 停止終了後は見回しせずIdleへ
+        stopTimer_ -= dt;
+        if (stopTimer_ <= 0.0f) { isStopping_ = false; state_ = State::Idle; }
+    }
     if (isReacting_)  { HandleReacting(dt); }
 }
 
 void RushEnemy::HandlePrepare(float dt) {
     prepareTimer_ -= dt;
-    if (prepareTimer_ <= 0.0f) { isPreparing_ = false; isRushing_ = true; rushTimer_ = rushDuration_; endedRushWithoutWall_ = false; }
+    if (prepareTimer_ <= 0.0f) {
+        isPreparing_ = false;
+        isRushing_ = true;
+        rushTimer_ = rushDuration_;
+        endedRushWithoutWall_ = false;
+        // 突進開始瞬間の伸び演出
+        rushStretchTimer_ = rushStretchDuration_;
+    }
 }
 
 bool RushEnemy::CheckWallHit(const Vector3& desiredMove, Vector3& outHitNormal) const {
@@ -187,12 +221,15 @@ void RushEnemy::HandleReacting(float dt) {
             rotation.z = std::atan2(reactionDir_.y, reactionDir_.x);
             rushDir_ = reactionDir_;
         }
-        // 次の状態へ（既存仕様に合わせる）
-        isScanning_ = true;
-        lookAroundTimer_ = lookAroundDuration_;
+        // 見回しに入らずIdleへ
+        isScanning_ = false;
         state_ = State::Idle;
         endedRushWithoutWall_ = false;
-        // 反応ソースをクリア
+        // リアクションが終わった時点で、クールダウンが残っていればスタン開始
+        if (rushCooldownTimer_ > 0.0f) {
+            isStunned_ = true;
+            stunTimer_ = rushCooldownTimer_;
+        }
         lastReactionSource_ = ReactionSource::None;
     }
 }
@@ -200,15 +237,33 @@ void RushEnemy::HandleReacting(float dt) {
 // -------------------------------------------------
 // Visuals and debug
 // -------------------------------------------------
-void RushEnemy::ApplyChargeAndVisuals(float /*dt*/) {
+void RushEnemy::ApplyChargeAndVisuals(float dt) {
     Vector3 visualScale = scale;
+    // チャージ中は縮み + 赤み
     if (isPreparing_) {
         float prepT = std::clamp(1.0f - (prepareTimer_ / std::max(0.0001f, prepareDuration_)), 0.0f, 1.0f);
         float pulse = 0.18f * std::sin(prepT * DirectX::XM_PI * 2.0f);
-        float sx = 1.0f + pulse;
-        float sy = 1.0f - pulse * 0.5f;
-        visualScale.x *= sx; visualScale.y *= sy;
+        float sx = 1.0f - 0.25f * prepT + pulse * 0.5f; // 徐々に縮む + 少し脈動
+        float sy = 1.0f - 0.25f * prepT - pulse * 0.3f;
+        visualScale.x *= std::max(0.6f, sx);
+        visualScale.y *= std::max(0.6f, sy);
     }
+    // 突進開始直後の一瞬伸び（進行方向=ローカルXを伸ばす）
+    if (rushStretchTimer_ > 0.0f) {
+        float t = std::clamp(rushStretchTimer_ / std::max(0.0001f, rushStretchDuration_), 0.0f, 1.0f);
+        float stretch = 0.35f * t;
+        visualScale.x *= (1.0f + stretch);
+        visualScale.y *= (1.0f - stretch * 0.5f);
+        rushStretchTimer_ -= dt;
+        if (rushStretchTimer_ < 0.0f) rushStretchTimer_ = 0.0f;
+    }
+    // 突進継続中はわずかに伸ばしてスピード感
+    if (isRushing_) {
+        float runningStretch = 0.12f;
+        visualScale.x *= (1.0f + runningStretch);
+        visualScale.y *= (1.0f - runningStretch * 0.5f);
+    }
+
     object3d->SetPosition(position);
     object3d->SetRotation(rotation);
     object3d->SetScale(visualScale);
@@ -260,10 +315,31 @@ bool RushEnemy::HandlePlayerCollision(Collider* other) {
 
 void RushEnemy::HandleWeaponAfterRush(Collider* other, uint32_t typeID) {
     if (typeID != static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon) || !endedRushWithoutWall_) return;
-    endedRushWithoutWall_ = false; isStopping_ = false; isScanning_ = false; state_ = State::Chase;
-    if (player_) {
-        Vector3 toP = player_->GetPosition() - position; toP.z = 0.0f; float len = std::sqrt(toP.x*toP.x + toP.y*toP.y);
-        if (len > 0.0001f) { Vector3 dir{toP.x/len, toP.y/len, 0.0f}; rotation.z = std::atan2(dir.y, dir.x); Vector3 step{dir.x*baseMoveSpeed_, dir.y*baseMoveSpeed_, 0}; MoveWithCollision(position, step, mapChipField); }
+    // 一度のみ
+    endedRushWithoutWall_ = false;
+    isStopping_ = false;
+    isScanning_ = false;
+
+    if (!player_) { state_ = State::Idle; return; }
+
+    // プレイヤーとの距離で分岐
+    Vector3 toP = player_->GetPosition() - position; toP.z = 0.0f;
+    float len = std::sqrt(toP.x*toP.x + toP.y*toP.y);
+    if (len > rushTriggerDistance_) {
+        // 突進可能範囲外：Chase は許可（即時移動はしない）
+        state_ = State::Chase;
+    } else {
+        // 突進可能範囲内：突進以外で接近しない
+        if (rushCooldownTimer_ <= 0.0f && !requireExitBeforeNextRush_) {
+            Vector3 dir{ toP.x/len, toP.y/len, 0.0f };
+            rushDir_ = dir;
+            rotation.z = std::atan2(dir.y, dir.x);
+            state_ = State::Attack;
+            isPreparing_ = true;
+            prepareTimer_ = prepareDuration_;
+        } else {
+            state_ = State::Idle; // クールダウン中は足を止める
+        }
     }
 }
 
@@ -273,6 +349,20 @@ void RushEnemy::Update() {
 
     bool canSeePlayer = false; float distanceToPlayer = 0.0f;
     UpdatePerceptionAndTimers(dt, canSeePlayer, distanceToPlayer);
+
+    // スタン中は完全停止（向き/状態維持）。見た目更新のみして早期return。
+    if (isStunned_) {
+        object3d->SetPosition(position);
+        object3d->SetRotation(rotation);
+        object3d->SetScale(scale);
+        object3d->SetCamera(camera_);
+        object3d->Update();
+        if (hitEmitter_) hitEmitter_->GetPreset().center = position;
+        if (deathEmitter_ && !deathEffectPlayed_) deathEmitter_->GetPreset().center = position;
+        wasHit = isHit; isHit = false;
+        return;
+    }
+
     UpdateStateByVision(canSeePlayer, distanceToPlayer);
 
     if (state_ != State::Attack && !isScanning_) { isPreparing_ = false; if (isRushing_) isRushing_ = false; if (isStopping_) isStopping_ = false; }

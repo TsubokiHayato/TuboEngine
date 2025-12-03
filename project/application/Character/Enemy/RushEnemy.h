@@ -57,6 +57,10 @@ private:
     // クールダウン
     float rushCooldownDuration_ = 2.5f; // クールダウン延長
     float rushCooldownTimer_ = 0.0f;
+    // スタン（クールダウン中の硬直）
+    bool  isStunned_ = false;
+    float stunTimer_ = 0.0f;
+
     // ヒステリシス
     float exitHysteresis_ = 0.5f;      // 余裕距離増加
     bool  requireExitBeforeNextRush_ = false;
