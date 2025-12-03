@@ -112,6 +112,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application\Character\Enemy\RushEnemy.cpp" />
     <ClCompile Include="application\StageState\BossState.cpp" />
     <ClCompile Include="application\StageState\GameClearState.cpp" />
     <ClCompile Include="application\StageState\GameOverState.cpp" />
@@ -246,6 +247,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\SkyDome\SkyDome.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application\Character\Enemy\RushEnemy.h" />
     <ClInclude Include="application\Character\Player\Player.h" />
     <ClInclude Include="application\Bullet\Player\PlayerBullet.h" />
     <ClInclude Include="application\SceneType.h" />
