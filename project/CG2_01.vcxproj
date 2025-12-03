@@ -124,6 +124,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\StageState\StageStateManager.cpp" />
     <ClCompile Include="application\Animation\DropWaveAnimation.cpp" />
     <ClCompile Include="application\TitleUI.cpp" />
+    <ClCompile Include="application\UI\HpUI.cpp" />
     <ClCompile Include="engine\graphic\Particle\AuraEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\ClearConfettiEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\ClearFireworkEmitter.cpp" />
@@ -266,6 +267,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Animation\DropWaveAnimation.h" />
     <ClInclude Include="application\TitleUI.h" />
     <ClInclude Include="application\TitleUIButton.h" />
+    <ClInclude Include="application\UI\HpUI.h" />
     <ClInclude Include="engine\graphic\Particle\AuraEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\ClearConfettiEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\ClearFireworkEmitter.h" />
