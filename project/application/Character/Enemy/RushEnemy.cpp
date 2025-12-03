@@ -108,11 +108,30 @@ void RushEnemy::Update() {
         break; }
     }
 
-    object3d->SetPosition(position); object3d->SetRotation(rotation); object3d->SetScale(scale); object3d->SetCamera(camera_); object3d->Update();
+    // チャージ演出: 体の伸縮（スケール変更）と擬似色の変化
+    Vector3 visualScale = scale;
+    Vector4 tintColor = {1.0f,1.0f,1.0f,1.0f}; // 擬似カラー（必要ならObject3dに反映できるAPIがあれば使用）
+    if (isPreparing_) {
+        float prepT = std::clamp(1.0f - (prepareTimer_ / std::max(0.0001f, prepareDuration_)), 0.0f, 1.0f);
+        float pulse = 0.18f * std::sin(prepT * DirectX::XM_PI * 2.0f);
+        float sx = 1.0f + pulse;
+        float sy = 1.0f - pulse * 0.5f;
+        visualScale.x *= sx;
+        visualScale.y *= sy;
+        // 赤みを帯びる
+        tintColor = {1.0f, 0.6f + 0.4f*prepT, 0.3f + 0.2f*std::sin(prepT*DirectX::XM_PI), 1.0f};
+    }
+
+    object3d->SetPosition(position);
+    object3d->SetRotation(rotation);
+    object3d->SetScale(visualScale);
+    object3d->SetCamera(camera_);
+    object3d->Update();
+
     if (hitEmitter_) hitEmitter_->GetPreset().center = position; if (deathEmitter_ && !deathEffectPlayed_) deathEmitter_->GetPreset().center = position; if (!wasHit && isHit) EmitHitParticle(); wasHit = isHit; isHit = false;
 
     const int div = 24; Vector4 triggerCol{0.3f,0.9f,0.3f,0.35f}; for (int i=0;i<div;++i){ float a0=(2.0f*DirectX::XM_PI)*(float(i)/div); float a1=(2.0f*DirectX::XM_PI)*(float(i+1)/div); Vector3 p0=position+Vector3{std::cos(a0)*rushTriggerDistance_, std::sin(a0)*rushTriggerDistance_,0}; Vector3 p1=position+Vector3{std::cos(a1)*rushTriggerDistance_, std::sin(a1)*rushTriggerDistance_,0}; LineManager::GetInstance()->DrawLine(p0,p1,triggerCol);}    
-    Vector4 dirCol = isPreparing_? Vector4{1,0.8f,0.1f,1} : (isRushing_? Vector4{1,0.2f,0.2f,1} : (isStopping_? Vector4{0.8f,0.8f,0.8f,1} : (isScanning_? Vector4{0.2f,0.7f,1.0f,1} : (rushCooldownTimer_>0.0f? Vector4{0.4f,0.4f,0.4f,1}:Vector4{0.4f,0.4f,0.9f,1}))));
+    Vector4 dirCol = isPreparing_? Vector4{1,0.6f,0.2f,1} : (isRushing_? Vector4{1,0.2f,0.2f,1} : (isStopping_? Vector4{0.8f,0.8f,0.8f,1} : (isScanning_? Vector4{0.2f,0.7f,1.0f,1} : (rushCooldownTimer_>0.0f? Vector4{0.4f,0.4f,0.4f,1}:Vector4{0.4f,0.4f,0.9f,1}))));
     Vector3 head = position + Vector3{rushDir_.x*2.2f,rushDir_.y*2.2f,0}; LineManager::GetInstance()->DrawLine(position, head, dirCol);
 
     if (isPreparing_) {
@@ -126,14 +145,39 @@ void RushEnemy::Draw() { if (!GetIsAllive()) return; if (object3d) object3d->Dra
 
 void RushEnemy::DrawImGui() {
 #ifdef USE_IMGUI
-    ImGui::Begin("RushEnemy"); ImGui::Text("Pos:(%.2f,%.2f,%.2f)", position.x, position.y, position.z); ImGui::Text("HP:%d", HP); ImGui::Text("State:%d", (int)state_);
-    ImGui::Text("Preparing:%s", isPreparing_?"true":"false"); ImGui::Text("Rushing:%s", isRushing_?"true":"false"); ImGui::Text("Stopping:%s", isStopping_?"true":"false"); ImGui::Text("Scanning:%s", isScanning_?"true":"false"); ImGui::Text("Reacting:%s", isReacting_?"true":"false"); ImGui::Text("EndedRushWithoutWall:%s", endedRushWithoutWall_?"true":"false");
+    ImGui::Begin("RushEnemy");
+    ImGui::Text("Pos:(%.2f,%.2f,%.2f)", position.x, position.y, position.z);
+    ImGui::Text("HP:%d", HP);
+    ImGui::Text("State:%d", (int)state_);
+    ImGui::Text("Preparing:%s", isPreparing_?"true":"false");
+    ImGui::Text("Rushing:%s", isRushing_?"true":"false");
+    ImGui::Text("Stopping:%s", isStopping_?"true":"false");
+    ImGui::Text("Scanning:%s", isScanning_?"true":"false");
+    ImGui::Text("Reacting:%s", isReacting_?"true":"false");
+    ImGui::Text("EndedRushWithoutWall:%s", endedRushWithoutWall_?"true":"false");
+
     ImGui::Checkbox("ShowDashPreview", &showDashPreview_);
-    ImGui::DragFloat("BaseMoveSpeed", &baseMoveSpeed_, 0.005f, 0.0f, 2.0f); ImGui::DragFloat("PrepareMoveSpeed", &prepareMoveSpeed_, 0.002f, 0.0f, 0.2f); ImGui::DragFloat("RushSpeed", &rushSpeed_, 0.01f, 0.0f, 3.0f);
-    ImGui::DragFloat("RushTriggerDistance", &rushTriggerDistance_, 0.05f, 0.0f, 20.0f); ImGui::DragFloat("PrepareDuration", &prepareDuration_, 0.01f, 0.05f, 5.0f); ImGui::DragFloat("RushDuration", &rushDuration_, 0.01f, 0.05f, 5.0f);
-    ImGui::DragFloat("StopDuration", &stopDuration_, 0.01f, 0.0f, 5.0f); ImGui::DragFloat("LookAroundDuration", &lookAroundDuration_, 0.01f, 0.0f, 5.0f); ImGui::DragFloat("RushCooldown", &rushCooldownDuration_, 0.01f, 0.0f, 10.0f);
-    ImGui::DragFloat("ExitHysteresis", &exitHysteresis_, 0.01f, 0.0f, 5.0f); ImGui::DragFloat("TurnSpeed", &turnSpeed_, 0.001f, 0.0f, 1.0f); ImGui::DragFloat("ReactionDuration", &reactionDuration_, 0.01f, 0.0f, 3.0f); ImGui::DragFloat("ReactionBackoffSpeed", &reactionBackoffSpeed_, 0.005f, 0.0f, 1.0f);
-    moveSpeed_ = baseMoveSpeed_; ImGui::End();
+
+    ImGui::DragFloat("BaseMoveSpeed", &baseMoveSpeed_, 0.005f, 0.0f, 2.0f);
+    ImGui::DragFloat("PrepareMoveSpeed", &prepareMoveSpeed_, 0.002f, 0.0f, 0.2f);
+    ImGui::DragFloat("RushSpeed", &rushSpeed_, 0.01f, 0.0f, 3.0f);
+
+    ImGui::DragFloat("RushTriggerDistance", &rushTriggerDistance_, 0.05f, 0.0f, 20.0f);
+    ImGui::DragFloat("PrepareDuration", &prepareDuration_, 0.01f, 0.05f, 5.0f);
+    ImGui::DragFloat("RushDuration", &rushDuration_, 0.01f, 0.05f, 5.0f);
+
+    ImGui::DragFloat("StopDuration", &stopDuration_, 0.01f, 0.0f, 5.0f);
+    ImGui::DragFloat("LookAroundDuration", &lookAroundDuration_, 0.01f, 0.0f, 5.0f);
+    ImGui::DragFloat("RushCooldown", &rushCooldownDuration_, 0.01f, 0.0f, 10.0f);
+
+    ImGui::DragFloat("ExitHysteresis", &exitHysteresis_, 0.01f, 0.0f, 5.0f);
+    ImGui::DragFloat("TurnSpeed", &turnSpeed_, 0.001f, 0.0f, 1.0f);
+
+    ImGui::DragFloat("ReactionDuration", &reactionDuration_, 0.01f, 0.0f, 3.0f);
+    ImGui::DragFloat("ReactionBackoffSpeed", &reactionBackoffSpeed_, 0.005f, 0.0f, 3.0f);
+
+    moveSpeed_ = baseMoveSpeed_;
+    ImGui::End();
 #endif
 }
 
