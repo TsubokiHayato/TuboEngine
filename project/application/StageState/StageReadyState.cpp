@@ -86,7 +86,7 @@ void StageReadyState::Enter(StageScene* scene) {
 			blockRippleLayers_.push_back((float)layer);
 		} else if (type == MapChipType::Enemy) {
 			// エネミー生成
-			auto enemy = std::make_unique<Enemy>();
+			auto enemy = std::make_unique<RushEnemy>();
 			enemy->Initialize();
 
 			enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
