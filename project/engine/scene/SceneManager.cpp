@@ -8,11 +8,23 @@
 
 
 SceneManager* SceneManager::instance = nullptr; // シングルトンインスタンス
-void SceneManager::Initialize() {
-	
-	//初期シーンを設定
-	currentScene = std::make_unique<TitleScene>();
-	currentScene->Initialize();
+void SceneManager::Initialize(int startSceneNo) {
+    // 初期シーンを設定
+    currentSceneNo = startSceneNo;
+    prevSceneNo = -1;
+
+    // シーン番号によってシーンを設定
+    if (currentSceneNo == DEBUG) {
+        currentScene = std::make_unique<DebugScene>();
+    } else if (currentSceneNo == TITLE) {
+        currentScene = std::make_unique<TitleScene>();
+    } else if (currentSceneNo == STAGE) {
+        currentScene = std::make_unique<StageScene>();
+    } else if (currentSceneNo == CLEAR) {
+        currentScene = std::make_unique<ClearScene>();
+	} else if (currentSceneNo == OVER) {
+		currentScene = std::make_unique<OverScene>();
+	}
 
 
     if (currentScene) {
@@ -127,6 +139,14 @@ void SceneManager::ImGuiDraw() {
 	ImGui::End();
 
 	#endif // USE_IMGUI
+}
+
+void SceneManager::ChangeScene(int sceneNo) {
+	//現在のシーンがnullptrでない場合
+	if (currentScene) {
+		//シーン番号を設定
+		currentScene->SetSceneNo(sceneNo);
+	}
 }
 
 void SceneManager::ParticleDraw() {
