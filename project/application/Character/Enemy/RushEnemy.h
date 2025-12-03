@@ -44,6 +44,10 @@ private:
     float prepareMoveSpeed_ = 0.03f;   // ため中の前進速度 (遅く)
     bool  isRushing_ = false;          // 突進中フラグ
     float rushTimer_ = 0.0f;           // 残り突進時間
+    // 突進開始時の一時的な伸び演出用タイマー
+    float rushStretchTimer_ = 0.0f;      // 秒数
+    float rushStretchDuration_ = 0.12f;  // 伸び演出の長さ
+
     // 停止
     bool  isStopping_ = false;         // 突進直後の停止中
     float stopDuration_ = 1.0f;        // 停止秒数 (延長)
@@ -62,7 +66,7 @@ private:
     bool  isReacting_ = false;         // 壁にぶつかったリアクション中
     float reactionDuration_ = 0.4f;    // リアクション秒数
     float reactionTimer_ = 0.0f;       // 残りリアクション時間
-    float reactionBackoffSpeed_ = 0.12f; // ノックバック速度
+    float reactionBackoffSpeed_ = 0.25f; // ノックバック速度
     Vector3 reactionDir_ {0.0f, 0.0f, 0.0f}; // リアクション方向（反射方向）
     bool  endedRushWithoutWall_ = false; // 壁非ヒットで突進タイマー終了した直後フラグ
 
