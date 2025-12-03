@@ -7,6 +7,8 @@
 #include "SceneManager.h"
 #include "TitleUI.h"
 #include <random>
+#include "Animation/SceneChangeAnimation.h"
+
 #include <memory>
 #include "Sprite.h"
 #include "Character/Player/Player.h" // 追加: Player
@@ -58,6 +60,10 @@ private:
 	Vector3 cameraPosition = {0.0f, 0.0f, -10.0f};
 	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
+
+	// --- ここを追加 ---
+	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation;
+	bool isRequestSceneChange = false;
 
 	std::unique_ptr<TitleUI> titleUI;
 
