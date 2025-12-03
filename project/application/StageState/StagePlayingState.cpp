@@ -103,7 +103,7 @@ void StagePlayingState::Update(StageScene* scene) {
 	Player* player_ = scene->GetPlayer();
 	MapChipField* mapChipField_ = scene->GetMapChipField();
 	std::vector<std::unique_ptr<Block>>& blocks_ = scene->GetBlocks();
-	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
+	std::vector<std::unique_ptr<RushEnemy>>& enemies = scene->GetEnemies();
 	FollowTopDownCamera* followCamera = scene->GetFollowCamera();
 
 	///------------------------------------------------
@@ -211,7 +211,7 @@ void StagePlayingState::Object3DDraw(StageScene* scene) {
 	scene->GetPlayer()->Draw();
 
 	// 敵の3Dオブジェクトを描画
-	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
+	std::vector<std::unique_ptr<RushEnemy>>& enemies = scene->GetEnemies();
 	for (auto& enemy : enemies) {
 		enemy->Draw();
 	}
@@ -265,7 +265,7 @@ void StagePlayingState::ImGuiDraw(StageScene* scene) {
 	scene->GetFollowCamera()->DrawImGui();
 	scene->GetPlayer()->DrawImGui();
 
-	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
+	std::vector<std::unique_ptr<RushEnemy>>& enemies = scene->GetEnemies();
 	// EnemyのImgui
 	for (auto& enemy : enemies) {
 		enemy->DrawImGui();
@@ -282,7 +282,7 @@ void StagePlayingState::ImGuiDraw(StageScene* scene) {
 
 void StagePlayingState::ParticleDraw(StageScene* scene) {
 
-	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
+	std::vector<std::unique_ptr<RushEnemy>>& enemies = scene->GetEnemies();
 
 	for (auto& enemy : enemies) {
 		enemy->ParticleDraw();
