@@ -32,6 +32,7 @@
 
 #include "Animation/SceneChangeAnimation.h"
 #include "application/UI/HpUI.h"
+#include "application/UI/EnemyHpUI.h"
 
 
 class StageScene : public IScene {
@@ -162,5 +163,7 @@ private:
 
 	/// HpUI ///
 	std::unique_ptr<HpUI> hpUI_;
+	/// EnemyHpUI ///
+	std::unique_ptr<EnemyHpUI> enemyHpUI_;
 
 };

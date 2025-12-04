@@ -1,6 +1,6 @@
 #include "StageScene.h"
-#include "Collider/CollisionManager.h"
 #include "Camera/FollowTopDownCamera.h"
+#include "Collider/CollisionManager.h"
 #include "LineManager.h"
 #include "ParticleManager.h" // 追加: パーティクル描画/更新
 
@@ -18,7 +18,7 @@ void StageScene::Initialize() {
 	stateManager_ = std::make_unique<StageStateManager>();
 	skyDome_ = std::make_unique<SkyDome>();
 	sceneChangeAnimation_ = std::make_unique<SceneChangeAnimation>(1280, 720, 80, 1.5f, "barrier.png");
-	
+
 	// 衝突マネージャの生成
 	collisionManager_->Initialize();
 	// ステートマネージャの生成
@@ -27,25 +27,31 @@ void StageScene::Initialize() {
 	sceneChangeAnimation_->Initialize();
 	isRequestSceneChange = false;
 
-	// HP UI
+	// HP UI (Player)
 	hpUI_ = std::make_unique<HpUI>();
-	// テクスチャはすでに用意されている前提: 32x32黒枠= "hp_frame.png"、白塗り= "hp_fill.png" と仮定
-	// 実ファイル名に合わせて変更してください
 	TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
 	TextureManager::GetInstance()->LoadTexture("HP.png");
 	int maxHp = 5; // Player 初期HPに合わせる
 	hpUI_->Initialize("HPBarFrame.png", "HP.png", maxHp);
 	hpUI_->SetPosition({20.0f, 20.0f});
-	hpUI_->SetSpacing(36.0f);
-	hpUI_->SetScale(1.0f);
-	
+	hpUI_->SetSpacing(4.0f);
+	hpUI_->SetScale(0.8f);
+	hpUI_->SetAlignRight(false); // 左揃えに変更
+
+	// Enemy HP UI
+	enemyHpUI_ = std::make_unique<EnemyHpUI>();
+	TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
+	TextureManager::GetInstance()->LoadTexture("HP.png");
+	enemyHpUI_->Initialize("HPBarFrame.png", "HP.png");
+	enemyHpUI_->SetYOffset(-24.0f);
+	enemyHpUI_->SetScale(0.45f);
+	enemyHpUI_->SetSpacing(0.0f);
 }
 
 void StageScene::Update() {
 
 	sceneChangeAnimation_->Update(1.0f / 60.0f);
 
-	
 	if (sceneChangeAnimation_->IsFinished()) {
 		// ステートマネージャの更新
 		if (stateManager_) {
@@ -64,6 +70,8 @@ void StageScene::Update() {
 
 	// HP UI 更新
 	if (hpUI_) { hpUI_->Update(player_.get()); }
+	// Enemy HP UI 更新（エネミーに追従）
+	if (enemyHpUI_) { enemyHpUI_->Update(enemies, followCamera->GetCamera()); }
 }
 
 void StageScene::Finalize() {}
@@ -92,13 +100,14 @@ void StageScene::SpriteDraw() {
 	
 	// HP UI 描画
 	if (hpUI_) { hpUI_->Draw(); }
+	// Enemy HP UI 描画（追従）
+	if (enemyHpUI_) { enemyHpUI_->Draw(); }
 	
 	// アニメーション描画
 	if (sceneChangeAnimation_) {
 		sceneChangeAnimation_->Draw();
 	}
-	
-	 }
+}
 
 void StageScene::ImGuiDraw() {
 
