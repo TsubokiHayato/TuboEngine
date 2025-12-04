@@ -123,7 +123,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\StageState\StageReadyState.cpp" />
     <ClCompile Include="application\StageState\StageStateManager.cpp" />
     <ClCompile Include="application\Animation\DropWaveAnimation.cpp" />
-    <ClCompile Include="application\TitleUI.cpp" />
+    <ClCompile Include="application\UI\TitleUI.cpp" />
+    <ClCompile Include="application\UI\EnemyHpUI.cpp" />
     <ClCompile Include="application\UI\HpUI.cpp" />
     <ClCompile Include="engine\graphic\Particle\AuraEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\ClearConfettiEmitter.cpp" />
@@ -251,7 +252,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Character\Enemy\RushEnemy.h" />
     <ClInclude Include="application\Character\Player\Player.h" />
     <ClInclude Include="application\Bullet\Player\PlayerBullet.h" />
-    <ClInclude Include="application\SceneType.h" />
+    <ClInclude Include="engine\scene\SceneType.h" />
     <ClInclude Include="application\scene\StageState\ClearState.h" />
     <ClInclude Include="application\StageState\BossState.h" />
     <ClInclude Include="application\StageState\DropWaveAnimator.h" />
@@ -265,8 +266,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\StageState\StageStateManager.h" />
     <ClInclude Include="application\StageState\StageType.h" />
     <ClInclude Include="application\Animation\DropWaveAnimation.h" />
-    <ClInclude Include="application\TitleUI.h" />
-    <ClInclude Include="application\TitleUIButton.h" />
+    <ClInclude Include="application\UI\TitleUI.h" />
+    <ClInclude Include="application\UI\TitleUIButton.h" />
+    <ClInclude Include="application\UI\EnemyHpUI.h" />
     <ClInclude Include="application\UI\HpUI.h" />
     <ClInclude Include="engine\graphic\Particle\AuraEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\ClearConfettiEmitter.h" />
