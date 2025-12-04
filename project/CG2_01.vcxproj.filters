@@ -118,7 +118,7 @@
     <ClCompile Include="engine\scene\OverScene.cpp" />
     <ClCompile Include="application\SkyDome\SkyDome.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
-    <ClCompile Include="application\TitleUI.cpp" />
+    <ClCompile Include="application\UI\TitleUI.cpp" />
     <ClCompile Include="engine\graphic\Particle\ParticleManager.cpp" />
     <ClCompile Include="engine\graphic\Particle\IParticleEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\ClearConfettiEmitter.cpp" />
@@ -127,6 +127,7 @@
     <ClCompile Include="engine\graphic\Particle\cppvoid.cpp" />
     <ClCompile Include="application\Character\Enemy\RushEnemy.cpp" />
     <ClCompile Include="application\UI\HpUI.cpp" />
+    <ClCompile Include="application\UI\EnemyHpUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
@@ -263,9 +264,9 @@
     <ClInclude Include="application\Tile\Tile.h" />
     <ClInclude Include="engine\scene\OverScene.h" />
     <ClInclude Include="application\SkyDome\SkyDome.h" />
-    <ClInclude Include="application\SceneType.h" />
-    <ClInclude Include="application\TitleUIButton.h" />
-    <ClInclude Include="application\TitleUI.h" />
+    <ClInclude Include="engine\scene\SceneType.h" />
+    <ClInclude Include="application\UI\TitleUIButton.h" />
+    <ClInclude Include="application\UI\TitleUI.h" />
     <ClInclude Include="application\scene\StageState\ClearState.h" />
     <ClInclude Include="engine\graphic\Particle\IParticleEmitter.h" />
     <ClInclude Include="engine\graphic\Particle\RingEmitter.h" />
@@ -280,6 +281,7 @@
     <ClInclude Include="engine\graphic\Particle\DefaultEmitter.h" />
     <ClInclude Include="application\Character\Enemy\RushEnemy.h" />
     <ClInclude Include="application\UI\HpUI.h" />
+    <ClInclude Include="application\UI\EnemyHpUI.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
