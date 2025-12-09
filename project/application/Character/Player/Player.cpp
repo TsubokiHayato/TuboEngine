@@ -4,6 +4,9 @@
 #include "Input.h"
 #include "ParticleManager.h"              // 追加: パーティクル生成用
 #include "OrbitTrailEmitter.h"            // 追加: 軌道トレイルエミッター
+#include "TextureManager.h"
+#include "engine/graphic/Particle/ParticleManager.h"
+#include "engine/graphic/Particle/RingEmitter.h"
 
 //--------------------------------------------------
 // コンストラクタ
@@ -81,6 +84,27 @@ void Player::Initialize() {
 		trailEmitter_ = ParticleManager::GetInstance()->CreateEmitter<OrbitTrailEmitter>(p);
 		prevPositionTrail_ = position;
 	}
+
+	// ダッシュリングエミッタ作成
+	if (!dashRingEmitter_) {
+		TextureManager::GetInstance()->LoadTexture("gradationLine.png");
+		ParticlePreset p{};
+		p.name = "PlayerDashRing";
+		p.texture = "gradationLine.png";
+		p.maxInstances = 16;
+		p.autoEmit = false;
+		p.burstCount = 1;
+		p.lifeMin = 0.35f;
+		p.lifeMax = 0.6f;
+		p.scaleStart = {0.6f, 0.6f, 1.0f};
+		p.scaleEnd   = {1.2f, 1.2f, 1.0f};
+		p.colorStart = {0.9f, 0.95f, 1.0f, 0.85f};
+		p.colorEnd   = {0.9f, 0.95f, 1.0f, 0.0f};
+		p.center = GetPosition();
+		// エミッタ中心に追従させる（ワールド空間で独立しない）
+		p.simulateInWorldSpace = false;
+		dashRingEmitter_ = ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
+	}
 }
 
 //--------------------------------------------------
@@ -138,6 +162,25 @@ void Player::Update() {
 		trailEmitter_->GetPreset().center = position;
 		prevPositionTrail_ = position;
 	}
+	// 位置追従（カメラ前方オフセット対応）
+	if (dashRingEmitter_) {
+		Vector3 center = GetPosition();
+		if (camera_) {
+			Vector3 camRot = camera_->GetRotation();
+			// Z回転のみで前方ベクトル（2D平面想定）
+			Vector3 forward{ std::cos(camRot.z), std::sin(camRot.z), 0.0f };
+			center = center + forward * dashRingOffsetForward_;
+		}
+		dashRingEmitter_->GetPreset().center = center;
+	}
+
+	// 回避開始タイミングでEmit（立ち上がり検出）
+	static bool wasDodgingPrevLocal = false; // 関数スコープの前フレーム値
+	bool dodgingNow = isDodging;             // 既存の回避フラグを使用
+	if (dashRingEmitter_ && dodgingNow && !wasDodgingPrevLocal) {
+		TriggerDashRing();
+	}
+	wasDodgingPrevLocal = dodgingNow;
 }
 
 //--------------------------------------------------
@@ -285,6 +328,21 @@ void Player::DrawImGui() {
 		ImGui::DragFloat("TrailEmitRate", &preset.emitRate, 0.1f, 0.0f, 500.0f);
 		ImGui::DragFloat2("TrailLifeRange", &preset.lifeMin, 0.01f, 0.05f, 5.0f);
 	}
+	if (dashRingEmitter_) {
+		auto& p = dashRingEmitter_->GetPreset();
+		ImGui::Separator();
+		ImGui::Text("Dodge Ring");
+		ImGui::DragFloat("Ring Offset Forward", &dashRingOffsetForward_, 0.01f, -5.0f, 5.0f);
+		ImGui::DragFloat("Ring lifeMin", &p.lifeMin, 0.01f, 0.05f, 5.0f);
+		ImGui::DragFloat("Ring lifeMax", &p.lifeMax, 0.01f, 0.05f, 5.0f);
+		ImGui::DragFloat3("Ring scaleStart", &p.scaleStart.x, 0.01f, 0.1f, 5.0f);
+		ImGui::DragFloat3("Ring scaleEnd", &p.scaleEnd.x, 0.01f, 0.1f, 5.0f);
+		ImGui::ColorEdit4("Ring colorStart", &p.colorStart.x);
+		ImGui::ColorEdit4("Ring colorEnd", &p.colorEnd.x);
+		ImGui::DragInt("Ring burstCount", reinterpret_cast<int*>(&p.burstCount), 1, 1, 16);
+		ImGui::Checkbox("Ring autoEmit", &p.autoEmit);
+		if (ImGui::Button("Emit Ring")) { dashRingEmitter_->Emit(p.burstCount); }
+	}
 	ImGui::End();
 	object3d->DrawImGui("Player");
 	PlayerBullet::DrawImGuiGlobal();
@@ -334,4 +392,10 @@ Vector3 Player::GetDodgeInputDirection() const {
 	if (Input::GetInstance()->PushKey(DIK_A)) inputDir.x -= 1.0f;
 	if (Input::GetInstance()->PushKey(DIK_D)) inputDir.x += 1.0f;
 	return inputDir;
+}
+
+// --- ダッシュリングトリガー ---
+void Player::TriggerDashRing() {
+	if (!dashRingEmitter_) return;
+	dashRingEmitter_->Emit(dashRingEmitter_->GetPreset().burstCount);
 }
