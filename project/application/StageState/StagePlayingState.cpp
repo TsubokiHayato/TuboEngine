@@ -139,7 +139,11 @@ void StagePlayingState::Object3DDraw(StageScene* scene) {
 }
 
 void StagePlayingState::SpriteDraw(StageScene* scene) { 
+	std::vector<std::unique_ptr<RushEnemy>>& enemies = scene->GetEnemies();
 	scene->GetPlayer()->ReticleDraw();
+	for (auto& enemy : enemies) {
+		enemy->DrawSprite();
+	}
 	ruleSprite_->Draw();
 }
 
