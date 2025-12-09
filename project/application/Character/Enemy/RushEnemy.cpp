@@ -347,6 +347,9 @@ void RushEnemy::Update() {
     if (!isAllive) { if (!deathEffectPlayed_) { EmitDeathParticle(); deathEffectPlayed_ = true; } if (deathEmitter_) deathEmitter_->GetPreset().center = position; return; }
     const float dt = 1.0f / 60.0f;
 
+    // --- Enemyのノックバック適用を先頭で共有 ---
+    ApplyKnockback(dt);
+
     bool canSeePlayer = false; float distanceToPlayer = 0.0f;
     UpdatePerceptionAndTimers(dt, canSeePlayer, distanceToPlayer);
 
