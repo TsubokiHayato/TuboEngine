@@ -7,6 +7,9 @@
 #include <cmath>
 #include <algorithm>
 
+#include "WinApp.h"
+#include "engine/camera/Camera.h"
+
 // 角度正規化 [-PI, PI]
 float RushEnemy::NormalizeAngle(float angle) {
     while (angle > DirectX::XM_PI) angle -= 2.0f * DirectX::XM_PI;
@@ -353,6 +356,18 @@ void RushEnemy::Update() {
     bool canSeePlayer = false; float distanceToPlayer = 0.0f;
     UpdatePerceptionAndTimers(dt, canSeePlayer, distanceToPlayer);
 
+    // 可視/不可視の瞬間イベントをRushEnemyでも処理（アイコンタイマー設定）
+    wasJustFound_ = (!sawPlayerPrev_ && canSeePlayer);
+    wasJustLost_  = (sawPlayerPrev_ && !canSeePlayer);
+    sawPlayerPrev_ = canSeePlayer;
+    if (wasJustFound_) { exclamationTimer_ = iconDuration_; }
+    if (wasJustLost_)  { questionTimer_    = iconDuration_; }
+
+    // タイマー減衰
+    if (questionTimer_ > 0.0f) { questionTimer_ -= dt; if (questionTimer_ < 0.0f) questionTimer_ = 0.0f; }
+    if (exclamationTimer_ > 0.0f) { exclamationTimer_ -= dt; if (exclamationTimer_ < 0.0f) exclamationTimer_ = 0.0f; }
+    if (surpriseTimer_ > 0.0f) { surpriseTimer_ -= dt; if (surpriseTimer_ < 0.0f) surpriseTimer_ = 0.0f; }
+
     // スタン中は完全停止（向き/状態維持）。見た目更新のみして早期return。
     if (isStunned_) {
         object3d->SetPosition(position);
@@ -392,6 +407,66 @@ void RushEnemy::Update() {
 }
 
 void RushEnemy::Draw() { if (!GetIsAllive()) return; if (object3d) object3d->Draw(); DrawViewCone(); DrawLastSeenMark(); DrawStateIcon(); }
+
+void RushEnemy::DrawSprite() {
+    if (!GetIsAllive()) return;
+    if (!camera_) return; // カメラ必須
+
+    // 頭上ワールド座標
+    Vector3 world = position;
+    world.y += iconOffsetY_;
+
+    // ワールド→スクリーン座標変換
+    const Matrix4x4& vp = camera_->GetViewProjectionMatrix();
+    // 行列は左手座標系の想定。Vector4に拡張
+    float x = world.x, y = world.y, z = world.z;
+    float sx = vp.m[0][0]*x + vp.m[1][0]*y + vp.m[2][0]*z + vp.m[3][0];
+    float sy = vp.m[0][1]*x + vp.m[1][1]*y + vp.m[2][1]*z + vp.m[3][1];
+    float sw = vp.m[0][3]*x + vp.m[1][3]*y + vp.m[2][3]*z + vp.m[3][3];
+    if (sw == 0.0f) return; sx/=sw; sy/=sw; // NDC
+    int w = WinApp::GetInstance()->GetClientWidth();
+    int h = WinApp::GetInstance()->GetClientHeight();
+    float baseX = (sx * 0.5f + 0.5f) * float(w);
+    float baseY = (-sy * 0.5f + 0.5f) * float(h);
+    baseY += iconScreenOffsetY_; // スクリーンYの追加オフセット（上方向は負）
+
+    if (sw < 0.0f) return;
+    if (baseX < -50 || baseX > w + 50 || baseY < -50 || baseY > h + 50) { return; }
+
+    bool showQ = (questionTimer_ > 0.0f && questionIcon_ != nullptr);
+    bool showE = (exclamationTimer_ > 0.0f && exclamationIcon_ != nullptr);
+
+    // 両方表示時は重ならないようにオフセット（順序: ！ → ？）
+    if (showQ && showE) {
+        float gap = std::max(8.0f, iconSize_.x * 0.6f);
+        float ex = baseX - gap * 0.5f; // 左に！
+        float qx = baseX + gap * 0.5f; // 右に？
+
+        exclamationIcon_->SetPosition({ex, baseY});
+        exclamationIcon_->SetSize(iconSize_);
+        exclamationIcon_->Update();
+        exclamationIcon_->Draw();
+
+        questionIcon_->SetPosition({qx, baseY});
+        questionIcon_->SetSize(iconSize_);
+        questionIcon_->Update();
+        questionIcon_->Draw();
+        return;
+    }
+
+    if (showQ) {
+        questionIcon_->SetPosition({baseX, baseY});
+        questionIcon_->SetSize(iconSize_);
+        questionIcon_->Update();
+        questionIcon_->Draw();
+    }
+    if (showE) {
+        exclamationIcon_->SetPosition({baseX, baseY});
+        exclamationIcon_->SetSize(iconSize_);
+        exclamationIcon_->Update();
+        exclamationIcon_->Draw();
+    }
+}
 
 void RushEnemy::DrawImGui() {
 #ifdef USE_IMGUI

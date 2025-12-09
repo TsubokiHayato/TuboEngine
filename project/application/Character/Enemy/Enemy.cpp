@@ -11,7 +11,6 @@
 #include <cmath>
 #include <limits>
 #include <queue>
-// 追加: パーティクルマネージャと各種エミッタ (正しいパス)
 #include "engine/graphic/Particle/ParticleManager.h"
 #include "engine/graphic/Particle/PrimitiveEmitter.h"
 #include "engine/graphic/Particle/RingEmitter.h"
@@ -37,6 +36,18 @@ void Enemy::Initialize() {
     std::string particleTextureHandle = "gradationLine.png";
     TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
 
+    // Icons
+    TextureManager::GetInstance()->LoadTexture("Question.png");
+    TextureManager::GetInstance()->LoadTexture("Exclamation.png");
+    questionIcon_ = std::make_unique<Sprite>();
+    questionIcon_->Initialize("Question.png");
+    questionIcon_->SetGetIsAdjustTextureSize(false);
+    questionIcon_->SetAnchorPoint({0.5f, 0.5f});
+    exclamationIcon_ = std::make_unique<Sprite>();
+    exclamationIcon_->Initialize("Exclamation.png");
+    exclamationIcon_->SetGetIsAdjustTextureSize(false);
+    exclamationIcon_->SetAnchorPoint({0.5f, 0.5f});
+
     HP = 10; // 調整: 少し耐える
 
     idleLookAroundTimer = idleLookAroundIntervalSec;
@@ -50,7 +61,7 @@ void Enemy::Initialize() {
     knockbackVelocity_ = {0.0f, 0.0f, 0.0f};
 
     // --- 追加: 演出用エミッタ生成 ---
-    // ヒット時: 小さなリング or スパーク
+    // ヒット時: 小さなスパーク（既存）
     if (!hitEmitter_) {
         ParticlePreset p{};
         p.name = "EnemyHit";
@@ -66,6 +77,23 @@ void Enemy::Initialize() {
         p.colorEnd = {1.0f, 1.0f, 0.4f, 0.0f};
         p.center = position;
         hitEmitter_ = ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
+    }
+    // 追加: ヒット時の小さなリングを別エミッタで生成（既存と併用）
+    if (!hitRingEmitter_) {
+        ParticlePreset p{};
+        p.name = "EnemyHitRing";
+        p.texture = "gradationLine.png";
+        p.maxInstances = 16;
+        p.autoEmit = false;
+        p.burstCount = 1;
+        p.lifeMin = 0.25f;
+        p.lifeMax = 0.45f;
+        p.scaleStart = {0.4f, 0.4f, 1.0f};
+        p.scaleEnd   = {0.4f, 0.4f, 1.0f};
+        p.colorStart = {1.0f, 0.5f, 0.2f, 0.9f};
+        p.colorEnd   = {1.0f, 0.9f, 0.6f, 0.0f};
+        p.center = position;
+        hitRingEmitter_ = ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
     }
     // 死亡時: 大きなリング (一度だけ)
     if (!deathEmitter_) {
@@ -263,7 +291,7 @@ bool Enemy::BuildPathTo(const Vector3& worldGoal) {
             if (grid[nIdx].closed)
                 continue;
 
-            float ng = grid[cIdx].g + 1.0f; // 4近傍=コスト1
+            float ng = grid[cIdx].g + 1.0f; // 4近傑=コスト1
             if (!grid[nIdx].opened || ng < grid[nIdx].g) {
                 grid[nIdx].g = ng;
                 grid[nIdx].f = ng + Heuristic(nx, ny);
@@ -333,13 +361,33 @@ void Enemy::Update() {
         distanceToPlayer = std::sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y + toPlayer.z * toPlayer.z);
     }
     bool canSeePlayer = CanSeePlayer();
+
+    // 視認状態フラグ更新
+    wasJustFound_ = (!sawPlayerPrev_ && canSeePlayer);
+    wasJustLost_  = (sawPlayerPrev_ && !canSeePlayer);
+    sawPlayerPrev_ = canSeePlayer;
+
     if (canSeePlayer) {
         lastSeenPlayerPos = player_->GetPosition();
         lastSeenTimer = kLastSeenDuration;
         ClearPath();
+        // 見つけた瞬間にExclamationを表示
+        if (wasJustFound_) {
+            exclamationTimer_ = iconDuration_;
+            questionTimer_ = 0.0f;
+        }
     } else if (lastSeenTimer > 0.0f) {
         lastSeenTimer -= dt;
+        // 見失った瞬間にQuestionを表示
+        if (wasJustLost_) {
+            questionTimer_ = iconDuration_;
+            exclamationTimer_ = 0.0f;
+        }
     }
+
+    // アイコンタイマー更新
+    if (questionTimer_ > 0.0f) { questionTimer_ -= dt; if (questionTimer_ < 0.0f) questionTimer_ = 0.0f; }
+    if (exclamationTimer_ > 0.0f) { exclamationTimer_ -= dt; if (exclamationTimer_ < 0.0f) exclamationTimer_ = 0.0f; }
 
     if (player_) {
         if (canSeePlayer) {
@@ -514,6 +562,20 @@ void Enemy::Update() {
     }
     wasHit = isHit;
     isHit = false;
+
+    // アイコン表示更新
+    Vector3 iconWorldPos = position; iconWorldPos.z = position.z;
+    iconWorldPos.y += iconOffsetY_;
+    if (questionTimer_ > 0.0f && questionIcon_) {
+        questionIcon_->SetPosition({iconWorldPos.x, iconWorldPos.y});
+        questionIcon_->SetSize(iconSize_);
+        questionIcon_->Update();
+    }
+    if (exclamationTimer_ > 0.0f && exclamationIcon_) {
+        exclamationIcon_->SetPosition({iconWorldPos.x, iconWorldPos.y});
+        exclamationIcon_->SetSize(iconSize_);
+        exclamationIcon_->Update();
+    }
 }
 
 void Enemy::ApplyKnockback(float dt) {
@@ -531,10 +593,16 @@ void Enemy::ApplyKnockback(float dt) {
 }
 
 void Enemy::EmitHitParticle() {
-    if (!hitEmitter_)
-        return;
-    // 小 burst
-    hitEmitter_->Emit(hitEmitter_->GetPreset().burstCount);
+    // 既存のヒットスパーク
+    if (hitEmitter_) {
+        hitEmitter_->GetPreset().center = position;
+        hitEmitter_->Emit(hitEmitter_->GetPreset().burstCount);
+    }
+    // 追加の小リング（既存と併用）
+    if (hitRingEmitter_) {
+        hitRingEmitter_->GetPreset().center = position;
+        hitRingEmitter_->Emit(hitRingEmitter_->GetPreset().burstCount);
+    }
 }
 
 void Enemy::EmitDeathParticle() {
@@ -544,50 +612,39 @@ void Enemy::EmitDeathParticle() {
 }
 
 void Enemy::OnCollision(Collider* other) {
-    if (!other)
-        return;
+    if (!other) return;
     const uint32_t typeID = other->GetTypeID();
-    if (typeID != static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon))
-        return;
+    if (typeID != static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon)) return;
     isHit = true;
     HP -= PlayerBullet::s_damage;
 
-    // --- ノックバック開始 ---
-    // 押し戻し方向: 弾の衝突位置から敵へ（弾の来た方向に押し戻す）
-    {
-        Vector3 hitPos;
-        // 弾インスタンスから当たり位置を取得できる場合は優先
-        if (auto* bullet = dynamic_cast<PlayerBullet*>(other)) {
-            hitPos = bullet->GetCenterPosition();
-        } else if (player_) {
-            // フォールバック: プレイヤー位置（従来）
-            hitPos = player_->GetPosition();
-        } else {
-            hitPos = position; // 安全策
-        }
-        Vector3 away = position - hitPos;
-        away.z = 0.0f;
-        float len = std::sqrt(away.x * away.x + away.y * away.y);
-        if (len > 0.001f) {
-            away.x /= len; away.y /= len;
-        }
-        const float tile = MapChipField::GetBlockSize();
-        float speed = tile * knockbackStrength_;
-        knockbackVelocity_.x = away.x * speed;
-        knockbackVelocity_.y = away.y * speed;
-        knockbackTimer_ = 0.12f; // 体感的に短い押し戻し
+    // 視認してないときに攻撃されたら Question と Exclamation を同時に表示
+    if (!sawPlayerPrev_) {
+        questionTimer_ = iconDuration_;
+        exclamationTimer_ = iconDuration_;
     }
 
+    // ノックバック（弾位置基準）
+    Vector3 hitPos;
+    if (auto* bullet = dynamic_cast<PlayerBullet*>(other)) hitPos = bullet->GetCenterPosition();
+    else if (player_) hitPos = player_->GetPosition();
+    else hitPos = position;
+    Vector3 away = position - hitPos; away.z = 0.0f;
+    float len = std::sqrt(away.x * away.x + away.y * away.y);
+    if (len > 0.001f) { away.x /= len; away.y /= len; }
+    const float tile = MapChipField::GetBlockSize();
+    float speed = tile * knockbackStrength_;
+    knockbackVelocity_.x = away.x * speed;
+    knockbackVelocity_.y = away.y * speed;
+    knockbackTimer_ = 0.12f;
+
     if (HP <= 0 && isAllive) {
-        isAllive = false;    // 次フレーム Update で死亡演出
-        EmitDeathParticle(); // 直ちに再生 (冗長でも deathEffectPlayed_ で制御)
+        isAllive = false;
+        EmitDeathParticle();
         deathEffectPlayed_ = true;
     }
     if (state_ == State::Idle || state_ == State::Alert) {
-        if (player_) {
-            lastSeenPlayerPos = player_->GetPosition();
-            lastSeenTimer = kLastSeenDuration;
-        }
+        if (player_) { lastSeenPlayerPos = player_->GetPosition(); lastSeenTimer = kLastSeenDuration; }
         state_ = State::Chase;
     }
 }
@@ -603,6 +660,7 @@ void Enemy::Draw() {
     DrawViewCone();
     DrawLastSeenMark();
     DrawStateIcon();
+    // 2Dスプライトはここでは描かない（SpriteDrawフェーズで個別に描画）
 }
 void Enemy::ParticleDraw() { /* legacy */ }
 
@@ -613,21 +671,17 @@ void Enemy::DrawImGui() {
     ImGui::Text("HP:%d", HP);
     ImGui::Text("Alive:%s", isAllive ? "Yes" : "No");
     ImGui::Text("State:%d", (int)state_);
-    if (hitEmitter_) {
-        auto& p = hitEmitter_->GetPreset();
-        ImGui::Text("HitEmitter rate:%.1f", p.emitRate);
-    }
-    if (deathEmitter_) {
-        auto& p = deathEmitter_->GetPreset();
-        ImGui::Text("DeathEmitter life:[%.2f,%.2f]", p.lifeMin, p.lifeMax);
-    }
-    // ノックバック調整（強度/減衰/時間）
+    if (hitEmitter_) { auto& p = hitEmitter_->GetPreset(); ImGui::Text("HitEmitter rate:%.1f", p.emitRate); }
+    if (deathEmitter_) { auto& p = deathEmitter_->GetPreset(); ImGui::Text("DeathEmitter life:[%.2f,%.2f]", p.lifeMin, p.lifeMax); }
     ImGui::Separator();
     ImGui::Text("KnockbackTimer: %.2f", knockbackTimer_);
-    ImGui::DragFloat("KnockbackStrength", &knockbackStrength_, 0.01f, 0.1f, 3.0f);
+    ImGui::DragFloat("KnockbackStrength", &knockbackStrength_, 0.01f, 0.1f, 10.0f);
     ImGui::DragFloat("KnockbackDamping", &knockbackDamping_, 0.01f, 0.5f, 0.99f);
-    // 時間も微調整したい場合
-    ImGui::DragFloat("KnockbackDuration", &knockbackTimer_, 0.01f, 0.0f, 0.5f);
+    ImGui::Separator();
+    ImGui::Checkbox("Show Ray Samples", &showRaySamples_);
+    ImGui::DragFloat("Icon Duration", &iconDuration_, 0.01f, 0.2f, 3.0f);
+    ImGui::DragFloat("Icon Offset Y", &iconOffsetY_, 0.01f, 0.0f, 5.0f);
+    ImGui::DragFloat2("Icon Size", &iconSize_.x, 0.5f, 16.0f, 128.0f);
     ImGui::End();
 #endif
 }
@@ -677,21 +731,47 @@ void Enemy::DrawViewCone() {
     float halfRad = (kViewAngleDeg / 2.0f) * kPI / 180.0f;
     float baseAngle = rotation.z;
     Vector3 center = position;
-    // 扇形の放射ライン
+
+    Vector4 colNone = {1.0f, 1.0f, 0.0f, 0.7f};
+    Vector4 colAware = {1.0f, 0.6f, 0.0f, 0.8f};
+    Vector4 colFound = {1.0f, 0.2f, 0.2f, 0.9f};
+    bool canSee = CanSeePlayer();
+    Vector4 coneColor = canSee ? colFound : (lastSeenTimer > 0.0f ? colAware : colNone);
+
     for (int i = 0; i < kViewLineDiv; ++i) {
         float a0 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i) / kViewLineDiv);
         Vector3 p0 = center + Vector3{std::cos(a0) * kViewDistance, std::sin(a0) * kViewDistance, 0.0f};
         p0.z = center.z;
-        LineManager::GetInstance()->DrawLine(center, p0, kViewColor);
+        LineManager::GetInstance()->DrawLine(center, p0, coneColor);
     }
-    // 外周
     for (int i = 0; i < kViewLineDiv - 1; ++i) {
         float a0 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i) / kViewLineDiv);
         float a1 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i + 1) / kViewLineDiv);
         Vector3 p0 = center + Vector3{std::cos(a0) * kViewDistance, std::sin(a0) * kViewDistance, 0.0f};
         Vector3 p1 = center + Vector3{std::cos(a1) * kViewDistance, std::sin(a1) * kViewDistance, 0.0f};
         p0.z = p1.z = center.z;
-        LineManager::GetInstance()->DrawLine(p0, p1, kViewColor);
+        LineManager::GetInstance()->DrawLine(p0, p1, coneColor);
+    }
+
+    // レイサンプルはデバッグフラグがONかつプレイヤーが存在する時のみ描画
+    if (showRaySamples_ && player_ && mapChipField) {
+        Vector2 start = {center.x, center.y};
+        Vector2 end = {player_->GetPosition().x, player_->GetPosition().y};
+        const float step = 0.5f;
+        Vector2 dir = end - start;
+        float length = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+        if (length > 0.001f) {
+            dir.x /= length; dir.y /= length;
+            for (float t = 0.0f; t <= length; t += step) {
+                Vector2 pos2 = start + dir * t;
+                Vector3 checkPos = {pos2.x, pos2.y, center.z};
+                bool blocked = mapChipField->IsBlocked(checkPos);
+                Vector4 dotCol = blocked ? Vector4{1.0f, 0.1f, 0.1f, 1.0f} : Vector4{0.2f, 1.0f, 0.2f, 1.0f};
+                Vector3 pA = {checkPos.x - 0.05f, checkPos.y - 0.05f, checkPos.z};
+                Vector3 pB = {checkPos.x + 0.05f, checkPos.y + 0.05f, checkPos.z};
+                LineManager::GetInstance()->DrawLine(pA, pB, dotCol);
+            }
+        }
     }
 }
 
