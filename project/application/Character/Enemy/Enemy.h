@@ -96,7 +96,8 @@ protected: // 変更: 派生クラス(RushEnemy等)で行動を拡張できる�
     size_t pathCursor_ = 0;
     int lastPathGoalIndex_ = -1;
     float waypointArriveEps_ = 0.15f;
-    IParticleEmitter* hitEmitter_ = nullptr;
+    IParticleEmitter* hitEmitter_ = nullptr;       // 既存: スパーク等
+    IParticleEmitter* hitRingEmitter_ = nullptr;   // 追加: ヒット時の小リング
     IParticleEmitter* deathEmitter_ = nullptr;
     bool deathEffectPlayed_ = false;
     Camera* camera_ = nullptr;
@@ -106,13 +107,9 @@ protected: // 変更: 派生クラス(RushEnemy等)で行動を拡張できる�
     bool BuildPathTo(const Vector3& worldGoal);
 
     // --- Knockback（被弾時押し戻し）---
-    // 被弾後の短時間ノックバック用タイマー（秒）
     float knockbackTimer_ = 0.0f;
-    // ノックバック速度（毎フレーム適用する移動量/秒）
     Vector3 knockbackVelocity_ {0.0f, 0.0f, 0.0f};
-    // ノックバックの初期強さ（タイルサイズに対する割合で設定しやすい）
-    float knockbackStrength_ = 10.0f; // タイル幅の約1.2倍/秒
-    // 減衰係数（毎フレーム少し弱める）
+    float knockbackStrength_ = 5.0f; // タイル幅の約5.0倍/秒
     float knockbackDamping_ = 0.85f;
     void ApplyKnockback(float dt);
 };
