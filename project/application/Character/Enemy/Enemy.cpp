@@ -50,7 +50,7 @@ void Enemy::Initialize() {
     knockbackVelocity_ = {0.0f, 0.0f, 0.0f};
 
     // --- 追加: 演出用エミッタ生成 ---
-    // ヒット時: 小さなリング or スパーク
+    // ヒット時: 小さなスパーク（既存）
     if (!hitEmitter_) {
         ParticlePreset p{};
         p.name = "EnemyHit";
@@ -66,6 +66,23 @@ void Enemy::Initialize() {
         p.colorEnd = {1.0f, 1.0f, 0.4f, 0.0f};
         p.center = position;
         hitEmitter_ = ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
+    }
+    // 追加: ヒット時の小さなリングを別エミッタで生成（既存と併用）
+    if (!hitRingEmitter_) {
+        ParticlePreset p{};
+        p.name = "EnemyHitRing";
+        p.texture = "gradationLine.png";
+        p.maxInstances = 16;
+        p.autoEmit = false;
+        p.burstCount = 1;
+        p.lifeMin = 0.25f;
+        p.lifeMax = 0.45f;
+        p.scaleStart = {0.4f, 0.4f, 1.0f};
+        p.scaleEnd   = {0.4f, 0.4f, 1.0f};
+        p.colorStart = {1.0f, 0.5f, 0.2f, 0.9f};
+        p.colorEnd   = {1.0f, 0.9f, 0.6f, 0.0f};
+        p.center = position;
+        hitRingEmitter_ = ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
     }
     // 死亡時: 大きなリング (一度だけ)
     if (!deathEmitter_) {
@@ -531,10 +548,16 @@ void Enemy::ApplyKnockback(float dt) {
 }
 
 void Enemy::EmitHitParticle() {
-    if (!hitEmitter_)
-        return;
-    // 小 burst
-    hitEmitter_->Emit(hitEmitter_->GetPreset().burstCount);
+    // 既存のヒットスパーク
+    if (hitEmitter_) {
+        hitEmitter_->GetPreset().center = position;
+        hitEmitter_->Emit(hitEmitter_->GetPreset().burstCount);
+    }
+    // 追加の小リング（既存と併用）
+    if (hitRingEmitter_) {
+        hitRingEmitter_->GetPreset().center = position;
+        hitRingEmitter_->Emit(hitRingEmitter_->GetPreset().burstCount);
+    }
 }
 
 void Enemy::EmitDeathParticle() {
@@ -621,13 +644,11 @@ void Enemy::DrawImGui() {
         auto& p = deathEmitter_->GetPreset();
         ImGui::Text("DeathEmitter life:[%.2f,%.2f]", p.lifeMin, p.lifeMax);
     }
-    // ノックバック調整（強度/減衰/時間）
+    // ノックバック調整
     ImGui::Separator();
     ImGui::Text("KnockbackTimer: %.2f", knockbackTimer_);
-    ImGui::DragFloat("KnockbackStrength", &knockbackStrength_, 0.01f, 0.1f, 3.0f);
+    ImGui::DragFloat("KnockbackStrength", &knockbackStrength_, 0.01f, 0.1f, 2.0f);
     ImGui::DragFloat("KnockbackDamping", &knockbackDamping_, 0.01f, 0.5f, 0.99f);
-    // 時間も微調整したい場合
-    ImGui::DragFloat("KnockbackDuration", &knockbackTimer_, 0.01f, 0.0f, 0.5f);
     ImGui::End();
 #endif
 }
