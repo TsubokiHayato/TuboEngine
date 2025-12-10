@@ -2,8 +2,8 @@
 #include "Collider/CollisionTypeId.h"
 #include "ImGuiManager.h"
 #include "Input.h"
-#include "ParticleManager.h"              // 追加: パーティクル生成用
-#include "OrbitTrailEmitter.h"            // 追加: 軌道トレイルエミッター
+#include "OrbitTrailEmitter.h" // 追加: 軌道トレイルエミッター
+#include "ParticleManager.h"   // 追加: パーティクル生成用
 #include "TextureManager.h"
 #include "engine/graphic/Particle/ParticleManager.h"
 #include "engine/graphic/Particle/RingEmitter.h"
@@ -11,8 +11,9 @@
 //--------------------------------------------------
 // コンストラクタ
 //--------------------------------------------------
-Player::Player() : cooldownTime(0.2f), damageCooldownTimer(0.0f), damageCooldownTime(1.0f),
-	isDodging(false), dodgeTimer(0.0f), dodgeCooldownTimer(0.0f), dodgeDuration(0.2f), dodgeCooldown(1.0f), dodgeSpeed(0.5f), dodgeDirection(0.0f, 0.0f, 0.0f) {}
+Player::Player()
+    : cooldownTime(0.2f), damageCooldownTimer(0.0f), damageCooldownTime(1.0f), isDodging(false), dodgeTimer(0.0f), dodgeCooldownTimer(0.0f), dodgeDuration(0.2f), dodgeCooldown(1.0f), dodgeSpeed(0.5f),
+      dodgeDirection(0.0f, 0.0f, 0.0f) {}
 
 //--------------------------------------------------
 // デストラクタ
@@ -70,17 +71,20 @@ void Player::Initialize() {
 	// --- 追加: 軌道トレイル用パーティクルエミッター生成 ---
 	if (!trailEmitter_) {
 		ParticlePreset p{};
-		p.name = "PlayerTrail";            // 自動で一意名に調整される可能性あり
-		p.texture = "circle2.png";        // 好みで変更
-		p.autoEmit = true;                  // 自動発生
-		p.emitRate = 60.0f;                 // 毎秒粒子
-		p.lifeMin = 0.35f; p.lifeMax = 0.6f;
-		p.scaleStart = {0.7f,0.7f,0.7f}; p.scaleEnd = {0.6f,0.6f,0.6f};
-		p.colorStart = {0.6f,0.8f,1.0f,0.9f}; p.colorEnd = {0.2f,0.4f,1.0f,0.0f};
-		p.maxInstances = 512;               // 移動で多発するので少し多め
+		p.name = "PlayerTrail";    // 自動で一意名に調整される可能性あり
+		p.texture = "circle2.png"; // 好みで変更
+		p.autoEmit = true;         // 自動発生
+		p.emitRate = 60.0f;        // 毎秒粒子
+		p.lifeMin = 0.35f;
+		p.lifeMax = 0.6f;
+		p.scaleStart = {0.7f, 0.7f, 0.7f};
+		p.scaleEnd = {0.6f, 0.6f, 0.6f};
+		p.colorStart = {0.6f, 0.8f, 1.0f, 0.9f};
+		p.colorEnd = {0.2f, 0.4f, 1.0f, 0.0f};
+		p.maxInstances = 512; // 移動で多発するので少し多め
 		p.billboard = true;
 		p.simulateInWorldSpace = true;
-		p.center = position;                // 初期中心
+		p.center = position; // 初期中心
 		trailEmitter_ = ParticleManager::GetInstance()->CreateEmitter<OrbitTrailEmitter>(p);
 		prevPositionTrail_ = position;
 	}
@@ -97,9 +101,9 @@ void Player::Initialize() {
 		p.lifeMin = 0.35f;
 		p.lifeMax = 0.6f;
 		p.scaleStart = {0.6f, 0.6f, 1.0f};
-		p.scaleEnd   = {1.2f, 1.2f, 1.0f};
+		p.scaleEnd = {1.2f, 1.2f, 1.0f};
 		p.colorStart = {0.9f, 0.95f, 1.0f, 0.85f};
-		p.colorEnd   = {0.9f, 0.95f, 1.0f, 0.0f};
+		p.colorEnd = {0.9f, 0.95f, 1.0f, 0.0f};
 		p.center = GetPosition();
 		// エミッタ中心に追従させる（ワールド空間で独立しない）
 		p.simulateInWorldSpace = false;
@@ -113,7 +117,7 @@ void Player::Initialize() {
 void Player::Update() {
 	if (isAllive == false) {
 		return;
-	}// 死亡状態なら更新しない
+	} // 死亡状態なら更新しない
 
 	if (!isDontMove) {
 		isHit = false;
@@ -153,7 +157,7 @@ void Player::Update() {
 	object3d->Update();
 
 	reticleSprite->SetPosition(reticlePosition);
-	reticleSprite->SetGetIsAdjustTextureSize(true); // レティクルのサイズを調整する
+	reticleSprite->SetGetIsAdjustTextureSize(true);     // レティクルのサイズを調整する
 	reticleSprite->SetAnchorPoint(Vector2(0.5f, 0.5f)); // アンカーポイントを中央に設定
 	reticleSprite->Update();
 
@@ -168,7 +172,7 @@ void Player::Update() {
 		if (camera_) {
 			Vector3 camRot = camera_->GetRotation();
 			// Z回転のみで前方ベクトル（2D平面想定）
-			Vector3 forward{ std::cos(camRot.z), std::sin(camRot.z), 0.0f };
+			Vector3 forward{std::cos(camRot.z), std::sin(camRot.z), 0.0f};
 			center = center + forward * dashRingOffsetForward_;
 		}
 		dashRingEmitter_->GetPreset().center = center;
@@ -202,7 +206,9 @@ void Player::Shoot() {
 // 描画処理
 //--------------------------------------------------
 void Player::Draw() {
-	for (auto& bullet : bullets) { bullet->Draw(); }
+	for (auto& bullet : bullets) {
+		bullet->Draw();
+	}
 	object3d->Draw();
 }
 
@@ -223,14 +229,22 @@ void Player::Move() {
 	}
 	Vector3 prevPosition = position;
 	Vector3 moveDelta = {0.0f, 0.0f, 0.0f};
-	if (Input::GetInstance()->PushKey(DIK_W)) { moveDelta.y -= 0.1f; }
-	if (Input::GetInstance()->PushKey(DIK_S)) { moveDelta.y += 0.1f; }
-	if (Input::GetInstance()->PushKey(DIK_A)) { moveDelta.x -= 0.1f; }
-	if (Input::GetInstance()->PushKey(DIK_D)) { moveDelta.x += 0.1f; }
+	if (Input::GetInstance()->PushKey(DIK_W)) {
+		moveDelta.y -= 0.1f;
+	}
+	if (Input::GetInstance()->PushKey(DIK_S)) {
+		moveDelta.y += 0.1f;
+	}
+	if (Input::GetInstance()->PushKey(DIK_A)) {
+		moveDelta.x -= 0.1f;
+	}
+	if (Input::GetInstance()->PushKey(DIK_D)) {
+		moveDelta.x += 0.1f;
+	}
 	Vector3 tryPosition = position + moveDelta;
 	if (mapChipField) {
-		float playerWidth = scale.x * MapChipField::GetBlockWidth()-0.1f;
-		float playerHeight = scale.y * MapChipField::GetBlockHeight()-0.1f;
+		float playerWidth = scale.x * MapChipField::GetBlockWidth() - 0.1f;
+		float playerHeight = scale.y * MapChipField::GetBlockHeight() - 0.1f;
 		if (!mapChipField->IsRectBlocked(tryPosition, playerWidth, playerHeight)) {
 			position = tryPosition;
 		}
@@ -269,17 +283,23 @@ Vector3 Player::GetCenterPosition() const {
 // 衝突時の処理
 //--------------------------------------------------
 void Player::OnCollision(Collider* other) {
-	if (isDodging) { return; }
+	if (isDodging) {
+		return;
+	}
 	uint32_t typeID = other->GetTypeID();
 	if (damageCooldownTimer <= 0.0f) {
 		if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy)) {
-			HP -= 1; isHit = true; damageCooldownTimer = damageCooldownTime;
+			HP -= 1;
+			isHit = true;
+			damageCooldownTimer = damageCooldownTime;
 		} else if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
-			isHit = true; damageCooldownTimer = damageCooldownTime;
+			isHit = true;
+			damageCooldownTimer = damageCooldownTime;
 		}
 	}
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
-		HP -= 1; isHit = true;
+		HP -= 1;
+		isHit = true;
 	}
 }
 
@@ -315,7 +335,10 @@ void Player::DrawImGui() {
 		MapChipField::IndexSet index = mapChipField->GetMapChipIndexSetByPosition(position);
 		MapChipType type = mapChipField->GetMapChipTypeByIndex(index.xIndex, index.yIndex);
 		const char* typeStr = "Unknown";
-		if (type == MapChipType::kBlank) typeStr = "Blank"; else if (type == MapChipType::kBlock) typeStr = "Block";
+		if (type == MapChipType::kBlank)
+			typeStr = "Blank";
+		else if (type == MapChipType::kBlock)
+			typeStr = "Block";
 		ImGui::Separator();
 		ImGui::Text("MapChip: %s", typeStr);
 	}
@@ -341,7 +364,9 @@ void Player::DrawImGui() {
 		ImGui::ColorEdit4("Ring colorEnd", &p.colorEnd.x);
 		ImGui::DragInt("Ring burstCount", reinterpret_cast<int*>(&p.burstCount), 1, 1, 16);
 		ImGui::Checkbox("Ring autoEmit", &p.autoEmit);
-		if (ImGui::Button("Emit Ring")) { dashRingEmitter_->Emit(p.burstCount); }
+		if (ImGui::Button("Emit Ring")) {
+			dashRingEmitter_->Emit(p.burstCount);
+		}
 	}
 	ImGui::End();
 	object3d->DrawImGui("Player");
@@ -356,7 +381,10 @@ void Player::StartDodge() {
 	Vector3 inputDir = GetDodgeInputDirection();
 	if (inputDir.x != 0.0f || inputDir.y != 0.0f) {
 		float len = std::sqrt(inputDir.x * inputDir.x + inputDir.y * inputDir.y);
-		if (len > 0.0f) { inputDir.x /= len; inputDir.y /= len; }
+		if (len > 0.0f) {
+			inputDir.x /= len;
+			inputDir.y /= len;
+		}
 		dodgeDirection = inputDir;
 	} else {
 		float angle = rotation.z;
@@ -370,7 +398,8 @@ void Player::StartDodge() {
 void Player::UpdateDodge() {
 	if (dodgeCooldownTimer > 0.0f) {
 		dodgeCooldownTimer -= 1.0f / 60.0f;
-		if (dodgeCooldownTimer < 0.0f) dodgeCooldownTimer = 0.0f;
+		if (dodgeCooldownTimer < 0.0f)
+			dodgeCooldownTimer = 0.0f;
 	}
 	if (isDodging) {
 		dodgeTimer -= 1.0f / 60.0f;
@@ -387,15 +416,20 @@ bool Player::CanDodge() const { return !isDodging && dodgeCooldownTimer <= 0.0f;
 // --- 回避入力方向取得 ---
 Vector3 Player::GetDodgeInputDirection() const {
 	Vector3 inputDir(0.0f, 0.0f, 0.0f);
-	if (Input::GetInstance()->PushKey(DIK_W)) inputDir.y -= 1.0f;
-	if (Input::GetInstance()->PushKey(DIK_S)) inputDir.y += 1.0f;
-	if (Input::GetInstance()->PushKey(DIK_A)) inputDir.x -= 1.0f;
-	if (Input::GetInstance()->PushKey(DIK_D)) inputDir.x += 1.0f;
+	if (Input::GetInstance()->PushKey(DIK_W))
+		inputDir.y -= 1.0f;
+	if (Input::GetInstance()->PushKey(DIK_S))
+		inputDir.y += 1.0f;
+	if (Input::GetInstance()->PushKey(DIK_A))
+		inputDir.x -= 1.0f;
+	if (Input::GetInstance()->PushKey(DIK_D))
+		inputDir.x += 1.0f;
 	return inputDir;
 }
 
 // --- ダッシュリングトリガー ---
 void Player::TriggerDashRing() {
-	if (!dashRingEmitter_) return;
+	if (!dashRingEmitter_)
+		return;
 	dashRingEmitter_->Emit(dashRingEmitter_->GetPreset().burstCount);
 }
