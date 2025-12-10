@@ -78,6 +78,7 @@ public:
 	// プレイヤーの弾のリストを取得
 	const std::vector<std::unique_ptr<PlayerBullet>>& GetBullets() const { return bullets; }
 	bool IsDashing() const { return isDashing_; } // 既存なら流用、無ければダミー
+	bool GetIsHit() const { return isHit; } // 被弾フラグのゲッター
 
 	///-----------------------------------
 	///				セッター

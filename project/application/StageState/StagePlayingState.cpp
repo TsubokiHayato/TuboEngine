@@ -3,14 +3,12 @@
 #include "StageScene.h"
 #include <cmath> // 追加: sqrtf など
 
-
 // StagePlayingState
 void StagePlayingState::Enter(StageScene* scene) {
 	ruleSprite_ = std::make_unique<Sprite>();
 	ruleSprite_->Initialize("rule.png");
 	ruleSprite_->SetPosition({0.0f, 0.0f});
 	ruleSprite_->Update();
-
 }
 
 void StagePlayingState::Update(StageScene* scene) {
@@ -29,7 +27,6 @@ void StagePlayingState::Update(StageScene* scene) {
 	/// 各オブジェクトの更新
 	///------------------------------------------------
 
-
 	/// ブロック ///
 	for (auto& block : blocks_) {
 		// カメラ設定
@@ -43,6 +40,12 @@ void StagePlayingState::Update(StageScene* scene) {
 	player_->SetCamera(followCamera->GetCamera());
 	player_->SetIsDontMove(false);
 	player_->SetMapChipField(mapChipField_);
+
+	// プレイヤー被弾時にカメラシェイク
+	if (player_->GetIsHit() == true) {
+		// 適度な強度と時間。必要に応じて調整可能
+		followCamera->Shake(0.35f, 0.25f);
+	}
 	// 更新
 	player_->Update();
 
@@ -71,8 +74,6 @@ void StagePlayingState::Update(StageScene* scene) {
 	// 更新
 	followCamera->Update();
 
-	
-	
 	///------------------------------------------------
 	/// ゲームクリア判定
 	///------------------------------------------------
@@ -100,11 +101,7 @@ void StagePlayingState::Update(StageScene* scene) {
 		return;
 	}
 
-
-
 	ruleSprite_->Update();
-	
-
 }
 
 void StagePlayingState::Exit(StageScene* scene) {}
@@ -134,11 +131,9 @@ void StagePlayingState::Object3DDraw(StageScene* scene) {
 	for (auto& enemy : enemies) {
 		enemy->Draw();
 	}
-
-	
 }
 
-void StagePlayingState::SpriteDraw(StageScene* scene) { 
+void StagePlayingState::SpriteDraw(StageScene* scene) {
 	std::vector<std::unique_ptr<RushEnemy>>& enemies = scene->GetEnemies();
 	scene->GetPlayer()->ReticleDraw();
 	for (auto& enemy : enemies) {
@@ -163,8 +158,6 @@ void StagePlayingState::ImGuiDraw(StageScene* scene) {
 	for (auto& block : blocks_) {
 		block->DrawImGui();
 	}
-
-	
 }
 
 void StagePlayingState::ParticleDraw(StageScene* scene) {
