@@ -37,8 +37,25 @@ void FollowTopDownCamera::Update() {
 	// 注視点オフセット
 	Vector3 lookAt = targetPos + lookAtOffset_;
 
+	// 回転に応じてオフセットを回転させる（斜め視点対応）
+	// rotation_はラジアン想定。順序: Z->X->Y（右手座標系）
+	Vector3 rotatedOffset = offset_;
+	{
+		using namespace DirectX;
+		XMVECTOR off = XMVectorSet(offset_.x, offset_.y, offset_.z, 0.0f);
+		XMVECTOR rotZ = XMQuaternionRotationAxis(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), rotation_.z);
+		XMVECTOR rotX = XMQuaternionRotationAxis(XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), rotation_.x);
+		XMVECTOR rotY = XMQuaternionRotationAxis(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), rotation_.y);
+		XMVECTOR rotQ = XMQuaternionMultiply(XMQuaternionMultiply(rotZ, rotX), rotY);
+		XMVECTOR offR = XMVector3Rotate(off, rotQ);
+		XMVectorGetX(offR);
+		rotatedOffset.x = XMVectorGetX(offR);
+		rotatedOffset.y = XMVectorGetY(offR);
+		rotatedOffset.z = XMVectorGetZ(offR);
+	}
+
 	// 目標カメラ位置（ズーム対応）
-	Vector3 desiredPos = targetPos + offset_ * zoom_;
+	Vector3 desiredPos = targetPos + rotatedOffset * zoom_;
 
 	// 障害物回避（雛形）
 	AvoidObstacles(desiredPos);
