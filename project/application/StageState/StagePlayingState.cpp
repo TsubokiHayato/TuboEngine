@@ -1,9 +1,8 @@
 #include "StagePlayingState.h"
 #include "LineManager.h"
 #include "StageScene.h"
-#include <cmath>
-#include "engine/graphic/PostEffect/OffscreenRendering.h"
-#include "engine/graphic/PostEffect/VignetteEffect.h"
+#include <cmath> // 追加: sqrtf など
+
 
 // StagePlayingState
 void StagePlayingState::Enter(StageScene* scene) {
@@ -11,6 +10,7 @@ void StagePlayingState::Enter(StageScene* scene) {
 	ruleSprite_->Initialize("rule.png");
 	ruleSprite_->SetPosition({0.0f, 0.0f});
 	ruleSprite_->Update();
+
 }
 
 void StagePlayingState::Update(StageScene* scene) {
@@ -24,87 +24,66 @@ void StagePlayingState::Update(StageScene* scene) {
 	std::vector<std::unique_ptr<Block>>& blocks_ = scene->GetBlocks();
 	std::vector<std::unique_ptr<RushEnemy>>& enemies = scene->GetEnemies();
 	FollowTopDownCamera* followCamera = scene->GetFollowCamera();
-	OffScreenRendering* off = OffScreenRendering::GetInstance();
 
 	///------------------------------------------------
 	/// 各オブジェクトの更新
 	///------------------------------------------------
 
+
 	/// ブロック ///
 	for (auto& block : blocks_) {
+		// カメラ設定
 		block->SetCamera(followCamera->GetCamera());
+		// 更新
 		block->Update();
 	}
 
 	/// プレイヤー ///
+	// カメラ設定
 	player_->SetCamera(followCamera->GetCamera());
 	player_->SetIsDontMove(false);
 	player_->SetMapChipField(mapChipField_);
-
-	// HPに応じて外枠の赤を控えめに調整（見づらくならない上限）
-	{
-		const int maxHP = 5;
-		int hp = player_->GetHP();
-		float hpRatio = hp / static_cast<float>(maxHP);
-		if (hpRatio < 0.0f) hpRatio = 0.0f;
-		if (hpRatio > 1.0f) hpRatio = 1.0f;
-
-		off->SetCurrentPostEffect(3); // Vignette
-		if (auto* vignette = off->GetPostEffect<VignetteEffect>()) {
-			float basePower = 0.8f;
-			float baseScale = 14.0f;
-			float maxBoostPower = 3.0f;
-			float maxBoostScale = 6.0f;
-			vignette->GetParams()->vignettePower = basePower + (1.0f - hpRatio) * maxBoostPower;
-			vignette->GetParams()->vignetteScale = baseScale + (1.0f - hpRatio) * maxBoostScale;
-			vignette->GetParams()->tintR = 1.0f;
-			vignette->GetParams()->tintG = 0.25f;
-			vignette->GetParams()->tintB = 0.25f;
-			vignette->GetParams()->tintA = 0.12f + (1.0f - hpRatio) * 0.28f;
-		}
-	}
-
-	// プレイヤー被弾時にカメラシェイク + 外枠の赤みを一瞬だけ強調（視認性維持）
-	if (player_->GetIsHit()) {
-		followCamera->Shake(0.35f, 0.25f);
-		if (auto* vignette = off->GetPostEffect<VignetteEffect>()) {
-			if (vignette->GetParams()->tintA < 0.55f) {
-				vignette->GetParams()->tintA = 0.55f;
-			}
-			if (vignette->GetParams()->vignettePower < 4.0f) {
-				vignette->GetParams()->vignettePower = 4.0f;
-			}
-		}
-	}
-
 	// 更新
 	player_->Update();
 
 	/// 敵 ///
 	for (auto& enemy : enemies) {
+		// カメラ設定
 		enemy->SetCamera(followCamera->GetCamera());
+		// プレイヤー設定
 		enemy->SetPlayer(player_);
+		// マップチップフィールド設定
 		enemy->SetMapChipField(mapChipField_);
+		// 更新
 		enemy->Update();
 	}
 
 	/// Tile///
 	std::vector<std::unique_ptr<Tile>>& tiles_ = scene->GetTiles();
 	for (auto& tile : tiles_) {
+		// カメラ設定
 		tile->SetCamera(followCamera->GetCamera());
+		// 更新
 		tile->Update();
 	}
 
 	/// カメラ ///
+	// 更新
 	followCamera->Update();
 
+	
+	
 	///------------------------------------------------
 	/// ゲームクリア判定
 	///------------------------------------------------
 
+	// 全ての敵が倒されたかチェック
 	bool allEnemiesDefeated = true;
 	for (const auto& enemy : enemies) {
-		if (enemy->GetIsAllive()) { allEnemiesDefeated = false; break; }
+		if (enemy->GetIsAllive()) {
+			allEnemiesDefeated = false;
+			break;
+		}
 	}
 	if (allEnemiesDefeated && !enemies.empty()) {
 		scene->GetStageStateManager()->ChangeState(StageType::StageClear, scene);
@@ -116,43 +95,83 @@ void StagePlayingState::Update(StageScene* scene) {
 	///------------------------------------------------
 
 	if (!player_->GetIsAllive()) {
+		// プレイヤーが死亡したらゲームオーバーステートへ
 		scene->GetStageStateManager()->ChangeState(StageType::GameOver, scene);
 		return;
 	}
 
+
+
 	ruleSprite_->Update();
+	
+
 }
 
 void StagePlayingState::Exit(StageScene* scene) {}
 
 void StagePlayingState::Object3DDraw(StageScene* scene) {
+	// 3Dオブジェクトの描画
+	// スカイドーム描画
 	scene->GetSkyDome()->Draw();
+
+	// タイル描画
 	std::vector<std::unique_ptr<Tile>>& tiles_ = scene->GetTiles();
-	for (auto& tile : tiles_) { tile->Draw(); }
+	for (auto& tile : tiles_) {
+		tile->Draw();
+	}
+
+	// ブロック描画
 	std::vector<std::unique_ptr<Block>>& blocks_ = scene->GetBlocks();
-	for (auto& block : blocks_) { block->Draw(); }
+	for (auto& block : blocks_) {
+		block->Draw();
+	}
+
+	// プレイヤーの3Dオブジェクトを描画
 	scene->GetPlayer()->Draw();
+
+	// 敵の3Dオブジェクトを描画
 	std::vector<std::unique_ptr<RushEnemy>>& enemies = scene->GetEnemies();
-	for (auto& enemy : enemies) { enemy->Draw(); }
+	for (auto& enemy : enemies) {
+		enemy->Draw();
+	}
+
+	
 }
 
-void StagePlayingState::SpriteDraw(StageScene* scene) {
+void StagePlayingState::SpriteDraw(StageScene* scene) { 
 	std::vector<std::unique_ptr<RushEnemy>>& enemies = scene->GetEnemies();
 	scene->GetPlayer()->ReticleDraw();
-	for (auto& enemy : enemies) { enemy->DrawSprite(); }
+	for (auto& enemy : enemies) {
+		enemy->DrawSprite();
+	}
 	ruleSprite_->Draw();
 }
 
 void StagePlayingState::ImGuiDraw(StageScene* scene) {
+
 	scene->GetFollowCamera()->DrawImGui();
 	scene->GetPlayer()->DrawImGui();
+
 	std::vector<std::unique_ptr<RushEnemy>>& enemies = scene->GetEnemies();
-	for (auto& enemy : enemies) { enemy->DrawImGui(); }
+	// EnemyのImgui
+	for (auto& enemy : enemies) {
+		enemy->DrawImGui();
+	}
+
 	std::vector<std::unique_ptr<Block>>& blocks_ = scene->GetBlocks();
-	for (auto& block : blocks_) { block->DrawImGui(); }
+	// ブロックのImGui
+	for (auto& block : blocks_) {
+		block->DrawImGui();
+	}
+
+	
 }
 
 void StagePlayingState::ParticleDraw(StageScene* scene) {
+
 	std::vector<std::unique_ptr<RushEnemy>>& enemies = scene->GetEnemies();
-	for (auto& enemy : enemies) { enemy->ParticleDraw(); }
+
+	for (auto& enemy : enemies) {
+		enemy->ParticleDraw();
+	}
 }
