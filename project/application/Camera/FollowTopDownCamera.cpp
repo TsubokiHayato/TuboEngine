@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include <algorithm>
 #include <cfloat>
+#include "Input.h"
 
 FollowTopDownCamera::FollowTopDownCamera() {}
 
@@ -31,6 +32,13 @@ void FollowTopDownCamera::Update() {
 	if (!target_ || !camera_)
 		return;
 
+	// ホイールズーム更新（下限・上限を保持）
+	int wheel = Input::GetInstance()->GetWheel();
+	if (wheel != 0) {
+		float delta = (wheel > 0 ? -1.0f : 1.0f) * zoomSpeed_;
+		zoom_ = std::max(zoomMin_, std::min(zoomMax_, zoom_ + delta));
+	}
+
 	// プレイヤーの位置を取得
 	Vector3 targetPos = target_->GetPosition();
 
@@ -48,7 +56,6 @@ void FollowTopDownCamera::Update() {
 		XMVECTOR rotY = XMQuaternionRotationAxis(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), rotation_.y);
 		XMVECTOR rotQ = XMQuaternionMultiply(XMQuaternionMultiply(rotZ, rotX), rotY);
 		XMVECTOR offR = XMVector3Rotate(off, rotQ);
-		XMVectorGetX(offR);
 		rotatedOffset.x = XMVectorGetX(offR);
 		rotatedOffset.y = XMVectorGetY(offR);
 		rotatedOffset.z = XMVectorGetZ(offR);
@@ -95,7 +102,10 @@ void FollowTopDownCamera::DrawImGui() {
 	ImGui::DragFloat3("LookAtOffset", &lookAtOffset_.x, 0.1f);
 	ImGui::DragFloat3("Rotation", &rotation_.x, 0.01f);
 	ImGui::DragFloat("Follow Speed", &followSpeed_, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("Zoom", &zoom_, 0.01f, 0.1f, 10.0f);
+	ImGui::DragFloat("Zoom", &zoom_, 0.01f, zoomMin_, zoomMax_);
+	ImGui::DragFloat("Zoom Speed", &zoomSpeed_, 0.001f, 0.0f, 0.2f);
+	ImGui::DragFloat("Zoom Min", &zoomMin_, 0.01f, 0.1f, 10.0f);
+	ImGui::DragFloat("Zoom Max", &zoomMax_, 0.01f, 0.1f, 10.0f);
 	ImGui::Checkbox("Use Bounds", &useBounds_);
 	ImGui::DragFloat3("Bounds Min", &boundsMin_.x, 0.1f);
 	ImGui::DragFloat3("Bounds Max", &boundsMax_.x, 0.1f);
@@ -113,7 +123,7 @@ void FollowTopDownCamera::SetTarget(Player* target) { target_ = target; }
 void FollowTopDownCamera::SetOffset(const Vector3& offset) { offset_ = offset; }
 void FollowTopDownCamera::SetFollowSpeed(float speed) { followSpeed_ = speed; }
 void FollowTopDownCamera::SetLookAtOffset(const Vector3& offset) { lookAtOffset_ = offset; }
-void FollowTopDownCamera::SetZoom(float zoom) { zoom_ = zoom; }
+void FollowTopDownCamera::SetZoom(float zoom) { zoom_ = std::max(zoomMin_, std::min(zoomMax_, zoom)); }
 void FollowTopDownCamera::SetBounds(const Vector3& min, const Vector3& max) {
 	boundsMin_ = min;
 	boundsMax_ = max;
