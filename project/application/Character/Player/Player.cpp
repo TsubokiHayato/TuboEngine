@@ -268,7 +268,8 @@ void Player::Rotate() {
 
 	// レイキャストで算出した地面上ターゲット方向で回転を更新（斜め視点対応）
 	Vector3 aimDir = GetAimDirectionFromReticle();
-	float angle = std::atan2(aimDir.x, -aimDir.y);
+	// 現状のモデルがレティクルと逆を向くため、180度補正を加える
+	float angle = std::atan2(aimDir.x, -aimDir.y) + DirectX::XM_PI;
 	rotation.z = angle;
 }
 
@@ -313,7 +314,7 @@ void Player::OnCollision(Collider* other) {
 void Player::DrawImGui() {
 #ifdef USE_IMGUI
 	position = object3d->GetPosition();
-	rotation = object3d->GetRotation();
+	//rotation = object3d->GetRotation();
 	scale = object3d->GetScale();
 	ImGui::Begin("Player");
 	ImGui::Text("HP: %d", HP);
