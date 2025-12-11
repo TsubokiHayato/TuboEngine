@@ -381,6 +381,22 @@ void RushEnemy::Update() {
         return;
     }
 
+    // クールダウン/スタンが終了した直後に、突進可能範囲内なら即座に突進準備へ移行
+    if (!isStunned_ && !isPreparing_ && !isRushing_ && !isReacting_ && !isStopping_) {
+        if (rushCooldownTimer_ <= 0.0f && !requireExitBeforeNextRush_ && player_ && canSeePlayer) {
+            Vector3 toP = player_->GetPosition() - position; toP.z = 0.0f;
+            float len = std::sqrt(toP.x*toP.x + toP.y*toP.y);
+            if (len <= rushTriggerDistance_ && len > 0.001f) {
+                Vector3 dir{ toP.x/len, toP.y/len, 0.0f };
+                rushDir_ = dir;
+                rotation.z = std::atan2(dir.y, dir.x);
+                state_ = State::Attack;
+                isPreparing_ = true;
+                prepareTimer_ = prepareDuration_;
+            }
+        }
+    }
+
     UpdateStateByVision(canSeePlayer, distanceToPlayer);
 
     if (state_ != State::Attack && !isScanning_) { isPreparing_ = false; if (isRushing_) isRushing_ = false; if (isStopping_) isStopping_ = false; }

@@ -71,7 +71,7 @@ private:
     bool  isScanning_ = false;         // 見回し中
     // 衝突リアクション
     bool  isReacting_ = false;         // 壁にぶつかったリアクション中
-    float reactionDuration_ = 0.4f;    // リアクション秒数
+    float reactionDuration_ = 0.65f;    // リアクション秒数
     float reactionTimer_ = 0.0f;       // 残りリアクション時間
     float reactionBackoffSpeed_ = 0.25f; // ノックバック速度
     Vector3 reactionDir_ {0.0f, 0.0f, 0.0f}; // リアクション方向（反射方向）
