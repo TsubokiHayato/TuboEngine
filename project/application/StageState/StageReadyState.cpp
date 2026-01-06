@@ -51,7 +51,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	scene->GetPlayer()->SetPosition(playerTargetPosition_); // 初期位置をマップチップ座標に設定
 
 	// フォローカメラ初期化（プレイヤー追従）
-	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), Vector3 {0.0f, 0.0f, 70.0f}, 0.25f);
+	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), Vector3 {0.0f, 0.0f, -70.0f}, 0.25f);
 	scene->GetFollowCamera()->Update();
 
 	LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());

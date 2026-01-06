@@ -49,7 +49,9 @@ public:
 
 	void TriggerDashRing();
 
-	
+	// 斜め視点でもレティクル通りに飛ばすための方向取得関数（地面へレイキャスト）
+	Vector3 GetAimDirectionFromReticle() const;
+
 
 private:
 	// --- 回避関連 ---
@@ -97,7 +99,7 @@ public:
 	// プレイヤーの死亡状態を設定
 	void SetIsDead(bool isAllive) { this->isAllive = isAllive; }
 	// カメラを設定
-	void SetCamera(Camera* camera) { object3d->SetCamera(camera); }
+	void SetCamera(Camera* camera) { object3d->SetCamera(camera); camera_ = camera; }
 	void SetDashRingOffset(float forward) { dashRingOffsetForward_ = forward; }
 
 	// モデルのアルファ設定

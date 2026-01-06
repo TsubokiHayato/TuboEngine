@@ -102,6 +102,8 @@ void StagePlayingState::Update(StageScene* scene) {
 	}
 
 	ruleSprite_->Update();
+	scene->GetSkyDome()->Update();
+
 }
 
 void StagePlayingState::Exit(StageScene* scene) {}
