@@ -101,7 +101,7 @@ public:
 	Player* GetPlayer() const { return player_.get(); }
 	MapChipField* GetMapChipField() const { return mapChipField_.get(); }
 	std::vector<std::unique_ptr<Block>>& GetBlocks() { return blocks_; }
-	std::vector<std::unique_ptr<Tile>>& GetTiles() { return tiles_; }
+	std::unique_ptr<Tile>& GetTile() { return tile_; }
 	std::vector<std::unique_ptr<Enemy>>& GetEnemies() { return enemies; }
 
 	FollowTopDownCamera* GetFollowCamera() const { return followCamera.get(); }
@@ -149,7 +149,7 @@ private:
 	std::vector<std::unique_ptr<Block>> blocks_;
 
 	/// Tile ///
-	std::vector<std::unique_ptr<Tile>> tiles_;
+	std::unique_ptr<Tile> tile_;
 
 	/// StageStateManager ///
 	std::unique_ptr<StageStateManager> stateManager_;

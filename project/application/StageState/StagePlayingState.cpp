@@ -62,13 +62,11 @@ void StagePlayingState::Update(StageScene* scene) {
 	}
 
 	/// Tile///
-	std::vector<std::unique_ptr<Tile>>& tiles_ = scene->GetTiles();
-	for (auto& tile : tiles_) {
-		// カメラ設定
-		tile->SetCamera(followCamera->GetCamera());
-		// 更新
-		tile->Update();
-	}
+	std::unique_ptr<Tile>& tile_ = scene->GetTile();
+	// カメラ設定
+	tile_->SetCamera(followCamera->GetCamera());
+	// 更新
+	tile_->Update();
 
 	/// カメラ ///
 	// 更新
@@ -112,10 +110,8 @@ void StagePlayingState::Object3DDraw(StageScene* scene) {
 	scene->GetSkyDome()->Draw();
 
 	// タイル描画
-	std::vector<std::unique_ptr<Tile>>& tiles_ = scene->GetTiles();
-	for (auto& tile : tiles_) {
-		tile->Draw();
-	}
+	std::unique_ptr<Tile>& tile_ = scene->GetTile();
+	tile_->Draw();
 
 	// ブロック描画
 	std::vector<std::unique_ptr<Block>>& blocks_ = scene->GetBlocks();
