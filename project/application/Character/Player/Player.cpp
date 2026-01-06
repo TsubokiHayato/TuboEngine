@@ -189,14 +189,20 @@ void Player::Update() {
 
 //--------------------------------------------------
 // 弾を撃つ処理
-//--------------------------------------------------
+//--------------------------------------------------	
 void Player::Shoot() {
 	if (Input::GetInstance()->IsPressMouse(0) && bulletTimer <= 0.0f) {
+		// プレイヤーの現在の回転(Z)から発射方向を作る（Rotateと一貫性を保つ）
+		float ang = rotation.z;
+		Vector3 dir{ std::sin(ang), -std::cos(ang), 0.0f };
+		// 発射
 		auto bullet = std::make_unique<PlayerBullet>();
 		bullet->Initialize(position);
 		bullet->SetPlayerRotation(rotation);
 		bullet->SetPlayerPosition(position);
 		bullet->SetMapChipField(mapChipField);
+		// 弾の速度をプレイヤー向きに設定
+		bullet->SetVelocity({dir.x * PlayerBullet::s_bulletSpeed, dir.y * PlayerBullet::s_bulletSpeed, dir.z * PlayerBullet::s_bulletSpeed});
 		bullets.push_back(std::move(bullet));
 		bulletTimer = cooldownTime;
 	}
@@ -204,7 +210,7 @@ void Player::Shoot() {
 
 //--------------------------------------------------
 // 描画処理
-//--------------------------------------------------
+//--------------------------------------------------	
 void Player::Draw() {
 	for (auto& bullet : bullets) {
 		bullet->Draw();
@@ -251,7 +257,8 @@ void Player::Move() {
 	}
 }
 
-///---------------------------------------------------
+
+//--------------------------------------------------
 // 回転処理
 //---------------------------------------------------
 void Player::Rotate() {
@@ -259,14 +266,15 @@ void Player::Rotate() {
 	int screenHeight = static_cast<int>(WinApp::GetInstance()->GetClientHeight());
 	int mouseX = static_cast<int>(Input::GetInstance()->GetMousePosition().x);
 	int mouseY = static_cast<int>(Input::GetInstance()->GetMousePosition().y);
-	float centerX = static_cast<float>(screenWidth) / 2.0f;
-	float centerY = static_cast<float>(screenHeight) / 2.0f;
-	float dx = static_cast<float>(mouseX) - centerX;
-	float dy = static_cast<float>(mouseY) - centerY;
-	float angle = std::atan2(dx, -dy);
-	rotation.z = angle;
 	reticlePosition = Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
+
+	// レイキャストで算出した地面上ターゲット方向で回転を更新（斜め視点対応）
+	Vector3 aimDir = GetAimDirectionFromReticle();
+	// 反転補正を削除し、レティクル方向と一致させる
+	float angle = std::atan2(aimDir.x, -aimDir.y);
+	rotation.z = angle;
 }
+
 
 void Player::ReticleDraw() { reticleSprite->Draw(); }
 
@@ -309,7 +317,7 @@ void Player::OnCollision(Collider* other) {
 void Player::DrawImGui() {
 #ifdef USE_IMGUI
 	position = object3d->GetPosition();
-	rotation = object3d->GetRotation();
+	//rotation = object3d->GetRotation();
 	scale = object3d->GetScale();
 	ImGui::Begin("Player");
 	ImGui::Text("HP: %d", HP);
@@ -432,4 +440,54 @@ void Player::TriggerDashRing() {
 	if (!dashRingEmitter_)
 		return;
 	dashRingEmitter_->Emit(dashRingEmitter_->GetPreset().burstCount);
+}
+
+// --- レティクルから地面へのレイキャストでエイム方向取得（斜め視点対応） ---
+Vector3 Player::GetAimDirectionFromReticle() const {
+	Vector3 dir{0.0f, -1.0f, 0.0f};
+	if (!camera_) {
+		return dir; // カメラ未設定なら従来の前方
+	}
+	// スクリーン座標からNDCに変換
+	float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
+	float screenH = static_cast<float>(WinApp::GetInstance()->GetClientHeight());
+	Vector2 mouse = Input::GetInstance()->GetMousePosition();
+	float ndcX = (mouse.x / screenW) * 2.0f - 1.0f;
+	float ndcY = 1.0f - (mouse.y / screenH) * 2.0f; // 上が+1
+
+	// カメラのViewProjection逆行列を計算（DirectXMath）
+	const Matrix4x4& vp = camera_->GetViewProjectionMatrix();
+	DirectX::XMMATRIX xmVP = DirectX::XMMatrixSet(
+		vp.m[0][0], vp.m[0][1], vp.m[0][2], vp.m[0][3],
+		vp.m[1][0], vp.m[1][1], vp.m[1][2], vp.m[1][3],
+		vp.m[2][0], vp.m[2][1], vp.m[2][2], vp.m[2][3],
+		vp.m[3][0], vp.m[3][1], vp.m[3][2], vp.m[3][3]
+	);
+	DirectX::XMVECTOR det;
+	DirectX::XMMATRIX xmInvVP = DirectX::XMMatrixInverse(&det, xmVP);
+	// ヘルパー: アンプロジェクト
+	auto unproject = [&](float x, float y, float z) {
+		DirectX::XMVECTOR p = DirectX::XMVectorSet(x, y, z, 1.0f);
+		DirectX::XMVECTOR w = DirectX::XMVector4Transform(p, xmInvVP);
+		DirectX::XMFLOAT4 wf;
+		DirectX::XMStoreFloat4(&wf, w);
+		if (std::fabs(wf.w) > 1e-6f) {
+			wf.x /= wf.w; wf.y /= wf.w; wf.z /= wf.w;
+		}
+		return Vector3{wf.x, wf.y, wf.z};
+	};
+	Vector3 worldNear = unproject(ndcX, ndcY, 0.0f);
+	Vector3 worldFar  = unproject(ndcX, ndcY, 1.0f);
+	Vector3 rayOrigin = worldNear;
+	Vector3 rayDir = {worldFar.x - worldNear.x, worldFar.y - worldNear.y, worldFar.z - worldNear.z};
+	float len = std::sqrt(rayDir.x * rayDir.x + rayDir.y * rayDir.y + rayDir.z * rayDir.z);
+	if (len > 0.0f) { rayDir.x /= len; rayDir.y /= len; rayDir.z /= len; }
+	// Z=0 平面と交差（地面）
+	if (std::fabs(rayDir.z) < 1e-5f) { return dir; }
+	float t = (0.0f - rayOrigin.z) / rayDir.z;
+	Vector3 hit = {rayOrigin.x + rayDir.x * t, rayOrigin.y + rayDir.y * t, 0.0f};
+	Vector3 aim = {hit.x - position.x, hit.y - position.y, hit.z - position.z};
+	float ilen = std::sqrt(aim.x * aim.x + aim.y * aim.y + aim.z * aim.z);
+	if (ilen > 0.0f) { aim.x /= ilen; aim.y /= ilen; aim.z /= ilen; }
+	return aim;
 }
