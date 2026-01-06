@@ -1,5 +1,5 @@
 #include "EnemyHpUI.h"
-#include "application/Character/Enemy/RushEnemy.h"
+#include "application/Character/Enemy/Enemy.h"
 #include "Camera.h"
 #include "WinApp.h"
 #include "MT_Matrix.h"
@@ -28,7 +28,7 @@ void EnemyHpUI::Initialize(const std::string& frameTexturePath, const std::strin
     frameTex_ = frameTexturePath; fillTex_ = fillTexturePath;
 }
 
-void EnemyHpUI::Update(const std::vector<std::unique_ptr<RushEnemy>>& enemies, Camera* cam) {
+void EnemyHpUI::Update(const std::vector<std::unique_ptr<Enemy>>& enemies, Camera* cam) {
     bars_.resize(enemies.size());
     for (size_t i = 0; i < enemies.size(); ++i) {
         auto* e = enemies[i].get();

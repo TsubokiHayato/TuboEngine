@@ -84,13 +84,24 @@ void StageReadyState::Enter(StageScene* scene) {
 			scene->GetBlocks().push_back(std::move(block));
 			blockTargetPositions_.push_back(pos);
 			blockRippleLayers_.push_back((float)layer);
-		} else if (type == MapChipType::Enemy) {
-			// エネミー生成
+		} else if (type == MapChipType::Enemy || type == MapChipType::EnemyRush) {
+			// ラッシュエネミー生成
 			auto enemy = std::make_unique<RushEnemy>();
 			enemy->Initialize();
 
 			enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
 
+			enemy->SetPlayer(scene->GetPlayer());
+			enemy->SetPosition(pos);
+			enemy->Update();
+			scene->GetEnemies().push_back(std::move(enemy));
+			enemyTargetPositions_.push_back(pos);
+			enemyRippleLayers_.push_back((float)layer);
+		} else if (type == MapChipType::EnemyShoot) {
+			// 射撃エネミー（通常の追跡+射撃を行うベースEnemy）
+			auto enemy = std::make_unique<Enemy>();
+			enemy->Initialize();
+			enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
 			enemy->SetPlayer(scene->GetPlayer());
 			enemy->SetPosition(pos);
 			enemy->Update();
