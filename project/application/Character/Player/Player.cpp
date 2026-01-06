@@ -189,19 +189,20 @@ void Player::Update() {
 
 //--------------------------------------------------
 // 弾を撃つ処理
-//--------------------------------------------------
+//--------------------------------------------------	
 void Player::Shoot() {
 	if (Input::GetInstance()->IsPressMouse(0) && bulletTimer <= 0.0f) {
-		// 斜め視点対応: レティクル方向へレイキャストして地面に当たる方向を算出
-		Vector3 aimDir = GetAimDirectionFromReticle();
+		// プレイヤーの現在の回転(Z)から発射方向を作る（Rotateと一貫性を保つ）
+		float ang = rotation.z;
+		Vector3 dir{ std::sin(ang), -std::cos(ang), 0.0f };
 		// 発射
 		auto bullet = std::make_unique<PlayerBullet>();
 		bullet->Initialize(position);
 		bullet->SetPlayerRotation(rotation);
 		bullet->SetPlayerPosition(position);
 		bullet->SetMapChipField(mapChipField);
-		// 弾の速度をレティクル方向に設定
-		bullet->SetVelocity({aimDir.x * PlayerBullet::s_bulletSpeed, aimDir.y * PlayerBullet::s_bulletSpeed, aimDir.z * PlayerBullet::s_bulletSpeed});
+		// 弾の速度をプレイヤー向きに設定
+		bullet->SetVelocity({dir.x * PlayerBullet::s_bulletSpeed, dir.y * PlayerBullet::s_bulletSpeed, dir.z * PlayerBullet::s_bulletSpeed});
 		bullets.push_back(std::move(bullet));
 		bulletTimer = cooldownTime;
 	}
@@ -209,7 +210,7 @@ void Player::Shoot() {
 
 //--------------------------------------------------
 // 描画処理
-//--------------------------------------------------
+//--------------------------------------------------	
 void Player::Draw() {
 	for (auto& bullet : bullets) {
 		bullet->Draw();
@@ -256,7 +257,8 @@ void Player::Move() {
 	}
 }
 
-///---------------------------------------------------
+
+//--------------------------------------------------
 // 回転処理
 //---------------------------------------------------
 void Player::Rotate() {
@@ -268,10 +270,11 @@ void Player::Rotate() {
 
 	// レイキャストで算出した地面上ターゲット方向で回転を更新（斜め視点対応）
 	Vector3 aimDir = GetAimDirectionFromReticle();
-	// 現状のモデルがレティクルと逆を向くため、180度補正を加える
-	float angle = std::atan2(aimDir.x, -aimDir.y) + DirectX::XM_PI;
+	// 反転補正を削除し、レティクル方向と一致させる
+	float angle = std::atan2(aimDir.x, -aimDir.y);
 	rotation.z = angle;
 }
+
 
 void Player::ReticleDraw() { reticleSprite->Draw(); }
 
