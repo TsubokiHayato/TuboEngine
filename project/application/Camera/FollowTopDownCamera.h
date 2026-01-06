@@ -19,6 +19,8 @@ public:
 	void SetZoom(float zoom);
 	void SetBounds(const Vector3& min, const Vector3& max);
 	void Shake(float intensity, float duration);
+	void SetZoomLimits(float minZoom, float maxZoom) { zoomMin_ = minZoom; zoomMax_ = maxZoom; }
+	void SetZoomSpeed(float speed) { zoomSpeed_ = speed; }
 
 	Camera* GetCamera() const { return camera_; }
 	Vector3 GetOffset() const { return offset_; }
@@ -30,7 +32,7 @@ private:
 	Vector3 lookAtOffset_ = {0, 0, 0};
 	float followSpeed_ = 0.07f;
 	float zoom_ = 1.0f;
-	Vector3 rotation_ = {DirectX::XM_PIDIV2 * 2.0f,0.0f, 0.0f};
+	Vector3 rotation_ = {DirectX::XM_PIDIV2 * 1.5f,0.0f, 0.0f};
 	Camera* camera_ = nullptr;
 
 	// カメラシェイク
@@ -42,6 +44,11 @@ private:
 	bool useBounds_ = false;
 	Vector3 boundsMin_ = {-FLT_MAX, -FLT_MAX, -FLT_MAX};
 	Vector3 boundsMax_ = {FLT_MAX, FLT_MAX, FLT_MAX};
+
+	// ズーム制限・速度
+	float zoomMin_ = 0.5f;
+	float zoomMax_ = 1.0f;
+	float zoomSpeed_ = 0.05f; // ホイール1単位あたりのズーム変化
 
 	// 障害物回避（雛形）
 	void AvoidObstacles(Vector3& desiredPos);
