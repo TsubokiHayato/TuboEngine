@@ -59,6 +59,9 @@ void Framework::Initialize() {
 	//ラインマネージャーの初期化
 	LineManager::GetInstance()->Initialize();
 
+	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
+	TextureManager::GetInstance()->LoadTexture(testDDSTextureHandle);
+
 	//シーンマネージャーの初期化
 	SceneManager::GetInstance()->Initialize(STAGE); // タイトルシーンから開始
 
