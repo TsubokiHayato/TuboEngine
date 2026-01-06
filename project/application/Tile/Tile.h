@@ -9,7 +9,7 @@ public:
 	~Tile();
 
 	// 初期化（位置・スケール・モデルファイル名など）
-	void Initialize(const Vector3& position, const Vector3& scale = {1.0f, 1.0f, 1.0f}, const std::string& modelFileName = "tile/tile.gltf");
+	void Initialize( Vector3 position, const Vector3& scale = {1.0f, 1.0f, 1.0f}, const std::string& modelFileName = "tile/tile.gltf");
 
 	void Update();
 	// 描画
@@ -42,8 +42,12 @@ public:
 	void SetCamera(Camera* camera) { object3d_->SetCamera(camera); }
 
 private:
-	Vector3 position_;
-	Vector3 scale_;
-	Vector3 rotation_;
-	std::unique_ptr<Object3d> object3d_;
+	Vector3 position_ = {};
+	Vector3 scale_ = {};
+	Vector3 rotation_ = {};
+	std::unique_ptr<Object3d> object3d_ = {};
+
+	// まとめタイルのみ描画するためのフラグ（最初に生成されたTileだけ描画）
+	bool isPrimary_ = false;
+	static bool sPrimaryAssigned_;
 };

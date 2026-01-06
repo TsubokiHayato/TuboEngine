@@ -17,6 +17,7 @@ void StageScene::Initialize() {
 	collisionManager_ = std::make_unique<CollisionManager>();
 	stateManager_ = std::make_unique<StageStateManager>();
 	skyDome_ = std::make_unique<SkyDome>();
+	tile_ = std::make_unique<Tile>();
 	sceneChangeAnimation_ = std::make_unique<SceneChangeAnimation>(1280, 720, 80, 1.5f, "barrier.png");
 
 	// 衝突マネージャの生成
