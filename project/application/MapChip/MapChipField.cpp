@@ -25,6 +25,8 @@ std::map<std::string, MapChipType> mapChipTable = {
     {"1", MapChipType::kBlock},
     {"2", MapChipType::Player},
     {"3", MapChipType::Enemy },
+    {"4", MapChipType::EnemyRush },
+    {"5", MapChipType::EnemyShoot },
 };
 }
 
@@ -94,6 +96,12 @@ void MapChipField::LoadMapChipCsv(const std::string& filePath) {
 				break;
 			case 3:
 				row.push_back(MapChipType::Enemy);
+				break;
+			case 4:
+				row.push_back(MapChipType::EnemyRush);
+				break;
+			case 5:
+				row.push_back(MapChipType::EnemyShoot);
 				break;
 			default:
 				row.push_back(MapChipType::kBlank);
@@ -216,11 +224,13 @@ void MapChipField::DrawImGui(const char* windowName) {
                 const char* label = nullptr;
                 ImVec4 color;
                 switch (mapChipType) {
-                    case MapChipType::kBlank:  label = ""; color = ImVec4(0.8f, 0.8f, 0.8f, 1.0f); break;
-                    case MapChipType::kBlock:  label = "B"; color = ImVec4(0.3f, 0.3f, 0.8f, 1.0f); break;
-                    case MapChipType::Player:  label = "P"; color = ImVec4(0.2f, 0.8f, 0.2f, 1.0f); break;
-                    case MapChipType::Enemy:   label = "E"; color = ImVec4(0.8f, 0.2f, 0.2f, 1.0f); break;
-                    default:                   label = "?"; color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); break;
+                    case MapChipType::kBlank:     label = "";  color = ImVec4(0.8f, 0.8f, 0.8f, 1.0f); break;
+                    case MapChipType::kBlock:     label = "B"; color = ImVec4(0.3f, 0.3f, 0.8f, 1.0f); break;
+                    case MapChipType::Player:     label = "P"; color = ImVec4(0.2f, 0.8f, 0.2f, 1.0f); break;
+                    case MapChipType::Enemy:      label = "E"; color = ImVec4(0.8f, 0.2f, 0.2f, 1.0f); break;
+                    case MapChipType::EnemyRush:  label = "ER"; color = ImVec4(1.0f, 0.4f, 0.2f, 1.0f); break;
+                    case MapChipType::EnemyShoot: label = "ES"; color = ImVec4(0.9f, 0.6f, 0.2f, 1.0f); break;
+                    default:                      label = "?"; color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); break;
                 }
                 ImGui::PushStyleColor(ImGuiCol_Button, color);
                 ImGui::PushID(yIndex * kNumBlockHorizontal + xIndex);
@@ -228,11 +238,13 @@ void MapChipField::DrawImGui(const char* windowName) {
                     // クリックで種類を順番に切り替え
                     MapChipType nextType = MapChipType::kBlank;
                     switch (mapChipType) {
-                        case MapChipType::kBlank:  nextType = MapChipType::kBlock;  break;
-                        case MapChipType::kBlock:  nextType = MapChipType::Player;  break;
-                        case MapChipType::Player:  nextType = MapChipType::Enemy;   break;
-                        case MapChipType::Enemy:   nextType = MapChipType::kBlank;  break;
-                        default:                   nextType = MapChipType::kBlank;  break;
+                        case MapChipType::kBlank:     nextType = MapChipType::kBlock;      break;
+                        case MapChipType::kBlock:     nextType = MapChipType::Player;      break;
+                        case MapChipType::Player:     nextType = MapChipType::Enemy;       break;
+                        case MapChipType::Enemy:      nextType = MapChipType::EnemyRush;   break;
+                        case MapChipType::EnemyRush:  nextType = MapChipType::EnemyShoot;  break;
+                        case MapChipType::EnemyShoot: nextType = MapChipType::kBlank;      break;
+                        default:                      nextType = MapChipType::kBlank;      break;
                     }
                     SetMapChipTypeByIndex(xIndex, yIndex, nextType);
                 }
