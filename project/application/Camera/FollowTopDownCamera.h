@@ -25,6 +25,8 @@ public:
 	Camera* GetCamera() const { return camera_; }
 	Vector3 GetOffset() const { return offset_; }
 	Vector3 GetRotation() const { return rotation_; }
+	float GetZoom() const { return zoom_; }
+	float GetZoomMin() const { return zoomMin_; }
 
 private:
 	Player* target_ = nullptr;
@@ -48,7 +50,7 @@ private:
 	// ズーム制限・速度
 	float zoomMin_ = 0.5f;
 	float zoomMax_ = 1.0f;
-	float zoomSpeed_ = 0.05f; // ホイール1単位あたりのズーム変化
+	float zoomSpeed_ = 0.05f; // ホイール1単位あたり의ズーム変化
 
 	// 障害物回避（雛形）
 	void AvoidObstacles(Vector3& desiredPos);
