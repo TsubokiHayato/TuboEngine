@@ -678,6 +678,15 @@ void Enemy::DrawImGui() {
     ImGui::DragFloat("KnockbackStrength", &knockbackStrength_, 0.01f, 0.1f, 10.0f);
     ImGui::DragFloat("KnockbackDamping", &knockbackDamping_, 0.01f, 0.5f, 0.99f);
     ImGui::Separator();
+    // 視野角・視認距離を調整
+    float angle = GetViewAngleDeg();
+    if (ImGui::DragFloat("View Angle (deg)", &angle, 0.5f, 1.0f, 360.0f)) {
+        SetViewAngleDeg(angle);
+    }
+    float dist = GetViewDistance();
+    if (ImGui::DragFloat("View Distance", &dist, 0.1f, 0.0f, 200.0f)) {
+        SetViewDistance(dist);
+    }
     ImGui::Checkbox("Show Ray Samples", &showRaySamples_);
     ImGui::DragFloat("Icon Duration", &iconDuration_, 0.01f, 0.2f, 3.0f);
     ImGui::DragFloat("Icon Offset Y", &iconOffsetY_, 0.01f, 0.0f, 5.0f);
