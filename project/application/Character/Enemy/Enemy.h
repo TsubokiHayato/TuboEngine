@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm> // for std::clamp
 #include "Character/BaseCharacter.h"
 #include "Bullet/Enemy/EnemyNormalBullet.h"
 #include "MapChip/MapChipField.h"
@@ -42,6 +43,12 @@ public:
     void SetMapChipField(MapChipField* field) { mapChipField = field; }
     int GetHP() const { return HP; }
     int GetMaxHP() const { return 10; }
+
+    // 視野角・距離の取得/設定
+    float GetViewAngleDeg() const { return kViewAngleDeg; }
+    void SetViewAngleDeg(float deg) { kViewAngleDeg = std::clamp(deg, 1.0f, 360.0f); }
+    float GetViewDistance() const { return kViewDistance; }
+    void SetViewDistance(float dist) { kViewDistance = (dist < 0.0f) ? 0.0f : dist; }
 
     enum class State { Idle, Alert, LookAround, Patrol, Chase, Attack };
 
