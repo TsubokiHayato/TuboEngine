@@ -14,7 +14,6 @@ public:
     void Initialize() override; // 基底初期化 + パラメータ調整
     void Update() override;     // シーケンス制御
     void Draw() override;       // 弾描画なし
-	void DrawSprite();
     void DrawImGui();           // パラメータ調整用
     void OnCollision(Collider* other) override; // プレイヤー接触時のノックバック & 追加リアクション
 
@@ -39,7 +38,7 @@ private:
     // --- Parameters ---
     float baseMoveSpeed_ = 0.08f;      // 通常追跡速度 (少し遅く)
     float rushSpeed_ = 0.30f;          // 突進速度 (やや抑制)
-    float rushTriggerDistance_ = 5.0f; // 突進開始距離
+    float rushTriggerDistance_ = 4.5f; // 突進開始距離
     float rushDuration_ = 0.8f;        // 突進持続秒 (少し延長)
     bool  isPreparing_ = false;        // 突進前ため状態
     float prepareDuration_ = 0.9f;     // ため秒数 (延長)
@@ -71,7 +70,7 @@ private:
     bool  isScanning_ = false;         // 見回し中
     // 衝突リアクション
     bool  isReacting_ = false;         // 壁にぶつかったリアクション中
-    float reactionDuration_ = 0.65f;    // リアクション秒数
+    float reactionDuration_ = 0.4f;    // リアクション秒数
     float reactionTimer_ = 0.0f;       // 残りリアクション時間
     float reactionBackoffSpeed_ = 0.25f; // ノックバック速度
     Vector3 reactionDir_ {0.0f, 0.0f, 0.0f}; // リアクション方向（反射方向）
