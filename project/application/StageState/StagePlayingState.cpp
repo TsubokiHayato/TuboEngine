@@ -129,6 +129,24 @@ void StagePlayingState::Object3DDraw(StageScene* scene) {
 	for (auto& enemy : enemies) {
 		enemy->Draw();
 	}
+
+	// --- 追加: プレビューステージ（Stage1+）も描画（見せるだけ） ---
+	auto& stages = scene->GetStageInstances();
+	for (size_t i = 1; i < stages.size(); ++i) {
+		auto& st = stages[i];
+		if (!st.visible) {
+			continue;
+		}
+		if (st.tile) {
+			st.tile->Draw();
+		}
+		for (auto& b : st.blocks) {
+			b->Draw();
+		}
+		for (auto& e : st.enemies) {
+			e->Draw();
+		}
+	}
 }
 
 void StagePlayingState::SpriteDraw(StageScene* scene) {
