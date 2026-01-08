@@ -11,9 +11,11 @@
 //--------------------------------------------------
 // コンストラクタ
 //--------------------------------------------------
+
 Player::Player()
     : cooldownTime(0.2f), damageCooldownTimer(0.0f), damageCooldownTime(1.0f), isDodging(false), dodgeTimer(0.0f), dodgeCooldownTimer(0.0f), dodgeDuration(0.2f), dodgeCooldown(1.0f), dodgeSpeed(0.5f),
       dodgeDirection(0.0f, 0.0f, 0.0f) {}
+
 
 //--------------------------------------------------
 // デストラクタ
@@ -37,9 +39,9 @@ void Player::Initialize() {
 	// プレイヤーの初期速度
 	velocity = Vector3(0.0f, 0.0f, 0.0f);
 	// プレイヤーのHP
-	HP = 5;
+	HP = 100;
 	// プレイヤーの死亡状態
-	isAllive = true;
+	isDead = false;
 
 	// モデルファイルパス
 	const std::string modelFileNamePath = "player/Player.obj";
@@ -377,6 +379,7 @@ void Player::DrawImGui() {
 		}
 	}
 	ImGui::End();
+
 	object3d->DrawImGui("Player");
 	PlayerBullet::DrawImGuiGlobal();
 #endif // USE_IMGUI
