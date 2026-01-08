@@ -55,8 +55,6 @@ public:
 	/// </summary>
 	Camera* GetMainCamera() const { return camera.get(); }
 
-	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
-
 private:
 	std::unique_ptr<Camera> camera;
 	Vector3 cameraPosition = {0.0f, 0.0f, -10.0f};
