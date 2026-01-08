@@ -4,9 +4,6 @@
 #include "Object3d.h"
 #include "Sprite.h"
 #include "MapChip/MapChipField.h"
-#include "engine/graphic/Particle/ParticleManager.h"
-#include "engine/graphic/Particle/RingEmitter.h"
-#include "Camera.h"
 // 前方宣言（ヘッダ依存軽減）
 class IParticleEmitter;
 ///--------------------------------------------------
@@ -47,11 +44,7 @@ public:
 
 	void ReticleDraw();
 
-	void TriggerDashRing();
-
-	// 斜め視点でもレティクル通りに飛ばすための方向取得関数（地面へレイキャスト）
-	Vector3 GetAimDirectionFromReticle() const;
-
+	
 
 private:
 	// --- 回避関連 ---
@@ -79,8 +72,6 @@ public:
 	bool IsDead() const { return isDead; }
 	// プレイヤーの弾のリストを取得
 	const std::vector<std::unique_ptr<PlayerBullet>>& GetBullets() const { return bullets; }
-	bool IsDashing() const { return isDashing_; } // 既存なら流用、無ければダミー
-	bool GetIsHit() const { return isHit; } // 被弾フラグのゲッター
 
 	///-----------------------------------
 	///				セッター
@@ -99,8 +90,7 @@ public:
 	// プレイヤーの死亡状態を設定
 	void SetIsDead(bool isDead) { this->isDead = isDead; }
 	// カメラを設定
-	void SetCamera(Camera* camera) { object3d->SetCamera(camera); camera_ = camera; }
-	void SetDashRingOffset(float forward) { dashRingOffsetForward_ = forward; }
+	void SetCamera(Camera* camera) { object3d->SetCamera(camera); }
 
 	// モデルのアルファ設定
 	void SetModelAlpha(float alpha) {
@@ -152,13 +142,4 @@ private:
 	// --- 追加: 移動軌跡用パーティクルエミッター ---
 	IParticleEmitter* trailEmitter_ = nullptr; // ParticleManager生成管理。解放はマネージャに委譲
 	Vector3 prevPositionTrail_{};              // 前フレーム位置
-	IParticleEmitter* dashRingEmitter_ = nullptr;
-	bool wasDashingPrev_ = false;
-	bool isDashing_ = false; // 既存のダッシュ状態に置き換え可
-	Camera* camera_ = nullptr; // 位置/方向参照用
-	float dashRingOffsetForward_ = 0.0f; // カメラ前方方向へのオフセット量
-
-	// 連続リング発生のためのタイマーと間隔
-	float dodgeRingIntervalSec_ = 0.12f; // 回避中の連続発生間隔
-	float dodgeRingEmitTimer_ = 0.0f;    // 次発生までの残り時間
 };
