@@ -114,7 +114,7 @@ void Sprite::Initialize(std::string textureFilePath)
 
 	textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFilePath);
 
-	AdjustTextureSize();
+
 }
 
 void Sprite::Update()
@@ -161,6 +161,7 @@ void Sprite::Update()
 	if (isAdjustTextureSize) {
 		AdjustTextureSize();
 	}
+
 
 	/*---------------------------------------
 	テクスチャの位置、画像位置, 法線ベクトル, 大きさ
