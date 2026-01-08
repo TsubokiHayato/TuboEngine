@@ -8,7 +8,7 @@ public:
 	~SkyDome();
 
 	// 初期化（位置・スケール・モデルファイル名など）
-	void Initialize(const Vector3& position = {0.0f,0.0f,0.0f}, const Vector3& scale = {10.0f, 10.0f, 10.0f}, const std::string& modelFileName = "skyBox/skyBox.obj");
+	void Initialize(const Vector3& position = {0.0f,0.0f,0.0f}, const Vector3& scale = {1.0f, 1.0f, 1.0f}, const std::string& modelFileName = "skyBox/skyBox.obj");
 
 	void Update();
 	// 描画

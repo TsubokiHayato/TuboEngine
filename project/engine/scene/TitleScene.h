@@ -5,7 +5,7 @@
 #include "Particle.h"
 #include "ParticleEmitter.h"
 #include "SceneManager.h"
-#include "UI/TitleUI.h"
+#include "TitleUI.h"
 #include <random>
 #include "Animation/SceneChangeAnimation.h"
 

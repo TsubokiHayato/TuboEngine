@@ -10,9 +10,6 @@
 
 void TitleScene::Initialize() {
 
-
-	
-
 	// カメラ（3D向けに調整）
 	camera = std::make_unique<Camera>();
 	camera->SetTranslate(cameraPosition);

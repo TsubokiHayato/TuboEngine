@@ -1,6 +1,6 @@
 #include "StageScene.h"
-#include "Camera/FollowTopDownCamera.h"
 #include "Collider/CollisionManager.h"
+#include "Camera/FollowTopDownCamera.h"
 #include "LineManager.h"
 #include "ParticleManager.h" // 追加: パーティクル描画/更新
 
@@ -17,9 +17,8 @@ void StageScene::Initialize() {
 	collisionManager_ = std::make_unique<CollisionManager>();
 	stateManager_ = std::make_unique<StageStateManager>();
 	skyDome_ = std::make_unique<SkyDome>();
-	tile_ = std::make_unique<Tile>();
 	sceneChangeAnimation_ = std::make_unique<SceneChangeAnimation>(1280, 720, 80, 1.5f, "barrier.png");
-
+	
 	// 衝突マネージャの生成
 	collisionManager_->Initialize();
 	// ステートマネージャの生成
@@ -27,32 +26,14 @@ void StageScene::Initialize() {
 	// シーンチェンジアニメーション初期化（シーン開始時はDisappearingで覆いを消す）
 	sceneChangeAnimation_->Initialize();
 	isRequestSceneChange = false;
-
-	// HP UI (Player)
-	hpUI_ = std::make_unique<HpUI>();
-	TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
-	TextureManager::GetInstance()->LoadTexture("HP.png");
-	int maxHp = 5; // Player 初期HPに合わせる
-	hpUI_->Initialize("HPBarFrame.png", "HP.png", maxHp);
-	hpUI_->SetPosition({20.0f, 20.0f});
-	hpUI_->SetSpacing(4.0f);
-	hpUI_->SetScale(0.8f);
-	hpUI_->SetAlignRight(false); // 左揃えに変更
-
-	// Enemy HP UI
-	enemyHpUI_ = std::make_unique<EnemyHpUI>();
-	TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
-	TextureManager::GetInstance()->LoadTexture("HP.png");
-	enemyHpUI_->Initialize("HPBarFrame.png", "HP.png");
-	enemyHpUI_->SetYOffset(-24.0f);
-	enemyHpUI_->SetScale(0.45f);
-	enemyHpUI_->SetSpacing(0.0f);
+	
 }
 
 void StageScene::Update() {
 
 	sceneChangeAnimation_->Update(1.0f / 60.0f);
 
+	
 	if (sceneChangeAnimation_->IsFinished()) {
 		// ステートマネージャの更新
 		if (stateManager_) {
@@ -68,11 +49,6 @@ void StageScene::Update() {
 
 	// 追加: プレイヤーが存在すればパーティクル更新 (Trail 用)
 	ParticleManager::GetInstance()->Update(1.0f/60.0f, followCamera->GetCamera());
-
-	// HP UI 更新
-	if (hpUI_) { hpUI_->Update(player_.get()); }
-	// Enemy HP UI 更新（エネミーに追従）
-	if (enemyHpUI_) { enemyHpUI_->Update(enemies, followCamera->GetCamera()); }
 }
 
 void StageScene::Finalize() {}
@@ -99,16 +75,12 @@ void StageScene::SpriteDraw() {
 		stateManager_->SpriteDraw(this);
 	}
 	
-	// HP UI 描画
-	if (hpUI_) { hpUI_->Draw(); }
-	// Enemy HP UI 描画（追従）
-	if (enemyHpUI_) { enemyHpUI_->Draw(); }
-	
 	// アニメーション描画
 	if (sceneChangeAnimation_) {
 		sceneChangeAnimation_->Draw();
 	}
-}
+	
+	 }
 
 void StageScene::ImGuiDraw() {
 
