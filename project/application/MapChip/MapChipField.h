@@ -12,9 +12,7 @@ enum class MapChipType {
 	kBlank,      // 空白
 	kBlock,      // ブロック
 	Player,      // プレイヤー
-	Enemy,       // 旧: 敵（互換用。今後は下の個別タイプを推奨）
-	EnemyRush,   // 追加: 突進敵
-	EnemyShoot,  // 追加: 射撃敵
+	Enemy,       // 敵
 };
 
 ///--------------------------------------------------
