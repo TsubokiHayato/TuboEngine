@@ -21,6 +21,7 @@
 #include "Bullet/Player/PlayerBullet.h"
 #include "Character/Player/Player.h"
 
+#include "Character/Enemy/Enemy.h"
 #include "Character/Enemy/RushEnemy.h"
 
 #include "MapChip/MapChipField.h"
@@ -31,6 +32,8 @@
 #include "SkyDome/SkyDome.h"
 
 #include "Animation/SceneChangeAnimation.h"
+#include "application/UI/HpUI.h"
+#include "application/UI/EnemyHpUI.h"
 
 
 class StageScene : public IScene {
@@ -76,7 +79,7 @@ public:
 	/// </summary>
 	Camera* GetMainCamera() const { return followCamera->GetCamera(); }
 
-	
+
 
 
 	/// <summary>
@@ -101,8 +104,8 @@ public:
 	Player* GetPlayer() const { return player_.get(); }
 	MapChipField* GetMapChipField() const { return mapChipField_.get(); }
 	std::vector<std::unique_ptr<Block>>& GetBlocks() { return blocks_; }
-	std::vector<std::unique_ptr<Tile>>& GetTiles() { return tiles_; }
-	std::vector<std::unique_ptr<RushEnemy>>& GetEnemies() { return enemies; }
+	std::unique_ptr<Tile>& GetTile() { return tile_; }
+	std::vector<std::unique_ptr<Enemy>>& GetEnemies() { return enemies; }
 
 	FollowTopDownCamera* GetFollowCamera() const { return followCamera.get(); }
 	std::string& GetMapChipCsvFilePath() { return mapChipCsvFilePath_; }
@@ -136,7 +139,7 @@ private:
 	std::unique_ptr<Player> player_ = nullptr;
 	/// Enemy ///
 	std::unique_ptr<Enemy> enemy_ = nullptr;
-	std::vector<std::unique_ptr<RushEnemy>> enemies; // Enemyリスト
+	std::vector<std::unique_ptr<Enemy>> enemies; // Enemyリスト（RushEnemyや射撃Enemyなどを混在）
 
 	/// SkyBox ///
 	std::unique_ptr<SkyBox> skyBox_ = nullptr;
@@ -149,7 +152,7 @@ private:
 	std::vector<std::unique_ptr<Block>> blocks_;
 
 	/// Tile ///
-	std::vector<std::unique_ptr<Tile>> tiles_;
+	std::unique_ptr<Tile> tile_;
 
 	/// StageStateManager ///
 	std::unique_ptr<StageStateManager> stateManager_;
@@ -161,5 +164,10 @@ private:
 
 	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation_ = nullptr;
 	bool isRequestSceneChange = false;
+
+	/// HpUI ///
+	std::unique_ptr<HpUI> hpUI_;
+	/// EnemyHpUI ///
+	std::unique_ptr<EnemyHpUI> enemyHpUI_;
 
 };
