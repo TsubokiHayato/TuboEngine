@@ -4,6 +4,9 @@
 #include "Object3d.h"
 #include "Sprite.h"
 #include "MapChip/MapChipField.h"
+#include "engine/graphic/Particle/ParticleManager.h"
+#include "engine/graphic/Particle/RingEmitter.h"
+#include "Camera.h"
 // 前方宣言（ヘッダ依存軽減）
 class IParticleEmitter;
 ///--------------------------------------------------
@@ -44,7 +47,11 @@ public:
 
 	void ReticleDraw();
 
-	
+	void TriggerDashRing();
+
+	// 斜め視点でもレティクル通りに飛ばすための方向取得関数（地面へレイキャスト）
+	Vector3 GetAimDirectionFromReticle() const;
+
 
 private:
 	// --- 回避関連 ---
@@ -69,9 +76,11 @@ public:
 	// プレイヤーのHPを取得
 	int GetHP() const { return HP; }
 	// プレイヤーの死亡状態を取得
-	bool IsDead() const { return isDead; }
+	bool GetIsAllive() const { return isAllive; }
 	// プレイヤーの弾のリストを取得
 	const std::vector<std::unique_ptr<PlayerBullet>>& GetBullets() const { return bullets; }
+	bool IsDashing() const { return isDashing_; } // 既存なら流用、無ければダミー
+	bool GetIsHit() const { return isHit; } // 被弾フラグのゲッター
 
 	///-----------------------------------
 	///				セッター
@@ -88,9 +97,10 @@ public:
 	// プレイヤーのHPを設定
 	void SetHP(int HP) { this->HP = HP; }
 	// プレイヤーの死亡状態を設定
-	void SetIsDead(bool isDead) { this->isDead = isDead; }
+	void SetIsDead(bool isAllive) { this->isAllive = isAllive; }
 	// カメラを設定
-	void SetCamera(Camera* camera) { object3d->SetCamera(camera); }
+	void SetCamera(Camera* camera) { object3d->SetCamera(camera); camera_ = camera; }
+	void SetDashRingOffset(float forward) { dashRingOffsetForward_ = forward; }
 
 	// モデルのアルファ設定
 	void SetModelAlpha(float alpha) {
@@ -115,12 +125,26 @@ private:
 
 private:
 	///--------------------------------------------------
-	///				メンバ変数
+	///			メンバ変数
 	///--------------------------------------------------
 
 	std::unique_ptr<Object3d> object3d;                 // 3Dオブジェクト
 	std::vector<std::unique_ptr<PlayerBullet>> bullets; // プレイヤーの弾のリスト
 	float bulletTimer = 0.0f;                           // 発射間隔タイマー
+	float cooldownTime = 0.2f;                          // クールダウン時間（秒）
+
+	float damageCooldownTimer = 0.0f;                   // ダメージクールダウンタイマー
+	float damageCooldownTime = 1.0f;                    // ダメージクールダウン時間（秒）
+
+	// 回避行動
+	bool isDodging = false;                             // 回避中フラグ
+	float dodgeTimer = 0.0f;                            // 回避残り時間
+	float dodgeCooldownTimer = 0.0f;                    // 回避クールダウンタイマー
+	float dodgeDuration = 0.2f;                         // 回避時間（秒）
+	float dodgeCooldown = 1.0f;                         // 回避クールダウン（秒）
+	float dodgeSpeed = 0.5f;                            // 回避速度
+
+	Vector3 dodgeDirection = {0.0f, 0.0f, 0.0f};        // 回避方向
 
 	Vector3 position; // プレイヤーの位置
 	Vector3 rotation; // プレイヤーの回転
@@ -129,7 +153,7 @@ private:
 	Vector3 velocity; // プレイヤーの速度
 	int HP;           // プレイヤーのHP
 	bool isHit;       // プレイヤーがヒットしたかどうか
-	bool isDead;      // プレイヤーの死亡状態
+	bool isAllive;      // プレイヤーの死亡状態
 
 	//Reticle
 
@@ -142,4 +166,13 @@ private:
 	// --- 追加: 移動軌跡用パーティクルエミッター ---
 	IParticleEmitter* trailEmitter_ = nullptr; // ParticleManager生成管理。解放はマネージャに委譲
 	Vector3 prevPositionTrail_{};              // 前フレーム位置
+	IParticleEmitter* dashRingEmitter_ = nullptr;
+	bool wasDashingPrev_ = false;
+	bool isDashing_ = false; // 既存のダッシュ状態に置き換え可
+	Camera* camera_ = nullptr; // 位置/方向参照用
+	float dashRingOffsetForward_ = 0.0f; // カメラ前方方向へのオフセット量
+
+	// 連続リング発生のためのタイマーと間隔
+	float dodgeRingIntervalSec_ = 0.12f; // 回避中の連続発生間隔
+	float dodgeRingEmitTimer_ = 0.0f;    // 次発生までの残り時間
 };

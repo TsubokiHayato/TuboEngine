@@ -5,7 +5,7 @@
 #include "Particle.h"
 #include "ParticleEmitter.h"
 #include "SceneManager.h"
-#include "TitleUI.h"
+#include "UI/TitleUI.h"
 #include <random>
 #include "Animation/SceneChangeAnimation.h"
 
@@ -54,6 +54,8 @@ public:
 	/// カメラの取得
 	/// </summary>
 	Camera* GetMainCamera() const { return camera.get(); }
+
+	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
 
 private:
 	std::unique_ptr<Camera> camera;
