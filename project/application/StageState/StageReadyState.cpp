@@ -51,7 +51,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	scene->GetPlayer()->SetPosition(playerTargetPosition_); // 初期位置をマップチップ座標に設定
 
 	// フォローカメラ初期化（プレイヤー追従）
-	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), Vector3 {0.0f, 0.0f, -70.0f}, 0.25f);
+	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), Vector3 {0.0f, 0.0f, 70.0f}, 0.25f);
 	scene->GetFollowCamera()->Update();
 
 	LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
@@ -59,8 +59,10 @@ void StageReadyState::Enter(StageScene* scene) {
 	// ブロック・エネミー・タイルの初期化
 	auto& blocks = scene->GetBlocks();
 	auto& enemies = scene->GetEnemies();
+	auto& tiles = scene->GetTiles();
 	blocks.clear();
 	enemies.clear();
+	tiles.clear();
 	blockTargetPositions_.clear();
 	blockRippleLayers_.clear();
 	enemyTargetPositions_.clear();
@@ -82,8 +84,8 @@ void StageReadyState::Enter(StageScene* scene) {
 			scene->GetBlocks().push_back(std::move(block));
 			blockTargetPositions_.push_back(pos);
 			blockRippleLayers_.push_back((float)layer);
-		} else if (type == MapChipType::Enemy || type == MapChipType::EnemyRush) {
-			// ラッシュエネミー生成
+		} else if (type == MapChipType::Enemy) {
+			// エネミー生成
 			auto enemy = std::make_unique<RushEnemy>();
 			enemy->Initialize();
 
@@ -95,27 +97,17 @@ void StageReadyState::Enter(StageScene* scene) {
 			scene->GetEnemies().push_back(std::move(enemy));
 			enemyTargetPositions_.push_back(pos);
 			enemyRippleLayers_.push_back((float)layer);
-		} else if (type == MapChipType::EnemyShoot) {
-			// 射撃エネミー（通常の追跡+射撃を行うベースEnemy）
-			auto enemy = std::make_unique<Enemy>();
-			enemy->Initialize();
-			enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
-			enemy->SetPlayer(scene->GetPlayer());
-			enemy->SetPosition(pos);
-			enemy->Update();
-			scene->GetEnemies().push_back(std::move(enemy));
-			enemyTargetPositions_.push_back(pos);
-			enemyRippleLayers_.push_back((float)layer);
 		}
 		// タイルは全マス生成
-		
-		Vector3 tilePos = scene->GetMapChipField()->GetMapChipPositionByIndex(0,0);
+		auto tile = std::make_unique<Tile>();
+		Vector3 tilePos = pos;
 		tilePos.z = -1.0f; // ブロックの下に配置
-		scene->GetTile()->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile30x30.obj");
+		tile->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile.obj");
 
-		scene->GetTile()->SetCamera(scene->GetFollowCamera()->GetCamera());
+		tile->SetCamera(scene->GetFollowCamera()->GetCamera());
 
-		scene->GetTile()->Update();
+		tile->Update();
+		scene->GetTiles().push_back(std::move(tile));
 		tileTargetPositions_.push_back(tilePos);
 		tileRippleLayers_.push_back((float)layer);
 	});
@@ -186,9 +178,10 @@ void StageReadyState::Update(StageScene* scene) {
 			enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
 			enemy->Update();
 		}
-			scene->GetTile()->SetCamera(scene->GetFollowCamera()->GetCamera());
-			scene->GetTile()->Update();
-		
+		for (auto& tile : scene->GetTiles()) {
+			tile->SetCamera(scene->GetFollowCamera()->GetCamera());
+			tile->Update();
+		}
 		return;
 	} else {
 		restartWaitTimer_ = 0.0f;
@@ -280,10 +273,12 @@ void StageReadyState::Update(StageScene* scene) {
 
 		// ブロック・タイル・エネミーの落下
 		animateDrop(scene->GetBlocks(), blockTargetPositions_, blockRippleLayers_);
+		animateDrop(scene->GetTiles(), tileTargetPositions_, tileRippleLayers_);
 		animateDrop(scene->GetEnemies(), enemyTargetPositions_, enemyRippleLayers_);
 
 		// タイルは毎フレームUpdate
-		scene->GetTile()->Update();
+		for (auto& tile : scene->GetTiles())
+			tile->Update();
 
 		// プレイヤーの落下
 		if (currentDroppingLayer_ > 0) {
@@ -327,10 +322,10 @@ void StageReadyState::Update(StageScene* scene) {
 
 		// 各オブジェクトのUpdate
 		scene->GetFollowCamera()->Update();
-
-		scene->GetTile()->SetCamera(scene->GetFollowCamera()->GetCamera());
-		scene->GetTile()->Update();
-	
+		for (auto& tile : scene->GetTiles()) {
+			tile->SetCamera(scene->GetFollowCamera()->GetCamera());
+			tile->Update();
+		}
 		for (auto& block : scene->GetBlocks()) {
 			block->SetCamera(scene->GetFollowCamera()->GetCamera());
 			block->Update();
@@ -352,7 +347,11 @@ void StageReadyState::Update(StageScene* scene) {
 	readySprite_->Update();
 	startSprite_->Update();
 
-	
+	for (auto& tile : scene->GetTiles()) {
+		tile->SetCamera(scene->GetFollowCamera()->GetCamera());
+		tile->Update();
+	}
+
 	// 通常のオブジェクト更新
 	for (auto& block : scene->GetBlocks()) {
 		block->SetCamera(scene->GetFollowCamera()->GetCamera());
@@ -364,10 +363,10 @@ void StageReadyState::Update(StageScene* scene) {
 		enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
 		enemy->Update();
 	}
-	
-	scene->GetTile()->SetCamera(scene->GetFollowCamera()->GetCamera());
-	scene->GetTile()->Update();
-	
+	for (auto& tile : scene->GetTiles()) {
+		tile->SetCamera(scene->GetFollowCamera()->GetCamera());
+		tile->Update();
+	}
 	scene->GetSkyDome()->SetCamera(scene->GetFollowCamera()->GetCamera());
 	scene->GetSkyDome()->Update();
 
@@ -383,8 +382,8 @@ void StageReadyState::Object3DDraw(StageScene* scene) {
 	scene->GetPlayer()->Draw();
 	for (auto& enemy : scene->GetEnemies())
 		enemy->Draw();
-
-	scene->GetTile()->Draw();
+	for (auto& tile : scene->GetTiles())
+		tile->Draw();
 
 	scene->GetSkyDome()->Draw();
 }
