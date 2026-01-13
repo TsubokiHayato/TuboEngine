@@ -42,8 +42,8 @@ public:
 	// インデックスからマップチップの座標を取得
 	Vector3 GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex);
 	
-	uint32_t GetNumBlockVirtical() { return static_cast<uint32_t>(mapChipData_.data.size()); }
-	uint32_t GetNumBlockHorizontal() { return mapChipData_.data.empty() ? 0 : static_cast<uint32_t>(mapChipData_.data[0].size()); }
+	uint32_t GetNumBlockVirtical() const { return static_cast<uint32_t>(mapChipData_.data.size()); }
+	uint32_t GetNumBlockHorizontal() const { return mapChipData_.data.empty() ? 0 : static_cast<uint32_t>(mapChipData_.data[0].size()); }
 
 	///--------------------------------------------------
 	///				構造体
