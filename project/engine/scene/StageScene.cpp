@@ -116,6 +116,11 @@ void StageScene::Initialize() {
 	sceneChangeAnimation_->Initialize();
 	isRequestSceneChange = false;
 
+	// 追加: TUTORIALシーンとして起動された場合はTutorialStateから開始
+	if (GetSceneNo() == TUTORIAL && stateManager_) {
+		stateManager_->ChangeState(StageType::Tutorial, this);
+	}
+
 	// Multi-stage (debug/editor): 初期ステージを2つ用意しておく
 	stageInstances_.clear();
 	{
