@@ -143,11 +143,15 @@ Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex
 // インデックスでマップチップ種別を設定
 //--------------------------------------------------
 void MapChipField::SetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex, MapChipType mapChipType) {
-	// インデックスの範囲チェック
-	if (xIndex >= 0 && xIndex < kNumBlockHorizontal && yIndex >= 0 && yIndex < kNumBlockVirtical) {
-		// マップチップの種類を設定
-		mapChipData_.data[yIndex][xIndex] = mapChipType;
+	// 実データで境界チェック（可変サイズCSV対応）
+	if (yIndex >= mapChipData_.data.size()) {
+		return;
 	}
+	auto& row = mapChipData_.data[yIndex];
+	if (xIndex >= row.size()) {
+		return;
+	}
+	row[xIndex] = mapChipType;
 }
 
 //--------------------------------------------------

@@ -12,6 +12,9 @@ void StageStateManager::Initialize(StageScene* scene) {
     states_[StageType::GameClear]    = std::make_unique<GameClearState>();
     states_[StageType::GameOver]     = std::make_unique<GameOverState>();
 
+    // 新規: TutorialState（他Stateと合併せず、独立して存在させる）
+    states_[StageType::Tutorial]     = std::make_unique<TutorialState>();
+
     // 最初のステートをセットしてEnterのみ呼ぶ
     state_ = StageType::Ready;
 	currentState_ = states_[StageType::Ready].get();
@@ -101,6 +104,9 @@ void StageStateManager::DrawImGui(StageScene* scene) {
         case StageType::GameOver:
             ImGui::Text("GameOver");
             break;
+        case StageType::Tutorial:
+            ImGui::Text("Tutorial");
+            break;
         default:
             ImGui::Text("Unknown State");
             break;
@@ -132,6 +138,9 @@ void StageStateManager::DrawImGui(StageScene* scene) {
 	}
 	if (ImGui::Button("GameOver")) {
 		pendingState_ = StageType::GameOver;
+	}
+	if (ImGui::Button("Tutorial")) {
+		pendingState_ = StageType::Tutorial;
 	}
 
     ImGui::End();
