@@ -30,7 +30,7 @@ void Player::Initialize() {
 	// プレイヤーの初期位置
 	position = Vector3(0.0f, 0.0f, 0.0f);
 	// プレイヤーの初期回転
-	rotation = Vector3(0.0f, 0.0f, 0.0f);
+	rotation = Vector3(1.56f, 0.0f, 3.12f);
 	// プレイヤーの初期スケール
 	scale = Vector3(1.0f, 1.0f, 1.0f);
 
@@ -116,8 +116,25 @@ void Player::Initialize() {
 //--------------------------------------------------
 void Player::Update() {
 	if (isAllive == false) {
+		// 死亡中でも見た目の姿勢は維持（Object3dへ反映）
+		object3d->SetPosition(position);
+		object3d->SetRotation(rotation);
+		object3d->SetScale(scale);
+		object3d->Update();
 		return;
 	} // 死亡状態なら更新しない
+
+#ifdef USE_IMGUI
+	// ImGuiの操作中はゲーム側の自動回転（マウス追従）で上書きしない
+	const bool wantCaptureMouse = ImGui::GetIO().WantCaptureMouse;
+#else
+	const bool wantCaptureMouse = false;
+#endif
+
+	// 移動停止フラグ中でも「回転」は維持/更新できるようにする
+	if (!wantCaptureMouse) {
+		Rotate();
+	}
 
 	if (!isDontMove) {
 		isHit = false;
@@ -133,7 +150,7 @@ void Player::Update() {
 			StartDodge();
 		}
 		Move();
-		Rotate();
+		// Rotate() は上で一度だけ行う（ImGui操作中はスキップ）
 		// 発射タイマー更新
 		if (bulletTimer > 0.0f) {
 			bulletTimer -= 1.0f / 60.0f; // 60FPS前提
@@ -262,6 +279,11 @@ void Player::Move() {
 // 回転処理
 //---------------------------------------------------
 void Player::Rotate() {
+	// カメラが未設定なら回転を上書きしない（現在のrotationを維持）
+	if (!camera_) {
+		return;
+	}
+
 	int screenWidth = static_cast<int>(WinApp::GetInstance()->GetClientWidth());
 	int screenHeight = static_cast<int>(WinApp::GetInstance()->GetClientHeight());
 	int mouseX = static_cast<int>(Input::GetInstance()->GetMousePosition().x);
@@ -272,7 +294,7 @@ void Player::Rotate() {
 	Vector3 aimDir = GetAimDirectionFromReticle();
 	// 反転補正を削除し、レティクル方向と一致させる
 	float angle = std::atan2(aimDir.x, -aimDir.y);
-	rotation.z = angle;
+	rotation.z = 3.12f+angle;
 }
 
 
@@ -317,7 +339,7 @@ void Player::OnCollision(Collider* other) {
 void Player::DrawImGui() {
 #ifdef USE_IMGUI
 	position = object3d->GetPosition();
-	//rotation = object3d->GetRotation();
+	rotation = object3d->GetRotation();
 	scale = object3d->GetScale();
 	ImGui::Begin("Player");
 	ImGui::Text("HP: %d", HP);
