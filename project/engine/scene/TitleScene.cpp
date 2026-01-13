@@ -120,24 +120,40 @@ void TitleScene::Update() {
 	LineManager::GetInstance()->SetDefaultCamera(camera.get());
 	LineManager::GetInstance()->Update();
 
-	// シーンチェンジアニメーション更新（既存）
+	// シーンチェンジアニメーション更新
 	sceneChangeAnimation->Update(dt);
 
-	// 入力：スペースでシーン遷移（既存）
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	// UI更新
+	titleUI->Update();
+
+	// UIからのシーン遷移要求を受け取って、演出開始
+	if (!isRequestSceneChange && titleUI && titleUI->GetrRequestSceneChange_()) {
 		if (sceneChangeAnimation->IsFinished()) {
 			sceneChangeAnimation->SetPhase(SceneChangeAnimation::Phase::Appearing);
 			isRequestSceneChange = true;
 		}
 	}
 
-	// シーン遷移完了判定
+	// シーン遷移完了判定（UIの要求に応じて遷移）
 	if (isRequestSceneChange && sceneChangeAnimation->IsFinished()) {
-		SceneManager::GetInstance()->ChangeScene(SCENE::STAGE);
+		int next = TITLE;
+		if (titleUI) {
+			switch (titleUI->GetNextSceneType()) {
+			case SceneType::Select:
+				next = STAGE;
+				break;
+			case SceneType::Tutorial:
+				next = TUTORIAL;
+				break;
+			default:
+				next = TITLE;
+				break;
+			}
+			titleUI->ClearSceneChangeRequest();
+		}
+		SceneManager::GetInstance()->ChangeScene(next);
 		isRequestSceneChange = false;
 	}
-
-	titleUI->Update();
 
 	// 背景アニメ（時間のみで更新、Object3DDraw で参照）
 }
