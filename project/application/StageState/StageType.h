@@ -1,2 +1,12 @@
 #pragma once
-enum class StageType { Ready, Playing, StageClear, RewardSelect, Boss, GameClear, GameOver };
+
+enum class StageType {
+	Ready,
+	Playing,
+	StageClear,
+	RewardSelect,
+	Boss,
+	GameClear,
+	GameOver,
+	Tutorial,
+};
