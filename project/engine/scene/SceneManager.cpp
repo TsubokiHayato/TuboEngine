@@ -20,6 +20,9 @@ void SceneManager::Initialize(int startSceneNo) {
         currentScene = std::make_unique<TitleScene>();
     } else if (currentSceneNo == STAGE) {
         currentScene = std::make_unique<StageScene>();
+    } else if (currentSceneNo == TUTORIAL) {
+        // TutorialもStageSceneを使い、内部StateでTutorialStateを動かす
+        currentScene = std::make_unique<StageScene>();
     } else if (currentSceneNo == CLEAR) {
         currentScene = std::make_unique<ClearScene>();
 	} else if (currentSceneNo == OVER) {
@@ -61,6 +64,10 @@ void SceneManager::Update() {
 			currentScene->Initialize();
 		} else if (currentSceneNo == STAGE) {
 			//ステージシーンを設定
+			currentScene = std::make_unique<StageScene>();
+			currentScene->Initialize();
+		} else if (currentSceneNo == TUTORIAL) {
+			// チュートリアルもStageSceneを使う
 			currentScene = std::make_unique<StageScene>();
 			currentScene->Initialize();
 		} else if (currentSceneNo == CLEAR) {
@@ -129,6 +136,9 @@ void SceneManager::ImGuiDraw() {
 	}
 	if (ImGui::Button("Stage")) {
 		currentScene->SetSceneNo(STAGE);
+	}
+	if (ImGui::Button("Tutorial")) {
+		currentScene->SetSceneNo(TUTORIAL);
 	}
 	if (ImGui::Button("Clear")) {
 		currentScene->SetSceneNo(CLEAR);

@@ -35,6 +35,9 @@
 #include "application/UI/HpUI.h"
 #include "application/UI/EnemyHpUI.h"
 
+#include <string>
+#include <vector>
+
 
 class StageScene : public IScene {
 public:
@@ -79,13 +82,6 @@ public:
 	/// </summary>
 	Camera* GetMainCamera() const { return followCamera->GetCamera(); }
 
-
-
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="sceneNo"></param>
 	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
 
 	/// <summary>
@@ -113,58 +109,83 @@ public:
 	bool GetIsRequestSceneChange() const { return isRequestSceneChange; }
 	void SetIsRequestSceneChange(bool request) { isRequestSceneChange = request; }
 
+	// ------------------------
+	// Multi-stage layout
+	// ------------------------
+	struct StageBounds {
+		float left{};
+		float right{};
+		float bottom{};
+		float top{};
+	};
+
+	struct StageInstance {
+		std::string csvPath;
+		Vector3 origin{0.0f, 0.0f, 0.0f};
+		bool visible = true;
+
+		std::unique_ptr<MapChipField> field;
+		std::vector<std::unique_ptr<Block>> blocks;
+		std::vector<std::unique_ptr<Enemy>> enemies;
+		std::unique_ptr<Tile> tile;
+
+		// Stage[0]用（Playerチップ探索結果）
+		int playerMapX = -1;
+		int playerMapY = -1;
+
+		StageBounds boundsWorld{};
+	};
+
+	std::vector<StageInstance>& GetStageInstances() { return stageInstances_; }
+	const std::vector<StageInstance>& GetStageInstances() const { return stageInstances_; }
+
+	// デバッグ表示用：Stage[1..] のプレビューを描画するか
+	bool GetDrawPreviewStages() const { return drawPreviewStages_; }
+	void SetDrawPreviewStages(bool draw) { drawPreviewStages_ = draw; }
+
+	// ...existing code...
+
 private:
 	///----------------------------------------------------------------------------------------
 	///				メンバ変数
 	///----------------------------------------------------------------------------------------
 
-	/// Audio///
-
 	std::unique_ptr<Audio> audio = nullptr;
 
-	/// Collider ///
 	std::unique_ptr<CollisionManager> collisionManager_;
 
-	/// Camera ///
 	std::unique_ptr<FollowTopDownCamera> followCamera;
 	std::unique_ptr<Camera> camera = nullptr;
 	Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
 	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
 
-	/// Player ///
 	std::unique_ptr<Player> player_ = nullptr;
-	/// Enemy ///
 	std::unique_ptr<Enemy> enemy_ = nullptr;
-	std::vector<std::unique_ptr<Enemy>> enemies; // Enemyリスト（RushEnemyや射撃Enemyなどを混在）
+	std::vector<std::unique_ptr<Enemy>> enemies;
 
-	/// SkyBox ///
 	std::unique_ptr<SkyBox> skyBox_ = nullptr;
 
-	/// MapChipField ///
 	std::unique_ptr<MapChipField> mapChipField_ = nullptr;
-	std::string mapChipCsvFilePath_ = "Resources/MapChip.csv"; // マップチップCSVファイルパス
+	std::string mapChipCsvFilePath_ = "Resources/MapChip.csv";
 
-	/// Block ///
 	std::vector<std::unique_ptr<Block>> blocks_;
 
-	/// Tile ///
 	std::unique_ptr<Tile> tile_;
 
-	/// StageStateManager ///
 	std::unique_ptr<StageStateManager> stateManager_;
 
-	/// SkyDome///
 	std::unique_ptr<SkyDome> skyDome_ = nullptr;
-
-	/// SceneChangeAnimation ///
 
 	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation_ = nullptr;
 	bool isRequestSceneChange = false;
 
-	/// HpUI ///
 	std::unique_ptr<HpUI> hpUI_;
-	/// EnemyHpUI ///
 	std::unique_ptr<EnemyHpUI> enemyHpUI_;
+
+	// Multi-stage layout data (debug / editor)
+	bool useMultiStageLayout_ = true;
+	bool drawPreviewStages_ = true;
+	std::vector<StageInstance> stageInstances_;
 
 };

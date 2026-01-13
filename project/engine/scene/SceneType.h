@@ -2,4 +2,4 @@
 ///=====================================================///
 /// シーンタイプ
 ///=====================================================///
-enum class SceneType { Title, Select, Game, Clear, GameOver, Debug };
+enum class SceneType { Title, Select, Tutorial, Game, Clear, GameOver, Debug };
