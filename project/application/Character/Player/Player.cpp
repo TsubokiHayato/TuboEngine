@@ -211,7 +211,7 @@ void Player::Shoot() {
 	if (Input::GetInstance()->IsPressMouse(0) && bulletTimer <= 0.0f) {
 		// プレイヤーの現在の回転(Z)から発射方向を作る（Rotateと一貫性を保つ）
 		float ang = rotation.z;
-		Vector3 dir{ std::sin(ang), -std::cos(ang), 0.0f };
+		Vector3 dir{ std::sin(ang), std::cos(ang), 0.0f };
 		// 発射
 		auto bullet = std::make_unique<PlayerBullet>();
 		bullet->Initialize(position);

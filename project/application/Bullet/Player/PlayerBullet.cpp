@@ -68,7 +68,7 @@ void PlayerBullet::Update() {
 	// 衝突判定の初期化
 	isHit = false;
 	// パラメータを静的変数から取得
-	bulletSpeed = s_bulletSpeed;
+	bulletSpeed = -s_bulletSpeed;
 	scale = s_scale;
 	rotation = s_rotation;
 
