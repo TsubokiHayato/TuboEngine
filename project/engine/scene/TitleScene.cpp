@@ -64,7 +64,7 @@ void TitleScene::Update() {
 		Vector3 targetPos = { 0.0f, 0.0f, 0.0f };
 
 		Vector3 pos = player_->GetPosition();
-		Vector3 rot = player_->GetRotation();
+		Vector3 rot = {};
 		Vector3 scl = player_->GetScale();
 
 		// Intro: 左からゆっくり歩いてくる
