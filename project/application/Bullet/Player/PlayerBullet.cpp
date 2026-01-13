@@ -55,7 +55,7 @@ void PlayerBullet::Initialize( const Vector3& startPos) {
 	// damage = s_damage; // ダメージ設定（未使用）
 
 	// モデルファイル名
-	const std::string modelFileNamePath = "plane.gltf";
+	const std::string modelFileNamePath = "star.obj";
 	// 3Dオブジェクト生成・初期化
 	object3d = std::make_unique<Object3d>();
 	object3d->Initialize(modelFileNamePath);
