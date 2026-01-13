@@ -69,8 +69,14 @@ public:
 	/// シーン遷移要求フラグ取得
 	/// </summary>
 	bool GetrRequestSceneChange_() const { return requestSceneChange_; }
-
-	
+	/// <summary>
+	/// 次のシーンのタイプ取得
+	/// </summary>
+	SceneType GetNextSceneType() const { return nextSceneType_; }
+	/// <summary>
+	/// シーン遷移要求フラグのクリア
+	/// </summary>
+	void ClearSceneChangeRequest() { requestSceneChange_ = false; }
 	/// <summary>
 	/// オプション表示状態取得
 	/// </summary>
@@ -93,6 +99,7 @@ private:
 	// 各種ボタン・セレクターのスプライト
 	std::unique_ptr<Sprite> LogoSprite_;
 	std::unique_ptr<Sprite> StartButtonSprite_;
+	std::unique_ptr<Sprite> TutorialButtonSprite_;
 	std::unique_ptr<Sprite> QuitButtonSprite_;
 
 	// オプション表示中フラグ
