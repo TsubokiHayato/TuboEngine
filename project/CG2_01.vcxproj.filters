@@ -128,6 +128,7 @@
     <ClCompile Include="application\Character\Enemy\RushEnemy.cpp" />
     <ClCompile Include="application\UI\HpUI.cpp" />
     <ClCompile Include="application\UI\EnemyHpUI.cpp" />
+    <ClCompile Include="application\StageState\TutorialState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
@@ -282,6 +283,7 @@
     <ClInclude Include="application\Character\Enemy\RushEnemy.h" />
     <ClInclude Include="application\UI\HpUI.h" />
     <ClInclude Include="application\UI\EnemyHpUI.h" />
+    <ClInclude Include="application\StageState\TutorialState.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
