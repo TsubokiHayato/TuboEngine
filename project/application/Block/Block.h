@@ -8,7 +8,7 @@ public:
 	~Block();
 
 	// 初期化（位置・スケール・モデルファイル名など）
-	void Initialize(const Vector3& position, const Vector3& scale = {1.0f, 1.0f, 1.0f}, const std::string& modelFileName = "block.gltf");
+	void Initialize(const Vector3& position, const Vector3& scale = {1.0f, 1.0f, 1.0f}, const std::string& modelFileName = "block/block.obj");
 
 	void Update();
 	// 描画
