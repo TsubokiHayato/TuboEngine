@@ -27,11 +27,12 @@ void Enemy::Initialize() {
     scale = {1.0f, 1.0f, 1.0f};
 
     object3d = std::make_unique<Object3d>();
-    const std::string modelFileNamePath = "barrier.obj";
+    const std::string modelFileNamePath = "player/player.obj";
     object3d->Initialize(modelFileNamePath);
     object3d->SetPosition(position);
     object3d->SetRotation(rotation);
     object3d->SetScale(scale);
+	object3d->SetModelColor({1.0f, 0.5f, 0.5f, 1.0f});
 
     std::string particleTextureHandle = "gradationLine.png";
     TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
