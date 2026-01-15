@@ -34,6 +34,7 @@
 #include "Animation/SceneChangeAnimation.h"
 #include "application/UI/HpUI.h"
 #include "application/UI/EnemyHpUI.h"
+#include "application/UI/GuideUI.h"
 
 #include <string>
 #include <vector>
@@ -182,6 +183,7 @@ private:
 
 	std::unique_ptr<HpUI> hpUI_;
 	std::unique_ptr<EnemyHpUI> enemyHpUI_;
+	std::unique_ptr<GuideUI> guideUI_;
 
 	// Multi-stage layout data (debug / editor)
 	bool useMultiStageLayout_ = true;
