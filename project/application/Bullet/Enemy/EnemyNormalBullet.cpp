@@ -39,7 +39,7 @@ void EnemyNormalBullet::Initialize(const Vector3& startPos) {
     Collider::SetRadius(0.5f);
 
     object3d = std::make_unique<Object3d>();
-    object3d->Initialize("plane.gltf");
+    object3d->Initialize("star.obj");
     object3d->SetPosition(position);
     object3d->SetRotation(rotation);
     object3d->SetScale(scale);

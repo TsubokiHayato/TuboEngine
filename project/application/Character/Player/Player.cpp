@@ -131,8 +131,10 @@ void Player::Update() {
 	const bool wantCaptureMouse = false;
 #endif
 
-	// 移動停止フラグ中でも「回転」は維持/更新できるようにする
-	if (!wantCaptureMouse) {
+	// Clear/Over等の演出シーンでは isDontMove=true で入力無効化される。
+	// そのときマウス位置参照の Rotate() を走らせると、意図しない方向を向いたり
+	// レティクルが更新されてしまうため、回転はシーン側が制御する。
+	if (!wantCaptureMouse && !isDontMove) {
 		Rotate();
 	}
 
