@@ -25,12 +25,22 @@ TitleUI::~TitleUI() {
 /// 初期化処理
 ///-------------------------------------------///
 void TitleUI::Initialize() {
+	// UIを確実に有効化（再入時/生成直後の安全策）
+	isActive_ = true;
+	requestSceneChange_ = false;
+	selectedIndex_ = 0;
+	decisionIndex_ = -1;
+	selectorAnimTime_ = 0.0f;
+	selectorDecisionAnim_ = false;
+	selectorDecisionAnimTime_ = 0.0f;
+
 	// 画面中央X座標（例: 1280x720想定）
 	const float centerX = 1280.0f / 2.0f;
 
 	//-----------------------------
 	// ボタン生成・追加
 	//-----------------------------
+	buttons_.clear();
 	// Startボタン（シーン遷移）
 	buttons_.emplace_back(std::make_unique<TitleUIButton>("Start", [this]() {
 		requestSceneChange_ = true;         // シーン遷移要求
@@ -58,14 +68,14 @@ void TitleUI::Initialize() {
 	    {-150.0f, 0.0f}  // Exit横
 	};
 
-
 	///----------------------------
 	///texture
 	///----------------------------
-	
+	TextureManager::GetInstance()->LoadTexture("TitleUI/Title.png");
 	TextureManager::GetInstance()->LoadTexture("TitleUI/Start.png");
 	TextureManager::GetInstance()->LoadTexture("TitleUI/Tutorial.png");
 	TextureManager::GetInstance()->LoadTexture("TitleUI/Exit.png");
+
 	//-----------------------------
 	// 各種スプライトの生成・初期化
 	//-----------------------------
@@ -110,10 +120,12 @@ void TitleUI::Initialize() {
 	selectorOffsets_.resize(buttons_.size(), {-150.0f, 0.0f});
 
 	//-----------------------------
-	// 入力確認ボタン
+	// ボタン位置を本パラメータ（buttonStartY_/buttonSpacing_）で確定させる
 	//-----------------------------
 	UpdateButtonPositions();
 
+	// 初回色反映
+	UpdateButtonSprites();
 }
 
 ///-------------------------------------------///
