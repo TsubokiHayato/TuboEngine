@@ -96,6 +96,19 @@ void ClearScene::Initialize() {
     // 初期位置を手前に配置して見やすく
     player_->SetPosition({0.0f, 0.0f, 4.0f});
     player_->SetScale({1.0f, 1.0f, 1.0f});
+
+    // クリアシーンでは入力が無効なので、マウス追従のRotate()が実行されず
+    // Player::Initialize()の固定回転のままになりやすい。見た目が破綻しないよう
+    // 「カメラ正面（画面奥方向）」を向く回転を明示的に指定しておく。
+    // 本プロジェクトの移動/弾方向は rotation.z を基準にしているため z のみ整える。
+    {
+        Vector3 r = player_->GetRotation();
+        r.x = 0.0f;
+        r.y = 0.0f;
+        r.z = 0.0f;
+        player_->SetRotation(r);
+    }
+
     player_->Update();
 
     // 画面中心を取得して配置する
@@ -208,6 +221,14 @@ void ClearScene::Update() {
 
     // プレイヤーに自動演出（ボブ：上下に揺れる）とスペースアニメの適用
     if (player_) {
+        // ClearScene中はマウスの位置でプレイヤー回転を決めない（入力無効・演出専用）
+        // Player::Update() 内部で Rotate() が走る可能性があるため、ここで固定値を入れる。
+        {
+            Vector3 fixedRot = player_->GetRotation();
+            fixedRot.z = 0.0f;
+            player_->SetRotation(fixedRot);
+        }
+
         Vector3 pos = player_->GetPosition();
         Vector3 rot = player_->GetRotation();
         Vector3 scl = player_->GetScale();
