@@ -17,21 +17,36 @@
 
 constexpr float kPI = 3.14159265358979323846f;
 
+// Enemyモデルの軸補正（モデルの向きがゲーム座標系と一致しない場合のための定数）
+// 90度ズレが「Z軸(ヨー)」ではなく「X軸/ Y軸」で起きるケースがあるため、軸ごとに分けて補正する。
+// ※右ねじの向き(+回転)やモデルの前方軸に合わせて調整してください。
+constexpr float kEnemyModelRotOffsetX = 0.0f;
+constexpr float kEnemyModelRotOffsetY = 0.0f;
+constexpr float kEnemyModelRotOffsetZ = -kPI * 0.5f; // 従来: yaw補正
+
 Enemy::Enemy() {}
 Enemy::~Enemy() {}
 
 void Enemy::Initialize() {
     Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kEnemy));
     position = {0.0f, 0.0f, 5.0f};
-    rotation = {};
+	rotation = Vector3(1.56f, 0.0f, 0.0f);
     scale = {1.0f, 1.0f, 1.0f};
 
     object3d = std::make_unique<Object3d>();
-    const std::string modelFileNamePath = "barrier.obj";
+    const std::string modelFileNamePath = "player/player.obj";
     object3d->Initialize(modelFileNamePath);
     object3d->SetPosition(position);
-    object3d->SetRotation(rotation);
+    // 初期化時にも描画補正を適用
+    {
+        Vector3 drawRot = rotation;
+        drawRot.x = drawRot.x + kEnemyModelRotOffsetX;
+        drawRot.y = drawRot.y + kEnemyModelRotOffsetY;
+        drawRot.z = drawRot.z + kEnemyModelRotOffsetZ;
+        object3d->SetRotation(drawRot);
+    }
     object3d->SetScale(scale);
+	object3d->SetModelColor({1.0f, 0.0f, 0.0f, 1.0f});
 
     std::string particleTextureHandle = "gradationLine.png";
     TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
@@ -502,6 +517,7 @@ void Enemy::Update() {
         }
         float diff = NormalizeAngle(lookAroundTargetAngle - rotation.z);
         float turn = std::clamp(diff, -lookAroundSpeed, lookAroundSpeed);
+        // 誤って固定値加算/二重更新されていたので、1回だけ更新
         rotation.z = NormalizeAngle(rotation.z + turn);
         if (std::fabs(diff) < 0.02f) {
             lookAroundDirection *= -1;
@@ -546,7 +562,12 @@ void Enemy::Update() {
         bullet->Update();
 
     object3d->SetPosition(position);
-    object3d->SetRotation(rotation);
+    // 描画側へモデル軸の補正を適用（ロジック上のrotationは"前方"のまま）
+    Vector3 drawRot = rotation;
+    drawRot.x = NormalizeAngle(drawRot.x + kEnemyModelRotOffsetX);
+    drawRot.y = NormalizeAngle(drawRot.y + kEnemyModelRotOffsetY);
+    drawRot.z = NormalizeAngle(drawRot.z + kEnemyModelRotOffsetZ);
+    object3d->SetRotation(drawRot);
     object3d->SetScale(scale);
     object3d->SetCamera(camera_);
     object3d->Update();
@@ -709,9 +730,12 @@ bool Enemy::CanSeePlayer() {
     if (distance > kViewDistance)
         return false;
 
-    // 視野角判定 (Z回転を前方ベクトルに)
+    // 視野角判定
+    // ここは「モデル見た目」ではなく「ロジック上の前方」に合わせるため、
+    // 描画補正オフセットは適用しない。
     Vector3 forward = {std::cos(rotation.z), std::sin(rotation.z), 0.0f};
     float dot = Vector3::Dot(Vector3::Normalize(forward), Vector3::Normalize(dirToPlayer));
+    dot = std::clamp(dot, -1.0f, 1.0f); // acosの安全化
     float angleToPlayer = std::acos(dot) * 180.0f / kPI;
     if (angleToPlayer > kViewAngleDeg / 2.0f)
         return false;

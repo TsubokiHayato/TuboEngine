@@ -10,6 +10,14 @@
 #include "WinApp.h"
 #include "engine/camera/Camera.h"
 
+// RushEnemy は Enemy::Update の描画補正処理を通らないため、ここでモデル軸補正を適用する。
+// Enemy.cpp 側の補正と同じ意味（必要なら同様に調整）。
+namespace {
+constexpr float kRushEnemyModelRotOffsetX = 0.0f;
+constexpr float kRushEnemyModelRotOffsetY = 0.0f;
+constexpr float kRushEnemyModelRotOffsetZ = -DirectX::XM_PI * 0.5f;
+}
+
 // 角度正規化 [-PI, PI]
 float RushEnemy::NormalizeAngle(float angle) {
     while (angle > DirectX::XM_PI) angle -= 2.0f * DirectX::XM_PI;
@@ -25,6 +33,8 @@ static void MoveWithCollisionImpl(Vector3& position, const Vector3& desiredMove,
     const float height = tile * 0.8f;
     float moveLen2D = std::sqrt(desiredMove.x*desiredMove.x + desiredMove.y*desiredMove.y);
     int subSteps = std::max(1, int(std::ceil(moveLen2D / (tile * 0.5f))));
+
+    // LineManager::GetInstance()->DrawLine(position, position + desiredMove, {1,0,0,1});
     Vector3 step = desiredMove / float(subSteps);
     for (int i=0;i<subSteps;++i) {
         Vector3 nextX = position; nextX.x += step.x; if (!field->IsRectBlocked(nextX,width,height)) position = nextX;
@@ -268,7 +278,12 @@ void RushEnemy::ApplyChargeAndVisuals(float dt) {
     }
 
     object3d->SetPosition(position);
-    object3d->SetRotation(rotation);
+    // 描画用回転（モデル軸補正込み）
+    Vector3 drawRot = rotation;
+    drawRot.x = NormalizeAngle(drawRot.x + kRushEnemyModelRotOffsetX);
+    drawRot.y = NormalizeAngle(drawRot.y + kRushEnemyModelRotOffsetY);
+    drawRot.z = NormalizeAngle(drawRot.z + kRushEnemyModelRotOffsetZ);
+    object3d->SetRotation(drawRot);
     object3d->SetScale(visualScale);
     object3d->SetCamera(camera_);
     object3d->Update();
@@ -371,7 +386,14 @@ void RushEnemy::Update() {
     // スタン中は完全停止（向き/状態維持）。見た目更新のみして早期return。
     if (isStunned_) {
         object3d->SetPosition(position);
-        object3d->SetRotation(rotation);
+        // スタン中も描画補正は適用
+        {
+            Vector3 drawRot = rotation;
+            drawRot.x = NormalizeAngle(drawRot.x + kRushEnemyModelRotOffsetX);
+            drawRot.y = NormalizeAngle(drawRot.y + kRushEnemyModelRotOffsetY);
+            drawRot.z = NormalizeAngle(drawRot.z + kRushEnemyModelRotOffsetZ);
+            object3d->SetRotation(drawRot);
+        }
         object3d->SetScale(scale);
         object3d->SetCamera(camera_);
         object3d->Update();
@@ -455,7 +477,7 @@ void RushEnemy::DrawSprite() {
     // 両方表示時は重ならないようにオフセット（順序: ！ → ？）
     if (showQ && showE) {
         float gap = std::max(8.0f, iconSize_.x * 0.6f);
-        float ex = baseX - gap * 0.5f; // 左に！
+        float ex = baseX - gap * 0.5f; // 左に！ 
         float qx = baseX + gap * 0.5f; // 右に？
 
         exclamationIcon_->SetPosition({ex, baseY});
