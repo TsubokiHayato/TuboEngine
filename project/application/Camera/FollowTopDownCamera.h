@@ -28,6 +28,9 @@ public:
 	// 開始時ズームアニメーション
 	// durationSec: 秒（Updateは60FPS前提で内部変換）
 	void StartIntroZoom(float startZoom, float endZoom, float durationSec);
+	// curve: 1.0=標準、>1.0で強め（ゆっくり始まって最後に加速）、<1.0で弱め
+	void SetIntroZoomCurve(float curve) { introZoomCurve_ = (curve < 0.01f) ? 0.01f : curve; }
+	float GetIntroZoomCurve() const { return introZoomCurve_; }
 	bool IsIntroZoomPlaying() const { return introZoomPlaying_; }
 
 	Camera* GetCamera() const { return camera_; }
@@ -37,6 +40,15 @@ public:
 	float GetZoomMin() const { return zoomMin_; }
 
 	void SnapToTarget();
+
+	// イントロズームアニメーションの進行状況
+	float GetIntroZoomElapsedSec() const { return introZoomElapsedSec_; }
+	float GetIntroZoomDurationSec() const { return introZoomDurationSec_; }
+	float GetIntroZoomStart() const { return introZoomStart_; }
+	float GetIntroZoomEnd() const { return introZoomEnd_; }
+	float GetIntroZoomT() const {
+		return (introZoomDurationSec_ > 0.0f) ? std::clamp(introZoomElapsedSec_ / introZoomDurationSec_, 0.0f, 1.0f) : 1.0f;
+	}
 
 private:
 	Player* target_ = nullptr;
@@ -68,6 +80,7 @@ private:
 	float introZoomEnd_ = 1.0f;
 	float introZoomDurationSec_ = 0.0f;
 	float introZoomElapsedSec_ = 0.0f;
+	float introZoomCurve_ = 1.0f;
 
 	// 障害物回避（雛形）
 	void AvoidObstacles(Vector3& desiredPos);
@@ -77,4 +90,5 @@ private:
 
 	// 内部: イージング
 	static float EaseInOutCubic(float t);
+	static float EaseWithCurve(float t, float curve);
 };
