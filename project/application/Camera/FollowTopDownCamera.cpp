@@ -22,6 +22,11 @@ float FollowTopDownCamera::EaseInOutCubic(float t) {
 	return (t < 0.5f) ? (4.0f * t * t * t) : (1.0f - std::pow(-2.0f * t + 2.0f, 3.0f) / 2.0f);
 }
 
+float FollowTopDownCamera::EaseWithCurve(float t, float curve) {
+	// tの進行をカーブさせる（curve>1で序盤ゆっくり/終盤速い、curve<1でその逆）
+	return std::pow(std::clamp(t, 0.0f, 1.0f), std::max(0.01f, curve));
+}
+
 void FollowTopDownCamera::StartIntroZoom(float startZoom, float endZoom, float durationSec) {
 	introZoomPlaying_ = true;
 	introZoomStart_ = startZoom;
@@ -52,6 +57,7 @@ void FollowTopDownCamera::Initialize(Player* target, const Vector3& offset, floa
 	introZoomDurationSec_ = 0.0f;
 	introZoomStart_ = zoom_;
 	introZoomEnd_ = zoom_;
+	introZoomCurve_ = 5.0f;
 }
 
 void FollowTopDownCamera::SnapToTarget() {
@@ -97,7 +103,8 @@ void FollowTopDownCamera::Update() {
 	if (introZoomPlaying_) {
 		introZoomElapsedSec_ += kAssumedDeltaTimeSec;
 		float t = introZoomElapsedSec_ / introZoomDurationSec_;
-		float e = EaseInOutCubic(t);
+		float tc = EaseWithCurve(t, introZoomCurve_);
+		float e = EaseInOutCubic(tc);
 		zoom_ = introZoomStart_ + (introZoomEnd_ - introZoomStart_) * e;
 		zoom_ = std::max(zoomMin_, std::min(zoomMax_, zoom_));
 		if (t >= 1.0f) {
@@ -188,7 +195,21 @@ void FollowTopDownCamera::DrawImGui() {
 	}
 	ImGui::Text("Camera Position: (%.2f, %.2f, %.2f)", camera_->GetTranslate().x, camera_->GetTranslate().y, camera_->GetTranslate().z);
 	ImGui::Text("Camera Rotation: (%.2f, %.2f, %.2f)", rotation_.x, rotation_.y, rotation_.z);
-	ImGui::Text("Intro Zoom Playing: %s", introZoomPlaying_ ? "true" : "false");
+
+	ImGui::SeparatorText("Intro Zoom");
+	ImGui::Text("Playing: %s", introZoomPlaying_ ? "true" : "false");
+	ImGui::Text("Start: %.3f  End: %.3f", introZoomStart_, introZoomEnd_);
+	ImGui::Text("Elapsed: %.3f / %.3f sec", introZoomElapsedSec_, introZoomDurationSec_);
+	const float t = GetIntroZoomT();
+	ImGui::ProgressBar(t, ImVec2(-1.0f, 0.0f), "t");
+	ImGui::DragFloat("Curve", &introZoomCurve_, 0.01f, 0.1f, 5.0f);
+	const float tc = EaseWithCurve(t, introZoomCurve_);
+	const float e = EaseInOutCubic(tc);
+	ImGui::Text("t(curved)=%.3f  ease=%.3f", tc, e);
+	if (ImGui::Button("Restart Intro (Debug)")) {
+		StartIntroZoom(introZoomStart_, introZoomEnd_, std::max(0.001f, introZoomDurationSec_));
+	}
+
 	ImGui::End();
 #endif // USE_IMGUI
 }
