@@ -5,12 +5,11 @@
 
 namespace {
 	// 16pxフォント想定のコンパクトUI
-	constexpr float kKeySize = 24.0f;
+	constexpr float kKeySize = 32.0f;
 	constexpr float kKeyGap = 4.0f;
 	constexpr float kMargin = 20.0f;
 	constexpr float kLabelH = 16.0f;
 	constexpr float kLabelW = 96.0f;
-	constexpr float kIconH = 64.0f;
  	constexpr float kSpaceW = 48.0f; // fixed layout width (actual sprite will use texture size)
  	constexpr float kSpaceH = 40.0f; // 行の高さを少し低めに
 	constexpr float kMouseDead = 2.0f;
@@ -164,7 +163,6 @@ void GuideUI::Update() {
 	const float cell = (kKeySize + kKeyGap);
 	const float rowGap = kRowGap;
 	const float labelGapX = kLabelGapX;
-	const float labelOffsetY = (kIconH - kLabelH) * 0.5f;
 
 	// clamp sizes
 	const float topBlockWidth = 3.0f * cell + 10.0f + kLabelW;
@@ -208,7 +206,7 @@ void GuideUI::Update() {
 		keyD_->SetPosition({ left + 2.0f * cell, rowBottomTopY });
 	}
 	if (labelMove_) {
-		labelMove_->SetPosition({ left + 3.0f * cell + labelGapX, rowBottomTopY + labelOffsetY });
+		labelMove_->SetPosition({ left + 3.0f * cell + labelGapX, rowBottomTopY });
 	}
 
 	// SPACE block
@@ -217,7 +215,7 @@ void GuideUI::Update() {
 		keySpace_->SetPosition({ left + 0.0f, spaceTopY });
 	}
 	if (labelDash_) {
-		labelDash_->SetPosition({ left + kSpaceW + labelGapX, spaceTopY + labelOffsetY });
+		labelDash_->SetPosition({ left + kSpaceW + labelGapX, spaceTopY });
 	}
 
 	// MOUSE block
@@ -226,7 +224,7 @@ void GuideUI::Update() {
 		mouseIcon_->SetPosition({ left + 0.0f, mouseTopY });
 	}
 	if (labelAim_) {
-		labelAim_->SetPosition({ left + kMouseW + labelGapX, mouseTopY + labelOffsetY });
+		labelAim_->SetPosition({ left + kMouseW + labelGapX, mouseTopY });
 	}
 
 	// MOUSE SHOOT block
@@ -235,7 +233,7 @@ void GuideUI::Update() {
 		mouseShootIcon_->SetPosition({ left + 0.0f, mouseShootTopY });
 	}
 	if (labelShoot_) {
-		labelShoot_->SetPosition({ left + kMouseShootW + labelGapX, mouseShootTopY + labelOffsetY });
+		labelShoot_->SetPosition({ left + kMouseShootW + labelGapX, mouseShootTopY });
 	}
 
 	auto* input = Input::GetInstance();
