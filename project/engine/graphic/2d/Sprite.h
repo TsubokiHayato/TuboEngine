@@ -83,6 +83,12 @@ public:
 	/// </summary>
 	void AdjustTextureSize();
 
+	/// <summary>
+	/// テクスチャを差し替える（SRVだけ切り替え）。
+	/// </summary>
+	void SetTexture(const std::string& textureFilePath) { textureFilePath_ = textureFilePath; }
+	const std::string& GetTexture() const { return textureFilePath_; }
+
 private:
 	
 	//バッファリソース
