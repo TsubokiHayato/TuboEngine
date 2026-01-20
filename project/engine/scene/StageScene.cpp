@@ -154,6 +154,10 @@ void StageScene::Initialize() {
 	enemyHpUI_->SetYOffset(-24.0f);
 	enemyHpUI_->SetScale(0.45f);
 	enemyHpUI_->SetSpacing(0.0f);
+
+	// Guide UI (WASD)
+	guideUI_ = std::make_unique<GuideUI>();
+	guideUI_->Initialize();
 }
 
 void StageScene::Update() {
@@ -180,6 +184,8 @@ void StageScene::Update() {
 	if (hpUI_) { hpUI_->Update(player_.get()); }
 	// Enemy HP UI 更新（エネミーに追従）
 	if (enemyHpUI_) { enemyHpUI_->Update(enemies, followCamera->GetCamera()); }
+	// Guide UI 更新
+	if (guideUI_) { guideUI_->Update(); }
 }
 
 void StageScene::Finalize() {}
@@ -231,6 +237,8 @@ void StageScene::SpriteDraw() {
 	if (hpUI_) { hpUI_->Draw(); }
 	// Enemy HP UI 描画（追従）
 	if (enemyHpUI_) { enemyHpUI_->Draw(); }
+	// Guide UI 描画
+	if (guideUI_) { guideUI_->Draw(); }
 	
 	// アニメーション描画
 	if (sceneChangeAnimation_) {

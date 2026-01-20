@@ -124,6 +124,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\StageState\StageStateManager.cpp" />
     <ClCompile Include="application\Animation\DropWaveAnimation.cpp" />
     <ClCompile Include="application\StageState\TutorialState.cpp" />
+    <ClCompile Include="application\UI\GuideUI.cpp" />
     <ClCompile Include="application\UI\TitleUI.cpp" />
     <ClCompile Include="application\UI\EnemyHpUI.cpp" />
     <ClCompile Include="application\UI\HpUI.cpp" />
@@ -254,6 +255,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Character\Player\Player.h" />
     <ClInclude Include="application\Bullet\Player\PlayerBullet.h" />
     <ClInclude Include="application\StageState\TutorialState.h" />
+    <ClInclude Include="application\UI\GuideUI.h" />
     <ClInclude Include="engine\scene\SceneType.h" />
     <ClInclude Include="application\scene\StageState\ClearState.h" />
     <ClInclude Include="application\StageState\BossState.h" />
