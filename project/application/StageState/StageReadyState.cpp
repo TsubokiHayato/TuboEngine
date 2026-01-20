@@ -2,16 +2,23 @@
 #include "LineManager.h"
 #include "StageScene.h"
 #include "StageType.h"
+#include "TextureManager.h"
+#include "WinApp.h"
+#include "Sprite.h"
 
 #undef max
 #include <algorithm>
 
-// ユーティリティ: チェビシェフ距離を計算
-static int ChebyshevDistance(int x1, int y1, int x2, int y2) { return std::max(std::abs(x1 - x2), std::abs(y1 - y2)); }
+namespace {
+	constexpr float kDeltaSec = 1.0f / 60.0f;
+}
 
-// 汎用: マップチップを走査してコールバック
-template<typename Func> void ForEachMapChip(StageScene* scene, Func func) {
-	auto* field = scene->GetMapChipField();
+// 汎用: マップチップを走査してコールバック（StageScene版）
+template<typename Func> static void ForEachMapChip(StageScene* scene, Func func) {
+	auto* field = scene ? scene->GetMapChipField() : nullptr;
+	if (!field) {
+		return;
+	}
 	for (uint32_t y = 0; y < field->GetNumBlockVirtical(); ++y) {
 		for (uint32_t x = 0; x < field->GetNumBlockHorizontal(); ++x) {
 			func(x, y, field->GetMapChipTypeByIndex(x, y));
@@ -20,8 +27,7 @@ template<typename Func> void ForEachMapChip(StageScene* scene, Func func) {
 }
 
 // 追加: 指定MapChipFieldを走査してコールバック（プレビュー用）
-template<typename Func>
-static void ForEachMapChipField(MapChipField* field, Func func) {
+template<typename Func> static void ForEachMapChipField(MapChipField* field, Func func) {
 	if (!field) {
 		return;
 	}
@@ -33,13 +39,6 @@ static void ForEachMapChipField(MapChipField* field, Func func) {
 }
 
 void StageReadyState::Enter(StageScene* scene) {
-	// 既存スプライトを破棄
-	readySprite_.reset();
-	startSprite_.reset();
-
-	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
-	TextureManager::GetInstance()->LoadTexture(testDDSTextureHandle);
-
 	// Stage0（実プレイ）のCSVをロード
 	scene->GetMapChipField()->LoadMapChipCsv(scene->GetMapChipCsvFilePath());
 
@@ -55,92 +54,37 @@ void StageReadyState::Enter(StageScene* scene) {
 		playerMapX = 0;
 		playerMapY = 0;
 	}
-	playerTargetPosition_ = scene->GetMapChipField()->GetMapChipPositionByIndex(playerMapX, playerMapY);
+	Vector3 playerPos = scene->GetMapChipField()->GetMapChipPositionByIndex(playerMapX, playerMapY);
 
 	// プレイヤー初期化（Stage0のみ）
 	scene->GetPlayer()->Initialize();
 	scene->GetPlayer()->SetMapChipField(scene->GetMapChipField());
-	scene->GetPlayer()->SetIsDontMove(true);
-	scene->GetPlayer()->SetPosition(playerTargetPosition_);
+	scene->GetPlayer()->SetIsDontMove(false);
+	scene->GetPlayer()->SetPosition(playerPos);
 
-	// フォローカメラ初期化（先に用意してプレビュー生成にも使う）
-	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), Vector3 {0.0f, 0.0f, -70.0f}, 0.25f);
-	scene->GetFollowCamera()->Update();
+	// フォローカメラ初期化（プレビュー生成にも使う）
+	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), Vector3{0.0f, 0.0f, -70.0f}, 0.25f);
+	// ズーム制限設定
+	scene->GetFollowCamera()->SetZoomLimits(0.1f, 1.0f);
+	// 開始時は近い(0.1)状態に固定してからカメラ位置を確定
+	scene->GetFollowCamera()->SetZoom(0.1f);
+	// 初回だけは補間せずスナップして「追従している状態」から開始したい
+	scene->GetFollowCamera()->SnapToTarget();
+	// 開始時カメラ演出: Zoomをイージングで変化（0.1 -> 1.0）
+	scene->GetFollowCamera()->StartIntroZoom(0.1f, 1.0f, 0.8f);
 	Camera* cam = scene->GetFollowCamera()->GetCamera();
 	LineManager::GetInstance()->SetDefaultCamera(cam);
+	scene->GetPlayer()->SetCamera(cam);
+	scene->GetPlayer()->Update();
 
-	// --- プレビューステージ（Stage1+）を生成（見せるだけ） ---
-	{
-		auto& stages = scene->GetStageInstances();
-		for (size_t i = 1; i < stages.size(); ++i) {
-			auto& st = stages[i];
-			if (!st.visible) {
-				continue;
-			}
-
-			if (!st.field) {
-				st.field = std::make_unique<MapChipField>();
-				st.field->LoadMapChipCsv(st.csvPath);
-			}
-
-			st.blocks.clear();
-			st.enemies.clear();
-			st.tile = std::make_unique<Tile>();
-
-			// Tile（プレビュー）は1枚だけ
-			{
-				Vector3 tilePos = st.origin;
-				tilePos.z = -1.0f;
-				st.tile->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile30x30.obj");
-				st.tile->SetCamera(cam);
-				st.tile->Update();
-			}
-
-			ForEachMapChipField(st.field.get(), [&](uint32_t x, uint32_t y, MapChipType type) {
-				Vector3 pos = st.field->GetMapChipPositionByIndex(x, y) + st.origin;
-				if (type == MapChipType::kBlock) {
-					auto block = std::make_unique<Block>();
-					block->Initialize(pos);
-					block->SetCamera(cam);
-					block->Update();
-					st.blocks.push_back(std::move(block));
-				} else if (type == MapChipType::Enemy || type == MapChipType::EnemyRush) {
-					auto enemy = std::make_unique<RushEnemy>();
-					enemy->Initialize();
-					enemy->SetCamera(cam);
-					enemy->SetPlayer(scene->GetPlayer());
-					enemy->SetPosition(pos);
-					enemy->Update();
-					st.enemies.push_back(std::move(enemy));
-				} else if (type == MapChipType::EnemyShoot) {
-					auto enemy = std::make_unique<Enemy>();
-					enemy->Initialize();
-					enemy->SetCamera(cam);
-					enemy->SetPlayer(scene->GetPlayer());
-					enemy->SetPosition(pos);
-					enemy->Update();
-					st.enemies.push_back(std::move(enemy));
-				}
-			});
-		}
-	}
-
-	// ブロック・エネミー・タイルの初期化（Stage0）
+	// ブロック・エネミーの生成（Stage0）
 	auto& blocks = scene->GetBlocks();
 	auto& enemies = scene->GetEnemies();
 	blocks.clear();
 	enemies.clear();
-	blockTargetPositions_.clear();
-	blockRippleLayers_.clear();
-	enemyTargetPositions_.clear();
-	enemyRippleLayers_.clear();
-	tileTargetPositions_.clear();
-	tileRippleLayers_.clear();
 
-	// マップチップを走査して各オブジェクト生成（Stage0）
 	ForEachMapChip(scene, [&](uint32_t x, uint32_t y, MapChipType type) {
 		Vector3 pos = scene->GetMapChipField()->GetMapChipPositionByIndex(x, y);
-		int layer = ChebyshevDistance(static_cast<int>(x), static_cast<int>(y), playerMapX, playerMapY);
 
 		if (type == MapChipType::kBlock) {
 			auto block = std::make_unique<Block>();
@@ -148,8 +92,6 @@ void StageReadyState::Enter(StageScene* scene) {
 			block->SetCamera(cam);
 			block->Update();
 			blocks.push_back(std::move(block));
-			blockTargetPositions_.push_back(pos);
-			blockRippleLayers_.push_back((float)layer);
 		} else if (type == MapChipType::Enemy || type == MapChipType::EnemyRush) {
 			auto enemy = std::make_unique<RushEnemy>();
 			enemy->Initialize();
@@ -158,8 +100,6 @@ void StageReadyState::Enter(StageScene* scene) {
 			enemy->SetPosition(pos);
 			enemy->Update();
 			enemies.push_back(std::move(enemy));
-			enemyTargetPositions_.push_back(pos);
-			enemyRippleLayers_.push_back((float)layer);
 		} else if (type == MapChipType::EnemyShoot) {
 			auto enemy = std::make_unique<Enemy>();
 			enemy->Initialize();
@@ -168,271 +108,118 @@ void StageReadyState::Enter(StageScene* scene) {
 			enemy->SetPosition(pos);
 			enemy->Update();
 			enemies.push_back(std::move(enemy));
-			enemyTargetPositions_.push_back(pos);
-			enemyRippleLayers_.push_back((float)layer);
 		}
-
-		// タイル（Stage0）
-		Vector3 tilePos = scene->GetMapChipField()->GetMapChipPositionByIndex(0, 0);
-		tilePos.z = -1.0f;
-		scene->GetTile()->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile30x30.obj");
-		scene->GetTile()->SetCamera(cam);
-		scene->GetTile()->Update();
-		tileTargetPositions_.push_back(tilePos);
-		tileRippleLayers_.push_back((float)layer);
 	});
 
-	scene->GetPlayer()->SetCamera(cam);
-	scene->GetPlayer()->Update();
+	// タイル（Stage0）
+	Vector3 tilePos = scene->GetMapChipField()->GetMapChipPositionByIndex(0, 0);
+	tilePos.z = -1.0f;
+	scene->GetTile()->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile30x30.obj");
+	scene->GetTile()->SetCamera(cam);
+	scene->GetTile()->Update();
 
-	// アニメーション用タイマー初期化
-	currentDroppingLayer_ = 0;
-	layerDropTimer_ = 0.0f;
-	isDropFinished_ = false;
-	prevTime_ = std::chrono::steady_clock::now();
-	dropDuration_ = 0.2f;
-
-	// READY/START!!スプライト初期化
-	readyPhase_ = ReadyStatePhase::Ready;
-	readyTimer_ = 0.0f;
-	restartWaitTimer_ = 0.0f;
-
-	TextureManager::GetInstance()->LoadTexture("ready.png");
-	TextureManager::GetInstance()->LoadTexture("start.png");
-	readySprite_ = std::make_unique<Sprite>();
-	readySprite_->Initialize("ready.png");
-	readySprite_->SetPosition({640.0f, 360.0f});
-	readySprite_->SetAnchorPoint({0.5f, 0.5f});
-
-	startSprite_ = std::make_unique<Sprite>();
-	startSprite_->Initialize("start.png");
-	startSprite_->SetPosition({640.0f, 360.0f});
-	startSprite_->SetAnchorPoint({0.5f, 0.5f});
-
-	readySprite_->Update();
-	startSprite_->Update();
-
+	// SkyDome
 	scene->GetSkyDome()->Initialize();
 	scene->GetSkyDome()->SetCamera(cam);
 	scene->GetSkyDome()->Update();
+
+	// タイマー初期化
+	prevTime_ = std::chrono::steady_clock::now();
+
+	// --- Ready/Start 演出用スプライト ---
+	phase_ = Phase::Ready;
+	phaseTimer_ = 0.0f;
+
+	const float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
+	const float screenH = static_cast<float>(WinApp::GetInstance()->GetClientHeight());
+	const Vector2 center = { screenW * 0.5f, screenH * 0.5f };
+
+	// テクスチャはプロジェクト側の配置に合わせて差し替えてください
+	const std::string readyTex = "ready.png";
+	const std::string startTex = "start.png";
+	TextureManager::GetInstance()->LoadTexture(readyTex);
+	TextureManager::GetInstance()->LoadTexture(startTex);
+
+	readySprite_ = std::make_unique<Sprite>();
+	readySprite_->Initialize(readyTex);
+	readySprite_->SetAnchorPoint({ 0.5f, 0.5f });
+	readySprite_->SetGetIsAdjustTextureSize(true);
+	readySprite_->SetPosition(center);
+	readySprite_->SetColor({ 1,1,1,1 });
+	readySprite_->Update();
+
+	startSprite_ = std::make_unique<Sprite>();
+	startSprite_->Initialize(startTex);
+	startSprite_->SetAnchorPoint({ 0.5f, 0.5f });
+	startSprite_->SetGetIsAdjustTextureSize(true);
+	startSprite_->SetPosition(center);
+	startSprite_->SetColor({ 1,1,1,0 }); // Startは最初非表示
+	startSprite_->Update();
 }
 
 void StageReadyState::Update(StageScene* scene) {
 	using namespace std::chrono;
 	auto now = steady_clock::now();
 	float deltaTime = duration_cast<duration<float>>(now - prevTime_).count();
+	(void)deltaTime;
 	prevTime_ = now;
 
-	// フォローカメラ更新
-	if (scene->GetFollowCamera()) {
-		scene->GetFollowCamera()->Update();
-		LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
-	}
-
-	// --- リスタート画面表示中 ---
-	if (readyPhase_ == ReadyStatePhase::None) {
-		restartWaitTimer_ += deltaTime;
-
-
-		scene->GetFollowCamera()->Update();
-		// 通常のオブジェクト更新
-		for (auto& block : scene->GetBlocks()) {
-
-			block->SetCamera(scene->GetFollowCamera()->GetCamera());
-			block->Update();
-		}
+	// 先にプレイヤーを更新してからカメラを更新する（追従対象が最新になる）
+	if (scene && scene->GetPlayer()) {
 		scene->GetPlayer()->SetCamera(scene->GetFollowCamera()->GetCamera());
 		scene->GetPlayer()->Update();
-		for (auto& enemy : scene->GetEnemies()) {
-			enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
-			enemy->Update();
-		}
-			scene->GetTile()->SetCamera(scene->GetFollowCamera()->GetCamera());
-			scene->GetTile()->Update();
-		
-		return;
-	} else {
-		restartWaitTimer_ = 0.0f;
 	}
 
+	scene->GetFollowCamera()->Update();
+	LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
 
-	// 常にフォローカメラをデフォルトに
-	if (scene->GetFollowCamera()) {
-		LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
-	}
-
-	// 落下アニメーション中はREADY表示
-	if (readyPhase_ == ReadyStatePhase::Ready) {
-		readyAppearAnim_ += deltaTime * 2.0f; // 0.5秒で1.0f
-		if (readyAppearAnim_ > 1.0f)
-			readyAppearAnim_ = 1.0f;
-
-		// S字イージング
-		float ease = readyAppearAnim_ < 0.5f ? 2.0f * readyAppearAnim_ * readyAppearAnim_ : 1.0f - powf(-2.0f * readyAppearAnim_ + 2.0f, 2.0f) / 2.0f;
-
-		// スライドイン（y: 600→360）
-		float y = 600.0f + (360.0f - 600.0f) * ease;
-
-		// フェードイン
-		float alpha = ease;
-
-		readySprite_->SetPosition({640.0f, y});
-		readySprite_->SetColor({1, 1, 1, alpha});
-
-	} else {
-		readyAppearAnim_ = 0.0f;
-	}
-
-	// --- START!!アニメーション（フェードアウト） ---
-	if (readyPhase_ == ReadyStatePhase::Start) {
-		startAppearAnim_ += deltaTime * 1.5f; // 0.67秒で1.0f
-		if (startAppearAnim_ > 1.0f)
-			startAppearAnim_ = 1.0f;
-
-		// S字イージング
-		float ease = startAppearAnim_ < 0.5f ? 2.0f * startAppearAnim_ * startAppearAnim_ : 1.0f - powf(-2.0f * startAppearAnim_ + 2.0f, 2.0f) / 2.0f;
-
-		// フェードアウト
-		float alpha = 1.0f - ease;
-
-
-
-		startSprite_->SetColor({1, 1, 1, alpha});
-
-		if (ease >= 1.0f) {
-			// STARTアニメーション終了でPlayingへ遷移
-			scene->GetStageStateManager()->ChangeState(StageType::Playing, scene);
-		}
-	} else {
-		startAppearAnim_ = 0.0f;
-	}
-
-	if (!isDropFinished_) {
-		layerDropTimer_ += deltaTime;
-
-		auto lerp = [](float a, float b, float t) { return a + (b - a) * t; };
-
-		// レイヤーごとに落下時間を短縮
-		float layerDropDuration = dropDuration_ * static_cast<float>(std::pow(0.8f, currentDroppingLayer_));
-
-		// 各オブジェクトの落下アニメーション
-		auto animateDrop = [&](auto& objects, const std::vector<Vector3>& targets, const std::vector<float>& layers) {
-			for (size_t i = 0; i < objects.size(); ++i) {
-				int layer = (int)layers[i];
-				if (layer < currentDroppingLayer_) {
-					objects[i]->SetPosition(targets[i]);
-				} else if (layer == currentDroppingLayer_) {
-					float t = std::min(layerDropTimer_ / layerDropDuration, 1.0f);
-					const Vector3& target = targets[i];
-					Vector3 start = target;
-					start.z += dropOffsetZ_;
-					Vector3 pos;
-					pos.x = lerp(start.x, target.x, t);
-					pos.y = lerp(start.y, target.y, t);
-					pos.z = lerp(start.z, target.z, t);
-					objects[i]->SetPosition(pos);
-				} else {
-					Vector3 pos = targets[i];
-					pos.z += dropOffsetZ_;
-					objects[i]->SetPosition(pos);
-				}
-			}
-		};
-
-		// ブロック・タイル・エネミーの落下
-		animateDrop(scene->GetBlocks(), blockTargetPositions_, blockRippleLayers_);
-		animateDrop(scene->GetEnemies(), enemyTargetPositions_, enemyRippleLayers_);
-
-		// タイルは毎フレームUpdate
-		scene->GetTile()->Update();
-
-		// プレイヤーの落下
-		if (currentDroppingLayer_ > 0) {
-			scene->GetPlayer()->SetPosition(playerTargetPosition_);
-		} else {
-			float t = std::min(layerDropTimer_ / layerDropDuration, 1.0f);
-			Vector3 start = playerTargetPosition_;
-			start.z += dropOffsetZ_;
-			Vector3 pos;
-			pos.x = lerp(start.x, playerTargetPosition_.x, t);
-			pos.y = lerp(start.y, playerTargetPosition_.y, t);
-			pos.z = lerp(start.z, playerTargetPosition_.z, t);
-			scene->GetPlayer()->SetPosition(pos);
-		}
-
-		// レイヤー内の全オブジェクトが落下完了したか判定
-		auto isLayerFinished = [&](const std::vector<float>& layers) {
-			for (auto l : layers)
-				if ((int)l == currentDroppingLayer_ && layerDropTimer_ < layerDropDuration)
-					return false;
-			return true;
-		};
-		bool layerFinished = isLayerFinished(blockRippleLayers_) && isLayerFinished(enemyRippleLayers_) && isLayerFinished(tileRippleLayers_);
-		if (currentDroppingLayer_ == 0 && layerDropTimer_ < layerDropDuration)
-			layerFinished = false;
-
-		// レイヤー進行
-		if (layerFinished) {
-			++currentDroppingLayer_;
-			layerDropTimer_ = 0.0f;
-			int maxLayer = 0;
-			for (auto l : blockRippleLayers_)
-				maxLayer = std::max(maxLayer, (int)l);
-			for (auto l : enemyRippleLayers_)
-				maxLayer = std::max(maxLayer, (int)l);
-			for (auto l : tileRippleLayers_)
-				maxLayer = std::max(maxLayer, (int)l);
-			if (currentDroppingLayer_ > maxLayer)
-				isDropFinished_ = true;
-		}
-
-		// 各オブジェクトのUpdate
-		scene->GetFollowCamera()->Update();
-
-		scene->GetTile()->SetCamera(scene->GetFollowCamera()->GetCamera());
-		scene->GetTile()->Update();
-	
-		for (auto& block : scene->GetBlocks()) {
-			block->SetCamera(scene->GetFollowCamera()->GetCamera());
-			block->Update();
-		}
-		scene->GetPlayer()->SetCamera(scene->GetFollowCamera()->GetCamera());
-		scene->GetPlayer()->Update();
-		for (auto& enemy : scene->GetEnemies()) {
-			enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
-			enemy->Update();
-		}
-
-		return;
-	} else {
-		// 落下アニメーションが終わった瞬間にSTART!!へ
-		readyPhase_ = ReadyStatePhase::Start;
-		readyTimer_ = 0.0f;
-	}
-
-	readySprite_->Update();
-	startSprite_->Update();
-
-	
-	// 通常のオブジェクト更新
 	for (auto& block : scene->GetBlocks()) {
 		block->SetCamera(scene->GetFollowCamera()->GetCamera());
 		block->Update();
 	}
-	scene->GetPlayer()->SetCamera(scene->GetFollowCamera()->GetCamera());
-	scene->GetPlayer()->Update();
 	for (auto& enemy : scene->GetEnemies()) {
 		enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
+		enemy->SetPlayer(scene->GetPlayer());
 		enemy->Update();
 	}
-	
 	scene->GetTile()->SetCamera(scene->GetFollowCamera()->GetCamera());
 	scene->GetTile()->Update();
-	
+
 	scene->GetSkyDome()->SetCamera(scene->GetFollowCamera()->GetCamera());
 	scene->GetSkyDome()->Update();
 
-	LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
+	// --- Ready/Start 演出フェーズ進行 ---
+	phaseTimer_ += kDeltaSec;
+
+	auto SetSpriteAlpha = [](Sprite* spr, float a) {
+		if (!spr) return;
+		Vector4 c = spr->GetColor();
+		c.w = std::clamp(a, 0.0f, 1.0f);
+		spr->SetColor(c);
+	};
+
+	if (phase_ == Phase::Ready) {
+		SetSpriteAlpha(readySprite_.get(), 1.0f);
+		SetSpriteAlpha(startSprite_.get(), 0.0f);
+		if (phaseTimer_ >= readyDuration_) {
+			phase_ = Phase::Start;
+			phaseTimer_ = 0.0f;
+		}
+	} else if (phase_ == Phase::Start) {
+		SetSpriteAlpha(readySprite_.get(), 0.0f);
+		SetSpriteAlpha(startSprite_.get(), 1.0f);
+		if (phaseTimer_ >= startDuration_) {
+			phase_ = Phase::Done;
+		}
+	}
+
+	if (readySprite_) readySprite_->Update();
+	if (startSprite_) startSprite_->Update();
+
+	// 演出が終わったらPlayingへ
+	if (phase_ == Phase::Done && !scene->GetFollowCamera()->IsIntroZoomPlaying()) {
+		scene->GetStageStateManager()->ChangeState(StageType::Playing, scene);
+	}
 }
 
 void StageReadyState::Exit(StageScene* scene) {}
@@ -448,80 +235,14 @@ void StageReadyState::Object3DDraw(StageScene* scene) {
 	}
 	scene->GetTile()->Draw();
 	scene->GetSkyDome()->Draw();
-
-	// Stage1+（プレビュー）
-	auto& stages = scene->GetStageInstances();
-	for (size_t i = 1; i < stages.size(); ++i) {
-		auto& st = stages[i];
-		if (!st.visible) {
-			continue;
-		}
-		if (st.tile) {
-			st.tile->Draw();
-		}
-		for (auto& block : st.blocks) {
-			block->Draw();
-		}
-		for (auto& enemy : st.enemies) {
-			enemy->Draw();
-		}
-	}
 }
 
 void StageReadyState::SpriteDraw(StageScene* scene) {
-	if (readyPhase_ == ReadyStatePhase::Ready && readySprite_) {
-		readySprite_->Draw();
-	} else if (readyPhase_ == ReadyStatePhase::Start && startSprite_) {
-		startSprite_->Draw();
-	}
+	(void)scene;
+	if (readySprite_) readySprite_->Draw();
+	if (startSprite_) startSprite_->Draw();
 }
 
-void StageReadyState::ImGuiDraw(StageScene* scene) {
+void StageReadyState::ImGuiDraw(StageScene* scene) { scene->GetFollowCamera()->DrawImGui(); }
 
-#ifdef USE_IMGUI
-	// カメラ操作用UI（FollowCamera）
-	if (scene->GetFollowCamera()) {
-		if (ImGui::CollapsingHeader("FollowCamera")) {
-			scene->GetFollowCamera()->DrawImGui();
-		}
-	}
-
-	// 落下アニメーション制御UI
-	if (ImGui::CollapsingHeader("Drop Animation")) {
-		auto easeOutQuad = [](float t) { return 1.0f - (1.0f - t) * (1.0f - t); };
-		float t = std::min(layerDropTimer_ / dropDuration_, 1.0f);
-		float easedT = easeOutQuad(t);
-		(void)easedT;
-
-		ImGui::ProgressBar(t, ImVec2(0.0f, 0.0f), "Progress");
-		ImGui::SliderFloat("Drop Duration", &dropDuration_, 0.05f, 2.0f, "%.2f sec");
-		ImGui::SliderFloat("Drop Offset Z", &dropOffsetZ_, 1.0f, 100.0f, "%.1f");
-
-		ImGui::SameLine();
-		if (ImGui::Button("Skip Animation")) {
-			int maxLayer = 0;
-			for (auto l : blockRippleLayers_) maxLayer = std::max(maxLayer, (int)l);
-			for (auto l : enemyRippleLayers_) maxLayer = std::max(maxLayer, (int)l);
-			for (auto l : tileRippleLayers_) maxLayer = std::max(maxLayer, (int)l);
-			currentDroppingLayer_ = maxLayer + 1;
-			isDropFinished_ = true;
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Restart Animation")) {
-			Enter(scene);
-		}
-
-		ImGui::Text("isDropFinished: %s", isDropFinished_ ? "true" : "false");
-
-		const char* phaseStr = "";
-		switch (readyPhase_) {
-		case ReadyStatePhase::Ready: phaseStr = "Ready"; break;
-		case ReadyStatePhase::Start: phaseStr = "Start"; break;
-		case ReadyStatePhase::None:  phaseStr = "None";  break;
-		}
-		ImGui::Text("Current Phase: %s", phaseStr);
-	}
-#endif // USE_IMGUI
-}
-
-void StageReadyState::ParticleDraw(StageScene* scene) {}
+void StageReadyState::ParticleDraw(StageScene* scene) { (void)scene; }
