@@ -1,6 +1,6 @@
 #include "Camera.h"
 #include"WinApp.h"
-#include"MT_Matrix.h"
+#include"Matrix.h"
 Camera::Camera()
 
 	:transform_({ { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f }, { 1.0f,1.0f,1.0f } })
