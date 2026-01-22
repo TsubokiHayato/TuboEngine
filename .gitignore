@@ -18,6 +18,31 @@
 # Build results
 generated/
 
+# ---- C/C++ build intermediates (MSVC) ----
+*.obj
+*.tlog
+*.log
+*.recipe
+*.idb
+*.pdb
+*.ilk
+*.ipdb
+*.iobj
+*.pch
+
+# ---- VS build output dirs ----
+x64/
+**/x64/
+[Bb]in/
+[Oo]ut/
+**/[Bb]in/
+**/[Oo]ut/
+**/[Dd]ebug/
+**/[Rr]elease/
+
+# ---- Known polluted external output ----
+project/externals/imgui/x64/
+
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
@@ -38,7 +63,7 @@ nunit-*.xml
 # Build Results of an ATL Project
 [Dd]ebugPS/
 [Rr]eleasePS/
-dlldata.c
+dllldata.c
 
 # Benchmark Results
 BenchmarkDotNet.Artifacts/
