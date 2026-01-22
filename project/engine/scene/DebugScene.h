@@ -3,7 +3,7 @@
 #include"DirectXCommon.h"
 #include"IScene.h"
 
-#include"MT_Matrix.h"
+#include"Matrix.h"
 #include "Input.h"
 #include"Audio.h"
 #include"Camera.h"
