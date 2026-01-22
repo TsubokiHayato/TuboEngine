@@ -111,7 +111,6 @@
     <ClCompile Include="application\Collider\CollisionManager.cpp" />
     <ClCompile Include="application\Character\Enemy\Enemy.cpp" />
     <ClCompile Include="application\Camera\FollowTopDownCamera.cpp" />
-    <ClCompile Include="application\HitEffect\HitEffectManager.cpp" />
     <ClCompile Include="application\MapChip\MapChipField.cpp" />
     <ClCompile Include="application\Tile\Tile.cpp" />
     <ClCompile Include="engine\scene\OverScene.cpp" />
@@ -257,7 +256,6 @@
     <ClInclude Include="application\Bullet\Enemy\EnemyNormalBullet.h" />
     <ClInclude Include="application\Block\Block.h" />
     <ClInclude Include="application\Camera\FollowTopDownCamera.h" />
-    <ClInclude Include="application\HitEffect\HitEffectManager.h" />
     <ClInclude Include="application\MapChip\MapChipField.h" />
     <ClInclude Include="application\StageState\DropWaveAnimator.h" />
     <ClInclude Include="application\Tile\Tile.h" />
