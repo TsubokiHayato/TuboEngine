@@ -52,7 +52,7 @@ public:
 
     enum class State { Idle, Alert, LookAround, Patrol, Chase, Attack };
 
-protected: // 変更: 派生クラス(RushEnemy等)で行動を拡張できるようにprivate→protected
+protected: // 変更: 派生クラス(RushEnemy等)で行動を拡張できるようにPrivate→protected
     Vector3 position;
     Vector3 rotation;
     Vector3 scale = {1.0f, 1.0f, 1.0f};

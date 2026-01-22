@@ -164,7 +164,7 @@ public:
 
 
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[3];
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[3] = 0;
 
 	Microsoft::WRL::ComPtr<ID3D12Fence> GetFence() { return fence; }
 	uint64_t GetFenceValue() { return fenceValue; }
@@ -193,7 +193,7 @@ public:
 		const wchar_t* profile);
 
 
-	//depthStencilResorceの取得
+	//depthStencilResourceの取得
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetDepthStencliResouece() { return depthStencilResource;}
 
 	///<summary>
@@ -226,7 +226,7 @@ public:
 
 	//HRESULTはWindow系のエラーコードであり、
 	//関数が成功したかどうかSUCCEEDEDマクロで判断出来る
-	HRESULT hr;
+	HRESULT hr=0;
 
 
 private:
@@ -256,9 +256,9 @@ private:
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 
 
-	uint32_t descriptorSizeSRV;
-	uint32_t descriptorSizeRTV;
-	uint32_t descriptorSizeDSV;
+	uint32_t descriptorSizeSRV = 0;
+	uint32_t descriptorSizeRTV = 0;
+	uint32_t descriptorSizeDSV = 0;
 
 
 	//RTVディスクイリプタヒープの生成
@@ -276,7 +276,7 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
 	uint64_t fenceValue = 0;
-	HANDLE fenceEvent;
+	HANDLE fenceEvent=0;
 
 	Microsoft::WRL::ComPtr <ID3D12Resource> depthStencilResource;
 
@@ -294,7 +294,7 @@ private:
 	D3D12_RESOURCE_BARRIER barrier{};
 	
 
-	UINT backBufferIndex;
+	UINT backBufferIndex = {};
 
 	//記録時間(FPS固定用)
 	std::chrono::steady_clock::time_point reference_;
