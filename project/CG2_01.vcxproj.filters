@@ -9,7 +9,6 @@
   <ItemGroup>
     <ClCompile Include="engine\graphic\PostEffect\DissolveEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\DissolvePSO.cpp" />
-    <ClCompile Include="engine\graphic\PSO\Blend\AddBlendPSO.cpp" />
     <ClCompile Include="engine\scene\ClearScene.cpp" />
     <ClCompile Include="engine\scene\DebugScene.cpp" />
     <ClCompile Include="engine\audio\Audio.cpp" />
@@ -50,11 +49,7 @@
     <ClCompile Include="engine\base\Common\SrvManager.cpp" />
     <ClCompile Include="engine\scene\StageScene.cpp" />
     <ClCompile Include="engine\scene\TitleScene.cpp" />
-    <ClCompile Include="engine\graphic\PSO\Blend\MultiplyBlendPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\Blend\NoneBlendPSO.cpp" />
-    <ClCompile Include="engine\graphic\PSO\Blend\NormalBlendPSO.cpp" />
-    <ClCompile Include="engine\graphic\PSO\Blend\ScreenBlendPSO.cpp" />
-    <ClCompile Include="engine\graphic\PSO\Blend\SubtractBlendPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\NoneEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\NonePSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\OffScreenRendering.cpp" />
@@ -127,13 +122,13 @@
     <ClCompile Include="application\UI\EnemyHpUI.cpp" />
     <ClCompile Include="application\StageState\TutorialState.cpp" />
     <ClCompile Include="application\UI\GuideUI.cpp" />
+    <ClCompile Include="engine\graphic\PSO\Blend\BlendPSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\DissolvePSO.h" />
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
     <ClInclude Include="engine\graphic\data\Node.h" />
-    <ClInclude Include="engine\graphic\PSO\Blend\AddBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\BlendMode.h" />
     <ClInclude Include="engine\scene\ClearScene.h" />
     <ClInclude Include="engine\scene\DebugScene.h" />
@@ -187,11 +182,7 @@
     <ClInclude Include="engine\base\Common\SrvManager.h" />
     <ClInclude Include="engine\scene\StageScene.h" />
     <ClInclude Include="engine\scene\TitleScene.h" />
-    <ClInclude Include="engine\graphic\PSO\Blend\MultiplyBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\Blend\NoneBlendPSO.h" />
-    <ClInclude Include="engine\graphic\PSO\Blend\NormalBlendPSO.h" />
-    <ClInclude Include="engine\graphic\PSO\Blend\ScreenBlendPSO.h" />
-    <ClInclude Include="engine\graphic\PSO\Blend\SubtractBlendPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\GaussianBlurEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\GaussianBlurPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\GrayScaleEffect.h" />
@@ -281,6 +272,7 @@
     <ClInclude Include="application\UI\EnemyHpUI.h" />
     <ClInclude Include="application\StageState\TutorialState.h" />
     <ClInclude Include="application\UI\GuideUI.h" />
+    <ClInclude Include="engine\graphic\PSO\Blend\BlendPSO.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
@@ -289,6 +281,7 @@
     <None Include="Resources\Shaders\Object3d.hlsli" />
     <None Include="Resources\Shaders\Particle.hlsli" />
     <None Include="gitignore .gitignore" />
+    <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
