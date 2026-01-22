@@ -288,6 +288,7 @@
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli" />
     <None Include="Resources\Shaders\Particle.hlsli" />
+    <None Include="gitignore .gitignore" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
