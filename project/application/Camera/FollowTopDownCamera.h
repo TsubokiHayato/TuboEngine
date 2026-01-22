@@ -1,6 +1,7 @@
 #pragma once
 #include "Camera.h"
 #include "Character/Player/Player.h"
+#include <memory>
 
 class FollowTopDownCamera {
 public:
@@ -33,7 +34,7 @@ public:
 	float GetIntroZoomCurve() const { return introZoomCurve_; }
 	bool IsIntroZoomPlaying() const { return introZoomPlaying_; }
 
-	Camera* GetCamera() const { return camera_; }
+	Camera* GetCamera() const { return camera_.get(); }
 	Vector3 GetOffset() const { return offset_; }
 	Vector3 GetRotation() const { return rotation_; }
 	float GetZoom() const { return zoom_; }
@@ -57,7 +58,7 @@ private:
 	float followSpeed_ = 0.07f;
 	float zoom_ = 1.0f;
 	Vector3 rotation_ = {DirectX::XM_PIDIV2 * 1.5f, 0.0f, 0.0f};
-	Camera* camera_ = nullptr;
+	std::unique_ptr<Camera> camera_;
 
 	// カメラシェイク
 	float shakeTime_ = 0.0f;

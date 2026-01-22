@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cfloat>
 #include <cmath>
+#include <memory>
 
 namespace {
 	constexpr float kAssumedDeltaTimeSec = 1.0f / 60.0f;
@@ -12,10 +13,7 @@ namespace {
 
 FollowTopDownCamera::FollowTopDownCamera() {}
 
-FollowTopDownCamera::~FollowTopDownCamera() {
-	delete camera_;
-	camera_ = nullptr;
-}
+FollowTopDownCamera::~FollowTopDownCamera() = default;
 
 float FollowTopDownCamera::EaseInOutCubic(float t) {
 	t = std::clamp(t, 0.0f, 1.0f);
@@ -40,10 +38,8 @@ void FollowTopDownCamera::Initialize(Player* target, const Vector3& offset, floa
 	target_ = target;
 	offset_ = offset;
 	followSpeed_ = followSpeed;
-	if (camera_) {
-		delete camera_;
-	}
-	camera_ = new Camera();
+
+	camera_ = std::make_unique<Camera>();
 	if (target_) {
 		camera_->SetTranslate(target_->GetPosition() + offset_);
 	} else {
@@ -125,6 +121,7 @@ void FollowTopDownCamera::Update() {
 
 	// 注視点オフセット
 	Vector3 lookAt = targetPos + lookAtOffset_;
+	(void)lookAt;
 
 	// 回転に応じてオフセットを回転させる（斜め視点対応）
 	// rotation_はラジアン想定。順序: Z->X->Y（右手座標系）
