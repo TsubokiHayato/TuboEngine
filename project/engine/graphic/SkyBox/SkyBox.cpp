@@ -1,6 +1,6 @@
 #include "SkyBox.h"
 #include "TextureManager.h"
-#include "MT_Matrix.h"
+#include "Matrix.h"
 
 void SkyBox::Initialize(const std::string& textureFilePath) {
 	SkyBoxCommon::GetInstance()->Initialize();

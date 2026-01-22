@@ -2,7 +2,7 @@
 #include "Camera.h"
 #include "DepthBasedOutlinePSO.h"
 #include "DirectXCommon.h"
-#include "MT_Matrix.h"
+#include "Matrix.h"
 #include "PostEffectBase.h"
 
 // 定数バッファ構造体（projectionMatrix用）
