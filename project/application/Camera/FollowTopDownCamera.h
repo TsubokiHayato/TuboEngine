@@ -1,6 +1,7 @@
 #pragma once
 #include "Camera.h"
 #include "Character/Player/Player.h"
+#include <memory>
 
 class FollowTopDownCamera {
 public:
@@ -19,14 +20,36 @@ public:
 	void SetZoom(float zoom);
 	void SetBounds(const Vector3& min, const Vector3& max);
 	void Shake(float intensity, float duration);
-	void SetZoomLimits(float minZoom, float maxZoom) { zoomMin_ = minZoom; zoomMax_ = maxZoom; }
+	void SetZoomLimits(float minZoom, float maxZoom) {
+		zoomMin_ = minZoom;
+		zoomMax_ = maxZoom;
+	}
 	void SetZoomSpeed(float speed) { zoomSpeed_ = speed; }
 
-	Camera* GetCamera() const { return camera_; }
+	// 開始時ズームアニメーション
+	// durationSec: 秒（Updateは60FPS前提で内部変換）
+	void StartIntroZoom(float startZoom, float endZoom, float durationSec);
+	// curve: 1.0=標準、>1.0で強め（ゆっくり始まって最後に加速）、<1.0で弱め
+	void SetIntroZoomCurve(float curve) { introZoomCurve_ = (curve < 0.01f) ? 0.01f : curve; }
+	float GetIntroZoomCurve() const { return introZoomCurve_; }
+	bool IsIntroZoomPlaying() const { return introZoomPlaying_; }
+
+	Camera* GetCamera() const { return camera_.get(); }
 	Vector3 GetOffset() const { return offset_; }
 	Vector3 GetRotation() const { return rotation_; }
 	float GetZoom() const { return zoom_; }
 	float GetZoomMin() const { return zoomMin_; }
+
+	void SnapToTarget();
+
+	// イントロズームアニメーションの進行状況
+	float GetIntroZoomElapsedSec() const { return introZoomElapsedSec_; }
+	float GetIntroZoomDurationSec() const { return introZoomDurationSec_; }
+	float GetIntroZoomStart() const { return introZoomStart_; }
+	float GetIntroZoomEnd() const { return introZoomEnd_; }
+	float GetIntroZoomT() const {
+		return (introZoomDurationSec_ > 0.0f) ? std::clamp(introZoomElapsedSec_ / introZoomDurationSec_, 0.0f, 1.0f) : 1.0f;
+	}
 
 private:
 	Player* target_ = nullptr;
@@ -34,8 +57,8 @@ private:
 	Vector3 lookAtOffset_ = {0, 0, 0};
 	float followSpeed_ = 0.07f;
 	float zoom_ = 1.0f;
-	Vector3 rotation_ = {DirectX::XM_PIDIV2 * 1.5f,0.0f, 0.0f};
-	Camera* camera_ = nullptr;
+	Vector3 rotation_ = {DirectX::XM_PIDIV2 * 1.5f, 0.0f, 0.0f};
+	std::unique_ptr<Camera> camera_;
 
 	// カメラシェイク
 	float shakeTime_ = 0.0f;
@@ -50,11 +73,23 @@ private:
 	// ズーム制限・速度
 	float zoomMin_ = 0.5f;
 	float zoomMax_ = 1.0f;
-	float zoomSpeed_ = 0.05f; // ホイール1単位あたり의ズーム変化
+	float zoomSpeed_ = 0.05f; // ホイール1単位あたり?ズーム変化
+
+	// 開始時ズームアニメーション（イージング）
+	bool introZoomPlaying_ = false;
+	float introZoomStart_ = 1.0f;
+	float introZoomEnd_ = 1.0f;
+	float introZoomDurationSec_ = 0.0f;
+	float introZoomElapsedSec_ = 0.0f;
+	float introZoomCurve_ = 1.0f;
 
 	// 障害物回避（雛形）
 	void AvoidObstacles(Vector3& desiredPos);
 
 	// シェイク用乱数
 	float RandomFloat(float min, float max);
+
+	// 内部: イージング
+	static float EaseInOutCubic(float t);
+	static float EaseWithCurve(float t, float curve);
 };
