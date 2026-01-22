@@ -88,7 +88,7 @@ private:
 
 
 	//SRV用のディスクリプタサイズ
-	uint32_t descriptorSize;
+	uint32_t descriptorSize = 0;
 	//SRVヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap;
 
