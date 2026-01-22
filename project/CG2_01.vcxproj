@@ -70,7 +70,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalOptions>/ignore:4049 /ignore:4098 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4049 /ignore:4098 /ignore:4099 %(AdditionalOptions)</AdditionalOptions>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
       <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -102,7 +102,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalOptions>/ignore:4049 /ignore:4098 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4049 /ignore:4098 /ignore:4099 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -133,6 +133,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\Particle\IParticleEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\ParticleManager.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\BloomEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\Blend\BlendPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\BloomPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\DepthBasedOutlineEffect.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\ToonEffect.cpp" />
@@ -145,7 +146,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Block\Block.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\DissolveEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\DissolvePSO.cpp" />
-    <ClCompile Include="engine\graphic\PSO\Blend\AddBlendPSO.cpp" />
     <ClCompile Include="application\Character\BaseCharacter.cpp" />
     <ClCompile Include="application\Bullet\BaseBullet.cpp" />
     <ClCompile Include="application\Collider\Collider.cpp" />
@@ -214,11 +214,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\base\Common\SrvManager.cpp" />
     <ClCompile Include="engine\scene\StageScene.cpp" />
     <ClCompile Include="engine\scene\TitleScene.cpp" />
-    <ClCompile Include="engine\graphic\PSO\Blend\MultiplyBlendPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\Blend\NoneBlendPSO.cpp" />
-    <ClCompile Include="engine\graphic\PSO\Blend\NormalBlendPSO.cpp" />
-    <ClCompile Include="engine\graphic\PSO\Blend\ScreenBlendPSO.cpp" />
-    <ClCompile Include="engine\graphic\PSO\Blend\SubtractBlendPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\NoneEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\NonePSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\OffScreenRendering.cpp" />
@@ -253,6 +249,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Bullet\Player\PlayerBullet.h" />
     <ClInclude Include="application\StageState\TutorialState.h" />
     <ClInclude Include="application\UI\GuideUI.h" />
+    <ClInclude Include="engine\graphic\PSO\Blend\BlendPSO.h" />
     <ClInclude Include="engine\scene\SceneType.h" />
     <ClInclude Include="application\scene\StageState\ClearState.h" />
     <ClInclude Include="application\StageState\BossState.h" />
@@ -300,7 +297,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\PSO\PostEffect\DissolvePSO.h" />
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
     <ClInclude Include="engine\graphic\data\Node.h" />
-    <ClInclude Include="engine\graphic\PSO\Blend\AddBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\BlendMode.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\ToonPSO.h" />
     <ClInclude Include="engine\scene\ClearScene.h" />
@@ -357,11 +353,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\base\Common\SrvManager.h" />
     <ClInclude Include="engine\scene\StageScene.h" />
     <ClInclude Include="engine\scene\TitleScene.h" />
-    <ClInclude Include="engine\graphic\PSO\Blend\MultiplyBlendPSO.h" />
     <ClInclude Include="engine\graphic\PSO\Blend\NoneBlendPSO.h" />
-    <ClInclude Include="engine\graphic\PSO\Blend\NormalBlendPSO.h" />
-    <ClInclude Include="engine\graphic\PSO\Blend\ScreenBlendPSO.h" />
-    <ClInclude Include="engine\graphic\PSO\Blend\SubtractBlendPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\GaussianBlurEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\GaussianBlurPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\GrayScaleEffect.h" />
@@ -412,7 +404,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ResourceCompile Include="CG2.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="gitignore .gitignore" />
     <None Include="Resources\Shaders\Object3d.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
