@@ -122,7 +122,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\StageState\StagePlayingState.cpp" />
     <ClCompile Include="application\StageState\StageReadyState.cpp" />
     <ClCompile Include="application\StageState\StageStateManager.cpp" />
-    <ClCompile Include="application\Animation\DropWaveAnimation.cpp" />
     <ClCompile Include="application\StageState\TutorialState.cpp" />
     <ClCompile Include="application\UI\GuideUI.cpp" />
     <ClCompile Include="application\UI\TitleUI.cpp" />
@@ -131,7 +130,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\Particle\AuraEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\ClearConfettiEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\ClearFireworkEmitter.cpp" />
-    <ClCompile Include="engine\graphic\Particle\cppvoid.cpp" />
     <ClCompile Include="engine\graphic\Particle\IParticleEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\ParticleManager.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\BloomEffect.cpp" />
@@ -191,8 +189,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\PostEffect\GrayScaleEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\GrayScalePSO.cpp" />
     <ClCompile Include="application\Camera\FollowTopDownCamera.cpp" />
-    <ClCompile Include="Framework\Framework.cpp" />
-    <ClCompile Include="Framework\Order.cpp" />
+    <ClCompile Include="engine\Framework\Framework.cpp" />
+    <ClCompile Include="engine\Framework\Order.cpp" />
     <ClCompile Include="application\HitEffect\HitEffectManager.cpp" />
     <ClCompile Include="engine\graphic\line\Line.cpp" />
     <ClCompile Include="engine\graphic\line\LineCommon.cpp" />
@@ -269,7 +267,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\StageState\StageReadyState.h" />
     <ClInclude Include="application\StageState\StageStateManager.h" />
     <ClInclude Include="application\StageState\StageType.h" />
-    <ClInclude Include="application\Animation\DropWaveAnimation.h" />
     <ClInclude Include="application\UI\TitleUI.h" />
     <ClInclude Include="application\UI\TitleUIButton.h" />
     <ClInclude Include="application\UI\EnemyHpUI.h" />
@@ -325,7 +322,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\3d\ModelCommon.h" />
     <ClInclude Include="engine\graphic\data\ModelData.h" />
     <ClInclude Include="engine\graphic\3d\ModelManager.h" />
-    <ClInclude Include="engine\math\MT_Matrix.h" />
+    <ClInclude Include="engine\math\Matrix.h" />
     <ClInclude Include="engine\graphic\3d\Object3d.h" />
     <ClInclude Include="engine\graphic\3d\Object3dCommon.h" />
     <ClInclude Include="engine\graphic\2d\Sprite.h" />
@@ -393,8 +390,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\SkyBox\SkyBox.h" />
     <ClInclude Include="engine\graphic\SkyBox\SkyBoxCommon.h" />
     <ClInclude Include="engine\graphic\PSO\SkyBoxPSO.h" />
-    <ClInclude Include="Framework\Framework.h" />
-    <ClInclude Include="Framework\Order.h" />
+    <ClInclude Include="engine\Framework\Framework.h" />
+    <ClInclude Include="engine\Framework\Order.h" />
     <ClInclude Include="application\MapChip\MapChipField.h" />
     <ClInclude Include="engine\graphic\line\Line.h" />
     <ClInclude Include="engine\graphic\line\LineCommon.h" />

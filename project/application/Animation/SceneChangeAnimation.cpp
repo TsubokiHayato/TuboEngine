@@ -2,7 +2,6 @@
 #include "ImGuiManager.h"
 #include "SceneChangeAnimation.h"
 #include "TextureManager.h"
-#include "DropWaveAnimation.h"
 
 SceneChangeAnimation::SceneChangeAnimation(int screenWidth, int screenHeight, int blockSize, float duration, const std::string& blockTexturePath)
     : m_screenWidth(screenWidth), m_screenHeight(screenHeight), m_blockSize(blockSize), m_duration(duration), m_elapsed(0.0f), m_rng(std::random_device{}()), m_blockTexturePath(blockTexturePath),

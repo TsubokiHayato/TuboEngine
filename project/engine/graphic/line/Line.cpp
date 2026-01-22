@@ -5,7 +5,7 @@
 #include "LineCommon.h"
 #include "TransformationMatrix.h"
 #define _USE_MATH_DEFINES
-#include "MT_Matrix.h"
+#include "Matrix.h"
 #include <math.h>
 
 ///----------------------------------------------------
