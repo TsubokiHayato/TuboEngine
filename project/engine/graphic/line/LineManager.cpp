@@ -2,7 +2,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "ImGuiManager.h"
-#include"MT_Matrix.h"
+#include"Matrix.h"
 
 ///----------------------------------------------------
 /// シングルトンインスタンス初期化

@@ -1,130 +1,136 @@
 #include "Framework.h"
 #include"WinApp.h"
+#include <dxcapi.h>
 
-void Framework::Initialize()
-{
-	//ウィンドウズアプリケーション
-	winApp = std::make_unique<WinApp>();
-	winApp->Initialize();
 
-#ifdef DEBUG
-	//リークチェッカー
-	D3DResourceLeakChecker leakChecker;
-#endif // _DEBUG
+
+void Framework::Initialize() {
+
+	WinApp::GetInstance()->Initialize();
 
 	//DirectX共通部分
 
-	dxCommon = std::make_unique<DirectXCommon>();
-	dxCommon->Initialize(winApp.get());
+
+	DirectXCommon::GetInstance()->Initialize();
 
 	// リソースの有効性を確認
-	if (!dxCommon->GetDevice() || !dxCommon->GetCommandList()) {
+	if (!DirectXCommon::GetInstance()->GetDevice() || !DirectXCommon::GetInstance()->GetCommandList()) {
 		throw std::runtime_error("DirectXリソースの初期化に失敗しました。");
 	}
 
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 
 	//ImGuiの初期化
 
-	imGuiManager = std::make_unique<ImGuiManager>();
-	imGuiManager->Initialize(winApp.get(), dxCommon.get());
 
-#endif // DEBUG
+	ImGuiManager::GetInstance()->Initialize();
 
-	srvManager = std::make_unique<SrvManager>();
-	srvManager->Initialize(dxCommon.get());
+#endif // USE_IMGUI
 
+	//SRVマネージャーの初期化
+	SrvManager::GetInstance()->Initialize();
 	//スプライト共通部分
-
-	spriteCommon = std::make_unique<SpriteCommon>();
-	spriteCommon->Initialize(winApp.get(), dxCommon.get());
-
-
+	SpriteCommon::GetInstance()->Initialize();
 
 	//オブジェクト3Dの共通部分
-	object3dCommon = std::make_unique<Object3dCommon>();
-	object3dCommon->Initialize(winApp.get(), dxCommon.get());
+	Object3dCommon::GetInstance()->Initialize();
 
-	//モデル共通部分
-	modelCommon = std::make_unique<ModelCommon>();
-	modelCommon->Initialize(dxCommon.get());
 
 	//パーティクル共通部分
-	particleCommon = std::make_unique<ParticleCommon>();
-	particleCommon->Initialize(winApp.get(), dxCommon.get(), srvManager.get());
+	ParticleCommon::GetInstance()->Initialize();
+
+
 
 	//テクスチャマネージャーの初期化
-	TextureManager::GetInstance()->Initialize(dxCommon.get(), srvManager.get());
+	TextureManager::GetInstance()->Initialize();
 
 	//モデルマネージャーの初期化
-	ModelManager::GetInstance()->initialize(dxCommon.get());
+	ModelManager::GetInstance()->initialize();
 
 	//オーディオ共通部
 	AudioCommon::GetInstance()->Initialize();
 
 	//入力初期化
-	Input::GetInstance()->Initialize(winApp->GetHWND());
+	Input::GetInstance()->Initialize(WinApp::GetInstance()->GetHWND());
 
+	//オフスクリーンレンダリングの初期化
+	OffScreenRendering::GetInstance()->Initialize();
+
+	//ラインマネージャーの初期化
+	LineManager::GetInstance()->Initialize();
+
+	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
+	TextureManager::GetInstance()->LoadTexture(testDDSTextureHandle);
 
 	//シーンマネージャーの初期化
-	sceneManager = std::make_unique<SceneManager>();
-	sceneManager->Initialize(object3dCommon.get(), spriteCommon.get(), particleCommon.get(), winApp.get(), dxCommon.get());
+	SceneManager::GetInstance()->Initialize(STAGE); // タイトルシーンから開始
 
 }
-void Framework::Update()
-{
+void Framework::Update() {
 	//メッセージ処理
-	if (winApp->ProcessMessage()) {
+	if (WinApp::GetInstance()->ProcessMessage()) {
 		endRequest = true;
 	}
 	//入力の更新
 	Input::GetInstance()->Update();
+	
 	//シーンマネージャーの更新
-	sceneManager->Update();
+	SceneManager::GetInstance()->Update();
 
+	Camera* mainCamera = SceneManager::GetInstance()->GetMainCamera();
 
+	if (mainCamera) {
+		// ラインマネージャーのカメラ設定
+		LineManager::GetInstance()->SetDefaultCamera(mainCamera);
+		OffScreenRendering::GetInstance()->SetCamera(mainCamera);
+	}
+
+	//オフスクリーンレンダリングの更新
+	OffScreenRendering::GetInstance()->Update();
+//
+	LineManager::GetInstance()->Update();
 }
-
-void Framework::Finalize()
-{
-
-	//ImGuiManagerの終了
-#ifdef _DEBUG
-	imGuiManager->Finalize();
-#endif // DEBUG
-	AudioCommon::GetInstance()->Finalize();
+void Framework::Finalize() {
+#ifdef USE_IMGUI
+	ImGuiManager::GetInstance()->Finalize();
+#endif // USE_IMGUI
 
 	Input::GetInstance()->Finalize();
 
-	//テクスチャマネージャの終了
+	// パーティクルマネージャの明示解放（エミッター内のGPUリソースを先に解放する）
+	ParticleManager::GetInstance()->Finalize();
+
 	TextureManager::GetInstance()->Finalize();
-	//モデルマネージャーの終了
 	ModelManager::GetInstance()->Finalize();
-	//DirectX共通部分の削除
-	CloseHandle(dxCommon->GetFenceEvent());
+	CloseHandle(DirectXCommon::GetInstance()->GetFenceEvent());
 
-	//DirectX共通部分の終了
-	dxCommon.reset();
-	//WindowsAppの削除
-	winApp->Finalize();
-	winApp.reset();
+	OffScreenRendering::GetInstance()->Finalize();
+	SrvManager::GetInstance()->Finalize();
+	SceneManager::GetInstance()->Finalize();
 
+	ParticleCommon::GetInstance()->Finalize();
+	SpriteCommon::GetInstance()->Finalize();
+	Object3dCommon::GetInstance()->Finalize();
+	SkyBoxCommon::GetInstance()->Finalize();
+	LineManager::GetInstance()->Finalize();
+	
+	AudioCommon::GetInstance()->Finalize();
+	DirectXCommon::GetInstance()->Finalize();
+	WinApp::GetInstance()->Finalize();
 }
 
 
-void Framework::Run()
-{
+
+void Framework::Run() {
 	//初期化
 	Initialize();
 	//メインループ
-	while (true)
-	{
+	while (true) {
 		//更新
 		Update();
 
 		//終了リクエストがあったら
-		if (IsEndRequest())
-		{
+		if (IsEndRequest()) {
 			//ループを抜ける
 			break;
 		}
@@ -136,40 +142,37 @@ void Framework::Run()
 	Finalize();
 }
 
-void Framework::FrameworkPreDraw()
-{
+void Framework::FrameworkSwapChainPreDraw() {
 	//描画前処理
-	dxCommon->PreDraw();
-	//ImGuiの受付開始
-	srvManager->PreDraw();
+	DirectXCommon::GetInstance()->PreDraw();
+
 }
 
-void Framework::FrameworkPostDraw()
-{
-#ifdef _DEBUG
+void Framework::FrameworkSwapChainPostDraw() {
+#ifdef USE_IMGUI
 	//ImGuiの描画
-	imGuiManager->Draw();
-#endif // _DEBUG
+	ImGuiManager::GetInstance()->Draw();
+#endif // USE_IMGUI
 
-
+	OffScreenRendering::GetInstance()->TransitionRenderTextureToRenderTarget();
 	//描画
-	dxCommon->PostDraw();
+	DirectXCommon::GetInstance()->PostDraw();
 }
 
-void Framework::ImguiPreDraw()
-{
-#ifdef _DEBUG
+void Framework::ImguiPreDraw() {
+#ifdef USE_IMGUI
 	//ImGuiの受付開始
-	imGuiManager->Begin();
+	ImGuiManager::GetInstance()->Begin();
 
-	sceneManager->ImGuiDraw();
-#endif // _DEBUG
+	SceneManager::GetInstance()->ImGuiDraw();
+
+	OffScreenRendering::GetInstance()->DrawImGui();
+#endif // USE_IMGUI
 
 }
 
-void Framework::ImguiPostDraw()
-{
-#ifdef _DEBUG
+void Framework::ImguiPostDraw() {
+#ifdef USE_IMGUI
 	//ImGuiの受付終了
 	ImGui::ShowDemoWindow();
 	//BlendMode変更
@@ -185,30 +188,58 @@ void Framework::ImguiPostDraw()
 	ImGui::SliderInt("SpriteBlendNum", &spriteBlendModeNum, 0, 5);
 	ImGui::End();
 
+
+
+	ImGuiManager::GetInstance()->End();
+#endif // USE_IMGUI
+
+}
+
+void Framework::FrameWorkRenderTargetPreDraw() {
+
+	//ImGuiの受付開始
+	OffScreenRendering::GetInstance()->PreDraw();
+
+	SrvManager::GetInstance()->PreDraw();
+
+	
+	
+}
+
+
+
+
+void Framework::Object3dCommonDraw() {
+	//オブジェクト3Dの描画
+	Object3dCommon::GetInstance()->DrawSettingsCommon(objectBlendModeNum);
+	
+	//3Dオブジェクトの描画
+	SceneManager::GetInstance()->Object3DDraw();
 	
 
-	imGuiManager->End();
-#endif // _DEBUG
-
 }
 
-void Framework::Object3dCommonDraw()
-{
-	//オブジェクト3Dの描画
-	object3dCommon->DrawSettingsCommon(objectBlendModeNum);
-	sceneManager->Object3DDraw();
-}
-
-void Framework::SpriteCommonDraw()
-{
+void Framework::SpriteCommonDraw() {
+	
 	//スプライトの描画
-	spriteCommon->DrawSettingsCommon(spriteBlendModeNum);
-	sceneManager->SpriteDraw();
+	SpriteCommon::GetInstance()->DrawSettingsCommon(spriteBlendModeNum);
+	SceneManager::GetInstance()->SpriteDraw();
+	
+
 }
 
-void Framework::ParticleCommonDraw()
-{
+void Framework::ParticleCommonDraw() {
 	//パーティクルの描画
-	particleCommon->DrawSettingsCommon();
-	sceneManager->ParticleDraw();
+	ParticleCommon::GetInstance()->DrawSettingsCommon();
+	SceneManager::GetInstance()->ParticleDraw();
 }
+
+void Framework::OffScreenRenderingDraw() {
+	OffScreenRendering::GetInstance()->TransitionRenderTextureToShaderResource();
+
+	OffScreenRendering::GetInstance()->TransitionDepthTo(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+	//オフスクリーンレンダリングの描画
+	OffScreenRendering::GetInstance()->Draw();
+}
+
