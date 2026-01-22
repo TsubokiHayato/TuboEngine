@@ -191,7 +191,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Camera\FollowTopDownCamera.cpp" />
     <ClCompile Include="engine\Framework\Framework.cpp" />
     <ClCompile Include="engine\Framework\Order.cpp" />
-    <ClCompile Include="application\HitEffect\HitEffectManager.cpp" />
     <ClCompile Include="engine\graphic\line\Line.cpp" />
     <ClCompile Include="engine\graphic\line\LineCommon.cpp" />
     <ClCompile Include="engine\graphic\line\LineManager.cpp" />
@@ -297,7 +296,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Bullet\Enemy\EnemyNormalBullet.h" />
     <ClInclude Include="application\Block\Block.h" />
     <ClInclude Include="application\Camera\FollowTopDownCamera.h" />
-    <ClInclude Include="application\HitEffect\HitEffectManager.h" />
     <ClInclude Include="engine\graphic\PostEffect\DissolveEffect.h" />
     <ClInclude Include="engine\graphic\PSO\PostEffect\DissolvePSO.h" />
     <ClInclude Include="engine\graphic\data\CameraForGPU.h" />
