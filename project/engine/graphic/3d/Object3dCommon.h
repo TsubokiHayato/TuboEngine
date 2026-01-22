@@ -76,7 +76,7 @@ private:
 
 
 	Camera* defaultCamera = nullptr;//デフォルトカメラ
-	int blenderMode_;//ブレンダーモード
+	int blenderMode_=0;//ブレンダーモード
 
 };
 

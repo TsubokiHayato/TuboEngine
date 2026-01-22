@@ -70,7 +70,7 @@ public:
 
 private:
     // クライアント領域のサイズ（ウィンドウサイズを表す構造体）
-    RECT wrc;
+	RECT wrc = {};
 
     // ウィンドウハンドル
     HWND hwnd = nullptr;
