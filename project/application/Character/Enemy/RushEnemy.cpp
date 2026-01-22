@@ -98,7 +98,7 @@ void RushEnemy::UpdatePerceptionAndTimers(float dt, bool& canSeePlayer, float& d
         if (distanceToPlayer > exitThresh) requireExitBeforeNextRush_ = false;
     }
 
-    // scanning sway (無効化したいなら早期returnにしても良い)
+    // scanning sway (無効化したいなら早期Returnにしても良い)
     if (isScanning_) {
         lookAroundTimer_ -= dt;
         if (lookAroundTimer_ <= 0.0f) { isScanning_ = false; state_ = State::Idle; }
