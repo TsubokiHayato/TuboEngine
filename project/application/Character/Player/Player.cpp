@@ -147,8 +147,10 @@ void Player::Update() {
 				damageCooldownTimer = 0.0f;
 		}
 		UpdateDodge();
-		// 回避入力（Zキー）
-		if (CanDodge() && Input::GetInstance()->PushKey(DIK_SPACE)) {
+		// 回避入力（SPACEキー）
+		// 長押し(PushKey)だと、クールダウン明けに押しっぱなしで即ダッシュしてしまうので
+		// 押した瞬間(TriggerKey)でのみ開始する。
+		if (CanDodge() && Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			StartDodge();
 		}
 		Move();
@@ -490,7 +492,7 @@ Vector3 Player::GetAimDirectionFromReticle() const {
 	DirectX::XMVECTOR det;
 	DirectX::XMMATRIX xmInvVP = DirectX::XMMatrixInverse(&det, xmVP);
 	// ヘルパー: アンプロジェクト
-	auto unproject = [&](float x, float y, float z) {
+	auto unprotect = [&](float x, float y, float z) {
 		DirectX::XMVECTOR p = DirectX::XMVectorSet(x, y, z, 1.0f);
 		DirectX::XMVECTOR w = DirectX::XMVector4Transform(p, xmInvVP);
 		DirectX::XMFLOAT4 wf;
@@ -500,8 +502,8 @@ Vector3 Player::GetAimDirectionFromReticle() const {
 		}
 		return Vector3{wf.x, wf.y, wf.z};
 	};
-	Vector3 worldNear = unproject(ndcX, ndcY, 0.0f);
-	Vector3 worldFar  = unproject(ndcX, ndcY, 1.0f);
+	Vector3 worldNear = unprotect(ndcX, ndcY, 0.0f);
+	Vector3 worldFar  = unprotect(ndcX, ndcY, 1.0f);
 	Vector3 rayOrigin = worldNear;
 	Vector3 rayDir = {worldFar.x - worldNear.x, worldFar.y - worldNear.y, worldFar.z - worldNear.z};
 	float len = std::sqrt(rayDir.x * rayDir.x + rayDir.y * rayDir.y + rayDir.z * rayDir.z);
