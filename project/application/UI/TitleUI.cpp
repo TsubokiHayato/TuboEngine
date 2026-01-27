@@ -30,9 +30,9 @@ void TitleUI::Initialize() {
 	requestSceneChange_ = false;
 	selectedIndex_ = 0;
 	decisionIndex_ = -1;
-	selectorAnimTime_ = 0.0f;
-	selectorDecisionAnim_ = false;
-	selectorDecisionAnimTime_ = 0.0f;
+	selectorAnimeTime_ = 0.0f;
+	selectorDecisionAnime_ = false;
+	selectorDecisionAnimeTime_ = 0.0f;
 
 	// 画面中央X座標（例: 1280x720想定）
 	const float centerX = 1280.0f / 2.0f;
@@ -176,19 +176,19 @@ void TitleUI::Update() {
 ///-------------------------------------------///
 void TitleUI::UpdateSelectorAnimTime(float deltaTime) {
 	// セレクターのアニメーション用経過時間を加算
-	selectorAnimTime_ += deltaTime;
+	selectorAnimeTime_ += deltaTime;
 }
 
 ///-------------------------------------------///
 /// 決定アニメーションの進行・終了判定
 ///-------------------------------------------///
 bool TitleUI::HandleDecisionAnimation(float deltaTime) {
-	if (selectorDecisionAnim_) {
+	if (selectorDecisionAnime_) {
 		// 決定アニメーション中
-		selectorDecisionAnimTime_ += deltaTime;
-		if (selectorDecisionAnimTime_ > 0.3f) { // 0.3秒でアニメーション終了
-			selectorDecisionAnim_ = false;
-			selectorDecisionAnimTime_ = 0.0f;
+		selectorDecisionAnimeTime_ += deltaTime;
+		if (selectorDecisionAnimeTime_ > 0.3f) { // 0.3秒でアニメーション終了
+			selectorDecisionAnime_ = false;
+			selectorDecisionAnimeTime_ = 0.0f;
 			// アニメーション終了時にClickを呼ぶ
 			if (decisionIndex_ >= 0 && decisionIndex_ < static_cast<int>(buttons_.size())) {
 				buttons_[decisionIndex_]->Click();
@@ -214,8 +214,8 @@ void TitleUI::HandleInput() {
 	}
 	// 決定ボタン：決定アニメーション開始
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN) || Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-        selectorDecisionAnim_ = true;
-        selectorDecisionAnimTime_ = 0.0f;
+        selectorDecisionAnime_ = true;
+        selectorDecisionAnimeTime_ = 0.0f;
         decisionIndex_ = selectedIndex_;
     }
 }
@@ -229,13 +229,13 @@ void TitleUI::UpdateSelectorSprite() {
 	(void)centerX;
 	// --- スケールアニメーション ---
 	float scale = 1.0f;
-	if (selectorDecisionAnim_) {
+	if (selectorDecisionAnime_) {
 		// 決定時は一瞬大きくしてから戻す
-		float t = selectorDecisionAnimTime_ / 0.3f;
+		float t = selectorDecisionAnimeTime_ / 0.3f;
 		scale = 1.0f + 0.5f * std::sin(t * 3.14159f); // 0→1→0
 	} else {
 		// 通常はゆっくり拡大縮小
-		scale = 1.0f + 0.1f * std::sin(selectorAnimTime_ * 2.0f * 3.14159f); // 1±0.1
+		scale = 1.0f + 0.1f * std::sin(selectorAnimeTime_ * 2.0f * 3.14159f); // 1±0.1
 	}
 	(void)scale;
 }
