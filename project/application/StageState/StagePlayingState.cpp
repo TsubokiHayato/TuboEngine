@@ -63,7 +63,7 @@ void StagePlayingState::Update(StageScene* scene) {
 	/// プレイヤー ///
 	// カメラ設定
 	player_->SetCamera(followCamera->GetCamera());
-	player_->SetIsDontMove(false);
+	player_->SetDontMove(false);
 	player_->SetMapChipField(mapChipField_);
 
 	// プレイヤー被弾時にカメラシェイク

@@ -59,7 +59,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	// プレイヤー初期化（Stage0のみ）
 	scene->GetPlayer()->Initialize();
 	scene->GetPlayer()->SetMapChipField(scene->GetMapChipField());
-	scene->GetPlayer()->SetIsDontMove(false);
+	scene->GetPlayer()->SetDontMove(false);
 	scene->GetPlayer()->SetPosition(playerPos);
 
 	// フォローカメラ初期化（プレビュー生成にも使う）
@@ -166,6 +166,7 @@ void StageReadyState::Update(StageScene* scene) {
 
 	// 先にプレイヤーを更新してからカメラを更新する（追従対象が最新になる）
 	if (scene && scene->GetPlayer()) {
+		scene->GetPlayer()->SetDontMove(true); // 移動禁止
 		scene->GetPlayer()->SetCamera(scene->GetFollowCamera()->GetCamera());
 		scene->GetPlayer()->Update();
 	}

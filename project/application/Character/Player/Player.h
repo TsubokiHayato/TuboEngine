@@ -115,7 +115,7 @@ public:
 	// マップチップフィールドを設定
 	void SetMapChipField(MapChipField* mapChipField) { this->mapChipField = mapChipField; }
 
-	void SetIsDontMove(bool flag) { isDontMove = flag; }
+	void SetDontMove(bool flag) { isDontMove = flag; }
 
 private:
 	///--------------------------------------------------
