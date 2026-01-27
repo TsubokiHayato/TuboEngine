@@ -8,6 +8,7 @@
 #include "StagePlayingState.h"
 #include "StageReadyState.h"
 #include "TutorialState.h"
+#include "PauseState.h"
 #include "StageType.h"
 #include <map>
 #include <memory>
