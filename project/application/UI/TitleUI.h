@@ -116,11 +116,11 @@ private:
 	bool requestSceneChange_ = false;
 	
 	// セレクターアニメーション用タイマー
-	float selectorAnimTime_ = 0.0f;
+	float selectorAnimeTime_ = 0.0f;
 	// 決定アニメーション中フラグ
-	bool selectorDecisionAnim_ = false;
+	bool selectorDecisionAnime_ = false;
 	// 決定アニメーション用タイマー
-	float selectorDecisionAnimTime_ = 0.0f;
+	float selectorDecisionAnimeTime_ = 0.0f;
 
 	SceneType nextSceneType_ = SceneType::Title;
 
