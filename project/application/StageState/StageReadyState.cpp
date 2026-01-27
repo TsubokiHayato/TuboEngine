@@ -171,6 +171,7 @@ void StageReadyState::Update(StageScene* scene) {
 	}
 
 	scene->GetFollowCamera()->Update();
+
 	LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
 
 	for (auto& block : scene->GetBlocks()) {
