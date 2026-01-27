@@ -147,8 +147,10 @@ void Player::Update() {
 				damageCooldownTimer = 0.0f;
 		}
 		UpdateDodge();
-		// 回避入力（Zキー）
-		if (CanDodge() && Input::GetInstance()->PushKey(DIK_SPACE)) {
+		// 回避入力（SPACEキー）
+		// 長押し(PushKey)だと、クールダウン明けに押しっぱなしで即ダッシュしてしまうので
+		// 押した瞬間(TriggerKey)でのみ開始する。
+		if (CanDodge() && Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			StartDodge();
 		}
 		Move();
