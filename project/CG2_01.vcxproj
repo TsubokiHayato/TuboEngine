@@ -117,6 +117,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\StageState\GameClearState.cpp" />
     <ClCompile Include="application\StageState\GameOverState.cpp" />
     <ClCompile Include="application\StageState\IStageState.cpp" />
+    <ClCompile Include="application\StageState\PauseState.cpp" />
     <ClCompile Include="application\StageState\RewardSelectState.cpp" />
     <ClCompile Include="application\StageState\StageClearState.cpp" />
     <ClCompile Include="application\StageState\StagePlayingState.cpp" />
@@ -247,6 +248,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Character\Enemy\RushEnemy.h" />
     <ClInclude Include="application\Character\Player\Player.h" />
     <ClInclude Include="application\Bullet\Player\PlayerBullet.h" />
+    <ClInclude Include="application\StageState\PauseState.h" />
     <ClInclude Include="application\StageState\TutorialState.h" />
     <ClInclude Include="application\UI\GuideUI.h" />
     <ClInclude Include="engine\graphic\PSO\Blend\BlendPSO.h" />
