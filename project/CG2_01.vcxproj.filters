@@ -280,7 +280,7 @@
     <ResourceCompile Include="CG2.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="README_Filters.md" />
+    <None Include="tools\README_Filters.md" />
     <None Include="Resources\Shaders\Object3d.hlsli" />
     <None Include="Resources\Shaders\Particle.hlsli" />
     <None Include="tools\RegenerateFilters.ps1" />
