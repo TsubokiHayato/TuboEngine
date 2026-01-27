@@ -1,17 +1,42 @@
 #include "StagePlayingState.h"
 #include "LineManager.h"
 #include "StageScene.h"
+#include "Input.h"
+#include "TextureManager.h"
+#include "WinApp.h"
 #include <cmath> // 追加: sqrtf など
+
+namespace {
+	constexpr const char* kPauseGuideTex = "Pose.png";
+}
 
 // StagePlayingState
 void StagePlayingState::Enter(StageScene* scene) {
-	ruleSprite_ = std::make_unique<Sprite>();
-	ruleSprite_->Initialize("rule.png");
-	ruleSprite_->SetPosition({0.0f, 0.0f});
-	ruleSprite_->Update();
+
+	// Pause guide UI (show how to open pause)
+	TextureManager::GetInstance()->LoadTexture(kPauseGuideTex);
+	pauseGuideSprite_ = std::make_unique<Sprite>();
+	pauseGuideSprite_->Initialize(kPauseGuideTex);
+
+	// 右上に収まるように画面サイズから計算（anchor=右上）
+	const float margin = 20.0f;
+	Vector2 spriteSize = pauseGuideSprite_->GetSize()/3;
+	const float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
+	pauseGuideSprite_->SetSize({spriteSize.x, spriteSize.y});
+	pauseGuideSprite_->SetPosition({screenW - spriteSize.x, margin});
+	pauseGuideSprite_->SetColor({1.0f, 1.0f, 1.0f, 0.9f});
+	pauseGuideSprite_->Update();
 }
 
 void StagePlayingState::Update(StageScene* scene) {
+
+	// ESCでポーズへ
+	if (Input::GetInstance()->TriggerKey(DIK_ESCAPE)) {
+		if (scene && scene->GetStageStateManager()) {
+			scene->GetStageStateManager()->ChangeState(StageType::Pause, scene);
+		}
+		return;
+	}
 
 	///------------------------------------------------
 	/// 各オブジェクトの取得
@@ -99,12 +124,15 @@ void StagePlayingState::Update(StageScene* scene) {
 		return;
 	}
 
-	ruleSprite_->Update();
-	scene->GetSkyDome()->Update();
+	if (pauseGuideSprite_) pauseGuideSprite_->Update();
+	if (scene->GetSkyDome()) scene->GetSkyDome()->Update();
 
 }
 
-void StagePlayingState::Exit(StageScene* scene) {}
+void StagePlayingState::Exit(StageScene* scene) {
+	(void)scene;
+	pauseGuideSprite_.reset();
+}
 
 void StagePlayingState::Object3DDraw(StageScene* scene) {
 	// 3Dオブジェクトの描画
@@ -157,7 +185,7 @@ void StagePlayingState::SpriteDraw(StageScene* scene) {
 			rush->DrawSprite();
 		}
 	}
-	ruleSprite_->Draw();
+	if (pauseGuideSprite_) pauseGuideSprite_->Draw();
 }
 
 void StagePlayingState::ImGuiDraw(StageScene* scene) {

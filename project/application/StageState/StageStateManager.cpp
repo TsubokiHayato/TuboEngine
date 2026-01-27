@@ -6,6 +6,7 @@
 void StageStateManager::Initialize(StageScene* scene) {
     states_[StageType::Ready]        = std::make_unique<StageReadyState>();
     states_[StageType::Playing]      = std::make_unique<StagePlayingState>();
+    states_[StageType::Pause]        = std::make_unique<PauseState>();
     states_[StageType::StageClear]   = std::make_unique<StageClearState>();
     states_[StageType::RewardSelect] = std::make_unique<RewardSelectState>();
     states_[StageType::Boss]         = std::make_unique<BossState>();
@@ -89,6 +90,9 @@ void StageStateManager::DrawImGui(StageScene* scene) {
         case StageType::Playing:
             ImGui::Text("Playing");
             break;
+        case StageType::Pause:
+            ImGui::Text("Pause");
+            break;
         case StageType::StageClear:
             ImGui::Text("StageClear");
             break;
@@ -123,6 +127,9 @@ void StageStateManager::DrawImGui(StageScene* scene) {
 	}
 	if (ImGui::Button("Playing")) {
 		pendingState_ = StageType::Playing;
+	}
+	if (ImGui::Button("Pause")) {
+		pendingState_ = StageType::Pause;
 	}
 	if (ImGui::Button("StageClear")) {
 		pendingState_ = StageType::StageClear;
