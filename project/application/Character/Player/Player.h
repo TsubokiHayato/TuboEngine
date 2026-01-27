@@ -175,4 +175,16 @@ private:
 	// 連続リング発生のためのタイマーと間隔
 	float dodgeRingIntervalSec_ = 0.12f; // 回避中の連続発生間隔
 	float dodgeRingEmitTimer_ = 0.0f;    // 次発生までの残り時間
+
+	// Dash演出（ポストエフェクト）
+	float dashPostEffectTimer_ = 0.0f;
+	float dashPostEffectDuration_ = 0.25f;
+	float dashRadialBlurPower_ = 0.06f; // 0.02がデフォルトなので少し強め
+
+	// Damage演出（ポストエフェクト）
+	// HP割合で常時かけるビネット（低HPほど強い）
+	float lowHpVignetteMaxPower_ = 3.0f; // HP0付近での最大（デフォルト0.8→最大3.0）
+	float lowHpVignetteStartRatio_ = 0.5f; // このHP割合以下から効き始める
+	float lowHpVignetteSmoothing_ = 0.15f; // 追従のなめらかさ（0で即時）
+	float lowHpVignetteCurrentPower_ = 0.8f; // 現在適用中（補間用）
 };

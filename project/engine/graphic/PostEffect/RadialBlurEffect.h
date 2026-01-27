@@ -22,6 +22,11 @@ public:
 	void DrawImGui() override;
 	void Draw(ID3D12GraphicsCommandList* commandList) override;
 
+	// Dash等の演出用にパラメータを外部から操作
+	void SetPower(float power);
+	void SetCenter(const Vector2& center);
+	float GetPower() const;
+
 private:
 	std::unique_ptr<RadialBlurPSO> pso_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> cbResource_;

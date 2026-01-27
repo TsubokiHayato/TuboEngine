@@ -7,6 +7,7 @@
 #include "TextureManager.h"
 #include "engine/graphic/Particle/ParticleManager.h"
 #include "engine/graphic/Particle/RingEmitter.h"
+#include "engine/graphic/PostEffect/OffScreenRendering.h"
 
 //--------------------------------------------------
 // コンストラクタ
@@ -139,7 +140,8 @@ void Player::Update() {
 	}
 
 	if (!isDontMove) {
-		isHit = false;
+		// ※isHit は OnCollision で立つ。ここで毎フレーム落とすと「被弾したフレーム」を取り逃すので
+		// 演出検出後に落とす。
 		// ダメージクールダウンタイマー更新
 		if (damageCooldownTimer > 0.0f) {
 			damageCooldownTimer -= 1.0f / 60.0f;
@@ -171,6 +173,9 @@ void Player::Update() {
 			isAllive = false; // HPが0以下なら死亡状態にする
 		}
 	}
+
+	// 被弾フラグは既存仕様通りこのタイミングで落とす
+	isHit = false;
 
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
@@ -204,8 +209,59 @@ void Player::Update() {
 	bool dodgingNow = isDodging;             // 既存の回避フラグを使用
 	if (dashRingEmitter_ && dodgingNow && !wasDodgingPrevLocal) {
 		TriggerDashRing();
+		// Dash演出: ポストエフェクトを一時的にRadialBlurへ
+		dashPostEffectTimer_ = dashPostEffectDuration_;
+		OffScreenRendering::GetInstance()->SetDashPostEffectEnabled(true);
 	}
 	wasDodgingPrevLocal = dodgingNow;
+
+	// Dashポストエフェクトの時間経過で自動復帰
+	if (dashPostEffectTimer_ > 0.0f) {
+		dashPostEffectTimer_ -= 1.0f / 60.0f;
+		// 0→1 の進行度（開始直後=1、終了直前=0）
+		float t = dashPostEffectTimer_ / std::max(0.0001f, dashPostEffectDuration_);
+		t = std::clamp(t, 0.0f, 1.0f);
+		// 立ち上がりで強く、徐々に弱まる（イージング）
+		float eased = t * t; // ease-out
+		OffScreenRendering::GetInstance()->SetDashRadialBlurPower(dashRadialBlurPower_ * eased);
+		if (dashPostEffectTimer_ <= 0.0f) {
+			dashPostEffectTimer_ = 0.0f;
+			OffScreenRendering::GetInstance()->SetDashRadialBlurPower(0.02f); // RadialBlurのデフォルトへ戻す
+			OffScreenRendering::GetInstance()->SetDashPostEffectEnabled(false);
+		}
+	}
+
+	// 低HP演出: HP割合が下がるほどビネットを強くする（常時）
+	// ※最大HPが固定(=5)ならこれでOK。将来可変なら getter を追加して置き換える。
+	constexpr float kMaxHpAssumed = 5.0f;
+	float hpRatio = (kMaxHpAssumed > 0.0f) ? (static_cast<float>(HP) / kMaxHpAssumed) : 1.0f;
+	hpRatio = std::clamp(hpRatio, 0.0f, 1.0f);
+
+	// 低HP開始ライン以下で 0→1 に正規化（HPが低いほど1に近い）
+	float t = 0.0f;
+	if (hpRatio < lowHpVignetteStartRatio_) {
+		float denom = std::max(0.0001f, lowHpVignetteStartRatio_);
+		t = (lowHpVignetteStartRatio_ - hpRatio) / denom;
+	}
+	t = std::clamp(t, 0.0f, 1.0f);
+	// 強めのカーブ（HP少ない時ほど急激に濃く）
+	float eased = t * t;
+	float targetPower = 0.8f + (lowHpVignetteMaxPower_ - 0.8f) * eased;
+
+	// なめらかに追従
+	if (lowHpVignetteSmoothing_ <= 0.0f) {
+		lowHpVignetteCurrentPower_ = targetPower;
+	} else {
+		float a = std::clamp(lowHpVignetteSmoothing_, 0.0f, 1.0f);
+		lowHpVignetteCurrentPower_ = lowHpVignetteCurrentPower_ + (targetPower - lowHpVignetteCurrentPower_) * a;
+	}
+
+	if (lowHpVignetteCurrentPower_ > 0.81f) {
+		OffScreenRendering::GetInstance()->SetLowHpVignetteEnabled(true);
+		OffScreenRendering::GetInstance()->SetLowHpVignettePower(lowHpVignetteCurrentPower_);
+	} else {
+		OffScreenRendering::GetInstance()->SetLowHpVignetteEnabled(false);
+	}
 }
 
 //--------------------------------------------------
