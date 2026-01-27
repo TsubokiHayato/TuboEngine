@@ -23,6 +23,10 @@ namespace {
 	float gCursorOffsetX = 16.0f; // X方向オフセット
 	float gCursorOffsetY = 40.0f;  // 追加: Y方向オフセット
 	float gCursorSize = 26.0f;
+
+	// 追加: 背景（画面全体の半透明グレー）
+	float gBackgroundAlpha = 0.55f;
+
 	// PoseUI/Pose.png はサイズ固定（調整しない）。位置だけImGui対応。
 	float gPoseX = kScreenW * 0.5f; // X軸：真ん中
 	float gPoseY = 100.0f;          // Y軸：上側（上からのマージン）
@@ -58,6 +62,15 @@ void PauseState::Enter(StageScene* /*scene*/) {
 	TextureManager::GetInstance()->LoadTexture("PoseUI/ReturnGame.png");
 	TextureManager::GetInstance()->LoadTexture("PoseUI/ReStart.png");
 	TextureManager::GetInstance()->LoadTexture("PoseUI/ReturnTitle.png");
+
+	// 追加: 背景（半透明グレー）
+	background_ = std::make_unique<Sprite>();
+	background_->Initialize("barrier.png");
+	background_->SetAnchorPoint({0.0f, 0.0f});
+	background_->SetSize({kScreenW, kScreenH});
+	background_->SetPosition({0.0f, 0.0f});
+	background_->SetColor({0.0f, 0.0f, 0.0f, gBackgroundAlpha});
+	background_->Update();
 
 	blackout_ = std::make_unique<Sprite>();
 	blackout_->Initialize("PoseUI/Pose.png");
@@ -160,6 +173,14 @@ void PauseState::Update(StageScene* scene) {
 		pulse = std::sinf(gPoseAnimTime * gPoseColorPulseSpeed) * gPoseColorPulseAmp;
 	}
 
+	// 背景（半透明グレー）
+	if (background_) {
+		background_->SetSize({kScreenW, kScreenH});
+		background_->SetPosition({0.0f, 0.0f});
+		background_->SetColor({0.0f, 0.0f, 0.0f, gBackgroundAlpha});
+		background_->Update();
+	}
+
 	// ImGui調整内容を反映
 	if (blackout_) {
 		blackout_->SetPosition({gPoseX, gPoseY + floatY});
@@ -185,6 +206,7 @@ void PauseState::Update(StageScene* scene) {
 }
 
 void PauseState::Exit(StageScene* /*scene*/) {
+	background_.reset();
 	blackout_.reset();
 	cursor_.reset();
 	resumeText_.reset();
@@ -223,6 +245,8 @@ void PauseState::SpriteDraw(StageScene* scene) {
 		scene->GetPlayer()->ReticleDraw();
 	}
 
+	// 追加: 背景→UIの順で描画
+	if (background_) background_->Draw();
 	if (blackout_) blackout_->Draw();
 	if (resumeText_) resumeText_->Draw();
 	if (restartText_) restartText_->Draw();
@@ -240,6 +264,9 @@ void PauseState::ImGuiDraw(StageScene* /*scene*/) {
 	ImGui::DragFloat("CursorOffsetX", &gCursorOffsetX, 1.0f, -300.0f, 300.0f);
 	ImGui::DragFloat("CursorOffsetY", &gCursorOffsetY, 1.0f, -300.0f, 300.0f);
 	ImGui::DragFloat("CursorSize", &gCursorSize, 1.0f, 1.0f, 200.0f);
+	ImGui::Separator();
+	ImGui::Text("Background (screen overlay)");
+	ImGui::DragFloat("BackgroundAlpha", &gBackgroundAlpha, 0.01f, 0.0f, 1.0f);
 	ImGui::Separator();
 	ImGui::Text("Pose (PoseUI/Pose.png) position + animation");
 	ImGui::DragFloat("PoseX", &gPoseX, 1.0f, -2000.0f, 2000.0f);
