@@ -95,6 +95,16 @@ public:
 public:
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
 
+	// Dash演出用: 一時的にRadialBlurへ切り替えて強度をブーストする
+	// enable=false にすると元のポストエフェクトへ戻す
+	void SetDashPostEffectEnabled(bool enable);
+	// Dash中のラジアルブラー強度(blurWidth相当)を設定
+	void SetDashRadialBlurPower(float power);
+
+	// HP演出用: Vignetteの強度を継続設定（現在値を保存して、Disableで復帰）
+	void SetLowHpVignetteEnabled(bool enable);
+	void SetLowHpVignettePower(float power);
+
 private:
 	///-----------------------------------------------------------------------
 	///                             メンバ変数
@@ -148,4 +158,13 @@ private:
 	///-----------------------------------------------------------------------
 
 	PostEffectManager postEffectManager;
+
+	// Dash用状態
+	bool dashPostEffectEnabled_ = false;
+	int32_t dashEffectIndex_ = -1;      // RadialBlur の index
+	int32_t savedEffectIndex_ = 0;      // 復帰用
+
+	// LowHP用状態
+	bool lowHpVignetteEnabled_ = false;
+	float savedVignettePower_ = 0.8f;
 };
