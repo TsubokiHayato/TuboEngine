@@ -123,6 +123,7 @@
     <ClCompile Include="application\Tile\Tile.cpp" />
     <ClCompile Include="engine\scene\OverScene.cpp" />
     <ClCompile Include="application\SkyDome\SkyDome.cpp" />
+    <ClCompile Include="application\StageState\PauseState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\Character\Enemy\RushEnemy.h" />
@@ -273,6 +274,7 @@
     <ClInclude Include="application\Tile\Tile.h" />
     <ClInclude Include="engine\scene\OverScene.h" />
     <ClInclude Include="application\SkyDome\SkyDome.h" />
+    <ClInclude Include="application\StageState\PauseState.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CG2.rc" />
