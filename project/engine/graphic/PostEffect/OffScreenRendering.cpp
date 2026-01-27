@@ -69,6 +69,80 @@ void OffScreenRendering::Initialize() {
 	postEffectManager.AddEffect(std::make_unique<BloomEffect>());             // ブルームエフェクト
 	// PostEffectManagerの初期化
 	postEffectManager.InitializeAll();
+
+	// Dash用: effectNames の並びに合わせて RadialBlur の index は 8
+	// （OffScreenRendering::DrawImGui の配列と揃えておく）
+	dashEffectIndex_ = 8;
+}
+
+void OffScreenRendering::SetDashPostEffectEnabled(bool enable) {
+	if (dashEffectIndex_ < 0 || static_cast<size_t>(dashEffectIndex_) >= postEffectManager.GetEffectCount()) {
+		return;
+	}
+
+	if (enable) {
+		if (dashPostEffectEnabled_) {
+			return;
+		}
+		savedEffectIndex_ = static_cast<int32_t>(postEffectManager.GetCurrentIndex());
+		postEffectManager.SetCurrentEffect(static_cast<size_t>(dashEffectIndex_));
+		dashPostEffectEnabled_ = true;
+	} else {
+		if (!dashPostEffectEnabled_) {
+			return;
+		}
+		postEffectManager.SetCurrentEffect(static_cast<size_t>(savedEffectIndex_));
+		dashPostEffectEnabled_ = false;
+	}
+}
+
+void OffScreenRendering::SetDashRadialBlurPower(float power) {
+	if (auto* radial = postEffectManager.GetEffect<RadialBlurEffect>()) {
+		radial->SetPower(power);
+	}
+}
+
+void OffScreenRendering::SetLowHpVignetteEnabled(bool enable) {
+	auto* vignette = postEffectManager.GetEffect<VignetteEffect>();
+	if (!vignette) {
+		return;
+	}
+	auto* params = vignette->GetParams();
+	if (!params) {
+		return;
+	}
+
+	if (enable) {
+		if (lowHpVignetteEnabled_) {
+			return;
+		}
+		// 現在のエフェクトとビネット強度を保存して、Vignetteへ切り替える
+		savedEffectIndex_ = static_cast<int32_t>(postEffectManager.GetCurrentIndex());
+		savedVignettePower_ = params->vignettePower;
+		// Vignette は effectNames の並びで index=3（OffScreenRendering::Initialize の追加順と一致）
+		postEffectManager.SetCurrentEffect(static_cast<size_t>(3));
+		lowHpVignetteEnabled_ = true;
+	} else {
+		if (!lowHpVignetteEnabled_) {
+			return;
+		}
+		params->vignettePower = savedVignettePower_;
+		// 元のエフェクトへ戻す
+		postEffectManager.SetCurrentEffect(static_cast<size_t>(savedEffectIndex_));
+		lowHpVignetteEnabled_ = false;
+	}
+}
+
+void OffScreenRendering::SetLowHpVignettePower(float power) {
+	auto* vignette = postEffectManager.GetEffect<VignetteEffect>();
+	if (!vignette) {
+		return;
+	}
+	auto* params = vignette->GetParams();
+	if (!params) {
+		return;
+	}
+	params->vignettePower = power;
 }
 
 void OffScreenRendering::Update() {
@@ -155,7 +229,7 @@ void OffScreenRendering::Draw() {
 
 	// 4. SRV用ディスクリプタヒープをセット
 	ID3D12DescriptorHeap* descriptorHeaps[] = {DirectXCommon::GetInstance()->GetSrvDescriptorHeap().Get()};
-	commandList->SetDescriptorHeaps(1, descriptorHeaps);
+ commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
 	// 5. PSO・ルートシグネチャ設定
 	postEffectManager.DrawCurrent(commandList.Get());
