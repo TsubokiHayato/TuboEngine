@@ -65,6 +65,13 @@ void StageStateManager::ChangeState(StageType nextType, StageScene* scene) {
     if (currentState_) {
         currentState_->Exit(scene);
     }
+
+    // 重要: ステート遷移直後に「Enterで使うTrigger判定」が誤爆しないようにする
+    // (例: Pauseメニュー決定にSPACEを使うと、次ステートで回避/ダッシュが即発動する)
+    if (Input::GetInstance()) {
+        Input::GetInstance()->FlushTriggers();
+    }
+
     currentState_ = it->second.get();
     state_ = nextType;
     if (currentState_) {
