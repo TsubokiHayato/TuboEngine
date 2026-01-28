@@ -110,6 +110,11 @@ public:
 	bool GetIsRequestSceneChange() const { return isRequestSceneChange; }
 	void SetIsRequestSceneChange(bool request) { isRequestSceneChange = request; }
 
+	// 追加: 同一StageScene内のステート切替を、SceneChangeAnimationで
+	// 『覆い→ステート切替→開場』として扱うためのリクエストAPI
+	void RequestStateChangeWithTransition(StageType nextState);
+	bool IsStateChangeTransitionActive() const { return isStateChangeTransitionActive_; }
+
 	// ------------------------
 	// Multi-stage layout
 	// ------------------------
@@ -180,6 +185,11 @@ private:
 
 	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation_ = nullptr;
 	bool isRequestSceneChange = false;
+
+	// 追加: ステート切替(リスタート等)用のトランジション状態
+	bool isStateChangeTransitionActive_ = false;
+	StageType pendingNextState_ = StageType::Ready;
+	bool startDisappearingAfterStateChange_ = false;
 
 	std::unique_ptr<HpUI> hpUI_;
 	std::unique_ptr<EnemyHpUI> enemyHpUI_;
