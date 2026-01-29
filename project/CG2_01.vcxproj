@@ -341,7 +341,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="engine\imgui\ImGuiManager.h" />
-    <ClInclude Include="engine\base\Framework\Framework.h" />
     <ClInclude Include="engine\scene\IScene.h" />
     <ClInclude Include="engine\base\Framework\Order.h" />
     <ClInclude Include="engine\graphic\Particle\Particle.h" />

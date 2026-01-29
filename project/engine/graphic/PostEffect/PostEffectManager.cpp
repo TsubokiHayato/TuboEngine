@@ -1,6 +1,6 @@
 #include "PostEffectManager.h"
-#include "DepthBasedOutlineEffect.h"
-#include "DissolveEffect.h"
+#include "Effects/DepthBasedOutline/DepthBasedOutlineEffect.h"
+#include "Effects/Dissolve/DissolveEffect.h"
 
 void PostEffectManager::AddEffect(std::unique_ptr<PostEffectBase> effect) {
     effects_.emplace_back(std::move(effect));
