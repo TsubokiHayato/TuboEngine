@@ -5,12 +5,12 @@
 #include <fstream>
 #include <algorithm>
 #include <cstdarg>
-#include "PrimitiveEmitter.h"
-#include "RingEmitter.h"
-#include "CylinderEmitter.h"
-#include "OriginalEmitter.h"
-#include "OrbitTrailEmitter.h"
-#include "DefaultEmitter.h"
+#include "Effects/Primitive/PrimitiveEmitter.h"
+#include "Effects/Ring/RingEmitter.h"
+#include "Effects/Cylinder/CylinderEmitter.h"
+#include "Effects/Original/OriginalEmitter.h"
+#include "Effects/OrbitTrail/OrbitTrailEmitter.h"
+#include "Effects/Default/DefaultEmitter.h"
 
 
 static void ApplyParticleManagerTheme(int themeId = 0) {
