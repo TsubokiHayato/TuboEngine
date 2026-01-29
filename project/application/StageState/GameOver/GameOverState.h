@@ -1,11 +1,10 @@
 #pragma once
-class StageScene; 
-#include "IStageState.h"
+#include "StageState/IStageState.h"
 #include <memory>
 #include "Animation/SceneChangeAnimation.h"
 
 class Player;
-
+class StageScene; 
 class GameOverState : public IStageState
 {
 public:
