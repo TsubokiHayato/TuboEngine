@@ -1,4 +1,4 @@
-#include "engine/graphic/Particle/AuraEmitter.h"
+#include "engine/graphic/Particle/Effects/Aura/AuraEmitter.h"
 
 void AuraEmitter::Initialize(const ParticlePreset& preset) {
 	// 受け取った preset をベースに、オーラ用の既定値を上書きしてから初期化する
