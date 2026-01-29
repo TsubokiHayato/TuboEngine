@@ -59,11 +59,11 @@ void StageReadyState::Enter(StageScene* scene) {
 	// プレイヤー初期化（Stage0のみ）
 	scene->GetPlayer()->Initialize();
 	scene->GetPlayer()->SetMapChipField(scene->GetMapChipField());
-	scene->GetPlayer()->SetIsDontMove(false);
+	scene->GetPlayer()->SetDontMove(false);
 	scene->GetPlayer()->SetPosition(playerPos);
 
 	// フォローカメラ初期化（プレビュー生成にも使う）
-	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), Vector3{0.0f, 0.0f, -70.0f}, 0.25f);
+	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), Vector3{0.0f, 0.0f, -70.0f}, 0.08f);
 	// ズーム制限設定
 	scene->GetFollowCamera()->SetZoomLimits(0.1f, 1.0f);
 	// 開始時は近い(0.1)状態に固定してからカメラ位置を確定
@@ -166,11 +166,13 @@ void StageReadyState::Update(StageScene* scene) {
 
 	// 先にプレイヤーを更新してからカメラを更新する（追従対象が最新になる）
 	if (scene && scene->GetPlayer()) {
+		scene->GetPlayer()->SetDontMove(true); // 移動禁止
 		scene->GetPlayer()->SetCamera(scene->GetFollowCamera()->GetCamera());
 		scene->GetPlayer()->Update();
 	}
 
 	scene->GetFollowCamera()->Update();
+
 	LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
 
 	for (auto& block : scene->GetBlocks()) {

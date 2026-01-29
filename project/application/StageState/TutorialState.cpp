@@ -129,7 +129,7 @@ void TutorialState::BuildTutorialStage(StageScene* scene) {
 
 	scene->GetPlayer()->Initialize();
 	scene->GetPlayer()->SetMapChipField(scene->GetMapChipField());
-	scene->GetPlayer()->SetIsDontMove(false);
+	scene->GetPlayer()->SetDontMove(false);
 	scene->GetPlayer()->SetPosition(playerStartPos);
 
 	// カメラ初期化
@@ -234,7 +234,7 @@ void TutorialState::Update(StageScene* scene) {
 	}
 
 	scene->GetPlayer()->SetCamera(scene->GetFollowCamera()->GetCamera());
-	scene->GetPlayer()->SetIsDontMove(false);
+	scene->GetPlayer()->SetDontMove(false);
 	scene->GetPlayer()->SetMapChipField(scene->GetMapChipField());
 	scene->GetPlayer()->Update();
 

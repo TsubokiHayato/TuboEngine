@@ -46,3 +46,21 @@ void RadialBlurEffect::Draw(ID3D12GraphicsCommandList* commandList) {
     // ここでCBVをバインドする場合:
     commandList->SetGraphicsRootConstantBufferView(1, cbResource_->GetGPUVirtualAddress());
 }
+
+void RadialBlurEffect::SetPower(float power) {
+	if (!params_) {
+		return;
+	}
+	params_->radialBlurPower = power;
+}
+
+void RadialBlurEffect::SetCenter(const Vector2& center) {
+	if (!params_) {
+		return;
+	}
+	params_->radialBlurCenter = center;
+}
+
+float RadialBlurEffect::GetPower() const {
+	return params_ ? params_->radialBlurPower : 0.0f;
+}

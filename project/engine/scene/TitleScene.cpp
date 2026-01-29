@@ -34,7 +34,7 @@ void TitleScene::Initialize() {
 	player_ = std::make_unique<Player>();
 	player_->Initialize();
 	// タイトルでは自動操作させない
-	player_->SetIsDontMove(true);
+	player_->SetDontMove(true);
 	// カメラをセット（描画用）
 	player_->SetCamera(camera.get());
 	// 初期は画面左外から入ってくる位置にセット（ワールド座標系前提）

@@ -1,11 +1,7 @@
 #pragma once
 #include<memory>
 #include"PSO.h"
-#include"NormalBlendPSO.h"
-#include"AddBlendPSO.h"
-#include"SubtractBlendPSO.h"
-#include"MultiplyBlendPSO.h"
-#include"ScreenBlendPSO.h"
+#include"BlendPSO.h"
 
 class SpriteCommon
 {
@@ -57,12 +53,7 @@ public:
 private:
 
 	std::unique_ptr <PSO> pso = nullptr;//PSOのユニークポインタ
-	std::unique_ptr <NormalBlendPSO > normalBlendPSO;//NormalBlendPSOのユニークポインタ
-	std::unique_ptr <AddBlendPSO > addBlendPSO;//AddBlendPSOのユニークポインタ
-	std::unique_ptr <MultiplyBlendPSO > multiplyBlendPSO;//MultiplyBlendPSOのユニークポインタ
-	std::unique_ptr <SubtractBlendPSO > subtractBlendPSO;//SubtractBlendPSOのユニークポインタ
-	std::unique_ptr <ScreenBlendPSO > screenBlendPSO;//ScreenBlendPSOのユニークポインタ
-
+	std::unique_ptr <BlendPSO> blendPso_;//ブレンドPSOのユニークポインタ
 
 	int blenderMode_;//ブレンダーモード
 };

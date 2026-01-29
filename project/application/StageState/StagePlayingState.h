@@ -21,7 +21,7 @@ class StageScene;
 	void ParticleDraw(StageScene* scene) override;
 
 private:
-	std::unique_ptr<Sprite> ruleSprite_ = nullptr;
+	std::unique_ptr<Sprite> pauseGuideSprite_ = nullptr; // 追加: ポーズ誘導UI
 
 
  };

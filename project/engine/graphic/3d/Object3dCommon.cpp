@@ -9,25 +9,9 @@ void Object3dCommon::Initialize() {
 	---------------------------------------*/
 	pso = std::make_unique<PSO>();
 	pso->Initialize();
-	// NormalBlendPSOの初期化
-	normalBlendPSO = std::make_unique<NormalBlendPSO>();
-	normalBlendPSO->Initialize();
-	// AddBlendPSOの初期化
-	addBlendPSO = std::make_unique<AddBlendPSO>();
-	addBlendPSO->Initialize();
-	// MultiplyBlendPSOの初期化
-	multiplyBlendPSO = std::make_unique<MultiplyBlendPSO>();
-	multiplyBlendPSO->Initialize();
-	// SubtractBlendPSOの初期化
-	subtractBlendPSO = std::make_unique<SubtractBlendPSO>();
-	subtractBlendPSO->Initialize();
-	// ScreenBlendPSOの初期化
-	screenBlendPSO = std::make_unique<ScreenBlendPSO>();
-	screenBlendPSO->Initialize();
-	
 
-
-
+	blendPso_ = std::make_unique<BlendPSO>();
+	blendPso_->Initialize(kBlendModeNormal);
 }
 
 void Object3dCommon::Finalize() {
@@ -45,24 +29,24 @@ void Object3dCommon::DrawSettingsCommon(int blendMode) {
 		pso->DrawSettingsCommon();
 		break;
 	case 1:
-		// NormalBlendPSO
-		normalBlendPSO->DrawSettingsCommon();
+		blendPso_->SetBlendMode(kBlendModeNormal);
+		blendPso_->DrawSettingsCommon();
 		break;
 	case 2:
-		// AddBlendPSO
-		addBlendPSO->DrawSettingsCommon();
+		blendPso_->SetBlendMode(kBlendModeAdd);
+		blendPso_->DrawSettingsCommon();
 		break;
 	case 3:
-		// SubtractBlendPSO
-		subtractBlendPSO->DrawSettingsCommon();
+		blendPso_->SetBlendMode(kBlendModeSubtract);
+		blendPso_->DrawSettingsCommon();
 		break;
 	case 4:
-		// MultiplyBlendPSO
-		multiplyBlendPSO->DrawSettingsCommon();
+		blendPso_->SetBlendMode(kBlendModeMultily);
+		blendPso_->DrawSettingsCommon();
 		break;
 	case 5:
-		// ScreenBlendPSO
-		screenBlendPSO->DrawSettingsCommon();
+		blendPso_->SetBlendMode(kBlendModeScreen);
+		blendPso_->DrawSettingsCommon();
 		break;
 	default:
 		// デフォルトはpso

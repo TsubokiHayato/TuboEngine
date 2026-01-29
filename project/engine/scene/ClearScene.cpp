@@ -90,7 +90,7 @@ void ClearScene::Initialize() {
     player_ = std::make_unique<Player>();
     player_->Initialize();
     // シーン側から操作するため入力は無効化（自動演出のみ）
-    player_->SetIsDontMove(true);
+    player_->SetDontMove(true);
     // カメラをセット（描画用）
     player_->SetCamera(camera.get());
     // 初期位置を手前に配置して見やすく

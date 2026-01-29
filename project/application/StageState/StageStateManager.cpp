@@ -6,6 +6,7 @@
 void StageStateManager::Initialize(StageScene* scene) {
     states_[StageType::Ready]        = std::make_unique<StageReadyState>();
     states_[StageType::Playing]      = std::make_unique<StagePlayingState>();
+    states_[StageType::Pause]        = std::make_unique<PauseState>();
     states_[StageType::StageClear]   = std::make_unique<StageClearState>();
     states_[StageType::RewardSelect] = std::make_unique<RewardSelectState>();
     states_[StageType::Boss]         = std::make_unique<BossState>();
@@ -64,6 +65,13 @@ void StageStateManager::ChangeState(StageType nextType, StageScene* scene) {
     if (currentState_) {
         currentState_->Exit(scene);
     }
+
+    // 重要: ステート遷移直後に「Enterで使うTrigger判定」が誤爆しないようにする
+    // (例: Pauseメニュー決定にSPACEを使うと、次ステートで回避/ダッシュが即発動する)
+    if (Input::GetInstance()) {
+        Input::GetInstance()->FlushTriggers();
+    }
+
     currentState_ = it->second.get();
     state_ = nextType;
     if (currentState_) {
@@ -88,6 +96,9 @@ void StageStateManager::DrawImGui(StageScene* scene) {
             break;
         case StageType::Playing:
             ImGui::Text("Playing");
+            break;
+        case StageType::Pause:
+            ImGui::Text("Pause");
             break;
         case StageType::StageClear:
             ImGui::Text("StageClear");
@@ -123,6 +134,9 @@ void StageStateManager::DrawImGui(StageScene* scene) {
 	}
 	if (ImGui::Button("Playing")) {
 		pendingState_ = StageType::Playing;
+	}
+	if (ImGui::Button("Pause")) {
+		pendingState_ = StageType::Pause;
 	}
 	if (ImGui::Button("StageClear")) {
 		pendingState_ = StageType::StageClear;
