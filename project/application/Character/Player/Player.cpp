@@ -40,7 +40,7 @@ void Player::Initialize() {
 	// プレイヤーのHP
 	HP = 5;
 	// プレイヤーの死亡状態
-	isAllive = true;
+	isAlive = true;
 
 	// モデルファイルパス
 	const std::string modelFileNamePath = "player/Player.obj";
@@ -116,7 +116,7 @@ void Player::Initialize() {
 // 更新処理
 //--------------------------------------------------
 void Player::Update() {
-	if (isAllive == false) {
+	if (isAlive == false) {
 		// 死亡中でも見た目の姿勢は維持（Object3dへ反映）
 		object3d->SetPosition(position);
 		object3d->SetRotation(rotation);
@@ -135,11 +135,11 @@ void Player::Update() {
 	// Clear/Over等の演出シーンでは isDontMove=true で入力無効化される。
 	// そのときマウス位置参照の Rotate() を走らせると、意図しない方向を向いたり
 	// レティクルが更新されてしまうため、回転はシーン側が制御する。
-	if (!wantCaptureMouse && !isDontMove) {
+	if (!wantCaptureMouse && !isMovementLocked) {
 		Rotate();
 	}
 
-	if (!isDontMove) {
+	if (!isMovementLocked) {
 		// ※isHit は OnCollision で立つ。ここで毎フレーム落とすと「被弾したフレーム」を取り逃すので
 		// 演出検出後に落とす。
 		// ダメージクールダウンタイマー更新
@@ -170,7 +170,7 @@ void Player::Update() {
 		// isAlive==false のバレットを削除
 		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const std::unique_ptr<PlayerBullet>& bullet) { return !bullet->GetIsAlive(); }), bullets.end());
 		if (HP <= 0) {
-			isAllive = false; // HPが0以下なら死亡状態にする
+			isAlive = false; // HPが0以下なら死亡状態にする
 		}
 	}
 
