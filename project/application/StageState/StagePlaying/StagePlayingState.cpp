@@ -63,7 +63,7 @@ void StagePlayingState::Update(StageScene* scene) {
 	/// プレイヤー ///
 	// カメラ設定
 	player_->SetCamera(followCamera->GetCamera());
-	player_->SetDontMove(false);
+	player_->SetMovementLocked(false);
 	player_->SetMapChipField(mapChipField_);
 
 	// プレイヤー被弾時にカメラシェイク
@@ -118,7 +118,7 @@ void StagePlayingState::Update(StageScene* scene) {
 	/// ゲームオーバー判定
 	///------------------------------------------------
 
-	if (!player_->GetIsAllive()) {
+	if (!player_->GetIsAlive()) {
 		// プレイヤーが死亡したらゲームオーバーステートへ
 		scene->GetStageStateManager()->ChangeState(StageType::GameOver, scene);
 		return;

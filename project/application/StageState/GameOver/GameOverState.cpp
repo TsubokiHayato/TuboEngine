@@ -18,7 +18,7 @@ void GameOverState::Enter(StageScene* scene) {
 
 	// プレイヤーは操作停止のみ
 	if (player_) {
-		player_->SetDontMove(true);
+		player_->SetMovementLocked(true);
 		player_->SetModelAlpha(1.0f);
 		player_->SetScale({1.0f, 1.0f, 1.0f});
 		player_->SetCamera(scene->GetFollowCamera()->GetCamera());
