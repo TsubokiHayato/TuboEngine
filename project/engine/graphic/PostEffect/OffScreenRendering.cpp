@@ -1,19 +1,20 @@
 #include "OffscreenRendering.h"
-#include "BloomEffect.h"
 #include "DirectXCommon.h"
-#include "DissolveEffect.h"
-#include "GaussianBlurEffect.h"
-#include "GrayScaleEffect.h"
 #include "ImGuiManager.h"
-#include "NoneEffect.h"
-#include "OutlineEffect.h"
-#include "RadialBlurEffect.h"
-#include "SepiaEffect.h"
-#include "SmoothingEffect.h"
-#include "ToonEffect.h"
-#include "VignetteEffect.h"
 #include "WinApp.h"
-#include "randomEffect.h"
+
+#include "Effects/Bloom/BloomEffect.h"
+#include "Effects/Dissolve/DissolveEffect.h"
+#include "Effects/GaussianBlurEffect/GaussianBlurEffect.h"
+#include "Effects/GrayScale/GrayScaleEffect.h"
+#include "Effects/None/NoneEffect.h"
+#include "Effects/Outline/OutlineEffect.h"
+#include "Effects/RadialBlur/RadialBlurEffect.h"
+#include "Effects/Sepia/SepiaEffect.h"
+#include "Effects/Smoothing/SmoothingEffect.h"
+#include "Effects/Toon/ToonEffect.h"
+#include "Effects/Vignette/VignetteEffect.h"
+#include "Effects/randam/randomEffect.h"
 
 OffScreenRendering* OffScreenRendering::instance = nullptr;
 
@@ -229,7 +230,7 @@ void OffScreenRendering::Draw() {
 
 	// 4. SRV用ディスクリプタヒープをセット
 	ID3D12DescriptorHeap* descriptorHeaps[] = {DirectXCommon::GetInstance()->GetSrvDescriptorHeap().Get()};
- commandList->SetDescriptorHeaps(1, descriptorHeaps);
+	commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
 	// 5. PSO・ルートシグネチャ設定
 	postEffectManager.DrawCurrent(commandList.Get());
