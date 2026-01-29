@@ -25,11 +25,10 @@
 
 // パーティクル
 #include "engine/graphic/Particle/ParticleManager.h"
-#include "engine/graphic/Particle/PrimitiveEmitter.h"
-#include "engine/graphic/Particle/RingEmitter.h"
-#include "engine/graphic/Particle/CylinderEmitter.h"
-#include "engine/graphic/Particle/OriginalEmitter.h"
-
+#include "engine/graphic/Particle/Effects/Primitive/PrimitiveEmitter.h"
+#include "Effects/Ring/RingEmitter.h"
+#include "engine/graphic/Particle/Effects/Original/OriginalEmitter.h"
+#include "Effects/Cylinder/CylinderEmitter.h"
 #undef min
 #undef max
 
