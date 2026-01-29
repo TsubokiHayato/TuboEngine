@@ -1,5 +1,5 @@
 #pragma once
-#include "PrimitiveEmitter.h"
+#include "../Primitive/PrimitiveEmitter.h"
 
 class ClearConfettiEmitter : public PrimitiveEmitter {
 public:
