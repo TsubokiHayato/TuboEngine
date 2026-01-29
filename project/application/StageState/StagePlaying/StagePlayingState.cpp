@@ -104,7 +104,7 @@ void StagePlayingState::Update(StageScene* scene) {
 	// 全ての敵が倒されたかチェック
 	bool allEnemiesDefeated = true;
 	for (const auto& enemy : enemies) {
-		if (enemy->GetIsAllive()) {
+		if (enemy->GetIsAlive()) {
 			allEnemiesDefeated = false;
 			break;
 		}

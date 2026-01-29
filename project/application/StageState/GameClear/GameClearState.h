@@ -1,5 +1,5 @@
 #pragma once
-#include "IStageState.h"
+#include "StageState/IStageState.h"
 class StageScene;
 class GameClearState : public IStageState {
 	public:
