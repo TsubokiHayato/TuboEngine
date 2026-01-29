@@ -501,7 +501,7 @@ void StageScene::CheckAllCollisions() {
 		if (!enemy) {
 			continue;
 		}
-		if (enemy->GetIsAllive() && enemy->GetHP() > 0) {
+		if (enemy->GetIsAlive() && enemy->GetHP() > 0) {
 			collisionManager_->AddCollider(enemy.get());
 		}
 	}

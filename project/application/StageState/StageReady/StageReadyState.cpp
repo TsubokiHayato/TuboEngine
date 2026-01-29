@@ -1,7 +1,7 @@
 #include "StageReadyState.h"
 #include "LineManager.h"
 #include "StageScene.h"
-#include "StageType.h"
+#include "StageState/StageType.h"
 #include "TextureManager.h"
 #include "WinApp.h"
 #include "Sprite.h"
