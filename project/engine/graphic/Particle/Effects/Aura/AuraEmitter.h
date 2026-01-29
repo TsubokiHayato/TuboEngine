@@ -1,5 +1,5 @@
 #pragma once
-#include "PrimitiveEmitter.h"
+#include "Effects/Primitive/PrimitiveEmitter.h"
 
 // プレイヤー周りの常時オーラ用エミッター
 class AuraEmitter : public PrimitiveEmitter {

@@ -5,7 +5,7 @@
 #include "Sprite.h"
 #include "MapChip/MapChipField.h"
 #include "engine/graphic/Particle/ParticleManager.h"
-#include "engine/graphic/Particle/RingEmitter.h"
+#include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 #include "Camera.h"
 // 前方宣言（ヘッダ依存軽減）
 class IParticleEmitter;

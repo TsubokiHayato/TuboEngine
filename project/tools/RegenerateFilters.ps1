@@ -15,13 +15,13 @@ param(
 
   # `RootFolders` : Filterの元にするルートフォルダ
   #   - 例: `engine\graphic\...` のような階層を、そのまま Visual Studio の仮想フォルダ(Filter)にする
-  #   - 必要なら `resources` / `shaders` なども追加してOK
-  [string[]]$RootFolders = @("engine","application"),
+  #   - 必要なら `Resources` / `externals` なども追加してOK
+  [string[]]$RootFolders = @("engine","application","Resources","externals","tools"),
 
   # `Extensions` : 対象にする拡張子
   #   - ここに無い拡張子のファイルはスキャン対象外
   #   - `.vcxproj` に含まれていても、拡張子が対象外なら `.filters` には出ない
-  [string[]]$Extensions = @(".h",".hpp",".inl",".cpp",".c",".txt",".md",".hlsl",".rc")
+  [string[]]$Extensions = @(".h",".hpp",".inl",".cpp",".c",".txt",".md",".hlsl",".hlsli",".rc")
 )
 
 # -----------------------------------------------------------------------------
@@ -82,7 +82,15 @@ $ns.AddNamespace("msb", $projXml.Project.NamespaceURI)
 
 # Include パスのセット(高速に存在判定するため HashSet を利用)
 $included = New-Object System.Collections.Generic.HashSet[string]
-foreach ($nodeName in @("ClCompile","ClInclude","None","ResourceCompile")) {
+foreach ($nodeName in @(
+  "ClCompile",
+  "ClInclude",
+  "None",
+  "ResourceCompile",
+  # シェーダーや追加アイテムも拾う（これが無いと `.filters` が空になりやすい）
+  "FxCompile",
+  "Text"
+)) {
   $nodes = $projXml.SelectNodes("//msb:$nodeName", $ns)
   foreach ($n in $nodes) {
     $inc = $n.GetAttribute("Include")
@@ -161,7 +169,8 @@ foreach ($flt in $filterSet) {
 #   - `.cpp` -> `<ClCompile Include="...">`
 #   - `.h`   -> `<ClInclude Include="...">`
 #   - `.rc`  -> `<ResourceCompile Include="...">`
-#   - その他 -> `<None Include="...">`
+#   - `.hlsl` -> `<FxCompile Include="...">`
+#   - `.txt`  -> `<Text Include="...">` または `<None Include="...">`
 function Add-ItemsGroup([string]$itemName, [object[]]$arr) {
   if ($arr.Count -eq 0) { return }
 
@@ -183,7 +192,7 @@ function Add-ItemsGroup([string]$itemName, [object[]]$arr) {
 }
 
 # 種類ごとに振り分け
-$clCompile = @(); $clInclude = @(); $none = @(); $rc = @()
+$clCompile = @(); $clInclude = @(); $none = @(); $rc = @(); $fx = @(); $text = @()
 foreach ($it in $items) {
   switch ($it.Ext) {
     ".cpp" { $clCompile += $it }
@@ -192,12 +201,17 @@ foreach ($it in $items) {
     ".hpp" { $clInclude += $it }
     ".inl" { $clInclude += $it }
     ".rc"  { $rc += $it }
+    ".hlsl" { $fx += $it }
+    ".hlsli" { $none += $it }
+    ".txt" { $text += $it }
     default { $none += $it }
   }
 }
 
 Add-ItemsGroup "ClCompile" $clCompile
 Add-ItemsGroup "ClInclude" $clInclude
+Add-ItemsGroup "FxCompile" $fx
+Add-ItemsGroup "Text" $text
 Add-ItemsGroup "None" $none
 Add-ItemsGroup "ResourceCompile" $rc
 
