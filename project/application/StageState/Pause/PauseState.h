@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IStageState.h"
+#include "StageState/IStageState.h"
 #include <memory>
 
 class Sprite;
