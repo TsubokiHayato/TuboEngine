@@ -12,8 +12,8 @@
 #include <limits>
 #include <queue>
 #include "engine/graphic/Particle/ParticleManager.h"
-#include "engine/graphic/Particle/PrimitiveEmitter.h"
-#include "engine/graphic/Particle/RingEmitter.h"
+#include "engine/graphic/Particle/Effects/Primitive/PrimitiveEmitter.h"
+#include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 
 constexpr float kPI = 3.14159265358979323846f;
 
@@ -353,7 +353,7 @@ bool Enemy::BuildPathTo(const Vector3& worldGoal) {
 
 void Enemy::Update() {
     // 死亡演出再生後は描画のみ (Update 最低限)
-    if (!isAllive) {
+    if (!isAlive) {
         if (!deathEffectPlayed_) {
             EmitDeathParticle();
             deathEffectPlayed_ = true;
@@ -659,8 +659,8 @@ void Enemy::OnCollision(Collider* other) {
     knockbackVelocity_.y = away.y * speed;
     knockbackTimer_ = 0.12f;
 
-    if (HP <= 0 && isAllive) {
-        isAllive = false;
+    if (HP <= 0 && isAlive) {
+        isAlive = false;
         EmitDeathParticle();
         deathEffectPlayed_ = true;
     }
@@ -671,7 +671,7 @@ void Enemy::OnCollision(Collider* other) {
 }
 
 void Enemy::Draw() {
-    if (isAllive == false) { /* 死亡後は通常モデル非表示 */
+    if (isAlive == false) { /* 死亡後は通常モデル非表示 */
         return;
     }
     if (object3d)
@@ -690,7 +690,7 @@ void Enemy::DrawImGui() {
     ImGui::Begin("Enemy");
     ImGui::Text("Pos:(%.2f,%.2f,%.2f)", position.x, position.y, position.z);
     ImGui::Text("HP:%d", HP);
-    ImGui::Text("Alive:%s", isAllive ? "Yes" : "No");
+    ImGui::Text("Alive:%s", isAlive ? "Yes" : "No");
     ImGui::Text("State:%d", (int)state_);
     if (hitEmitter_) { auto& p = hitEmitter_->GetPreset(); ImGui::Text("HitEmitter rate:%.1f", p.emitRate); }
     if (deathEmitter_) { auto& p = deathEmitter_->GetPreset(); ImGui::Text("DeathEmitter life:[%.2f,%.2f]", p.lifeMin, p.lifeMax); }
@@ -836,7 +836,7 @@ Vector3 Enemy::GetCenterPosition() const {
 
 void Enemy::DrawStateIcon() {
     // 状態に応じた簡易アイコンラインを頭上に描画
-    if (!isAllive)
+    if (!isAlive)
         return;
     Vector3 base = position;
     base.z += 0.0f; // 2D平面なのでそのまま
