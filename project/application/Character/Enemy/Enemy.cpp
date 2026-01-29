@@ -12,8 +12,8 @@
 #include <limits>
 #include <queue>
 #include "engine/graphic/Particle/ParticleManager.h"
-#include "engine/graphic/Particle/PrimitiveEmitter.h"
-#include "engine/graphic/Particle/RingEmitter.h"
+#include "engine/graphic/Particle/Effects/Primitive/PrimitiveEmitter.h"
+#include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 
 constexpr float kPI = 3.14159265358979323846f;
 
