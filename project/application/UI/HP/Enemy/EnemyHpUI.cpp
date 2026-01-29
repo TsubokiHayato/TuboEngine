@@ -32,7 +32,7 @@ void EnemyHpUI::Update(const std::vector<std::unique_ptr<Enemy>>& enemies, Camer
     bars_.resize(enemies.size());
     for (size_t i = 0; i < enemies.size(); ++i) {
         auto* e = enemies[i].get();
-        if (!e || !e->GetIsAllive()) { bars_[i].visible = false; continue; }
+        if (!e || !e->GetIsAlive()) { bars_[i].visible = false; continue; }
         int maxHp = e->GetMaxHP(); if (maxHp <= 0) { bars_[i].visible = false; continue; }
         int currentHp = std::clamp(e->GetHP(), 0, maxHp);
         EnemyBar& bar = bars_[i];
