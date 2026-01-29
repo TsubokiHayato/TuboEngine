@@ -129,7 +129,7 @@ void TutorialState::BuildTutorialStage(StageScene* scene) {
 
 	scene->GetPlayer()->Initialize();
 	scene->GetPlayer()->SetMapChipField(scene->GetMapChipField());
-	scene->GetPlayer()->SetDontMove(false);
+	scene->GetPlayer()->SetMovementLocked(false);
 	scene->GetPlayer()->SetPosition(playerStartPos);
 
 	// カメラ初期化
@@ -234,7 +234,7 @@ void TutorialState::Update(StageScene* scene) {
 	}
 
 	scene->GetPlayer()->SetCamera(scene->GetFollowCamera()->GetCamera());
-	scene->GetPlayer()->SetDontMove(false);
+	scene->GetPlayer()->SetMovementLocked(false);
 	scene->GetPlayer()->SetMapChipField(scene->GetMapChipField());
 	scene->GetPlayer()->Update();
 
@@ -257,7 +257,7 @@ void TutorialState::Update(StageScene* scene) {
 		scene->GetSkyDome()->Update();
 	}
 
-	if (!scene->GetPlayer()->GetIsAllive()) {
+	if (!scene->GetPlayer()->GetIsAlive()) {
 		scene->GetStageStateManager()->ChangeState(StageType::GameOver, scene);
 		return;
 	}
