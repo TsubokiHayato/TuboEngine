@@ -51,6 +51,9 @@ public:
 	bool TriggerKey(BYTE keyNumber) const;
 	const std::array<BYTE, 256>& GetAllKey() const { return key_; }
 
+	// 入力のトリガーを消す（ポーズ解除などで、直前の押下判定を残さないため）
+	void FlushTriggers();
+
 	// マウス
 	const DIMOUSESTATE2& GetAllMouse() const { return mouse_; }
 	bool IsPressMouse(int32_t button) const;

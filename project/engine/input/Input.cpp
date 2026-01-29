@@ -99,6 +99,15 @@ void Input::Update() {
 	// 必要に応じて新規接続の再列挙（例: 一定フレームごとにSetupJoysticks()を呼ぶ）
 }
 
+void Input::FlushTriggers() {
+	// 現在→前回へ同期することで、Trigger判定を出さない
+	keyPre_ = key_;
+	mousePre_ = mouse_;
+	for (auto& joystick : devJoysticks_) {
+		joystick.statePre_ = joystick.state_;
+	}
+}
+
 void Input::Finalize() {
 	if (devKeyboard_) {
 		devKeyboard_->Unacquire();
