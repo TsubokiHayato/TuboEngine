@@ -5,13 +5,13 @@
 #include "Particle.h"
 #include "ParticleEmitter.h"
 #include "SceneManager.h"
-#include "UI/TitleUI.h"
+#include "UI/Title/TitleUI.h"
 #include <random>
 #include "Animation/SceneChangeAnimation.h"
 
 #include <memory>
 #include "Sprite.h"
-#include "Character/Player/Player.h" // 追加: Player
+#include "Character/Player/Player.h"
 
 class TitleScene : public IScene {
 public:

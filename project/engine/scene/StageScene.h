@@ -32,9 +32,9 @@
 #include "SkyDome/SkyDome.h"
 
 #include "Animation/SceneChangeAnimation.h"
-#include "application/UI/HpUI.h"
-#include "application/UI/EnemyHpUI.h"
-#include "application/UI/GuideUI.h"
+#include "application/UI/HP/Player/HpUI.h"
+#include "application/UI/HP/Enemy/EnemyHpUI.h"
+#include "application/UI/Guide/GuideUI.h"
 
 #include <string>
 #include <vector>

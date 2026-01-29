@@ -5,7 +5,6 @@ enum class StageType {
 	Playing,
 	Pause,
 	StageClear,
-	RewardSelect,
 	Boss,
 	GameClear,
 	GameOver,

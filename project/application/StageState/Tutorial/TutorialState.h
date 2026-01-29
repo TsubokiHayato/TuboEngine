@@ -1,6 +1,5 @@
 #pragma once
-
-#include "IStageState.h"
+#include "StageState/IStageState.h"
 #include <string>
 #include <memory>
 
