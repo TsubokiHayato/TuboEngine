@@ -24,7 +24,7 @@ private:
         int maxHp = 0;
         int currentHp = 0;
         float animatedHp = 0.0f; // animated HP for smooth shrink
-        Vector2 basePos{};
+		TuboEngine::Math::Vector2 basePos{};
     };
 
     std::vector<EnemyBar> bars_;

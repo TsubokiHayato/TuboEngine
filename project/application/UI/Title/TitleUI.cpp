@@ -272,7 +272,7 @@ void TitleUI::UpdateButtonSprites() {
 ///-------------------------------------------///
 void TitleUI::UpdateButtonPositions() {
 	const float centerX = 1280.0f / 2.0f;
-	// 必ずbuttonYPositions_のサイズをbuttons_に合わせる
+	// 必ずButtonYPositions_のサイズをButtons_に合わせる
 	buttonYPositions_.resize(buttons_.size());
 	for (size_t i = 0; i < buttons_.size(); ++i) {
 		// Y座標を計算

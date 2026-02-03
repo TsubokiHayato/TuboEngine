@@ -117,10 +117,10 @@ void FollowTopDownCamera::Update() {
 	}
 
 	// プレイヤーの位置を取得
-	Vector3 targetPos = target_->GetPosition();
+	TuboEngine::Math::Vector3 targetPos = target_->GetPosition();
 
 	// 注視点オフセット
-	Vector3 lookAt = targetPos + lookAtOffset_;
+	TuboEngine::Math::Vector3 lookAt = targetPos + lookAtOffset_;
 	(void)lookAt;
 
 	// 回転に応じてオフセットを回転させる（斜め視点対応）
@@ -140,7 +140,7 @@ void FollowTopDownCamera::Update() {
 	}
 
 	// 目標カメラ位置（ズーム対応）
-	Vector3 desiredPos = targetPos + rotatedOffset * zoom_;
+	TuboEngine::Math::Vector3 desiredPos = targetPos + rotatedOffset * zoom_;
 
 	// 障害物回避（雛形）
 	AvoidObstacles(desiredPos);

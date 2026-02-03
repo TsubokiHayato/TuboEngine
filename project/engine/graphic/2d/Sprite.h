@@ -37,11 +37,13 @@ public:
 	/// </summary>
 	void DrawImGui(const char* windowName);
 
-
 	//getter_Pos
-	const Vector2& GetPosition()const { return position; }
+	    const TuboEngine::Math::Vector2&
+	    GetPosition() const {
+		return position;
+	}
 	//setter_Pos
-	void SetPosition(const Vector2& position) { this->position = position; }
+	    void SetPosition(const TuboEngine::Math::Vector2& position) { this->position = position; }
 
 
 	//getter_Rotation
@@ -50,18 +52,18 @@ public:
 	void SetRotation(const float& rotation) { this->rotation = rotation; }
 
 	//getter_Color
-	const Vector4& GetColor()const { return materialData->color;}
+	const TuboEngine::Math::Vector4& GetColor() const { return materialData->color; }
 	//setter_Color
-	void SetColor(const Vector4& color) { materialData->color = color; }
+	void SetColor(const TuboEngine::Math::Vector4& color) { materialData->color = color; }
 
 
 	//getter_Size
-	const Vector2& GetSize()const { return size; }
+	const TuboEngine::Math::Vector2& GetSize() const { return size; }
 	//setter_Size
-	void SetSize(const Vector2& size) { this->size = size; }
+	void SetSize(const TuboEngine::Math::Vector2& size) { this->size = size; }
 
-	const Vector2& GetAnchorPoint()const { return anchorPoint; }
-	void SetAnchorPoint(const Vector2& anchorPoint) { this->anchorPoint = anchorPoint; }
+	const TuboEngine::Math::Vector2& GetAnchorPoint() const { return anchorPoint; }
+	void SetAnchorPoint(const TuboEngine::Math::Vector2& anchorPoint) { this->anchorPoint = anchorPoint; }
 
 	const bool& GetFlipX()const { return isFlipX_; }
 	void SetFlipX(const bool& isFlipX) { this->isFlipX_ = isFlipX; }
@@ -69,11 +71,11 @@ public:
 	const bool& GetFlipY()const { return isFlipY_; }
 	void SetFlipY(const bool& isFlipY) { this->isFlipY_ = isFlipY; }
 
-	const Vector2& GetTextureLeftTop()const { return textureLeftTop_; }
-	void SetTextureLeftTop(const Vector2& textureLeftTop) { this->textureLeftTop_ = textureLeftTop; }
+	const TuboEngine::Math::Vector2& GetTextureLeftTop() const { return textureLeftTop_; }
+	void SetTextureLeftTop(const TuboEngine::Math::Vector2& textureLeftTop) { this->textureLeftTop_ = textureLeftTop; }
 
-	const Vector2& GetTextureSize()const { return textureSize_; }
-	void SetTextureSize(const Vector2& textureSize) { this->textureSize_ = textureSize; }
+	const TuboEngine::Math::Vector2& GetTextureSize() const { return textureSize_; }
+	void SetTextureSize(const TuboEngine::Math::Vector2& textureSize) { this->textureSize_ = textureSize; }
 
 	const bool& GetIsAdjustTextureSize()const { return isAdjustTextureSize; }
 	void SetGetIsAdjustTextureSize(const bool& isAdjustTextureSize) { this->isAdjustTextureSize = isAdjustTextureSize; }
@@ -123,9 +125,9 @@ private:
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
 
 
-	Vector2 position = {};
+	TuboEngine::Math::Vector2 position = {};
 	float rotation = {};
-	Vector2 size = { 640.0f,360.0f };
+	TuboEngine::Math::Vector2 size = {640.0f, 360.0f};
 
 	//テクスチャ番号
 	uint32_t textureIndex = 0;
@@ -136,15 +138,15 @@ private:
 	　　 拡張機能
 	-----------*/
 	//アンカーポイント
-	Vector2 anchorPoint = {};
+	TuboEngine::Math::Vector2 anchorPoint = {};
 	//左右フリップ
 	bool isFlipX_ = false;
 	//上下フリップ
 	bool isFlipY_ = false;
 	//テクスチャ左上座標
-	Vector2 textureLeftTop_ = {};
+	TuboEngine::Math::Vector2 textureLeftTop_ = {};
 	//テクスチャ切り出しサイズ
-	Vector2 textureSize_ = { 100.0f,100.0f };
+	TuboEngine::Math::Vector2 textureSize_ = {100.0f, 100.0f};
 	//初期サイズにするフラグ
 	bool isAdjustTextureSize;
 };
