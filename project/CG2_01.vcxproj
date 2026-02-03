@@ -254,7 +254,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\scene\SceneType.h" />
     <ClInclude Include="application\scene\StageState\ClearState.h" />
     <ClInclude Include="application\StageState\Boss\BossState.h" />
-    <ClInclude Include="application\StageState\DropWaveAnimator.h" />
     <ClInclude Include="application\StageState\GameClear\GameClearState.h" />
     <ClInclude Include="application\StageState\GameOver\GameOverState.h" />
     <ClInclude Include="application\StageState\IStageState.h" />
@@ -342,7 +341,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="engine\imgui\ImGuiManager.h" />
     <ClInclude Include="engine\scene\IScene.h" />
-    <ClInclude Include="engine\base\Framework\Order.h" />
     <ClInclude Include="engine\graphic\Particle\Particle.h" />
     <ClInclude Include="engine\graphic\Particle\ParticleCommon.h" />
     <ClInclude Include="engine\graphic\Particle\ParticleEmitter.h" />
