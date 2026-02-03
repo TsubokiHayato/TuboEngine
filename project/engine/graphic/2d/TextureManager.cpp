@@ -16,7 +16,7 @@ void TextureManager::LoadTexture(const std::string& filePath) {
 
 	// 読み込み済みテクスチャを検索
 	if (textureDatas.contains(fullPath_)) {
-		// 読み込み済みなら早期return
+		// 読み込み済みなら早期Return
 		return;
 	}
 
@@ -56,7 +56,7 @@ void TextureManager::LoadTexture(const std::string& filePath) {
 
 	textureData.filePath = fullPath_;
 	textureData.metadata = mipImages.GetMetadata();
-	textureData.resource = DirectXCommon::GetInstance()->CreateTextureResource(textureData.metadata);
+	textureData.resource = TuboEngine::DirectXCommon::GetInstance()->CreateTextureResource(textureData.metadata);
 
 	// テクスチャデータの要素番号をSRVのインデックスとする
 	textureData.srvIndex = SrvManager::GetInstance()->Allocate();
@@ -82,12 +82,12 @@ void TextureManager::LoadTexture(const std::string& filePath) {
 
 
 	// SRVの生成
-	Microsoft::WRL::ComPtr<ID3D12Device> device = DirectXCommon::GetInstance()->GetDevice();
+	Microsoft::WRL::ComPtr<ID3D12Device> device = TuboEngine::DirectXCommon::GetInstance()->GetDevice();
 	device->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = DirectXCommon::GetInstance()->UploadTextureData(textureData.resource, mipImages);
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = TuboEngine::DirectXCommon::GetInstance()->UploadTextureData(textureData.resource, mipImages);
 
-	DirectXCommon::GetInstance()->CommandExecution();
+	TuboEngine::DirectXCommon::GetInstance()->CommandExecution();
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& filePath) {

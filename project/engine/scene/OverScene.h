@@ -58,8 +58,8 @@ private:
 	// 落下＋バウンス演出用（プレイヤー）
 	float animTime_ = 0.0f;          // 経過時間
 	float animDuration_ = 1.2f;      // 全体の時間（秒）
-	Vector3 startPos_{-0.5f, 8.0f, 0.0f}; // 開始位置（Y>0）
-	Vector3 endPos_{0.0f, 0.0f, 0.0f};    // 終了位置（Y=0）
+	TuboEngine::Math::Vector3 startPos_{-0.5f, 8.0f, 0.0f}; // 開始位置（Y>0）
+	TuboEngine::Math::Vector3 endPos_{0.0f, 0.0f, 0.0f};    // 終了位置（Y=0）
 	float xOffset_ = 0.8f;            // X方向に寄せる量（終点方向）
 	bool loopBounce_ = false;         // ループ確認用
 
@@ -70,15 +70,15 @@ private:
 	// GAME OVER UI（各文字のドロップ演出）
 	struct LetterAnim {
 		std::unique_ptr<Sprite> sprite;
-		Vector2 start;
-		Vector2 end;
+		TuboEngine::Math::Vector2 start;
+		TuboEngine::Math::Vector2 end;
 		float delay = 0.0f;
 		float time = 0.0f;
 	};
 	std::vector<LetterAnim> letters_;
 	float letterDuration_ = 0.6f;   // 各文字のドロップ時間
 	float letterStagger_ = 0.08f;   // 文字ごとの遅延
-	Vector2 letterSize_ = {96.0f, 96.0f};
+	TuboEngine::Math::Vector2 letterSize_ = {96.0f, 96.0f};
 	float lettersRowY_ = 80.0f;     // 到着Y
 	float lettersStartY_ = -120.0f; // 開始Y（画面外上）
 	float lettersGap_ = 6.0f;       // 文字間隔
