@@ -35,7 +35,7 @@ void OverScene::Initialize() {
 
 	player = std::make_unique<Player>();
 	player->Initialize();
-	player->SetDontMove(true);
+	player->SetMovementLocked(true);
 	player->SetCamera(camera.get());
 
 	// アニメ開始位置へ
