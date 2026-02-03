@@ -15,13 +15,13 @@ param(
 
   # `RootFolders` : Filterの元にするルートフォルダ
   #   - 例: `engine\graphic\...` のような階層を、そのまま Visual Studio の仮想フォルダ(Filter)にする
-  #   - 必要なら `resources` / `shaders` なども追加してOK
-  [string[]]$RootFolders = @("engine","application"),
+  #   - 必要なら `Resources` / `externals` なども追加してOK
+  [string[]]$RootFolders = @("engine","application","Resources","externals","tools"),
 
   # `Extensions` : 対象にする拡張子
   #   - ここに無い拡張子のファイルはスキャン対象外
   #   - `.vcxproj` に含まれていても、拡張子が対象外なら `.filters` には出ない
-  [string[]]$Extensions = @(".h",".hpp",".inl",".cpp",".c",".txt",".md",".hlsl",".rc")
+  [string[]]$Extensions = @(".h",".hpp",".inl",".cpp",".c",".txt",".md",".hlsl",".hlsli",".rc")
 )
 
 # -----------------------------------------------------------------------------
@@ -54,6 +54,15 @@ function Get-RelPath([string]$base, [string]$full) {
   return [System.Uri]::UnescapeDataString($baseUri.MakeRelativeUri($fullUri).ToString().Replace('/','\\'))
 }
 
+# Include の突合用にパス表記を正規化する（.vcxproj 側は表記ゆれが起きやすい）
+function Normalize-IncludePath([string]$p) {
+  if ([string]::IsNullOrWhiteSpace($p)) { return "" }
+  $p2 = $p.Trim()
+  $p2 = $p2.Replace('/','\\')
+  if ($p2.StartsWith(".\\")) { $p2 = $p2.Substring(2) }
+  return $p2.ToLowerInvariant()
+}
+
 # -----------------------------------------------------------------------------
 # 1) 指定ルートフォルダ配下を走査して「候補ファイル一覧」を作る
 # -----------------------------------------------------------------------------
@@ -74,20 +83,29 @@ $allFiles = $allFiles | Sort-Object FullName -Unique
 # -----------------------------------------------------------------------------
 # 2) `.vcxproj` を解析して「実際に Include されている」パスだけを収集
 # -----------------------------------------------------------------------------
-# `.filters` はIDE表示用なので、プロジェクトに入っていないファイルを載せると混乱する。
-# そのため `.vcxproj` に記載のある項目のみ対象にする。
-[xml]$projXml = Get-Content $vcxprojPath
-$ns = New-Object System.Xml.XmlNamespaceManager($projXml.NameTable)
-$ns.AddNamespace("msb", $projXml.Project.NamespaceURI)
+# XML の名前空間有無に依存しないために、XPath ではなく XmlDocument API で local-name を見る。
+[xml]$projXml = Get-Content -LiteralPath $vcxprojPath
 
-# Include パスのセット(高速に存在判定するため HashSet を利用)
+$targetItemNames = @(
+  "ClCompile",
+  "ClInclude",
+  "None",
+  "ResourceCompile",
+  "FxCompile",
+  "Text"
+)
+
 $included = New-Object System.Collections.Generic.HashSet[string]
-foreach ($nodeName in @("ClCompile","ClInclude","None","ResourceCompile")) {
-  $nodes = $projXml.SelectNodes("//msb:$nodeName", $ns)
-  foreach ($n in $nodes) {
-    $inc = $n.GetAttribute("Include")
-    if (![string]::IsNullOrWhiteSpace($inc)) { [void]$included.Add($inc) }
-  }
+$allNodes = $projXml.SelectNodes("//*")
+foreach ($n in $allNodes) {
+  if ($targetItemNames -notcontains $n.LocalName) { continue }
+  $inc = $n.GetAttribute("Include")
+  if ([string]::IsNullOrWhiteSpace($inc)) { continue }
+  [void]$included.Add((Normalize-IncludePath $inc))
+}
+
+if ($included.Count -eq 0) {
+  throw "No <Item Include=...> found in '$vcxprojPath'. If you opened a temp copy in VS, make sure you're regenerating for the real project under '$projDir'."
 }
 
 # -----------------------------------------------------------------------------
@@ -98,9 +116,9 @@ foreach ($nodeName in @("ClCompile","ClInclude","None","ResourceCompile")) {
 $items = @()
 foreach ($f in $allFiles) {
   $rel = Get-RelPath $projDir $f.FullName
+  $relNorm = Normalize-IncludePath $rel
 
-  # `.vcxproj` に含まれていないものは対象外
-  if (!$included.Contains($rel)) { continue }
+  if (!$included.Contains($relNorm)) { continue }
 
   # 例: engine\graphic\3d\Object3dCommon.cpp -> Filter = engine\graphic\3d
   $filter = Split-Path $rel -Parent
@@ -109,15 +127,18 @@ foreach ($f in $allFiles) {
   $items += [pscustomobject]@{ Include = $rel; Filter = $filter; Ext = $f.Extension.ToLowerInvariant() }
 }
 
+if ($items.Count -eq 0) {
+  throw "Found 0 matched files. The project includes $($included.Count) items, but none matched scanned files. Check RootFolders/Extensions and that Include paths are relative to '$projDir'."
+}
+
 # -----------------------------------------------------------------------------
 # 4) 既存 `.vcxproj.filters` を読み込み、ItemGroup を全消ししてから再構築
 # -----------------------------------------------------------------------------
 # ※VSが読むXMLの "Project" / 名前空間などの外枠は流用し、
 #   中身(ItemGroup)だけを「決定的(Deterministic)」に作り直す。
-[xml]$filtersXml = Get-Content $filtersPath
+[xml]$filtersXml = Get-Content -LiteralPath $filtersPath
 $ns2 = New-Object System.Xml.XmlNamespaceManager($filtersXml.NameTable)
 $ns2.AddNamespace("msb", $filtersXml.Project.NamespaceURI)
-
 if ($filtersXml.Project -eq $null) { throw "Invalid .filters" }
 
 # 既存の ItemGroup を除去
@@ -161,7 +182,8 @@ foreach ($flt in $filterSet) {
 #   - `.cpp` -> `<ClCompile Include="...">`
 #   - `.h`   -> `<ClInclude Include="...">`
 #   - `.rc`  -> `<ResourceCompile Include="...">`
-#   - その他 -> `<None Include="...">`
+#   - `.hlsl` -> `<FxCompile Include="...">`
+#   - `.txt`  -> `<Text Include="...">` または `<None Include="...">`
 function Add-ItemsGroup([string]$itemName, [object[]]$arr) {
   if ($arr.Count -eq 0) { return }
 
@@ -183,7 +205,7 @@ function Add-ItemsGroup([string]$itemName, [object[]]$arr) {
 }
 
 # 種類ごとに振り分け
-$clCompile = @(); $clInclude = @(); $none = @(); $rc = @()
+$clCompile = @(); $clInclude = @(); $none = @(); $rc = @(); $fx = @(); $text = @()
 foreach ($it in $items) {
   switch ($it.Ext) {
     ".cpp" { $clCompile += $it }
@@ -192,12 +214,17 @@ foreach ($it in $items) {
     ".hpp" { $clInclude += $it }
     ".inl" { $clInclude += $it }
     ".rc"  { $rc += $it }
+    ".hlsl" { $fx += $it }
+    ".hlsli" { $none += $it }
+    ".txt" { $text += $it }
     default { $none += $it }
   }
 }
 
 Add-ItemsGroup "ClCompile" $clCompile
 Add-ItemsGroup "ClInclude" $clInclude
+Add-ItemsGroup "FxCompile" $fx
+Add-ItemsGroup "Text" $text
 Add-ItemsGroup "None" $none
 Add-ItemsGroup "ResourceCompile" $rc
 
@@ -218,3 +245,5 @@ $filtersXml.Save($writer)
 $writer.Close()
 
 Write-Host "Regenerated: $filtersPath"
+Write-Host "Included items (from vcxproj): $($included.Count)"
+Write-Host "Matched items (written to filters): $($items.Count)"

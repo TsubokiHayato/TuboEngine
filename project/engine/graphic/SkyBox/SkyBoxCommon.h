@@ -1,11 +1,9 @@
-#pragma once
-
 
 #pragma once
 #include"WinApp.h"
 #include"DirectXcommon.h"
 #include<memory>
-#include"SkyBoxPSO.h"
+#include"SkyBox/SkyBoxPSO.h"
 
 
 class SkyBoxCommon

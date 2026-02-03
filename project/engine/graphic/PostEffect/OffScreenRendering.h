@@ -5,7 +5,7 @@
 #include <memory>
 #include <wrl.h>
 #include "Camera.h"
-#include"DepthBasedOutlineEffect.h"
+#include"Effects/DepthBasedOutline/DepthBasedOutlineEffect.h"
 
 // 前方宣言
 class WinApp;

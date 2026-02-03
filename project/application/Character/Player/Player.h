@@ -5,7 +5,7 @@
 #include "Sprite.h"
 #include "MapChip/MapChipField.h"
 #include "engine/graphic/Particle/ParticleManager.h"
-#include "engine/graphic/Particle/RingEmitter.h"
+#include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 #include "Camera.h"
 // 前方宣言（ヘッダ依存軽減）
 class IParticleEmitter;
@@ -76,7 +76,7 @@ public:
 	// プレイヤーのHPを取得
 	int GetHP() const { return HP; }
 	// プレイヤーの死亡状態を取得
-	bool GetIsAllive() const { return isAllive; }
+	bool GetIsAlive() const { return isAlive; }
 	// プレイヤーの弾のリストを取得
 	const std::vector<std::unique_ptr<PlayerBullet>>& GetBullets() const { return bullets; }
 	bool IsDashing() const { return isDashing_; } // 既存なら流用、無ければダミー
@@ -97,7 +97,7 @@ public:
 	// プレイヤーのHPを設定
 	void SetHP(int HP) { this->HP = HP; }
 	// プレイヤーの死亡状態を設定
-	void SetIsDead(bool isAllive) { this->isAllive = isAllive; }
+	void SetIsDead(bool isAlive) { this->isAlive = isAlive; }
 	// カメラを設定
 	void SetCamera(Camera* camera) { object3d->SetCamera(camera); camera_ = camera; }
 	void SetDashRingOffset(float forward) { dashRingOffsetForward_ = forward; }
@@ -115,7 +115,7 @@ public:
 	// マップチップフィールドを設定
 	void SetMapChipField(MapChipField* mapChipField) { this->mapChipField = mapChipField; }
 
-	void SetDontMove(bool flag) { isDontMove = flag; }
+	void SetMovementLocked(bool flag) { isMovementLocked = flag; }
 
 private:
 	///--------------------------------------------------
@@ -153,7 +153,7 @@ private:
 	Vector3 velocity; // プレイヤーの速度
 	int HP;           // プレイヤーのHP
 	bool isHit;       // プレイヤーがヒットしたかどうか
-	bool isAllive;      // プレイヤーの死亡状態
+	bool isAlive;      // プレイヤーの死亡状態
 
 	//Reticle
 
@@ -161,7 +161,7 @@ private:
 	Vector2 reticlePosition = {0.0f, 0.0f}; // レティクルの位置（画面中央）
 	Vector2 reticleSize = {50.0f, 50.0f};   // レティクルのサイズ
 
-	bool isDontMove=false;
+	bool isMovementLocked=false;
 
 	// --- 追加: 移動軌跡用パーティクルエミッター ---
 	IParticleEmitter* trailEmitter_ = nullptr; // ParticleManager生成管理。解放はマネージャに委譲

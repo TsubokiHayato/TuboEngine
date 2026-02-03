@@ -2,11 +2,10 @@
 #include "Collider/CollisionTypeId.h"
 #include "ImGuiManager.h"
 #include "Input.h"
-#include "OrbitTrailEmitter.h" // 追加: 軌道トレイルエミッター
-#include "ParticleManager.h"   // 追加: パーティクル生成用
+#include"Effects/OrbitTrail/OrbitTrailEmitter.h"
 #include "TextureManager.h"
 #include "engine/graphic/Particle/ParticleManager.h"
-#include "engine/graphic/Particle/RingEmitter.h"
+#include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 #include "engine/graphic/PostEffect/OffScreenRendering.h"
 
 //--------------------------------------------------
@@ -40,7 +39,7 @@ void Player::Initialize() {
 	// プレイヤーのHP
 	HP = 5;
 	// プレイヤーの死亡状態
-	isAllive = true;
+	isAlive = true;
 
 	// モデルファイルパス
 	const std::string modelFileNamePath = "player/Player.obj";
@@ -116,7 +115,7 @@ void Player::Initialize() {
 // 更新処理
 //--------------------------------------------------
 void Player::Update() {
-	if (isAllive == false) {
+	if (isAlive == false) {
 		// 死亡中でも見た目の姿勢は維持（Object3dへ反映）
 		object3d->SetPosition(position);
 		object3d->SetRotation(rotation);
@@ -135,11 +134,11 @@ void Player::Update() {
 	// Clear/Over等の演出シーンでは isDontMove=true で入力無効化される。
 	// そのときマウス位置参照の Rotate() を走らせると、意図しない方向を向いたり
 	// レティクルが更新されてしまうため、回転はシーン側が制御する。
-	if (!wantCaptureMouse && !isDontMove) {
+	if (!wantCaptureMouse && !isMovementLocked) {
 		Rotate();
 	}
 
-	if (!isDontMove) {
+	if (!isMovementLocked) {
 		// ※isHit は OnCollision で立つ。ここで毎フレーム落とすと「被弾したフレーム」を取り逃すので
 		// 演出検出後に落とす。
 		// ダメージクールダウンタイマー更新
@@ -170,7 +169,7 @@ void Player::Update() {
 		// isAlive==false のバレットを削除
 		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const std::unique_ptr<PlayerBullet>& bullet) { return !bullet->GetIsAlive(); }), bullets.end());
 		if (HP <= 0) {
-			isAllive = false; // HPが0以下なら死亡状態にする
+			isAlive = false; // HPが0以下なら死亡状態にする
 		}
 	}
 
@@ -548,7 +547,7 @@ Vector3 Player::GetAimDirectionFromReticle() const {
 	DirectX::XMVECTOR det;
 	DirectX::XMMATRIX xmInvVP = DirectX::XMMatrixInverse(&det, xmVP);
 	// ヘルパー: アンプロジェクト
-	auto unprotect = [&](float x, float y, float z) {
+	auto unproject = [&](float x, float y, float z) {
 		DirectX::XMVECTOR p = DirectX::XMVectorSet(x, y, z, 1.0f);
 		DirectX::XMVECTOR w = DirectX::XMVector4Transform(p, xmInvVP);
 		DirectX::XMFLOAT4 wf;
@@ -558,8 +557,8 @@ Vector3 Player::GetAimDirectionFromReticle() const {
 		}
 		return Vector3{wf.x, wf.y, wf.z};
 	};
-	Vector3 worldNear = unprotect(ndcX, ndcY, 0.0f);
-	Vector3 worldFar  = unprotect(ndcX, ndcY, 1.0f);
+	Vector3 worldNear = unproject(ndcX, ndcY, 0.0f);
+	Vector3 worldFar  = unproject(ndcX, ndcY, 1.0f);
 	Vector3 rayOrigin = worldNear;
 	Vector3 rayDir = {worldFar.x - worldNear.x, worldFar.y - worldNear.y, worldFar.z - worldNear.z};
 	float len = std::sqrt(rayDir.x * rayDir.x + rayDir.y * rayDir.y + rayDir.z * rayDir.z);
