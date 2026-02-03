@@ -9,6 +9,7 @@
 #include "Camera.h"
 // 前方宣言（ヘッダ依存軽減）
 class IParticleEmitter;
+
 ///--------------------------------------------------
 // プレイヤークラス
 ///--------------------------------------------------
@@ -32,7 +33,7 @@ public:
 	// 衝突時の処理のオーバーライド
 	void OnCollision(Collider* other) override;
 	// 当たり判定の中心座標を取得のオーバーライド
-	Vector3 GetCenterPosition() const override;
+	TuboEngine::Math::Vector3 GetCenterPosition() const override;
 
 	// ImGuiの描画処理
 	void DrawImGui();
@@ -50,7 +51,7 @@ public:
 	void TriggerDashRing();
 
 	// 斜め視点でもレティクル通りに飛ばすための方向取得関数（地面へレイキャスト）
-	Vector3 GetAimDirectionFromReticle() const;
+	TuboEngine::Math::Vector3 GetAimDirectionFromReticle() const;
 
 
 private:
@@ -58,7 +59,7 @@ private:
 	void StartDodge();
 	void UpdateDodge();
 	bool CanDodge() const;
-	Vector3 GetDodgeInputDirection() const;
+	TuboEngine::Math::Vector3 GetDodgeInputDirection() const;
 
 public:
 	///-----------------------------------
@@ -66,13 +67,13 @@ public:
 	///------------------------------------
 
 	// プレイヤーの位置を取得
-	Vector3 GetPosition() const { return position; }
+	TuboEngine::Math::Vector3 GetPosition() const { return position; }
 	// プレイヤーの回転を取得
-	Vector3 GetRotation() const { return rotation; }
+	TuboEngine::Math::Vector3 GetRotation() const { return rotation; }
 	// プレイヤーのスケールを取得
-	Vector3 GetScale() const { return scale; }
+	TuboEngine::Math::Vector3 GetScale() const { return scale; }
 	// プレイヤーの速度を取得
-	Vector3 GetVelocity() const { return velocity; }
+	TuboEngine::Math::Vector3 GetVelocity() const { return velocity; }
 	// プレイヤーのHPを取得
 	int GetHP() const { return HP; }
 	// プレイヤーの死亡状態を取得
@@ -87,13 +88,13 @@ public:
 	///-------------------------------------
 
 	// プレイヤーの位置を設定
-	void SetPosition(const Vector3& position) { this->position = position; }
+	void SetPosition(const TuboEngine::Math::Vector3& position) { this->position = position; }
 	// プレイヤーの回転を設定
-	void SetRotation(const Vector3& rotation) { this->rotation = rotation; }
+	void SetRotation(const TuboEngine::Math::Vector3& rotation) { this->rotation = rotation; }
 	// プレイヤーのスケールを設定
-	void SetScale(const Vector3& scale) { this->scale = scale; }
+	void SetScale(const TuboEngine::Math::Vector3& scale) { this->scale = scale; }
 	// プレイヤーの速度を設定
-	void SetVelocity(const Vector3& velocity) { this->velocity = velocity; }
+	void SetVelocity(const TuboEngine::Math::Vector3& velocity) { this->velocity = velocity; }
 	// プレイヤーのHPを設定
 	void SetHP(int HP) { this->HP = HP; }
 	// プレイヤーの死亡状態を設定
@@ -144,13 +145,13 @@ private:
 	float dodgeCooldown = 1.0f;                         // 回避クールダウン（秒）
 	float dodgeSpeed = 0.5f;                            // 回避速度
 
-	Vector3 dodgeDirection = {0.0f, 0.0f, 0.0f};        // 回避方向
+	TuboEngine::Math::Vector3 dodgeDirection = {0.0f, 0.0f, 0.0f};        // 回避方向
 
-	Vector3 position; // プレイヤーの位置
-	Vector3 rotation; // プレイヤーの回転
-	Vector3 scale;    // プレイヤーのスケール
+	TuboEngine::Math::Vector3 position; // プレイヤーの位置
+	TuboEngine::Math::Vector3 rotation; // プレイヤーの回転
+	TuboEngine::Math::Vector3 scale;    // プレイヤーのスケール
 
-	Vector3 velocity; // プレイヤーの速度
+	TuboEngine::Math::Vector3 velocity; // プレイヤーの速度
 	int HP;           // プレイヤーのHP
 	bool isHit;       // プレイヤーがヒットしたかどうか
 	bool isAlive;      // プレイヤーの死亡状態
@@ -158,14 +159,14 @@ private:
 	//Reticle
 
 	std::unique_ptr<Sprite> reticleSprite; // スプライト
-	Vector2 reticlePosition = {0.0f, 0.0f}; // レティクルの位置（画面中央）
-	Vector2 reticleSize = {50.0f, 50.0f};   // レティクルのサイズ
+	TuboEngine::Math::Vector2 reticlePosition = {0.0f, 0.0f}; // レティクルの位置（画面中央）
+	TuboEngine::Math::Vector2 reticleSize = {50.0f, 50.0f};   // レティクルのサイズ
 
 	bool isMovementLocked=false;
 
 	// --- 追加: 移動軌跡用パーティクルエミッター ---
 	IParticleEmitter* trailEmitter_ = nullptr; // ParticleManager生成管理。解放はマネージャに委譲
-	Vector3 prevPositionTrail_{};              // 前フレーム位置
+	TuboEngine::Math::Vector3 prevPositionTrail_{};              // 前フレーム位置
 	IParticleEmitter* dashRingEmitter_ = nullptr;
 	bool wasDashingPrev_ = false;
 	bool isDashing_ = false; // 既存のダッシュ状態に置き換え可
