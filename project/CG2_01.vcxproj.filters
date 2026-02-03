@@ -276,9 +276,6 @@
     <ClCompile Include="application\Character\Enemy\RushEnemy.cpp">
       <Filter>projects\application</Filter>
     </ClCompile>
-    <ClCompile Include="application\Animation\SceneChangeAnimation.cpp">
-      <Filter>projects\application</Filter>
-    </ClCompile>
     <ClCompile Include="engine\scene\SceneManager.cpp">
       <Filter>projects\engine</Filter>
     </ClCompile>
@@ -362,6 +359,9 @@
     </ClCompile>
     <ClCompile Include="engine\base\Common\WinApp.cpp">
       <Filter>projects\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Animation\SceneChangeAnimation.cpp">
+      <Filter>projects\application\Animation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -692,9 +692,6 @@
     <ClInclude Include="application\Character\Enemy\RushEnemy.h">
       <Filter>projects\application</Filter>
     </ClInclude>
-    <ClInclude Include="application\Animation\SceneChangeAnimation.h">
-      <Filter>projects\application</Filter>
-    </ClInclude>
     <ClInclude Include="engine\scene\SceneManager.h">
       <Filter>projects\engine</Filter>
     </ClInclude>
@@ -806,6 +803,9 @@
     <ClInclude Include="engine\base\Common\WinApp.h">
       <Filter>projects\engine</Filter>
     </ClInclude>
+    <ClInclude Include="application\Animation\SceneChangeAnimation.h">
+      <Filter>projects\application\Animation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="tools\RegenerateFilters.ps1">
@@ -842,6 +842,9 @@
     </Filter>
     <Filter Include="projects\Resorces\Shaders">
       <UniqueIdentifier>{f5d22d9a-5db7-46eb-947a-09b00093da50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="projects\application\Animation">
+      <UniqueIdentifier>{c0ff4fb6-0caa-4c1b-9a72-2552688ea5ba}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
