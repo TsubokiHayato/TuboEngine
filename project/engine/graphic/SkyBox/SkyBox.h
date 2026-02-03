@@ -23,9 +23,9 @@ public:
 	void SetTransform(const Transform& transform) { this->transform = transform; }
 	const Transform& GetTransform() const { return transform; }
 
-	void SetPosition(const Vector3& position) { transform.translate = position; }
-	void SetRotation(const Vector3& rotation) { transform.rotate = rotation; }
-	void SetScale(const Vector3& scale) { transform.scale = scale; }
+	void SetPosition(const TuboEngine::Math::Vector3& position) { transform.translate = position; }
+	void SetRotation(const TuboEngine::Math::Vector3& rotation) { transform.rotate = rotation; }
+	void SetScale(const TuboEngine::Math::Vector3& scale) { transform.scale = scale; }
 
     void SetTextureFilePath(const std::string& textureFilePath) { textureFilePath_ = textureFilePath; }
     const std::string& GetTextureFilePath() const { return textureFilePath_; }

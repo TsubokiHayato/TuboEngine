@@ -108,7 +108,7 @@ void IParticleEmitter::DrawImGui() {
 }
 
 void IParticleEmitter::EnsureBuffers() {
-	auto* dx = DirectXCommon::GetInstance();
+	auto* dx = TuboEngine::DirectXCommon::GetInstance();
 
 	if (!vb_ && !vertices_.empty()) {
 		vb_ = dx->CreateBufferResource(sizeof(VertexData) * vertices_.size());
@@ -144,7 +144,7 @@ void IParticleEmitter::EnsureBuffers() {
 
 void IParticleEmitter::ReallocateInstanceBufferIfNeeded() {
 	if (preset_.maxInstances == allocatedInstances_) return;
-	auto* dx = DirectXCommon::GetInstance();
+	auto* dx = TuboEngine::DirectXCommon::GetInstance();
 	instancing_.Reset();
 	instancing_ = dx->CreateBufferResource(sizeof(ParticleForGPU) * preset_.maxInstances);
 	allocatedInstances_ = preset_.maxInstances;
@@ -202,7 +202,7 @@ void IParticleEmitter::UpdateParticles(float dt, const Matrix4x4& viewProj, cons
 			it->velocity.z *= d;
 		}
 
-		Vector3 delta{
+		TuboEngine::Math::Vector3 delta{
 			it->velocity.x * dt,
 			it->velocity.y * dt,
 			it->velocity.z * dt

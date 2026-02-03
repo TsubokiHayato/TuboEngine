@@ -3,13 +3,16 @@
 #include <Windows.h>
 #include <XInput.h>
 #include <array>
+#include <cstdint>
 #include <dinput.h>
 #include <vector>
 #include <wrl.h>
-#include"Vector2.h"
+#include "engine/math/Vector2.h"
 
 class Input {
 public:
+	using Vector2 = TuboEngine::Math::Vector2;
+
 	struct MouseMove {
 		LONG lX;
 		LONG lY;
@@ -34,7 +37,7 @@ public:
 		PadType type_;
 		State state_;
 		State statePre_;
-		bool isConnected_ = false; 
+		bool isConnected_ = false;
 		int32_t xinputIndex_ = -1;
 	};
 
@@ -74,7 +77,7 @@ public:
 private:
 	static Input* instance;
 	Input() = default;
-	~Input()=default;
+	~Input() = default;
 	Input(const Input&) = delete;
 	Input& operator=(const Input&) = delete;
 

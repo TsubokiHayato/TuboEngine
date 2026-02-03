@@ -1,5 +1,6 @@
-
 #include <string>
+
+namespace TuboEngine {
 
 namespace Logger {
 	/// <summary>
@@ -8,3 +9,5 @@ namespace Logger {
 	/// <param name="message">出力したいメッセージ</param>
     void Log(const std::string& message);
 }
+
+} // namespace TuboEngine

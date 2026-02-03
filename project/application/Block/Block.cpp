@@ -8,7 +8,7 @@ Block::Block() = default;
 
 Block::~Block() = default;
 
-void Block::Initialize(const Vector3& position, const Vector3& scale, const std::string& modelFileName) {
+void Block::Initialize(const TuboEngine::Math::Vector3& position, const TuboEngine::Math::Vector3& scale, const std::string& modelFileName) {
 	// --- 受け取った初期状態を保持 ---
 	position_ = position;
 	scale_ = scale;
@@ -54,7 +54,7 @@ void Block::DrawImGui(const char* windowName) {
 	object3d_->DrawImGui(windowName);
 }
 
-void Block::SetPosition(const Vector3& pos) {
+void Block::SetPosition(const TuboEngine::Math::Vector3& pos) {
 	// --- 状態を保持 ---
 	position_ = pos;
 
@@ -64,7 +64,7 @@ void Block::SetPosition(const Vector3& pos) {
 	}
 }
 
-void Block::SetScale(const Vector3& scale) {
+void Block::SetScale(const TuboEngine::Math::Vector3& scale) {
 	// --- 状態を保持 ---
 	scale_ = scale;
 
@@ -74,7 +74,7 @@ void Block::SetScale(const Vector3& scale) {
 	}
 }
 
-void Block::SetRotation(const Vector3& rot) {
+void Block::SetRotation(const TuboEngine::Math::Vector3& rot) {
 	// --- 状態を保持 ---
 	rotation_ = rot;
 

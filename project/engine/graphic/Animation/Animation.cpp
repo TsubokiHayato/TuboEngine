@@ -9,35 +9,35 @@ Animation LoadAnimation(const std::string& directoryPath, const std::string& fil
 	animation.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond); // アニメーションの総時間を設定
 
 	// NodeAnimationの解析
-	// assimpでは個々のNodeのAnimationをchannelと呼んでいるのでchannelを回してNodeAnimationの情報を取ってくる
+	// assimpでは個々のNodeのAnimationをChannelと呼んでいるのでChannelを回してNodeAnimationの情報を取ってくる
 	for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; ++channelIndex) {
 		aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
 		NodeAnimation nodeAnimation = animation.nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()]; // Node名でNodeAnimationを取得
 
 		// 位置のアニメーションカーブを設定（右手→左手変換）
 		for (uint32_t i = 0; i < nodeAnimationAssimp->mNumPositionKeys; ++i) {
-			KeyFrame<Vector3> keyFrame;
+			KeyFrame<TuboEngine::Math::Vector3> keyFrame;
 			keyFrame.time = float(nodeAnimationAssimp->mPositionKeys[i].mTime / animationAssimp->mTicksPerSecond);
-			keyFrame.value = Vector3(
+			keyFrame.value = TuboEngine::Math::Vector3(
 			    -nodeAnimationAssimp->mPositionKeys[i].mValue.x, // x反転
 			    nodeAnimationAssimp->mPositionKeys[i].mValue.y, nodeAnimationAssimp->mPositionKeys[i].mValue.z);
 			nodeAnimation.translate.keyframes.push_back(keyFrame);
 		}
 		// 回転のアニメーションカーブを設定（必要なら左右変換）
 		for (uint32_t i = 0; i < nodeAnimationAssimp->mNumRotationKeys; ++i) {
-			KeyFrame<Quaternion> keyFrame;
+			KeyFrame<TuboEngine::Math::Quaternion> keyFrame;
 			keyFrame.time = float(nodeAnimationAssimp->mRotationKeys[i].mTime / animationAssimp->mTicksPerSecond);
 			// x, y, z反転（右手→左手変換。必要に応じて調整）
-			keyFrame.value = Quaternion(
+			keyFrame.value = TuboEngine::Math::Quaternion(
 			    nodeAnimationAssimp->mRotationKeys[i].mValue.w, -nodeAnimationAssimp->mRotationKeys[i].mValue.x, nodeAnimationAssimp->mRotationKeys[i].mValue.y,
 			    nodeAnimationAssimp->mRotationKeys[i].mValue.z);
 			nodeAnimation.rotate.keyframes.push_back(keyFrame);
 		}
 		// スケールのアニメーションカーブを設定
 		for (uint32_t i = 0; i < nodeAnimationAssimp->mNumScalingKeys; ++i) {
-			KeyFrame<Vector3> keyFrame;
+			KeyFrame<TuboEngine::Math::Vector3> keyFrame;
 			keyFrame.time = float(nodeAnimationAssimp->mScalingKeys[i].mTime / animationAssimp->mTicksPerSecond);
-			keyFrame.value = Vector3(nodeAnimationAssimp->mScalingKeys[i].mValue.x, nodeAnimationAssimp->mScalingKeys[i].mValue.y, nodeAnimationAssimp->mScalingKeys[i].mValue.z);
+			keyFrame.value = TuboEngine::Math::Vector3(nodeAnimationAssimp->mScalingKeys[i].mValue.x, nodeAnimationAssimp->mScalingKeys[i].mValue.y, nodeAnimationAssimp->mScalingKeys[i].mValue.z);
 			nodeAnimation.scale.keyframes.push_back(keyFrame);
 		}
 		// ノード名をキーにしてNodeAnimationを保存

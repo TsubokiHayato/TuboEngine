@@ -38,7 +38,7 @@ private:
 	float tiltTarget_ = 1.3f;     // 目標の傾き角（rad）
 	float tiltSpeed_ = 1.2f;      // 傾き速度（rad/sec）
 	float fallMoveSpeed_ = 0.5f;  // 倒れる方向への移動速度
-	Vector3 fallDir_ = {0.0f, 0.0f, 0.0f};
+	TuboEngine::Math::Vector3 fallDir_ = {0.0f, 0.0f, 0.0f};
 
 	// 目が回る（Dizzy）演出
 	float dizzyDuration_ = 3.6f;  // 目が回る演出の長さ
@@ -52,10 +52,10 @@ private:
 
 	// GameOver時の正面カメラ設定（リクエストに合わせて狙い値へイージング）
 	float initialYaw_ = 0.0f;     // GameOver開始時のプレイヤー向き（Z軸）
-	Vector3 camStartOffset_ = {0.0f, 0.0f, 0.0f};
-	Vector3 camTargetOffset_ = {0.0f, 15.0f, 5.0f};
-	Vector3 camStartRot_ = {0.0f, 0.0f, 0.0f};
-	Vector3 camTargetRot_ = {1.9f, 0.0f, 0.0f};
+	TuboEngine::Math::Vector3 camStartOffset_ = {0.0f, 0.0f, 0.0f};
+	TuboEngine::Math::Vector3 camTargetOffset_ = {0.0f, 15.0f, 5.0f};
+	TuboEngine::Math::Vector3 camStartRot_ = {0.0f, 0.0f, 0.0f};
+	TuboEngine::Math::Vector3 camTargetRot_ = {1.9f, 0.0f, 0.0f};
 	float camAnimTime_ = 0.0f;
 	float camAnimDuration_ = 0.8f; // イージング時間
 

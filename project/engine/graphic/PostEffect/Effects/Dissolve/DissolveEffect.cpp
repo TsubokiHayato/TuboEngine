@@ -13,7 +13,7 @@ void DissolveEffect::Initialize() {
 	pso_ = std::make_unique<DissolvePSO>();
 	pso_->Initialize();
 	// 定数バッファ作成
-	cbResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(DissolveParams));
+	cbResource_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(DissolveParams));
 	cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&params_));
 	// デフォルト値
 	params_->dissolveThreshold = 0.5f;
@@ -24,7 +24,7 @@ void DissolveEffect::Initialize() {
 	
 
 	// マスクテクスチャのリソース生成
-	DirectX::ScratchImage mipImages = DirectXCommon::LoadTexture(maskTextureFileName_);
+	DirectX::ScratchImage mipImages = TuboEngine::DirectXCommon::LoadTexture(maskTextureFileName_);
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	maskTextureResource_ = DirectXCommon::GetInstance()->CreateTextureResource(metadata);
 	

@@ -3,8 +3,9 @@
 #include"Vector2.h"
 #include"Vector3.h"
 #include"Vector4.h"
+
 struct VertexData {
-	Vector4 position;
-	Vector2 texcoord;
-	Vector3 normal;
+	TuboEngine::Math::Vector4 position;
+	TuboEngine::Math::Vector2 texcoord;
+	TuboEngine::Math::Vector3 normal;
 };

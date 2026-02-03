@@ -28,14 +28,14 @@ void Player::Initialize() {
 	Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kPlayer));
 
 	// プレイヤーの初期位置
-	position = Vector3(0.0f, 0.0f, 0.0f);
+	position = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
 	// プレイヤーの初期回転
-	rotation = Vector3(1.56f, 0.0f, 3.12f);
+	rotation = TuboEngine::Math::(1.56f, 0.0f, 3.12f);
 	// プレイヤーの初期スケール
-	scale = Vector3(1.0f, 1.0f, 1.0f);
+	scale = TuboEngine::Math::Vector3(1.0f, 1.0f, 1.0f);
 
 	// プレイヤーの初期速度
-	velocity = Vector3(0.0f, 0.0f, 0.0f);
+	velocity = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
 	// プレイヤーのHP
 	HP = 5;
 	// プレイヤーの死亡状態
@@ -131,7 +131,7 @@ void Player::Update() {
 	const bool wantCaptureMouse = false;
 #endif
 
-	// Clear/Over等の演出シーンでは isDontMove=true で入力無効化される。
+	// Clear/Over等の演出シーンでは isMovementLocked=true で入力無効化される。
 	// そのときマウス位置参照の Rotate() を走らせると、意図しない方向を向いたり
 	// レティクルが更新されてしまうため、回転はシーン側が制御する。
 	if (!wantCaptureMouse && !isMovementLocked) {
@@ -309,8 +309,8 @@ void Player::Move() {
 		}
 		return;
 	}
-	Vector3 prevPosition = position;
-	Vector3 moveDelta = {0.0f, 0.0f, 0.0f};
+	TuboEngine::Math::Vector3 prevPosition = position;
+	TuboEngine::Math::Vector3 moveDelta = {0.0f, 0.0f, 0.0f};
 	if (Input::GetInstance()->PushKey(DIK_W)) {
 		moveDelta.y -= 0.1f;
 	}
@@ -323,7 +323,7 @@ void Player::Move() {
 	if (Input::GetInstance()->PushKey(DIK_D)) {
 		moveDelta.x += 0.1f;
 	}
-	Vector3 tryPosition = position + moveDelta;
+	TuboEngine::Math::Vector3 tryPosition = position + moveDelta;
 	if (mapChipField) {
 		float playerWidth = scale.x * MapChipField::GetBlockWidth() - 0.1f;
 		float playerHeight = scale.y * MapChipField::GetBlockHeight() - 0.1f;
@@ -338,7 +338,7 @@ void Player::Move() {
 // 回転処理
 //---------------------------------------------------
 void Player::Rotate() {
-	// カメラが未設定なら回転を上書きしない（現在のrotationを維持）
+	// カメラが未設定なら回転を上書きしない（現在のRotationを維持）
 	if (!camera_) {
 		return;
 	}
@@ -362,9 +362,9 @@ void Player::ReticleDraw() { reticleSprite->Draw(); }
 //--------------------------------------------------
 // 当たり判定の中心座標を取得
 //--------------------------------------------------
-Vector3 Player::GetCenterPosition() const {
+TuboEngine::Math::Vector3 Player::GetCenterPosition() const {
 	const Vector3 offset = {0.0f, 0.0f, 0.0f};
-	Vector3 worldPosition = position + offset;
+	TuboEngine::Math::Vector3 worldPosition = position + offset;
 	return worldPosition;
 }
 

@@ -8,6 +8,6 @@ struct KeyFrame {
 	tValue value;      // キーフレームの値
 };
 
-using KeyFrameVector3 = KeyFrame<Vector3>;
-using KeyFrameQuaternion = KeyFrame<Quaternion>;
+using KeyFrameVector3 = KeyFrame<TuboEngine::Math::Vector3>;
+using KeyFrameQuaternion = KeyFrame<TuboEngine::Math::Quaternion>;
 

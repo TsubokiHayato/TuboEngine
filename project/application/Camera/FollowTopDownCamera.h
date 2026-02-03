@@ -1,6 +1,10 @@
 #pragma once
 #include "Camera.h"
+#include "Vector3.h"
 #include "Character/Player/Player.h"
+
+#include <algorithm> // std::clamp
+#include <cfloat>    // FLT_MAX
 #include <memory>
 
 class FollowTopDownCamera {
@@ -8,17 +12,17 @@ public:
 	FollowTopDownCamera();
 	~FollowTopDownCamera();
 
-	void Initialize(Player* target, const Vector3& offset, float followSpeed = 0.2f);
+	void Initialize(Player* target, const TuboEngine::Math::Vector3& offset, float followSpeed = 0.2f);
 	void Update();
 	void DrawImGui();
 
-	void SetRotation(const Vector3& rotation);
+	void SetRotation(const TuboEngine::Math::Vector3& rotation);
 	void SetTarget(Player* target);
-	void SetOffset(const Vector3& offset);
+	void SetOffset(const TuboEngine::Math::Vector3& offset);
 	void SetFollowSpeed(float speed);
-	void SetLookAtOffset(const Vector3& offset);
+	void SetLookAtOffset(const TuboEngine::Math::Vector3& offset);
 	void SetZoom(float zoom);
-	void SetBounds(const Vector3& min, const Vector3& max);
+	void SetBounds(const TuboEngine::Math::Vector3& min, const TuboEngine::Math::Vector3& max);
 	void Shake(float intensity, float duration);
 	void SetZoomLimits(float minZoom, float maxZoom) {
 		zoomMin_ = minZoom;
@@ -35,8 +39,8 @@ public:
 	bool IsIntroZoomPlaying() const { return introZoomPlaying_; }
 
 	Camera* GetCamera() const { return camera_.get(); }
-	Vector3 GetOffset() const { return offset_; }
-	Vector3 GetRotation() const { return rotation_; }
+	TuboEngine::Math::Vector3 GetOffset() const { return offset_; }
+	TuboEngine::Math::Vector3 GetRotation() const { return rotation_; }
 	float GetZoom() const { return zoom_; }
 	float GetZoomMin() const { return zoomMin_; }
 
@@ -53,11 +57,11 @@ public:
 
 private:
 	Player* target_ = nullptr;
-	Vector3 offset_ = {0, 10, 0};
-	Vector3 lookAtOffset_ = {0, 0, 0};
+	TuboEngine::Math::Vector3 offset_ = {0, 10, 0};
+	TuboEngine::Math::Vector3 lookAtOffset_ = {0, 0, 0};
 	float followSpeed_ = 0.07f;
 	float zoom_ = 1.0f;
-	Vector3 rotation_ = {DirectX::XM_PIDIV2 * 1.5f, 0.0f, 0.0f};
+	TuboEngine::Math::Vector3 rotation_ = {DirectX::XM_PIDIV2 * 1.5f, 0.0f, 0.0f};
 	std::unique_ptr<Camera> camera_;
 
 	// カメラシェイク
@@ -67,8 +71,8 @@ private:
 
 	// 境界制限
 	bool useBounds_ = false;
-	Vector3 boundsMin_ = {-FLT_MAX, -FLT_MAX, -FLT_MAX};
-	Vector3 boundsMax_ = {FLT_MAX, FLT_MAX, FLT_MAX};
+	TuboEngine::Math::Vector3 boundsMin_ = {-FLT_MAX, -FLT_MAX, -FLT_MAX};
+	TuboEngine::Math::Vector3 boundsMax_ = {FLT_MAX, FLT_MAX, FLT_MAX};
 
 	// ズーム制限・速度
 	float zoomMin_ = 0.5f;
@@ -84,7 +88,7 @@ private:
 	float introZoomCurve_ = 1.0f;
 
 	// 障害物回避（雛形）
-	void AvoidObstacles(Vector3& desiredPos);
+	void AvoidObstacles(TuboEngine::Math::Vector3& desiredPos);
 
 	// シェイク用乱数
 	float RandomFloat(float min, float max);

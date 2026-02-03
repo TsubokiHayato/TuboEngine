@@ -62,7 +62,7 @@ public:
 	/// <summary>
 	/// ライン描画用頂点追加
 	/// </summary>
-	void DrawLine(const Vector3& start, const Vector3& end, const Vector4& color);
+	void DrawLine(const TuboEngine::Math::Vector3& start, const TuboEngine::Math::Vector3& end, const TuboEngine::Math::Vector4& color);
 
 	/// <summary>
 	/// グリッド描画
@@ -71,7 +71,7 @@ public:
 	/// <param name="split">分割数</param>
 	/// <param name="color">グリッドの色</param>
 	/// <param name="rotation">グリッドの回転</param>
-	void DrawGrid(float size, int split, const Vector3& rotation = {0.0f, 0.0f, 0.0f}, const Vector4& color = {0.0f, 0.0f, 0.0f, 1.0f} );
+	void DrawGrid(float size, int split, const TuboEngine::Math::Vector3& rotation = {0.0f, 0.0f, 0.0f}, const TuboEngine::Math::Vector4& color = {0.0f, 0.0f, 0.0f, 1.0f});
 
 	/// <summary>
 	/// 球描画
@@ -80,7 +80,7 @@ public:
 	/// <param name="radius">球の半径</param>
 	/// <param name="color">球の色</param>
 	/// <param name="divisions">球の分割数</param>
-	void DrawSphere(const Vector3& center, float radius, const Vector4& color, int divisions = 32);
+	void DrawSphere(const TuboEngine::Math::Vector3& center, float radius, const TuboEngine::Math::Vector4& color, int divisions = 32);
 
 	///----------------------------------------------------
 	/// ゲッター・セッター
@@ -99,6 +99,6 @@ private:
 	bool isDrawGrid_ = true;
 	float gridSize_ = 16.0f;
 	int gridDivisions_ = 2;
-	Vector4 gridColor_ = {0.0f, 0.0f, 0.0f, 1.0f};
+	TuboEngine::Math::Vector4 gridColor_ = {0.0f, 0.0f, 0.0f, 1.0f};
 	bool isDrawSphere_ = true;
 };

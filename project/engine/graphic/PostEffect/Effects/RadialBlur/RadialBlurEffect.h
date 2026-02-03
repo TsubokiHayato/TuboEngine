@@ -6,7 +6,7 @@
 
 struct RadialBlurParams
 {
-	Vector2 radialBlurCenter; // 中心座標
+	TuboEngine::Math::Vector2 radialBlurCenter; // 中心座標
 	float radialBlurPower;  // 効果の強さ
 	float pad[2]; // 16バイトアライメント
 

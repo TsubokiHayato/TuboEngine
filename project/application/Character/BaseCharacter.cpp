@@ -12,4 +12,4 @@ void BaseCharacter::Draw() {}
 
 void BaseCharacter::OnCollision(Collider* other) {}
 
-Vector3 BaseCharacter::GetCenterPosition() const { return Vector3(); }
+TuboEngine::Math::Vector3 BaseCharacter::GetCenterPosition() const { return TuboEngine::Math::Vector3(); }
