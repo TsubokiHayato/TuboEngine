@@ -362,7 +362,7 @@ void RushEnemy::HandleWeaponAfterRush(Collider* other, uint32_t typeID) {
 }
 
 void RushEnemy::Update() {
-    if (!isAllive) { if (!deathEffectPlayed_) { EmitDeathParticle(); deathEffectPlayed_ = true; } if (deathEmitter_) deathEmitter_->GetPreset().center = position; return; }
+    if (!isAlive) { if (!deathEffectPlayed_) { EmitDeathParticle(); deathEffectPlayed_ = true; } if (deathEmitter_) deathEmitter_->GetPreset().center = position; return; }
     const float dt = 1.0f / 60.0f;
 
     // --- Enemyのノックバック適用を先頭で共有 ---
@@ -444,10 +444,10 @@ void RushEnemy::Update() {
     DrawDebugGizmos();
 }
 
-void RushEnemy::Draw() { if (!GetIsAllive()) return; if (object3d) object3d->Draw(); DrawViewCone(); DrawLastSeenMark(); DrawStateIcon(); }
+void RushEnemy::Draw() { if (!GetIsAlive()) return; if (object3d) object3d->Draw(); DrawViewCone(); DrawLastSeenMark(); DrawStateIcon(); }
 
 void RushEnemy::DrawSprite() {
-    if (!GetIsAllive()) return;
+    if (!GetIsAlive()) return;
     if (!camera_) return; // カメラ必須
 
     // 頭上ワールド座標
