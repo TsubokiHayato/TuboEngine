@@ -1,14 +1,13 @@
 #include "skyBoxCommon.h"
-#include"SkyBoxPSO.h"
+#include "SkyBox/SkyBoxPSO.h"
 SkyBoxCommon* SkyBoxCommon::instance = nullptr; // シングルトンインスタンス
 void SkyBoxCommon::Initialize() {
-  
-    /*---------------------------------------
-        PSOの初期化
-    ---------------------------------------*/
+
+	/*---------------------------------------
+	    PSOの初期化
+	---------------------------------------*/
 	pso = std::make_unique<SkyBoxPSO>();
-    pso->Initialize();
-   
+	pso->Initialize();
 }
 
 void SkyBoxCommon::Finalize() {
@@ -16,7 +15,4 @@ void SkyBoxCommon::Finalize() {
 	instance = nullptr;
 }
 
-void SkyBoxCommon::DrawSettingsCommon() {
-	pso->DrawSettingsCommon();
-}
-
+void SkyBoxCommon::DrawSettingsCommon() { pso->DrawSettingsCommon(); }
