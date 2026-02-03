@@ -16,7 +16,7 @@ void Sprite::Initialize(std::string textureFilePath)
 
 #pragma region SpriteResource
 
-	vertexResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * 6);
+	vertexResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * 6);
 
 	//頂点バッファビューを作成する
 
@@ -61,7 +61,7 @@ void Sprite::Initialize(std::string textureFilePath)
 	vertexData[3].normal = { 0.0f,0.0f,1.0f };
 
 
-	transformationMatrixResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
+	transformationMatrixResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	//データを書き込む
 	transformationMatrixData = nullptr;
 
@@ -78,7 +78,7 @@ void Sprite::Initialize(std::string textureFilePath)
 #pragma region indexResourceSprite
 
 	//WVP用のリソースを作る
-	indexResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t) * 6);
+	indexResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t) * 6);
 	indexBufferView.BufferLocation = indexResource->GetGPUVirtualAddress();
 
 	indexBufferView.SizeInBytes = sizeof(uint32_t) * 6;
@@ -98,8 +98,7 @@ void Sprite::Initialize(std::string textureFilePath)
 
 #pragma region Material_Resource_Sprite
 	//マテリアル用のリソースを作る。今回はColor1つ分のサイズを用意する
-	materialResource =
-		DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
+	materialResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
 	//マテリアルにデータを書き込む
 	//書き込むためのアドレスを取得
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
@@ -197,14 +196,15 @@ void Sprite::Update()
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 viewMatrix = MakeIdentity4x4();
-	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::GetInstance()->GetClientWidth()), float(WinApp::GetInstance()->GetClientHeight()), 0.0f, 100.0f);
+	Matrix4x4 projectionMatrix =
+	    MakeOrthographicMatrix(0.0f, 0.0f, float(TuboEngine::WinApp::GetInstance()->GetClientWidth()), float(TuboEngine::WinApp::GetInstance()->GetClientHeight()), 0.0f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData->WVP = worldViewProjectionMatrix;
 	transformationMatrixData->World = worldMatrix;
 
 
 
-	commandList = DirectXCommon::GetInstance()->GetCommandList();
+	commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
 
 
 

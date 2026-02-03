@@ -117,7 +117,7 @@ void OverScene::Update() {
 		l.time += dt;
 		float tt = std::clamp((l.time - l.delay)/letterDuration_, 0.0f, 1.0f);
 		float by2 = SmoothStep(tt); // 落下はスムーズ、必要ならBounceに変更
-		Vector2 p = { l.start.x + (l.end.x - l.start.x) * by2,
+		TuboEngine::Math::Vector2 p = {l.start.x + (l.end.x - l.start.x) * by2,
 					l.start.y + (l.end.y - l.start.y) * by2 };
 		l.sprite->SetPosition(p);
 		l.sprite->Update();

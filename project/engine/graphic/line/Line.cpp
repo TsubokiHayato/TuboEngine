@@ -35,8 +35,8 @@ void Line::Update() {
     // デフォルトカメラ取得
     camera_ = lineCommon_->GetDefaultCamera();
     // ワールド行列作成
-    Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-    Matrix4x4 worldViewProjectionMatrix;
+	TuboEngine::Math::Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	TuboEngine::Math::Matrix4x4 worldViewProjectionMatrix;
     if (camera_) {
         // ビュー・プロジェクション行列取得
         const Matrix4x4& viewMatrix = camera_->GetViewMatrix();
@@ -57,7 +57,7 @@ void Line::Update() {
 ///----------------------------------------------------
 /// ライン描画用頂点追加
 ///----------------------------------------------------
-void Line::DrawLine(const Vector3& start, const Vector3& end, const Vector4& color) {
+void Line::DrawLine(const TuboEngine::Math::Vector3& start, const TuboEngine::Math::Vector3& end, const TuboEngine::Math::Vector4& color) {
     vertices_.push_back({start, color});
     vertices_.push_back({end, color});
 }

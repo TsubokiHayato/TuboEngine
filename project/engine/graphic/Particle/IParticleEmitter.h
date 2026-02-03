@@ -16,16 +16,16 @@
 
 struct ParticleInfo {
 	Transform transform;
-	Vector3 velocity;
-	Vector4 color;
+	TuboEngine::Math::Vector3 velocity;
+	TuboEngine::Math::Vector4 color;
 	float lifeTime;
 	float currentTime;
 };
 
 struct ParticleForGPU {
-	Matrix4x4 WVP;
-	Matrix4x4 World;
-	Vector4 color;
+	TuboEngine::Math::Matrix4x4 WVP;
+	TuboEngine::Math::Matrix4x4 World;
+	TuboEngine::Math::Vector4 color;
 };
 
 struct ParticlePreset {
@@ -35,11 +35,11 @@ struct ParticlePreset {
 	uint32_t maxInstances = 128;
 	bool billboard = true;
 
-	Vector3 center{0,0,0};              // 追加: 発生中心
-	Vector3 posMin{0,0,0}, posMax{0,0,0};
-	Vector3 velMin{0,0,0}, velMax{0,0,0};
-	Vector3 scaleMin{1,1,1}, scaleMax{1,1,1};
-	Vector4 colMin{1,1,1,1}, colMax{1,1,1,1};
+	TuboEngine::Math::Vector3 center{0,0,0};              // 追加: 発生中心
+	TuboEngine::Math::Vector3 posMin{0,0,0}, posMax{0,0,0};
+	TuboEngine::Math::Vector3 velMin{0,0,0}, velMax{0,0,0};
+	TuboEngine::Math::Vector3 scaleMin{1,1,1}, scaleMax{1,1,1};
+	TuboEngine::Math::Vector4 colMin{1,1,1,1}, colMax{1,1,1,1};
 	float lifeMin = 0.5f, lifeMax = 1.5f;
 
 	// Emit
@@ -48,12 +48,12 @@ struct ParticlePreset {
 	float emitRate = 30.0f;  // 個/秒
 	uint32_t burstCount = 10;
 	// 追加
-	Vector3 gravity{0.0f,-0.5f,0.0f};
+	TuboEngine::Math::Vector3 gravity{0.0f,-0.5f,0.0f};
 	float drag = 0.0f;                         // 速度減衰率（0～1）
-	Vector2 rotSpeedRangeZ{0.0f,0.0f};         // 回転速度範囲(Z軸)
-	Vector2 initialRotRangeZ{0.0f,0.0f};       // 初期回転角ランダム範囲
-	Vector3 scaleStart{1,1,1}, scaleEnd{1,1,1};
-	Vector4 colorStart{1,1,1,1}, colorEnd{1,1,1,0};
+	TuboEngine::Math::Vector2 rotSpeedRangeZ{0.0f,0.0f};         // 回転速度範囲(Z軸)
+	TuboEngine::Math::Vector2 initialRotRangeZ{0.0f,0.0f};       // 初期回転角ランダム範囲
+	TuboEngine::Math::Vector3 scaleStart{1,1,1}, scaleEnd{1,1,1};
+	TuboEngine::Math::Vector4 colorStart{1,1,1,1}, colorEnd{1,1,1,0};
 	int blendModeOverride = -1;                // -1 なら共通設定を使う
 	bool simulateInWorldSpace = true;
 	Transform emitterTransform{};              // エミッター自身の座標
@@ -88,7 +88,7 @@ protected:
 	virtual void BuildGeometry(std::vector<VertexData>& outVertices) = 0;
 	void EnsureBuffers();
 	void PushParticle(const ParticleInfo& p);
-	void UpdateParticles(float dt, const Matrix4x4& viewProj, const Matrix4x4& billboard);
+	void UpdateParticles(float dt, const TuboEngine::Math::Matrix4x4& viewProj, const TuboEngine::Math::Matrix4x4& billboard);
 	void ResetInstances();
 
 protected:

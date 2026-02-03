@@ -4,17 +4,17 @@
 /// -------------------------------------------------------------
 ///						　	初期化処理
 /// -------------------------------------------------------------
-void Collider::Initialize() {}
+void Application::Collider::Initialize() {}
 
 /// -------------------------------------------------------------
 ///						　	 更新処理
 /// -------------------------------------------------------------
-void Collider::Update() {}
+void Application::Collider::Update() {}
 
 /// -------------------------------------------------------------
 ///						　	 描画処理
 /// -------------------------------------------------------------
-void Collider::Draw() {
-	Vector3 center = GetCenterPosition();
+void Application::Collider::Draw() {
+	TuboEngine::Math::Vector3 center = GetCenterPosition();
 	LineManager::GetInstance()->DrawSphere(center, radius_, defaultColor, 16);
 }
