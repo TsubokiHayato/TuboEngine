@@ -3,7 +3,7 @@
 #include "WinApp.h"
 #include <algorithm>
 
-static Vector4 HPColor(float ratio) {
+static TuboEngine::Math::Vector4 HPColor(float ratio) {
     if (ratio < 0.0f) ratio = 0.0f; if (ratio > 1.0f) ratio = 1.0f;
     if (ratio < 0.5f) {
         float t = ratio / 0.5f; // 0..1
@@ -36,7 +36,7 @@ void HpUI::Initialize(const std::string& frameTexturePath, const std::string& fi
     }
 }
 
-void HpUI::Update(const Player* player) {
+void HpUI::Update(const Application::Player* player) {
     if (!player) return;
     currentHp_ = player->GetHP();
     currentHp_ = std::clamp(currentHp_, 0, maxHp_);
@@ -53,17 +53,17 @@ void HpUI::Update(const Player* player) {
     // compute base position
     float iconSize = 32.0f * scale_;
     float totalWidth = iconSize * maxHp_ + spacing_ * (maxHp_ - 1);
-    Vector2 base = position_;
+	TuboEngine::Math::Vector2 base = position_;
     if (alignRight_) {
-        int sw = (int)WinApp::GetInstance()->GetClientWidth();
+		int sw = (int)TuboEngine::WinApp::GetInstance()->GetClientWidth();
         base.x = (float)sw - rightMargin_ - totalWidth;
     }
 
     float ratio = maxHp_ > 0 ? animatedHp_ / (float)maxHp_ : 0.0f;
-    Vector4 fillColor = HPColor(ratio);
+    TuboEngine::Math::Vector4 fillColor = HPColor(ratio);
 
     for (int i = 0; i < maxHp_; ++i) {
-        Vector2 p = { base.x + i * (iconSize + spacing_), base.y };
+		TuboEngine::Math::Vector2 p = {base.x + i * (iconSize + spacing_), base.y};
         // frame
         auto& fr = frameSprites_[i];
         fr->SetPosition(p);

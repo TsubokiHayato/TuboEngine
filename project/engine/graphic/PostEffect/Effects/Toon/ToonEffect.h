@@ -9,8 +9,8 @@
 struct ToonParams {
 	int stepCount = 3;
 	float toonRate;
-	Vector3 shadowColor;
-	Vector3 highlightColor;
+	TuboEngine::Math::Vector3 shadowColor;
+	TuboEngine::Math::Vector3 highlightColor;
 	float padding[2]; // HLSLと同じサイズになるように
 };
 

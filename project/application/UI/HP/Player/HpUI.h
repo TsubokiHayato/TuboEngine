@@ -3,16 +3,19 @@
 #include <memory>
 #include <vector>
 
-class Player;
+namespace Application { class Player; }
 
 class HpUI {
 public:
     ~HpUI() = default;
     void Initialize(const std::string& frameTexturePath, const std::string& fillTexturePath, int maxHp);
-    void Update(const Player* player);
+    void Update(const Application::Player* player);
     void Draw();
 
-    void SetPosition(const Vector2& pos) { position_ = pos; alignRight_ = false; }
+    void SetPosition(const TuboEngine::Math::Vector2& pos) {
+		position_ = pos;
+		alignRight_ = false;
+	}
     void SetSpacing(float spacing) { spacing_ = spacing; }
     void SetScale(float scale) { scale_ = scale; }
     void SetAlignRight(bool enable, float marginPx = 20.0f) { alignRight_ = enable; rightMargin_ = marginPx; }
@@ -26,7 +29,7 @@ private:
     int currentHp_ = 0;
     float animatedHp_ = 0.0f;   // animates from previous HP to current HP
     float shrinkSpeed_ = 4.0f;  // icons per second shrink rate
-    Vector2 position_ { 20.0f, 20.0f };
+	TuboEngine::Math::Vector2 position_{20.0f, 20.0f};
     float spacing_ = 36.0f; // pixel spacing
     float scale_ = 1.0f;    // uniform scale
 

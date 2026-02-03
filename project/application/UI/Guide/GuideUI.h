@@ -15,8 +15,8 @@ public:
 	void SetActive(bool active) { isActive_ = active; }
 	bool IsActive() const { return isActive_; }
 
-	void SetPosition(const Vector2& leftBottom) { basePos_ = leftBottom; }
-	const Vector2& GetPosition() const { return basePos_; }
+	void SetPosition(const TuboEngine::Math::Vector2& leftBottom) { basePos_ = leftBottom; }
+	const TuboEngine::Math::Vector2& GetPosition() const { return basePos_; }
 
 private:
 	void UpdateKeySpriteState(class Sprite* sprite, const std::string& normalTex, const std::string& outlineTex, bool pressed) const;
@@ -24,7 +24,7 @@ private:
 
 private:
 	bool isActive_ = true;
-	Vector2 basePos_{ 20.0f, 720.0f - 20.0f }; // will be converted to left-bottom in Initialize
+	TuboEngine::Math::Vector2 basePos_{20.0f, 720.0f - 20.0f}; // will be converted to left-bottom in Initialize
 
 	std::unique_ptr<Sprite> labelMove_;
 	std::unique_ptr<Sprite> labelDash_;

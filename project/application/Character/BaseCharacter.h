@@ -4,7 +4,7 @@
 #include"Collider/Collider.h"
 
 
-class BaseCharacter : public Collider {
+class BaseCharacter : public Application::Collider {
 
 public:
 	///--------------------------------------------------
@@ -39,7 +39,7 @@ public:
 
 	/// <summary>
 	/// 当たり判定の中心座標を取得
-	virtual Vector3 GetCenterPosition() const override;
+	virtual TuboEngine::Math::Vector3 GetCenterPosition() const override;
 	
 
 

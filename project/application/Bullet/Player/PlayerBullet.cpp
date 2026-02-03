@@ -8,9 +8,9 @@ namespace {
 // 弾のデフォルト速度
 constexpr float kDefaultBulletSpeed = 2.0f;
 // 弾のデフォルトスケール
-constexpr Vector3 kDefaultBulletScale = {1.0f, 1.0f, 1.0f};
+constexpr TuboEngine::Math::Vector3 kDefaultBulletScale = {1.0f, 1.0f, 1.0f};
 // 弾のデフォルト回転
-constexpr Vector3 kDefaultBulletRotation = {0.0f, 0.0f, 0.0f};
+constexpr TuboEngine::Math::Vector3 kDefaultBulletRotation = {0.0f, 0.0f, 0.0f};
 // 弾が消滅するZ座標
 constexpr float kBulletDisappearZ = 100.0f;
 } // namespace
@@ -19,8 +19,8 @@ constexpr float kBulletDisappearZ = 100.0f;
 float PlayerBullet::s_disappearRadius = 100.0f;
 float PlayerBullet::s_bulletSpeed = 2.0f;
 float PlayerBullet::s_disappearZ = 100.0f;
-Vector3 PlayerBullet::s_scale = {1.0f, 1.0f, 1.0f};
-Vector3 PlayerBullet::s_rotation = {0.0f, 0.0f, 0.0f};
+TuboEngine::Math::Vector3 PlayerBullet::s_scale = {1.0f, 1.0f, 1.0f};
+TuboEngine::Math::Vector3 PlayerBullet::s_rotation = {0.0f, 0.0f, 0.0f};
 int PlayerBullet::s_damage = 1;
 float PlayerBullet::s_fireInterval = 0.2f;
 
