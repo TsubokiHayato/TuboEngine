@@ -1,6 +1,6 @@
 #pragma once
 #include "Camera.h"
-#include "LinePSO.h"
+#include "Line/LinePSO.h"
 #include <memory>
 #include <vector>
 

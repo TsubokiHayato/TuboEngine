@@ -37,8 +37,8 @@ public:
     void SetRotation(const Vector3& rot) { rotation = rot; }
     Vector3 GetScale() const { return scale; }
     void SetScale(const Vector3& scl) { scale = scl; }
-    bool GetIsAllive() const { return isAllive; }
-    void SetIsAlive(bool alive) { isAllive = alive; }
+    bool GetIsAlive() const { return isAlive; }
+    void SetIsAlive(bool alive) { isAlive = alive; }
     void SetPlayer(Player* player) { player_ = player; }
     void SetMapChipField(MapChipField* field) { mapChipField = field; }
     int GetHP() const { return HP; }
@@ -62,7 +62,7 @@ protected: // 変更: 派生クラス(RushEnemy等)で行動を拡張できる�
     float shootDistance_ = 7.0f;
     float moveStartDistance_ = 15.0f;
     int HP = 100;
-    bool isAllive = true;
+    bool isAlive = true;
     bool isHit = false;
     bool wasHit = false;
     std::unique_ptr<Object3d> object3d;
