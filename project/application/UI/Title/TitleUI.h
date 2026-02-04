@@ -99,7 +99,6 @@ private:
 	// 各種ボタン・セレクターのスプライト
 	std::unique_ptr<Sprite> LogoSprite_;
 	std::unique_ptr<Sprite> StartButtonSprite_;
-	std::unique_ptr<Sprite> TutorialButtonSprite_;
 	std::unique_ptr<Sprite> QuitButtonSprite_;
 
 	// オプション表示中フラグ
@@ -123,6 +122,4 @@ private:
 	float selectorDecisionAnimeTime_ = 0.0f;
 
 	SceneType nextSceneType_ = SceneType::Title;
-
-
 };
