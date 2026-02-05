@@ -218,13 +218,13 @@ void RushEnemy::HandleRushing(float dt) {
     } else {
 		TuboEngine::Math::Vector3 v = rushDir_;
         float nlen = std::sqrt(hitNormal.x*hitNormal.x + hitNormal.y*hitNormal.y);
-		TuboEngine::Math::Vector3 n = (nlen > 0.0001f) ? Vector3{hitNormal.x / nlen, hitNormal.y / nlen, 0} : Vector3{-v.x, -v.y, 0};
+		TuboEngine::Math::Vector3 n = (nlen > 0.0001f) ? TuboEngine::Math::Vector3{hitNormal.x / nlen, hitNormal.y / nlen, 0} : TuboEngine::Math::Vector3{-v.x, -v.y, 0};
         float dot = v.x*n.x + v.y*n.y;
 		TuboEngine::Math::Vector3 reflect{v.x - 2.0f * dot * n.x, v.y - 2.0f * dot * n.y, 0};
         reactionDir_ = reflect; isRushing_ = false; isReacting_ = true; reactionTimer_ = reactionDuration_;
         rushCooldownTimer_ = rushCooldownDuration_; requireExitBeforeNextRush_ = true; endedRushWithoutWall_ = false;
         lastReactionSource_ = ReactionSource::Wall; // 壁反射リアクション
-        Vector3 bounce = reactionDir_ * reactionBackoffSpeed_;
+		TuboEngine::Math::Vector3 bounce = reactionDir_ * reactionBackoffSpeed_;
         MoveWithCollision(position, bounce, mapChipField);
     }
 }
@@ -299,14 +299,31 @@ void RushEnemy::ApplyChargeAndVisuals(float dt) {
 
 void RushEnemy::DrawDebugGizmos() {
     const int div = 24; Vector4 triggerCol{0.3f,0.9f,0.3f,0.35f};
-    for (int i=0;i<div;++i){ float a0=(2.0f*DirectX::XM_PI)*(float(i)/div); float a1=(2.0f*DirectX::XM_PI)*(float(i+1)/div); Vector3 p0=position+Vector3{std::cos(a0)*rushTriggerDistance_, std::sin(a0)*rushTriggerDistance_,0}; Vector3 p1=position+Vector3{std::cos(a1)*rushTriggerDistance_, std::sin(a1)*rushTriggerDistance_,0}; LineManager::GetInstance()->DrawLine(p0,p1,triggerCol);}    
+	for (int i = 0; i < div; ++i) {
+		float a0 = (2.0f * DirectX::XM_PI) * (float(i) / div);
+		float a1 = (2.0f * DirectX::XM_PI) * (float(i + 1) / div);
+		TuboEngine::Math::Vector3 p0 = position + TuboEngine::Math::Vector3{std::cos(a0) * rushTriggerDistance_, std::sin(a0) * rushTriggerDistance_, 0};
+		TuboEngine::Math::Vector3 p1 = position + TuboEngine::Math::Vector3{std::cos(a1) * rushTriggerDistance_, std::sin(a1) * rushTriggerDistance_, 0};
+		LineManager::GetInstance()->DrawLine(p0, p1, triggerCol);
+	}    
    TuboEngine::Math:: Vector4 dirCol = isPreparing_? Vector4{1,0.6f,0.2f,1} : (isRushing_? Vector4{1,0.2f,0.2f,1} : (isStopping_? Vector4{0.8f,0.8f,0.8f,1} : (isScanning_? Vector4{0.2f,0.7f,1.0f,1} : (rushCooldownTimer_>0.0f? Vector4{0.4f,0.4f,0.4f,1}:Vector4{0.4f,0.4f,0.9f,1}))));
-    TuboEngine::Math::Vector3 head = position + Vector3{rushDir_.x*2.2f,rushDir_.y*2.2f,0}; LineManager::GetInstance()->DrawLine(position, head, dirCol);
+	TuboEngine::Math::Vector3 head = position + TuboEngine::Math::Vector3{rushDir_.x * 2.2f, rushDir_.y * 2.2f, 0};
+	LineManager::GetInstance()->DrawLine(position, head, dirCol);
     if (isPreparing_ && showDashPreview_) {
-		TuboEngine::Math::Vector3 predicted = position + Vector3{rushDir_.x * rushSpeed_ * rushDuration_, rushDir_.y * rushSpeed_ * rushDuration_, 0};
+		TuboEngine::Math::Vector3 predicted = position + TuboEngine::Math::Vector3{rushDir_.x * rushSpeed_ * rushDuration_, rushDir_.y * rushSpeed_ * rushDuration_, 0};
 		float previewR = 0.9f;
 		Vector4 previewCol{1, 0.15f, 0.15f, 0.85f};
-        for (int i=0;i<div;++i){ float a0=(2.0f*DirectX::XM_PI)*(float(i)/div); float a1=(2.0f*DirectX::XM_PI)*(float(i+1)/div); Vector3 p0=predicted+Vector3{std::cos(a0)*previewR,std::sin(a0)*previewR,0}; Vector3 p1=predicted+Vector3{std::cos(a1)*previewR,std::sin(a1)*previewR,0}; LineManager::GetInstance()->DrawLine(p0,p1,previewCol);} float cross=previewR; LineManager::GetInstance()->DrawLine(predicted+Vector3{-cross,0,0},predicted+Vector3{cross,0,0},previewCol); LineManager::GetInstance()->DrawLine(predicted+Vector3{0,-cross,0},predicted+Vector3{0,cross,0},previewCol); LineManager::GetInstance()->DrawLine(position,predicted,Vector4{1,0.3f,0.3f,0.3f});
+		for (int i = 0; i < div; ++i) {
+			float a0 = (2.0f * DirectX::XM_PI) * (float(i) / div);
+			float a1 = (2.0f * DirectX::XM_PI) * (float(i + 1) / div);
+			TuboEngine::Math::Vector3 p0 = predicted + TuboEngine::Math::Vector3{std::cos(a0) * previewR, std::sin(a0) * previewR, 0};
+			TuboEngine::Math::Vector3 p1 = predicted + TuboEngine::Math::Vector3{std::cos(a1) * previewR, std::sin(a1) * previewR, 0};
+			LineManager::GetInstance()->DrawLine(p0, p1, previewCol);
+		}
+		float cross = previewR;
+		LineManager::GetInstance()->DrawLine(predicted + TuboEngine::Math::Vector3{-cross, 0, 0}, predicted + TuboEngine::Math::Vector3{cross, 0, 0}, previewCol);
+		LineManager::GetInstance()->DrawLine(predicted + TuboEngine::Math::Vector3{0, -cross, 0}, predicted + TuboEngine::Math::Vector3{0, cross, 0}, previewCol);
+		LineManager::GetInstance()->DrawLine(position, predicted, Vector4{1, 0.3f, 0.3f, 0.3f});
     }
 }
 
@@ -324,9 +341,12 @@ bool RushEnemy::HandleReactingEarly(Collider* other, uint32_t typeID) {
 bool RushEnemy::HandlePlayerCollision(Collider* other) {
     Player* hitPlayer = dynamic_cast<Player*>(other);
     if (!hitPlayer) return false;
-    Vector3 pPos = hitPlayer->GetPosition(); Vector3 dir = position - pPos; dir.z = 0.0f; float len = std::sqrt(dir.x*dir.x + dir.y*dir.y);
+	TuboEngine::Math::Vector3 pPos = hitPlayer->GetPosition();
+	TuboEngine::Math::Vector3 dir = position - pPos;
+	dir.z = 0.0f;
+	float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
     if (len > 0.0001f) {
-        Vector3 away{dir.x/len, dir.y/len, 0.0f};
+		TuboEngine::Math::Vector3 away{dir.x / len, dir.y / len, 0.0f};
         reactionDir_ = away;
         isRushing_ = false;
         isReacting_ = true;
@@ -335,7 +355,7 @@ bool RushEnemy::HandlePlayerCollision(Collider* other) {
         requireExitBeforeNextRush_ = true;
         endedRushWithoutWall_ = false;
         lastReactionSource_ = ReactionSource::Player; // プレイヤー接触リアクション
-        Vector3 knock = reactionDir_ * reactionBackoffSpeed_;
+		TuboEngine::Math::Vector3 knock = reactionDir_ * reactionBackoffSpeed_;
         MoveWithCollision(position, knock, mapChipField);
     }
     return true;
@@ -351,7 +371,8 @@ void RushEnemy::HandleWeaponAfterRush(Collider* other, uint32_t typeID) {
     if (!player_) { state_ = State::Idle; return; }
 
     // プレイヤーとの距離で分岐
-    Vector3 toP = player_->GetPosition() - position; toP.z = 0.0f;
+	TuboEngine::Math::Vector3 toP = player_->GetPosition() - position;
+	toP.z = 0.0f;
     float len = std::sqrt(toP.x*toP.x + toP.y*toP.y);
     if (len > rushTriggerDistance_) {
         // 突進可能範囲外：Chase は許可（即時移動はしない）
@@ -359,7 +380,7 @@ void RushEnemy::HandleWeaponAfterRush(Collider* other, uint32_t typeID) {
     } else {
         // 突進可能範囲内：突進以外で接近しない
         if (rushCooldownTimer_ <= 0.0f && !requireExitBeforeNextRush_) {
-            Vector3 dir{ toP.x/len, toP.y/len, 0.0f };
+			TuboEngine::Math::Vector3 dir{toP.x / len, toP.y / len, 0.0f};
             rushDir_ = dir;
             rotation.z = std::atan2(dir.y, dir.x);
             state_ = State::Attack;
@@ -398,7 +419,7 @@ void RushEnemy::Update() {
         object3d->SetPosition(position);
         // スタン中も描画補正は適用
         {
-            Vector3 drawRot = rotation;
+			TuboEngine::Math::Vector3 drawRot = rotation;
             drawRot.x = NormalizeAngle(drawRot.x + kRushEnemyModelRotOffsetX);
             drawRot.y = NormalizeAngle(drawRot.y + kRushEnemyModelRotOffsetY);
             drawRot.z = NormalizeAngle(drawRot.z + kRushEnemyModelRotOffsetZ);
@@ -416,10 +437,11 @@ void RushEnemy::Update() {
     // クールダウン/スタンが終了した直後に、突進可能範囲内なら即座に突進準備へ移行
     if (!isStunned_ && !isPreparing_ && !isRushing_ && !isReacting_ && !isStopping_) {
         if (rushCooldownTimer_ <= 0.0f && !requireExitBeforeNextRush_ && player_ && canSeePlayer) {
-            Vector3 toP = player_->GetPosition() - position; toP.z = 0.0f;
+			TuboEngine::Math::Vector3 toP = player_->GetPosition() - position;
+			toP.z = 0.0f;
             float len = std::sqrt(toP.x*toP.x + toP.y*toP.y);
             if (len <= rushTriggerDistance_ && len > 0.001f) {
-                Vector3 dir{ toP.x/len, toP.y/len, 0.0f };
+				TuboEngine::Math::Vector3 dir{toP.x / len, toP.y / len, 0.0f};
                 rushDir_ = dir;
                 rotation.z = std::atan2(dir.y, dir.x);
                 state_ = State::Attack;
@@ -441,7 +463,17 @@ void RushEnemy::Update() {
     case State::LookAround: state_ = State::Idle; break;
     case State::Patrol: state_ = State::Idle; break;
     case State::Chase: {
-        if (player_) { Vector3 dir = player_->GetPosition() - position; dir.z = 0.0f; float len = std::sqrt(dir.x*dir.x + dir.y*dir.y); if (len > 0.1f) { dir.x/=len; dir.y/=len; Vector3 move{dir.x*moveSpeed_, dir.y*moveSpeed_,0}; MoveWithCollision(position, move, mapChipField); } }
+		if (player_) {
+			TuboEngine::Math::Vector3 dir = player_->GetPosition() - position;
+			dir.z = 0.0f;
+			float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+			if (len > 0.1f) {
+				dir.x /= len;
+				dir.y /= len;
+				TuboEngine::Math::Vector3 move{dir.x * moveSpeed_, dir.y * moveSpeed_, 0};
+				MoveWithCollision(position, move, mapChipField);
+			}
+		}
         break; }
     case State::Attack: { UpdateAttackState(dt); break; }
     }
@@ -461,7 +493,7 @@ void RushEnemy::DrawSprite() {
     if (!camera_) return; // カメラ必須
 
     // 頭上ワールド座標
-    Vector3 world = position;
+	TuboEngine::Math::Vector3 world = position;
     world.y += iconOffsetY_;
 
     // ワールド→スクリーン座標変換
@@ -472,8 +504,8 @@ void RushEnemy::DrawSprite() {
     float sy = vp.m[0][1]*x + vp.m[1][1]*y + vp.m[2][1]*z + vp.m[3][1];
     float sw = vp.m[0][3]*x + vp.m[1][3]*y + vp.m[2][3]*z + vp.m[3][3];
     if (sw == 0.0f) return; sx/=sw; sy/=sw; // NDC
-    int w = WinApp::GetInstance()->GetClientWidth();
-    int h = WinApp::GetInstance()->GetClientHeight();
+	int w = TuboEngine::WinApp::GetInstance()->GetClientWidth();
+	int h = TuboEngine::WinApp::GetInstance()->GetClientHeight();
     float baseX = (sx * 0.5f + 0.5f) * float(w);
     float baseY = (-sy * 0.5f + 0.5f) * float(h);
     baseY += iconScreenOffsetY_; // スクリーンYの追加オフセット（上方向は負）
