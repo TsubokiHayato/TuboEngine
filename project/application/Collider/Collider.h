@@ -3,7 +3,7 @@
 #include "Vector4.h"
 #include <cstdint>
 
-namespace Application {
+
 
 /// -------------------------------------------------------------
 ///					　当たり判定クラス
@@ -56,4 +56,3 @@ private: /// ---------- メンバ変数 ---------- ///
 	TuboEngine::Math::Vector4 defaultColor = {1.0f, 1.0f, 1.0f, 1.0f};
 };
 
-} // namespace Application
