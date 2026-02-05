@@ -15,7 +15,7 @@ void RadialBlurEffect::Initialize() {
 	pso_->Initialize();
 
     // 定数バッファ作成
-    cbResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(RadialBlurParams));
+	cbResource_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(RadialBlurParams));
     cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&params_));
     // デフォルト値
 	
@@ -54,7 +54,7 @@ void RadialBlurEffect::SetPower(float power) {
 	params_->radialBlurPower = power;
 }
 
-void RadialBlurEffect::SetCenter(const Vector2& center) {
+void RadialBlurEffect::SetCenter(const TuboEngine::Math::Vector2& center) {
 	if (!params_) {
 		return;
 	}
