@@ -20,16 +20,16 @@ protected:
 			float u0 = float(i) / float(kDiv);
 			float u1 = float(i + 1) / float(kDiv);
 
-			Vector2 tTop0{u0, 0.0f}, tTop1{u1, 0.0f};
-			Vector2 tBot0{u0, 1.0f}, tBot1{u1, 1.0f};
+			TuboEngine::Math::Vector2 tTop0{u0, 0.0f}, tTop1{u1, 0.0f};
+			TuboEngine::Math::Vector2 tBot0{u0, 1.0f}, tBot1{u1, 1.0f};
 			// v反転（必要なら）
 			tTop0.y = 1.0f - tTop0.y;
 			tTop1.y = 1.0f - tTop1.y;
 			tBot0.y = 1.0f - tBot0.y;
 			tBot1.y = 1.0f - tBot1.y;
 
-			Vector3 n0{-s0, 0.0f, c0};
-			Vector3 n1{-s1, 0.0f, c1};
+			TuboEngine::Math::Vector3 n0{-s0, 0.0f, c0};
+			TuboEngine::Math::Vector3 n1{-s1, 0.0f, c1};
 
 			// 2三角 + 追加の分割で少し厚み
 			out.push_back({
@@ -82,7 +82,7 @@ protected:
 		// らせん + 上昇速度
 		float ang = spiral(rng_);
 		float r = radial(rng_) * 0.6f; // 半径制限
-		Vector3 horiz{std::cos(ang) * r, 0.0f, std::sin(ang) * r};
+		TuboEngine::Math::Vector3 horiz{std::cos(ang) * r, 0.0f, std::sin(ang) * r};
 		p.velocity = {horiz.x * 0.4f, velY(rng_), horiz.z * 0.4f};
 
 		p.color = {colR(rng_), colG(rng_), colB(rng_), colA(rng_)};

@@ -105,7 +105,7 @@ public:
 	std::string& GetMapChipCsvFilePath() { return mapChipCsvFilePath_; }
 	std::unique_ptr<SkyDome>& GetSkyDome() { return skyDome_; }
 
-	StageStateManager* GetStageStateManager() { return stateManager_.get(); }
+	TuboEngine::Math::StageStateManager* GetStageStateManager() { return stateManager_.get(); }
 	SceneChangeAnimation* GetSceneChangeAnimation() { return sceneChangeAnimation_.get(); }
 	bool GetIsRequestSceneChange() const { return isRequestSceneChange; }
 	void SetIsRequestSceneChange(bool request) { isRequestSceneChange = request; }
@@ -127,7 +127,7 @@ public:
 
 	struct StageInstance {
 		std::string csvPath;
-		Vector3 origin{0.0f, 0.0f, 0.0f};
+		TuboEngine::Math::Vector3 origin{0.0f, 0.0f, 0.0f};
 		bool visible = true;
 
 		std::unique_ptr<MapChipField> field;
@@ -162,9 +162,9 @@ private:
 
 	std::unique_ptr<FollowTopDownCamera> followCamera;
 	std::unique_ptr<Camera> camera = nullptr;
-	Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
-	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
-	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
+	TuboEngine::Math::Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
+	TuboEngine::Math::Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
+	TuboEngine::Math::Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
 
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<Enemy> enemy_ = nullptr;
