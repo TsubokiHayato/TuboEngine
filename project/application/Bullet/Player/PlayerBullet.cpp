@@ -27,7 +27,7 @@ float PlayerBullet::s_fireInterval = 0.2f;
 //--------------------------------------------------
 // 2点間の距離を計算する関数
 //--------------------------------------------------
-static float Distance(const Vector3& a, const Vector3& b) {
+static float Distance(const TuboEngine::Math::Vector3& a, const TuboEngine::Math::Vector3& b) {
 	float dx = a.x - b.x;
 	float dy = a.y - b.y;
 	float dz = a.z - b.z;
@@ -37,7 +37,7 @@ static float Distance(const Vector3& a, const Vector3& b) {
 //--------------------------------------------------
 // 初期化処理
 //--------------------------------------------------
-void PlayerBullet::Initialize( const Vector3& startPos) {
+void PlayerBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
 	// 衝突判定のタイプIDを設定
 	Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon));
 	// 弾の初期位置を設定
@@ -78,16 +78,16 @@ void PlayerBullet::Update() {
 	velocity.z = 0.0f;
 
 	// 今フレームの移動量
-	Vector3 desiredMove = velocity; // dt(=1) 前提
+	TuboEngine::Math::Vector3 desiredMove = velocity; // dt(=1) 前提
 	float moveLen2D = std::sqrt(desiredMove.x * desiredMove.x + desiredMove.y * desiredMove.y);
 
 	// ブロック貫通防止用サブステップ
 	float tileSize = (mapChipField_) ? MapChipField::GetBlockSize() : 1.0f;
 	int subSteps = std::max(1, int(std::ceil(moveLen2D / (tileSize * 0.5f))));
-	Vector3 stepMove = desiredMove / float(subSteps);
+	TuboEngine::Math::Vector3 stepMove = desiredMove / float(subSteps);
 
 	for (int i = 0; i < subSteps; ++i) {
-		Vector3 nextPos = position + stepMove;
+		TuboEngine::Math::Vector3 nextPos = position + stepMove;
 		if (mapChipField_ && mapChipField_->IsBlocked(nextPos)) {
 			isAlive = false;
 			break;
@@ -117,9 +117,9 @@ void PlayerBullet::Draw() { object3d->Draw(); }
 //--------------------------------------------------
 // 当たり判定の中心座標を取得
 //--------------------------------------------------
-Vector3 PlayerBullet::GetCenterPosition() const {
-	const Vector3 offset = {0.0f, 0.0f, 0.0f}; // プレイヤーの中心を考慮
-	Vector3 worldPosition = position + offset;
+TuboEngine::Math::Vector3 PlayerBullet::GetCenterPosition() const {
+	const TuboEngine::Math::Vector3 offset = {0.0f, 0.0f, 0.0f}; // プレイヤーの中心を考慮
+	TuboEngine::Math::Vector3 worldPosition = position + offset;
 	return worldPosition;
 }
 
