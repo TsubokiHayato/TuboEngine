@@ -54,7 +54,7 @@ void StageReadyState::Enter(StageScene* scene) {
 		playerMapX = 0;
 		playerMapY = 0;
 	}
-	Vector3 playerPos = scene->GetMapChipField()->GetMapChipPositionByIndex(playerMapX, playerMapY);
+	TuboEngine::Math::Vector3 playerPos = scene->GetMapChipField()->GetMapChipPositionByIndex(playerMapX, playerMapY);
 
 	// プレイヤー初期化（Stage0のみ）
 	scene->GetPlayer()->Initialize();
@@ -63,7 +63,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	scene->GetPlayer()->SetPosition(playerPos);
 
 	// フォローカメラ初期化（プレビュー生成にも使う）
-	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), Vector3{0.0f, 0.0f, -70.0f}, 0.08f);
+	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), TuboEngine::Math::Vector3{0.0f, 0.0f, -70.0f}, 0.08f);
 	// ズーム制限設定
 	scene->GetFollowCamera()->SetZoomLimits(0.1f, 1.0f);
 	// 開始時は近い(0.1)状態に固定してからカメラ位置を確定
@@ -84,7 +84,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	enemies.clear();
 
 	ForEachMapChip(scene, [&](uint32_t x, uint32_t y, MapChipType type) {
-		Vector3 pos = scene->GetMapChipField()->GetMapChipPositionByIndex(x, y);
+		TuboEngine::Math::Vector3 pos = scene->GetMapChipField()->GetMapChipPositionByIndex(x, y);
 
 		if (type == MapChipType::kBlock) {
 			auto block = std::make_unique<Block>();
@@ -112,7 +112,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	});
 
 	// タイル（Stage0）
-	Vector3 tilePos = scene->GetMapChipField()->GetMapChipPositionByIndex(0, 0);
+	TuboEngine::Math::Vector3 tilePos = scene->GetMapChipField()->GetMapChipPositionByIndex(0, 0);
 	tilePos.z = -1.0f;
 	scene->GetTile()->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile30x30.obj");
 	scene->GetTile()->SetCamera(cam);
@@ -132,7 +132,7 @@ void StageReadyState::Enter(StageScene* scene) {
 
 	const float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
 	const float screenH = static_cast<float>(WinApp::GetInstance()->GetClientHeight());
-	const Vector2 center = { screenW * 0.5f, screenH * 0.5f };
+	const TuboEngine::Math::Vector2 center = {screenW * 0.5f, screenH * 0.5f};
 
 	// テクスチャはプロジェクト側の配置に合わせて差し替えてください
 	const std::string readyTex = "ready.png";
