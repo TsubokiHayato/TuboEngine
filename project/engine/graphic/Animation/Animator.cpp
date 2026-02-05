@@ -169,6 +169,16 @@ void Animator::Update() {
     commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
 }
 
+// モデルの設定
+void Animator::SetModel(Model* model) {
+	assert(model);
+	this->model_ = model;
+}
+
+void Animator::SetModel(const std::string& filePath) {
+	this->model_ = ModelManager::GetInstance()->FindModel(filePath);
+}
+
 // 描画処理
 void Animator::Draw() {
 	// TransformMatrix (b0, VertexShader)

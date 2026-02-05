@@ -130,8 +130,8 @@ void StageReadyState::Enter(StageScene* scene) {
 	phase_ = Phase::Ready;
 	phaseTimer_ = 0.0f;
 
-	const float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
-	const float screenH = static_cast<float>(WinApp::GetInstance()->GetClientHeight());
+	const float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
+	const float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
 	const TuboEngine::Math::Vector2 center = {screenW * 0.5f, screenH * 0.5f};
 
 	// テクスチャはプロジェクト側の配置に合わせて差し替えてください

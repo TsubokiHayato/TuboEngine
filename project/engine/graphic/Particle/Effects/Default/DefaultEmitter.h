@@ -49,7 +49,7 @@ public:
         const float rx = uni(p.posMin.x, p.posMax.x);
         const float ry = uni(p.posMin.y, p.posMax.y);
         const float rz = uni(p.posMin.z, p.posMax.z);
-        info.transform.translate = p.center + Vector3{rx, ry, rz};
+		info.transform.translate = p.center + TuboEngine::Math::Vector3{rx, ry, rz};
         // Velocity
         info.velocity = {
             uni(p.velMin.x, p.velMax.x),
