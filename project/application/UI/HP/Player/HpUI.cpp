@@ -36,7 +36,7 @@ void HpUI::Initialize(const std::string& frameTexturePath, const std::string& fi
     }
 }
 
-void HpUI::Update(const Application::Player* player) {
+void HpUI::Update(const Player* player) {
     if (!player) return;
     currentHp_ = player->GetHP();
     currentHp_ = std::clamp(currentHp_, 0, maxHp_);

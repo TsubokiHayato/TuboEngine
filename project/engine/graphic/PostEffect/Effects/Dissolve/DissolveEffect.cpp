@@ -26,9 +26,9 @@ void DissolveEffect::Initialize() {
 	// マスクテクスチャのリソース生成
 	DirectX::ScratchImage mipImages = TuboEngine::DirectXCommon::LoadTexture(maskTextureFileName_);
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	maskTextureResource_ = DirectXCommon::GetInstance()->CreateTextureResource(metadata);
+	maskTextureResource_ = TuboEngine::DirectXCommon::GetInstance()->CreateTextureResource(metadata);
 	
-	maskTextureUploadResource_ = DirectXCommon::GetInstance()->UploadTextureData(maskTextureResource_, mipImages);
+	maskTextureUploadResource_ = TuboEngine::DirectXCommon::GetInstance()->UploadTextureData(maskTextureResource_, mipImages);
 
 
 
@@ -39,9 +39,8 @@ void DissolveEffect::Initialize() {
 	maskTextureSRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	maskTextureSRVDesc.Texture2D.MipLevels = 1;
 
-	DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(
-		maskTextureResource_.Get(), &maskTextureSRVDesc,
-		DirectXCommon::GetInstance()->GetSRVCPUDescriptorHandle(1)
+	TuboEngine::DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(
+		maskTextureResource_.Get(), &maskTextureSRVDesc, TuboEngine::DirectXCommon::GetInstance()->GetSRVCPUDescriptorHandle(1)
 	);
 
 }
