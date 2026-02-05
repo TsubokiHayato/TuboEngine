@@ -30,7 +30,7 @@ void Player::Initialize() {
 	// プレイヤーの初期位置
 	position = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
 	// プレイヤーの初期回転
-	rotation = TuboEngine::Math::(1.56f, 0.0f, 3.12f);
+	rotation = TuboEngine::Math::Vector3(1.56f, 0.0f, 3.12f);
 	// プレイヤーの初期スケール
 	scale = TuboEngine::Math::Vector3(1.0f, 1.0f, 1.0f);
 
@@ -66,7 +66,7 @@ void Player::Initialize() {
 	dodgeDuration = 0.2f;
 	dodgeCooldown = 1.0f;
 	dodgeSpeed = 0.5f;
-	dodgeDirection = Vector3(0.0f, 0.0f, 0.0f);
+	dodgeDirection = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
 
 	// --- 追加: 軌道トレイル用パーティクルエミッター生成 ---
 	if (!trailEmitter_) {
@@ -183,7 +183,7 @@ void Player::Update() {
 
 	reticleSprite->SetPosition(reticlePosition);
 	reticleSprite->SetGetIsAdjustTextureSize(true);     // レティクルのサイズを調整する
-	reticleSprite->SetAnchorPoint(Vector2(0.5f, 0.5f)); // アンカーポイントを中央に設定
+	reticleSprite->SetAnchorPoint(TuboEngine::Math::Vector2(0.5f, 0.5f)); // アンカーポイントを中央に設定
 	reticleSprite->Update();
 
 	// --- 追加: トレイルエミッター中心更新 (プレイヤー位置) ---
@@ -193,11 +193,11 @@ void Player::Update() {
 	}
 	// 位置追従（カメラ前方オフセット対応）
 	if (dashRingEmitter_) {
-		Vector3 center = GetPosition();
+		TuboEngine::Math::Vector3 center = GetPosition();
 		if (camera_) {
-			Vector3 camRot = camera_->GetRotation();
+			TuboEngine::Math::Vector3 camRot = camera_->GetRotation();
 			// Z回転のみで前方ベクトル（2D平面想定）
-			Vector3 forward{std::cos(camRot.z), std::sin(camRot.z), 0.0f};
+			TuboEngine::Math::Vector3 forward{std::cos(camRot.z), std::sin(camRot.z), 0.0f};
 			center = center + forward * dashRingOffsetForward_;
 		}
 		dashRingEmitter_->GetPreset().center = center;
@@ -270,7 +270,7 @@ void Player::Shoot() {
 	if (Input::GetInstance()->IsPressMouse(0) && bulletTimer <= 0.0f) {
 		// プレイヤーの現在の回転(Z)から発射方向を作る（Rotateと一貫性を保つ）
 		float ang = rotation.z;
-		Vector3 dir{ std::sin(ang), std::cos(ang), 0.0f };
+		TuboEngine::Math::Vector3 dir{std::sin(ang), std::cos(ang), 0.0f};
 		// 発射
 		auto bullet = std::make_unique<PlayerBullet>();
 		bullet->Initialize(position);
@@ -299,7 +299,7 @@ void Player::Draw() {
 //--------------------------------------------------
 void Player::Move() {
 	if (isDodging) {
-		Vector3 tryPosition = position + dodgeDirection * dodgeSpeed;
+		TuboEngine::Math::Vector3 tryPosition = position + dodgeDirection * dodgeSpeed;
 		if (mapChipField) {
 			float playerWidth = scale.x * MapChipField::GetBlockWidth() - 0.1f;
 			float playerHeight = scale.y * MapChipField::GetBlockHeight() - 0.1f;
@@ -343,14 +343,14 @@ void Player::Rotate() {
 		return;
 	}
 
-	int screenWidth = static_cast<int>(WinApp::GetInstance()->GetClientWidth());
-	int screenHeight = static_cast<int>(WinApp::GetInstance()->GetClientHeight());
+	int screenWidth = static_cast<int>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
+	int screenHeight = static_cast<int>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
 	int mouseX = static_cast<int>(Input::GetInstance()->GetMousePosition().x);
 	int mouseY = static_cast<int>(Input::GetInstance()->GetMousePosition().y);
-	reticlePosition = Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
+	reticlePosition = TuboEngine::Math::Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
 
 	// レイキャストで算出した地面上ターゲット方向で回転を更新（斜め視点対応）
-	Vector3 aimDir = GetAimDirectionFromReticle();
+	TuboEngine::Math::Vector3 aimDir = GetAimDirectionFromReticle();
 	// 反転補正を削除し、レティクル方向と一致させる
 	float angle = std::atan2(aimDir.x, -aimDir.y);
 	rotation.z = 3.12f+angle;
@@ -363,7 +363,7 @@ void Player::ReticleDraw() { reticleSprite->Draw(); }
 // 当たり判定の中心座標を取得
 //--------------------------------------------------
 TuboEngine::Math::Vector3 Player::GetCenterPosition() const {
-	const Vector3 offset = {0.0f, 0.0f, 0.0f};
+	const TuboEngine::Math::Vector3 offset = {0.0f, 0.0f, 0.0f};
 	TuboEngine::Math::Vector3 worldPosition = position + offset;
 	return worldPosition;
 }
@@ -467,7 +467,7 @@ void Player::DrawImGui() {
 void Player::StartDodge() {
 	isDodging = true;
 	dodgeTimer = dodgeDuration;
-	Vector3 inputDir = GetDodgeInputDirection();
+	TuboEngine::Math::Vector3 inputDir = GetDodgeInputDirection();
 	if (inputDir.x != 0.0f || inputDir.y != 0.0f) {
 		float len = std::sqrt(inputDir.x * inputDir.x + inputDir.y * inputDir.y);
 		if (len > 0.0f) {
@@ -503,8 +503,8 @@ void Player::UpdateDodge() {
 bool Player::CanDodge() const { return !isDodging && dodgeCooldownTimer <= 0.0f; }
 
 // --- 回避入力方向取得 ---
-Vector3 Player::GetDodgeInputDirection() const {
-	Vector3 inputDir(0.0f, 0.0f, 0.0f);
+TuboEngine::Math::Vector3 Player::GetDodgeInputDirection() const {
+	TuboEngine::Math::Vector3 inputDir(0.0f, 0.0f, 0.0f);
 	if (Input::GetInstance()->PushKey(DIK_W))
 		inputDir.y -= 1.0f;
 	if (Input::GetInstance()->PushKey(DIK_S))
@@ -524,15 +524,15 @@ void Player::TriggerDashRing() {
 }
 
 // --- レティクルから地面へのレイキャストでエイム方向取得（斜め視点対応） ---
-Vector3 Player::GetAimDirectionFromReticle() const {
-	Vector3 dir{0.0f, -1.0f, 0.0f};
+TuboEngine::Math::Vector3 Player::GetAimDirectionFromReticle() const {
+	TuboEngine::Math::Vector3 dir{0.0f, -1.0f, 0.0f};
 	if (!camera_) {
 		return dir; // カメラ未設定なら従来の前方
 	}
 	// スクリーン座標からNDCに変換
-	float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
-	float screenH = static_cast<float>(WinApp::GetInstance()->GetClientHeight());
-	Vector2 mouse = Input::GetInstance()->GetMousePosition();
+	float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
+	float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
+	TuboEngine::Math::Vector2 mouse = Input::GetInstance()->GetMousePosition();
 	float ndcX = (mouse.x / screenW) * 2.0f - 1.0f;
 	float ndcY = 1.0f - (mouse.y / screenH) * 2.0f; // 上が+1
 
@@ -555,19 +555,19 @@ Vector3 Player::GetAimDirectionFromReticle() const {
 		if (std::fabs(wf.w) > 1e-6f) {
 			wf.x /= wf.w; wf.y /= wf.w; wf.z /= wf.w;
 		}
-		return Vector3{wf.x, wf.y, wf.z};
+		return TuboEngine::Math::Vector3{wf.x, wf.y, wf.z};
 	};
-	Vector3 worldNear = unproject(ndcX, ndcY, 0.0f);
-	Vector3 worldFar  = unproject(ndcX, ndcY, 1.0f);
-	Vector3 rayOrigin = worldNear;
-	Vector3 rayDir = {worldFar.x - worldNear.x, worldFar.y - worldNear.y, worldFar.z - worldNear.z};
+	TuboEngine::Math::Vector3 worldNear = unproject(ndcX, ndcY, 0.0f);
+	TuboEngine::Math::Vector3 worldFar = unproject(ndcX, ndcY, 1.0f);
+	TuboEngine::Math::Vector3 rayOrigin = worldNear;
+	TuboEngine::Math::Vector3 rayDir = {worldFar.x - worldNear.x, worldFar.y - worldNear.y, worldFar.z - worldNear.z};
 	float len = std::sqrt(rayDir.x * rayDir.x + rayDir.y * rayDir.y + rayDir.z * rayDir.z);
 	if (len > 0.0f) { rayDir.x /= len; rayDir.y /= len; rayDir.z /= len; }
 	// Z=0 平面と交差（地面）
 	if (std::fabs(rayDir.z) < 1e-5f) { return dir; }
 	float t = (0.0f - rayOrigin.z) / rayDir.z;
-	Vector3 hit = {rayOrigin.x + rayDir.x * t, rayOrigin.y + rayDir.y * t, 0.0f};
-	Vector3 aim = {hit.x - position.x, hit.y - position.y, hit.z - position.z};
+	TuboEngine::Math::Vector3 hit = {rayOrigin.x + rayDir.x * t, rayOrigin.y + rayDir.y * t, 0.0f};
+	TuboEngine::Math::Vector3 aim = {hit.x - position.x, hit.y - position.y, hit.z - position.z};
 	float ilen = std::sqrt(aim.x * aim.x + aim.y * aim.y + aim.z * aim.z);
 	if (ilen > 0.0f) { aim.x /= ilen; aim.y /= ilen; aim.z /= ilen; }
 	return aim;
