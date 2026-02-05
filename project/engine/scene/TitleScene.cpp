@@ -143,7 +143,8 @@ void TitleScene::Update() {
 				next = STAGE;
 				break;
 			case SceneType::Tutorial:
-				next = TUTORIAL;
+				// チュートリアル選択は無視してタイトルに留める
+				next = TITLE;
 				break;
 			default:
 				next = TITLE;

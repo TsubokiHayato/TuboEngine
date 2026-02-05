@@ -16,7 +16,6 @@ TitleUI::~TitleUI() {
 	// 各種スプライトのリセット
 	LogoSprite_.reset();
 	StartButtonSprite_.reset();
-	TutorialButtonSprite_.reset();
 	QuitButtonSprite_.reset();
 
 }
@@ -46,25 +45,19 @@ void TitleUI::Initialize() {
 		requestSceneChange_ = true;         // シーン遷移要求
 		nextSceneType_ = SceneType::Select; // 遷移先シーン
 	}));
-	// Tutorialボタン（チュートリアルへ）
-	buttons_.emplace_back(std::make_unique<TitleUIButton>("Tutorial", [this]() {
-		requestSceneChange_ = true;
-		nextSceneType_ = SceneType::Tutorial;
-	}));
 	// Exitボタン（アプリ終了）
 	buttons_.emplace_back(std::make_unique<TitleUIButton>("Exit", []() { PostQuitMessage(0); }));
 
 	//-----------------------------
 	// ボタンY座標の初期値設定
 	//-----------------------------
-	buttonYPositions_ = {300.0f, 400.0f, 500.0f}; // Start, Tutorial, Exit
+	buttonYPositions_ = {300.0f, 400.0f}; // Start, Exit
 
 	//-----------------------------
 	// セレクターのオフセット設定
 	//-----------------------------
 	selectorOffsets_ = {
 	    {-150.0f, 0.0f}, // Start横
-	    {-150.0f, 0.0f}, // Tutorial横
 	    {-150.0f, 0.0f}  // Exit横
 	};
 
@@ -73,7 +66,6 @@ void TitleUI::Initialize() {
 	///----------------------------
 	TextureManager::GetInstance()->LoadTexture("TitleUI/Title.png");
 	TextureManager::GetInstance()->LoadTexture("TitleUI/Start.png");
-	TextureManager::GetInstance()->LoadTexture("TitleUI/Tutorial.png");
 	TextureManager::GetInstance()->LoadTexture("TitleUI/Exit.png");
 
 	//-----------------------------
@@ -87,19 +79,11 @@ void TitleUI::Initialize() {
 	StartButtonSprite_->SetGetIsAdjustTextureSize(true);
 	StartButtonSprite_->Update();
 
-	// Tutorialボタン用スプライト
-	TutorialButtonSprite_ = std::make_unique<Sprite>();
-	TutorialButtonSprite_->Initialize("TitleUI/Tutorial.png");
-	TutorialButtonSprite_->SetAnchorPoint({0.5f, 0.5f});
-	TutorialButtonSprite_->SetPosition({centerX, buttonYPositions_[1]});
-	TutorialButtonSprite_->SetGetIsAdjustTextureSize(true);
-	TutorialButtonSprite_->Update();
-
 	// Exitボタン用スプライト
 	QuitButtonSprite_ = std::make_unique<Sprite>();
 	QuitButtonSprite_->Initialize("TitleUI/Exit.png");
 	QuitButtonSprite_->SetAnchorPoint({0.5f, 0.5f});
-	QuitButtonSprite_->SetPosition({centerX, buttonYPositions_[2]});
+	QuitButtonSprite_->SetPosition({centerX, buttonYPositions_[1]});
 	QuitButtonSprite_->SetGetIsAdjustTextureSize(true);
 	QuitButtonSprite_->Update();
 
@@ -254,15 +238,9 @@ void TitleUI::UpdateButtonSprites() {
         StartButtonSprite_->Update();
     }
 
-	// Tutorialボタン
-	if (TutorialButtonSprite_) {
-		TutorialButtonSprite_->SetColor((selectedIndex_ == 1) ? selectedColor : normalColor);
-		TutorialButtonSprite_->Update();
-	}
-
     // Quitボタン
     if (QuitButtonSprite_) {
-        QuitButtonSprite_->SetColor((selectedIndex_ == 2) ? selectedColor : normalColor);
+        QuitButtonSprite_->SetColor((selectedIndex_ == 1) ? selectedColor : normalColor);
         QuitButtonSprite_->Update();
     }
 }
@@ -285,11 +263,6 @@ void TitleUI::UpdateButtonPositions() {
 			}
 			break;
 		case 1:
-			if (TutorialButtonSprite_) {
-				TutorialButtonSprite_->SetPosition({centerX, y});
-			}
-			break;
-		case 2:
 			if (QuitButtonSprite_) {
 				QuitButtonSprite_->SetPosition({centerX, y});
 			}
@@ -315,9 +288,6 @@ void TitleUI::Draw() {
 	// 各ボタンのスプライト描画
 	if (StartButtonSprite_) {
 		StartButtonSprite_->Draw();
-	}
-	if (TutorialButtonSprite_) {
-		TutorialButtonSprite_->Draw();
 	}
 	if (QuitButtonSprite_) {
 		QuitButtonSprite_->Draw();
