@@ -3,13 +3,13 @@
 #include <memory>
 #include <vector>
 
-namespace Application { class Player; }
+
 
 class HpUI {
 public:
     ~HpUI() = default;
     void Initialize(const std::string& frameTexturePath, const std::string& fillTexturePath, int maxHp);
-    void Update(const Application::Player* player);
+    void Update(const Player* player);
     void Draw();
 
     void SetPosition(const TuboEngine::Math::Vector2& pos) {

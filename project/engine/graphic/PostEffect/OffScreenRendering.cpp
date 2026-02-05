@@ -26,16 +26,16 @@ void OffScreenRendering::Initialize() {
 
 	// メンバ変数に記録
 
-	device = DirectXCommon::GetInstance()->GetDevice();
-	commandList = DirectXCommon::GetInstance()->GetCommandList();
+	device = TuboEngine::DirectXCommon::GetInstance()->GetDevice();
+	commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
 
 	// RTVの作成
-	renderTextureResource_ =
-	    CreateRenderTargetResource(device, WinApp::GetInstance()->GetClientWidth(), WinApp::GetInstance()->GetClientHeight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, kRenderTargetClearValue);
+	renderTextureResource_ = CreateRenderTargetResource(
+	    device, TuboEngine::WinApp::GetInstance()->GetClientWidth(), TuboEngine::WinApp::GetInstance()->GetClientHeight(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, kRenderTargetClearValue);
 	renderTextureResource_->SetName(L"RenderTargetResource");
 
 	// オフスクリーン用（必要な数だけ。ここでは1つ）
-	offscreenRtvDescriptorHeap = DirectXCommon::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
+	offscreenRtvDescriptorHeap = TuboEngine::DirectXCommon::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
 	// オフスクリーン用RTVディスクリプタの取得
 	offscreenRtvHandle = offscreenRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	device->CreateRenderTargetView(renderTextureResource_.Get(), nullptr, offscreenRtvHandle);
@@ -48,7 +48,7 @@ void OffScreenRendering::Initialize() {
 	renderTextureSRVDesc.Texture2D.MipLevels = 1;
 
 	// SRVの生成
-	device->CreateShaderResourceView(renderTextureResource_.Get(), &renderTextureSRVDesc, DirectXCommon::GetInstance()->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
+	device->CreateShaderResourceView(renderTextureResource_.Get(), &renderTextureSRVDesc, TuboEngine::DirectXCommon::GetInstance()->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 
 	///---------------------------------------------------------------------
 	///					PostEffectManagerの初期化
@@ -166,14 +166,14 @@ void OffScreenRendering::PreDraw() {
 	renderingBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	renderingBarrier.Transition.pResource = renderTextureResource_.Get();
 
-	auto depthResource = DirectXCommon::GetInstance()->GetDepthStencliResouece();
+	auto depthResource = TuboEngine::DirectXCommon::GetInstance()->GetDepthStencliResouece();
 	depthBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	depthBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	depthBarrier.Transition.pResource = depthResource.Get();
 
 	// RTV/DSVの設定
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = DirectXCommon::GetInstance()->GetRTVCPUDescriptorHandle(0); // renderTextureResource用
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = DirectXCommon::GetInstance()->GetDSVCPUDescriptorHandle(0);
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = TuboEngine::DirectXCommon::GetInstance()->GetRTVCPUDescriptorHandle(0); // renderTextureResource用
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = TuboEngine::DirectXCommon::GetInstance()->GetDSVCPUDescriptorHandle(0);
 	commandList->OMSetRenderTargets(1, &offscreenRtvHandle, FALSE, &dsvHandle);
 	// クリア
 	FLOAT clearColor[4] = {kRenderTargetClearValue.x, kRenderTargetClearValue.y, kRenderTargetClearValue.z, kRenderTargetClearValue.w};
@@ -181,10 +181,10 @@ void OffScreenRendering::PreDraw() {
 	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	// viewportの設定
-	D3D12_VIEWPORT viewport = DirectXCommon::GetInstance()->GetViewport();
+	D3D12_VIEWPORT viewport = TuboEngine::DirectXCommon::GetInstance()->GetViewport();
 
 	// シザー矩形を一時変数に格納
-	D3D12_RECT scissorRect = DirectXCommon::GetInstance()->GetScissorRect();
+	D3D12_RECT scissorRect = TuboEngine::DirectXCommon::GetInstance()->GetScissorRect();
 
 	// ビューポート/シザー設定
 	commandList->RSSetViewports(1, &viewport);
@@ -229,7 +229,7 @@ void OffScreenRendering::TransitionRenderTextureToRenderTarget() {
 void OffScreenRendering::Draw() {
 
 	// 4. SRV用ディスクリプタヒープをセット
-	ID3D12DescriptorHeap* descriptorHeaps[] = {DirectXCommon::GetInstance()->GetSrvDescriptorHeap().Get()};
+	ID3D12DescriptorHeap* descriptorHeaps[] = {TuboEngine::DirectXCommon::GetInstance()->GetSrvDescriptorHeap().Get()};
 	commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
 	// 5. PSO・ルートシグネチャ設定
@@ -238,7 +238,7 @@ void OffScreenRendering::Draw() {
 	// 6. SRV（オフスクリーンテクスチャ）をルートパラメータにセット
 	// ※ルートシグネチャのSRVインデックスに合わせて変更（例: 0番なら0）
 
-	commandList->SetGraphicsRootDescriptorTable(0, DirectXCommon::GetInstance()->GetSRVGPUDescriptorHandle(0));
+	commandList->SetGraphicsRootDescriptorTable(0, TuboEngine::DirectXCommon::GetInstance()->GetSRVGPUDescriptorHandle(0));
 
 	// 7. 全画面三角形を描画
 	commandList->DrawInstanced(3, 1, 0, 0); // 全画面三角形
@@ -298,7 +298,7 @@ void OffScreenRendering::Finalize() {
 /// <param name="clearColor">クリアカラー</param>
 /// <returns>作成されたリソース</returns>
 Microsoft::WRL::ComPtr<ID3D12Resource>
-    OffScreenRendering::CreateRenderTargetResource(Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, DXGI_FORMAT format, const Vector4& clearColor) {
+    OffScreenRendering::CreateRenderTargetResource(Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, DXGI_FORMAT format, const TuboEngine::Math::Vector4& clearColor) {
 	// リソースの設定
 	D3D12_RESOURCE_DESC resourceDesc = {};
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;  // 2Dテクスチャ
@@ -337,7 +337,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource>
 
 	// 作成に失敗した場合はエラーを出力
 	if (FAILED(hr)) {
-		Logger::Log(std::format("Failed to create render target resource. HRESULT = {:#010x}\n", hr));
+		TuboEngine::Logger::Log(std::format("Failed to create render target resource. HRESULT = {:#010x}\n", hr));
 		assert(SUCCEEDED(hr));
 	}
 
