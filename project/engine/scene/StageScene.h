@@ -105,7 +105,7 @@ public:
 	std::string& GetMapChipCsvFilePath() { return mapChipCsvFilePath_; }
 	std::unique_ptr<SkyDome>& GetSkyDome() { return skyDome_; }
 
-	TuboEngine::Math::StageStateManager* GetStageStateManager() { return stateManager_.get(); }
+	StageStateManager* GetStageStateManager() { return stateManager_.get(); }
 	SceneChangeAnimation* GetSceneChangeAnimation() { return sceneChangeAnimation_.get(); }
 	bool GetIsRequestSceneChange() const { return isRequestSceneChange; }
 	void SetIsRequestSceneChange(bool request) { isRequestSceneChange = request; }
