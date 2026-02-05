@@ -736,7 +736,7 @@ bool Enemy::CanSeePlayer() {
     // ここは「モデル見た目」ではなく「ロジック上の前方」に合わせるため、
     // 描画補正オフセットは適用しない。
 	TuboEngine::Math::Vector3 forward = {std::cos(rotation.z), std::sin(rotation.z), 0.0f};
-    float dot = Vector3::Dot(Vector3::Normalize(forward), Vector3::Normalize(dirToPlayer));
+	float dot = TuboEngine::Math::Vector3::Dot(TuboEngine::Math::Vector3::Normalize(forward), TuboEngine::Math::Vector3::Normalize(dirToPlayer));
     dot = std::clamp(dot, -1.0f, 1.0f); // acosの安全化
     float angleToPlayer = std::acos(dot) * 180.0f / kPI;
     if (angleToPlayer > kViewAngleDeg / 2.0f)
@@ -824,8 +824,8 @@ void Enemy::DrawLastSeenMark() {
     for (int i = 0; i < circleDiv; ++i) {
         float a0 = (2.0f * kPI) * (float(i) / circleDiv);
         float a1 = (2.0f * kPI) * (float(i + 1) / circleDiv);
-		TuboEngine::Math::Vector3 p0 = center + Vector3{std::cos(a0) * kLastSeenMarkSize, std::sin(a0) * kLastSeenMarkSize, 0.0f};
-		TuboEngine::Math::Vector3 p1 = center + Vector3{std::cos(a1) * kLastSeenMarkSize, std::sin(a1) * kLastSeenMarkSize, 0.0f};
+		TuboEngine::Math::Vector3 p0 = center + TuboEngine::Math::Vector3{std::cos(a0) * kLastSeenMarkSize, std::sin(a0) * kLastSeenMarkSize, 0.0f};
+		TuboEngine::Math::Vector3 p1 = center + TuboEngine::Math::Vector3{std::cos(a1) * kLastSeenMarkSize, std::sin(a1) * kLastSeenMarkSize, 0.0f};
         LineManager::GetInstance()->DrawLine(p0, p1, kLastSeenColor);
     }
 }

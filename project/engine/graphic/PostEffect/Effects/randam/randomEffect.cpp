@@ -16,7 +16,7 @@ void randomEffect::Initialize() {
     pso_ = std::make_unique<randomPSO>();
     pso_->Initialize();
     // 定数バッファ作成
-    cbResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(RandomParams));
+	cbResource_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(RandomParams));
     cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&params_));
 
     // 乱数エンジンで値を生成（シードは時間ベースで初期化）

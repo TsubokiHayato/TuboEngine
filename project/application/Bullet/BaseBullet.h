@@ -4,7 +4,7 @@
 #include "Vector3.h"
 #include "Collider/Collider.h"
 
-class BaseBullet :public Application::Collider {
+class BaseBullet :public Collider {
 public:
 	virtual ~BaseBullet() = default;
 
