@@ -270,7 +270,7 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 	}
 
 	// インスタンシング用リソースの生成
-	newGroup.instancingResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
+	newGroup.instancingResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
 
 	newGroup.instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&newGroup.instancingDataPtr));
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
@@ -356,10 +356,10 @@ void Particle::CreateVertexDataForCylinder() {
 
 		//texcoord
 
-		Vector2 texcoordTop = { u, 0.0f };
-		Vector2 texcoordBottom = { u, 1.0f };
-		Vector2 texcoordTopNext = { uNext, 0.0f };
-		Vector2 texcoordBottomNext = { uNext, 1.0f };
+		TuboEngine::Math::Vector2 texcoordTop = {u, 0.0f};
+		TuboEngine::Math::Vector2 texcoordBottom = {u, 1.0f};
+		TuboEngine::Math::Vector2 texcoordTopNext = {uNext, 0.0f};
+		TuboEngine::Math::Vector2 texcoordBottomNext = {uNext, 1.0f};
 
 		//vを反転
 
@@ -413,7 +413,7 @@ void Particle::CreateVertexDataForOriginal() {
 /// </summary>
 void Particle::CreateVertexBufferView() {
 	// 頂点バッファの作成
-	vertexBuffer_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
+	vertexBuffer_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
 
 	// 頂点バッファビューの作成
 	// リソースの先頭のアドレスから使う
@@ -429,7 +429,7 @@ void Particle::CreateVertexBufferView() {
 /// </summary>
 void Particle::CreateMaterialData() {
 	// マテリアル用のリソースを作成
-	materialBuffer_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
+	materialBuffer_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
 
 	// 書き込むためのアドレスを取得
 	materialBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
@@ -450,7 +450,8 @@ void Particle::CreateMaterialData() {
 /// <param name="currentTime">経過時間</param>
 /// <returns>新しいパーティクル情報</returns>
 /// 
-ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo
+    Particle::CreateNewParticle(std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
@@ -470,7 +471,8 @@ ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Trans
 	return particle;
 }
 
-ParticleInfo Particle::CreateNewParticleForPrimitive(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo Particle::CreateNewParticleForPrimitive(
+    std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
@@ -497,7 +499,8 @@ ParticleInfo Particle::CreateNewParticleForPrimitive(std::mt19937& randomEngine,
 	return particle;
 }
 
-ParticleInfo Particle::CreateNewParticleForRing(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo
+    Particle::CreateNewParticleForRing(std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
@@ -517,7 +520,8 @@ ParticleInfo Particle::CreateNewParticleForRing(std::mt19937& randomEngine, cons
 	return particle;
 }
 
-ParticleInfo Particle::CreateNewParticleForCylinder(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo Particle::CreateNewParticleForCylinder(
+    std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
@@ -537,7 +541,8 @@ ParticleInfo Particle::CreateNewParticleForCylinder(std::mt19937& randomEngine, 
 	return particle;
 }
 
-ParticleInfo Particle::CreateNewParticleForOriginal(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo Particle::CreateNewParticleForOriginal(
+    std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 	return ParticleInfo();
 }
 
