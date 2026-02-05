@@ -12,7 +12,7 @@
 #include <map>
 #include <memory>
 
-namespace Application {
+
 
 class StageStateManager {
 
@@ -51,4 +51,4 @@ private:
 	IStageState* currentState_;
 };
 
-} // namespace Application
+

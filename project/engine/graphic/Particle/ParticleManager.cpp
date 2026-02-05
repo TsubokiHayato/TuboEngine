@@ -65,7 +65,11 @@ static void ApplyParticleManagerTheme(int themeId = 0) {
 
 namespace {
     inline void FixMinMax(float& mn, float& mx) { if (mn > mx) std::swap(mn, mx); }
-    inline void FixMinMax(Vector3& mn, Vector3& mx) { FixMinMax(mn.x, mx.x); FixMinMax(mn.y, mx.y); FixMinMax(mn.z, mx.z); }
+    inline void FixMinMax(TuboEngine::Math::Vector3& mn, TuboEngine::Math::Vector3& mx) {
+	    FixMinMax(mn.x, mx.x);
+	    FixMinMax(mn.y, mx.y);
+	    FixMinMax(mn.z, mx.z);
+    }
     inline void FixMinMax(Vector4& mn, Vector4& mx) { FixMinMax(mn.x, mx.x); FixMinMax(mn.y, mx.y); FixMinMax(mn.z, mx.z); FixMinMax(mn.w, mx.w); }
     inline void FixPresetRanges(ParticlePreset& p) {
         FixMinMax(p.lifeMin, p.lifeMax);
@@ -148,7 +152,7 @@ void ParticleManager::Update(float dt, Camera* cam) {
 }
 
 void ParticleManager::Draw() {
-    auto* cmd = DirectXCommon::GetInstance()->GetCommandList().Get();
+    auto* cmd = TuboEngine::DirectXCommon::GetInstance()->GetCommandList().Get();
     for (auto& e : emitters_) e->Draw(cmd);
     DrawPreview(cmd);
 }
@@ -256,8 +260,36 @@ void ParticleManager::ApplySnapshot(const std::string& jsonStr) {
     emitters_.clear(); if (!root.contains("emitters")) { SetStatus("Snapshot missing 'emitters'"); return; }
     for (auto& j : root["emitters"]) {
         ParticlePreset p; std::string type=j.value("type","Primitive"); p.name=j.value("name",""); p.texture=j.value("texture",""); p.maxInstances=j.value("maxInstances",128); p.billboard=j.value("billboard",true); p.emitRate=j.value("emitRate",30.0f); p.autoEmit=j.value("autoEmit",false); p.burstCount=j.value("burstCount",10); p.lifeMin=j.value("lifeMin",0.5f); p.lifeMax=j.value("lifeMax",1.5f);
-        auto readV3=[&](const char* key, Vector3 def){ if(!j.contains(key)) return def; auto arr=j[key]; if(arr.size()!=3) return def; return Vector3{arr[0],arr[1],arr[2]}; }; auto readV4=[&](const char* key, Vector4 def){ if(!j.contains(key)) return def; auto arr=j[key]; if(arr.size()!=4) return def; return Vector4{arr[0],arr[1],arr[2],arr[3]}; };
-        p.posMin=readV3("posMin",{}); p.posMax=readV3("posMax",{}); p.velMin=readV3("velMin",{}); p.velMax=readV3("velMax",{}); p.scaleStart=readV3("scaleStart",{1,1,1}); p.scaleEnd=readV3("scaleEnd",{1,1,1}); p.colorStart=readV4("colorStart",{1,1,1,1}); p.colorEnd=readV4("colorEnd",{1,1,1,0}); p.gravity=readV3("gravity",{0,-0.5f,0}); p.center=readV3("center",{0,0,0}); Vector3 emPos=readV3("emitterPos",{0,0,0}); p.emitterTransform.translate=emPos; p.drag=j.value("drag",0.0f); p.simulateInWorldSpace=j.value("simulateInWorldSpace",true);
+		auto readV3 = [&](const char* key, TuboEngine::Math::Vector3 def) {
+			if (!j.contains(key))
+				return def;
+			auto arr = j[key];
+			if (arr.size() != 3)
+				return def;
+			return TuboEngine::Math::Vector3{arr[0], arr[1], arr[2]};
+		};
+		auto readV4 = [&](const char* key, TuboEngine::Math::Vector4 def) {
+			if (!j.contains(key))
+				return def;
+			auto arr = j[key];
+			if (arr.size() != 4)
+				return def;
+			return Vector4{arr[0], arr[1], arr[2], arr[3]};
+		};
+		p.posMin = readV3("posMin", {});
+		p.posMax = readV3("posMax", {});
+		p.velMin = readV3("velMin", {});
+		p.velMax = readV3("velMax", {});
+		p.scaleStart = readV3("scaleStart", {1, 1, 1});
+		p.scaleEnd = readV3("scaleEnd", {1, 1, 1});
+		p.colorStart = readV4("colorStart", {1, 1, 1, 1});
+		p.colorEnd = readV4("colorEnd", {1, 1, 1, 0});
+		p.gravity = readV3("gravity", {0, -0.5f, 0});
+		p.center = readV3("center", {0, 0, 0});
+		TuboEngine::Math::Vector3 emPos = readV3("emitterPos", {0, 0, 0});
+		p.emitterTransform.translate = emPos;
+		p.drag = j.value("drag", 0.0f);
+		p.simulateInWorldSpace = j.value("simulateInWorldSpace", true);
         CreateEmitterByType(type, p);
     }
     SetStatus("Snapshot applied (%zu emitters)", emitters_.size());
@@ -275,8 +307,36 @@ void ParticleManager::LoadAll(const std::string& path) {
     if(!snap.contains("emitters")) { SetStatus("Load: no emitters field"); return; }
     for(auto& j : snap["emitters"]) {
         ParticlePreset p; std::string type=j.value("type","Primitive"); p.name=j.value("name",""); p.texture=j.value("texture",""); p.maxInstances=j.value("maxInstances",128); p.billboard=j.value("billboard",true); p.emitRate=j.value("emitRate",30.0f); p.autoEmit=j.value("autoEmit",false); p.burstCount=j.value("burstCount",10); p.lifeMin=j.value("lifeMin",0.5f); p.lifeMax=j.value("lifeMax",1.5f);
-        auto readV3=[&](const char* key, Vector3 def){ if(!j.contains(key)) return def; auto arr=j[key]; if(arr.size()!=3) return def; return Vector3{arr[0],arr[1],arr[2]}; }; auto readV4=[&](const char* key, Vector4 def){ if(!j.contains(key)) return def; auto arr=j[key]; if(arr.size()!=4) return def; return Vector4{arr[0],arr[1],arr[2],arr[3]}; };
-        p.posMin=readV3("posMin",{}); p.posMax=readV3("posMax",{}); p.velMin=readV3("velMin",{}); p.velMax=readV3("velMax",{}); p.scaleStart=readV3("scaleStart",{1,1,1}); p.scaleEnd=readV3("scaleEnd",{1,1,1}); p.colorStart=readV4("colorStart",{1,1,1,1}); p.colorEnd=readV4("colorEnd",{1,1,1,0}); p.gravity=readV3("gravity",{0,-0.5f,0}); p.center=readV3("center",{0,0,0}); Vector3 emPos=readV3("emitterPos",{0,0,0}); p.emitterTransform.translate=emPos; p.drag=j.value("drag",0.0f); p.simulateInWorldSpace=j.value("simulateInWorldSpace",true);
+		auto readV3 = [&](const char* key, TuboEngine::Math::Vector3 def) {
+			if (!j.contains(key))
+				return def;
+			auto arr = j[key];
+			if (arr.size() != 3)
+				return def;
+			return TuboEngine::Math::Vector3{arr[0], arr[1], arr[2]};
+		};
+		auto readV4 = [&](const char* key, Vector4 def) {
+			if (!j.contains(key))
+				return def;
+			auto arr = j[key];
+			if (arr.size() != 4)
+				return def;
+			return Vector4{arr[0], arr[1], arr[2], arr[3]};
+		};
+		p.posMin = readV3("posMin", {});
+		p.posMax = readV3("posMax", {});
+		p.velMin = readV3("velMin", {});
+		p.velMax = readV3("velMax", {});
+		p.scaleStart = readV3("scaleStart", {1, 1, 1});
+		p.scaleEnd = readV3("scaleEnd", {1, 1, 1});
+		p.colorStart = readV4("colorStart", {1, 1, 1, 1});
+		p.colorEnd = readV4("colorEnd", {1, 1, 1, 0});
+		p.gravity = readV3("gravity", {0, -0.5f, 0});
+		p.center = readV3("center", {0, 0, 0});
+		TuboEngine::Math::Vector3 emPos = readV3("emitterPos", {0, 0, 0});
+		p.emitterTransform.translate = emPos;
+		p.drag = j.value("drag", 0.0f);
+		p.simulateInWorldSpace = j.value("simulateInWorldSpace", true);
         CreateEmitterByType(type, p);
     }
     SetStatus("Loaded %zu emitters", emitters_.size()); MarkChanged();
@@ -288,7 +348,42 @@ void ParticleManager::SaveSelected(const std::string& path, const std::vector<st
 void ParticleManager::LoadMerge(const std::string& path) {
     std::ifstream ifs(path); if(!ifs){ SetStatus("Merge load failed"); return; } nlohmann::json root; try { root=nlohmann::json::parse(ifs); } catch (...) { SetStatus("Merge parse error"); return; }
     if (!root.contains("emitters")) { SetStatus("Merge: no emitters"); return; }
-    size_t added=0; for (auto& j : root["emitters"]) { ParticlePreset p; std::string type=j.value("type","Primitive"); p.name=j.value("name",""); p.texture=j.value("texture",""); p.maxInstances=j.value("maxInstances",128); p.billboard=j.value("billboard",true); p.emitRate=j.value("emitRate",30.0f); p.autoEmit=j.value("autoEmit",false); p.burstCount=j.value("burstCount",10); p.lifeMin=j.value("lifeMin",0.5f); p.lifeMax=j.value("lifeMax",1.5f); auto readV3=[&](const char* key, Vector3 def){ if(!j.contains(key)) return def; auto arr=j[key]; if(arr.size()!=3) return def; return Vector3{arr[0],arr[1],arr[2]}; }; p.posMin=readV3("posMin",{}); p.posMax=readV3("posMax",{}); p.velMin=readV3("velMin",{}); p.velMax=readV3("velMax",{}); p.scaleStart=readV3("scaleStart",{1,1,1}); p.scaleEnd=readV3("scaleEnd",{1,1,1}); p.gravity=readV3("gravity",{0,-0.5f,0}); Vector3 emPos=readV3("emitterPos",{0,0,0}); p.emitterTransform.translate=emPos; CreateEmitterByType(type, p); ++added; } SetStatus("Merged %zu emitters", added); MarkChanged(); }
+	size_t added = 0;
+	for (auto& j : root["emitters"]) {
+		ParticlePreset p;
+		std::string type = j.value("type", "Primitive");
+		p.name = j.value("name", "");
+		p.texture = j.value("texture", "");
+		p.maxInstances = j.value("maxInstances", 128);
+		p.billboard = j.value("billboard", true);
+		p.emitRate = j.value("emitRate", 30.0f);
+		p.autoEmit = j.value("autoEmit", false);
+		p.burstCount = j.value("burstCount", 10);
+		p.lifeMin = j.value("lifeMin", 0.5f);
+		p.lifeMax = j.value("lifeMax", 1.5f);
+		auto readV3 = [&](const char* key, TuboEngine::Math::Vector3 def) {
+			if (!j.contains(key))
+				return def;
+			auto arr = j[key];
+			if (arr.size() != 3)
+				return def;
+			return TuboEngine::Math::Vector3{arr[0], arr[1], arr[2]};
+		};
+		p.posMin = readV3("posMin", {});
+		p.posMax = readV3("posMax", {});
+		p.velMin = readV3("velMin", {});
+		p.velMax = readV3("velMax", {});
+		p.scaleStart = readV3("scaleStart", {1, 1, 1});
+		p.scaleEnd = readV3("scaleEnd", {1, 1, 1});
+		p.gravity = readV3("gravity", {0, -0.5f, 0});
+		TuboEngine::Math::Vector3 emPos = readV3("emitterPos", {0, 0, 0});
+		p.emitterTransform.translate = emPos;
+		CreateEmitterByType(type, p);
+		++added;
+	}
+	SetStatus("Merged %zu emitters", added);
+	MarkChanged();
+}
 
 void ParticleManager::InitialLoad(const std::string& filePath) { if (initialLoaded_) return; initialLoaded_ = true; std::ifstream ifs(filePath); if(!ifs){ SetStatus("Initial load skipped (%s not found)", filePath.c_str()); return; } LoadAll(filePath); }
 
