@@ -125,11 +125,9 @@ public:
 		lightTypeData->type = type;
 	}
 
-	void SetModel(Model* model) {
-		assert(model);
-		this->model_ = model;
-	}
+	void SetModel(Model* model);
 	void SetModel(const std::string& filePath);
+
 	void SetCamera(Camera* camera) { this->camera = camera; }
 	Camera* GetCamera() const { return camera; }
 

@@ -141,7 +141,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetDsvDescriptorHeap() { return dsvDescriptorHeap; }
 
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() { return rtvDesc; }
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[3] = 0;
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[3];
 
 	Microsoft::WRL::ComPtr<ID3D12Fence> GetFence() { return fence; }
 	uint64_t GetFenceValue() { return fenceValue; }

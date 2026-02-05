@@ -4,7 +4,7 @@
 #include"Collider/Collider.h"
 
 
-class BaseCharacter : public Application::Collider {
+class BaseCharacter : public Collider {
 
 public:
 	///--------------------------------------------------
