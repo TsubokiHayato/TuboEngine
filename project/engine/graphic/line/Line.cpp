@@ -39,10 +39,10 @@ void Line::Update() {
 	TuboEngine::Math::Matrix4x4 worldViewProjectionMatrix;
     if (camera_) {
         // ビュー・プロジェクション行列取得
-        const Matrix4x4& viewMatrix = camera_->GetViewMatrix();
-        const Matrix4x4& projectionMatrix = camera_->GetProjectionMatrix();
+		const TuboEngine::Math::Matrix4x4& viewMatrix = camera_->GetViewMatrix();
+		const TuboEngine::Math::Matrix4x4& projectionMatrix = camera_->GetProjectionMatrix();
         // ワールド→ビュー→プロジェクション
-        Matrix4x4 worldViewMatrix = Multiply(worldMatrix, viewMatrix);
+		TuboEngine::Math::Matrix4x4 worldViewMatrix = Multiply(worldMatrix, viewMatrix);
         worldViewProjectionMatrix = Multiply(worldViewMatrix, projectionMatrix);
     } else {
         // カメラが無い場合はワールド行列のみ
@@ -74,7 +74,7 @@ void Line::Draw() {
     vertexBuffer_->Map(0, nullptr, &pData);
     memcpy(pData, vertices_.data(), sizeof(LineVertex) * vertices_.size());
     vertexBuffer_->Unmap(0, nullptr);
-    auto commandList = DirectXCommon::GetInstance()->GetCommandList();
+	auto commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
     // 定数バッファビュー設定
     commandList->SetGraphicsRootConstantBufferView(0, transfomationMatrixBuffer_->GetGPUVirtualAddress());
     // 頂点バッファビュー設定
@@ -95,7 +95,7 @@ void Line::ClearLines() {
 ///----------------------------------------------------
 void Line::CreateVertexBuffer() {
     // デバイスの取得
-    auto device = DirectXCommon::GetInstance()->GetDevice();
+	auto device = TuboEngine::DirectXCommon::GetInstance()->GetDevice();
     // バッファサイズ（最大100000頂点分）
     auto bufferSize = sizeof(LineVertex) * 100000;
     // ヒーププロパティ設定（UPLOAD）
@@ -125,7 +125,7 @@ void Line::CreateVertexBuffer() {
 void Line::CreateTransformationMatrixBuffer() {
     // 定数バッファのサイズを 256 バイトの倍数に設定
     size_t bufferSize = (sizeof(TransformationMatrix) + 255) & ~255;
-    transfomationMatrixBuffer_ = DirectXCommon::GetInstance()->CreateBufferResource(bufferSize);
+	transfomationMatrixBuffer_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(bufferSize);
     // TransformationMatrixの初期化
     TransformationMatrix transformationMatrix = {};
     // 書き込むためのアドレスを取得

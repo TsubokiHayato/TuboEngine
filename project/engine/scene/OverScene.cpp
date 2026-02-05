@@ -48,7 +48,7 @@ void OverScene::Initialize() {
 	const char* text = "GAMEOVER"; // 8文字
 	letters_.clear();
 	int count = 0; while (text[count] != '\0') ++count;
-	float clientW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
+	float clientW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
 	float totalW = count * letterSize_.x + (count - 1) * lettersGap_;
 	float startX = (clientW - totalW) * 0.5f; // 中央寄せ
 	float x = startX;
@@ -94,12 +94,12 @@ void OverScene::Update() {
 	// Xは少し寄せる（開始X→終了X+xOffset_）
 	float ex = endPos_.x + xOffset_;
 	float x = startPos_.x + (ex - startPos_.x) * SmoothStep(t);
-	Vector3 pos = { x, y, endPos_.z };
+	TuboEngine::Math::Vector3 pos = {x, y, endPos_.z};
 	player->SetPosition(pos);
 
 	// 横倒れ（Z軸回りに倒す）: tに合わせて0→目標角
 	float tiltT = SmoothStep(t);
-	Vector3 rot = player->GetRotation();
+	TuboEngine::Math::Vector3 rot = player->GetRotation();
 	rot.z = -tiltSign_ * tiltTargetRad_ * tiltT;
 	player->SetRotation(rot);
 
