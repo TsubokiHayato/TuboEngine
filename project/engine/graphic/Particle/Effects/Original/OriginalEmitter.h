@@ -22,9 +22,9 @@ protected:
         for (uint32_t i = 0; i < rays; ++i) {
             float a = i * d;
             float a2 = a + 0.12f; // 幅
-            Vector3 p0{0,0,0};
-            Vector3 p1{ std::cos(a) * outer, std::sin(a) * outer, 0.0f };
-            Vector3 p2{ std::cos(a2) * outer, std::sin(a2) * outer, 0.0f };
+			TuboEngine::Math::Vector3 p0{0, 0, 0};
+			TuboEngine::Math::Vector3 p1{std::cos(a) * outer, std::sin(a) * outer, 0.0f};
+			TuboEngine::Math::Vector3 p2{std::cos(a2) * outer, std::sin(a2) * outer, 0.0f};
             // 三角面
             out.push_back({ {p0.x, p0.y, 0,1}, {0.5f,0.5f}, {0,0,1} });
             out.push_back({ {p1.x, p1.y, 0,1}, {0.0f,0.0f}, {0,0,1} });
@@ -49,7 +49,7 @@ protected:
         float a = ang1(rng_);
         float b = ang2(rng_);
         // 球面方向ベクトル
-        Vector3 dir{
+		TuboEngine::Math::Vector3 dir{
             r * std::sin(b) * std::cos(a),
             r * std::cos(b),
             r * std::sin(b) * std::sin(a)
