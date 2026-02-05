@@ -24,7 +24,7 @@ public:
 
 	// Dash等の演出用にパラメータを外部から操作
 	void SetPower(float power);
-	void SetCenter(const Vector2& center);
+	void SetCenter(const TuboEngine::Math::Vector2 & center);
 	float GetPower() const;
 
 private:

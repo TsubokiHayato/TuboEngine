@@ -16,7 +16,7 @@ void GaussianBlurEffect::Initialize() {
     pso_->Initialize();
 
     // 定数バッファ作成
-    cbResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(GaussianParams));
+	cbResource_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(GaussianParams));
     cbResource_->Map(0, nullptr, reinterpret_cast<void**>(&params_));
     // デフォルト値
 	params_->sigma = 1.0f;

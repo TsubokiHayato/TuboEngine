@@ -5,7 +5,7 @@
 #include "ParticleManager.h" // 追加: パーティクル描画/更新
 
 namespace {
-	StageScene::StageBounds ComputeBoundsWorld(const Vector3& origin, const MapChipField& field) {
+StageScene::StageBounds ComputeBoundsWorld(const TuboEngine::Math::Vector3& origin, const MapChipField& field) {
 		const float w = static_cast<float>(field.GetNumBlockHorizontal()) * MapChipField::GetBlockWidth();
 		const float h = static_cast<float>(field.GetNumBlockVirtical()) * MapChipField::GetBlockHeight();
 		StageScene::StageBounds b;
@@ -31,12 +31,12 @@ namespace {
 		Right,
 	};
 
-	Vector3 ComputeSpawnOriginFromCenter(const StageScene::StageBounds& center, const StageScene::StageBounds& nextAtOrigin,
+	TuboEngine::Math::Vector3 ComputeSpawnOriginFromCenter(const StageScene::StageBounds& center, const StageScene::StageBounds& nextAtOrigin,
 		NeighborDir dir, float gapX, float gapY) {
 		const float nextW = nextAtOrigin.right - nextAtOrigin.left;
 		const float nextH = nextAtOrigin.top - nextAtOrigin.bottom;
 
-		Vector3 origin{0.0f, 0.0f, 0.0f};
+		TuboEngine::Math::Vector3 origin{0.0f, 0.0f, 0.0f};
 
 		switch (dir) {
 		case NeighborDir::Right:
@@ -67,10 +67,10 @@ namespace {
 	}
 
 	void DrawBounds(const StageScene::StageBounds& b, float z, const Vector4& color) {
-		Vector3 p0{b.left, b.bottom, z};
-		Vector3 p1{b.right, b.bottom, z};
-		Vector3 p2{b.right, b.top, z};
-		Vector3 p3{b.left, b.top, z};
+	    TuboEngine::Math::Vector3 p0{b.left, b.bottom, z};
+	    TuboEngine::Math::Vector3 p1{b.right, b.bottom, z};
+	    TuboEngine::Math::Vector3 p2{b.right, b.top, z};
+	    TuboEngine::Math::Vector3 p3{b.left, b.top, z};
 		auto* lm = LineManager::GetInstance();
 		lm->DrawLine(p0, p1, color);
 		lm->DrawLine(p1, p2, color);
