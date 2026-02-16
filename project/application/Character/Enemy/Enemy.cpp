@@ -14,7 +14,11 @@
 #include "engine/graphic/Particle/Effects/Primitive/PrimitiveEmitter.h"
 #include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 
-constexpr float kPI = 3.14159265358979323846f;
+namespace {
+	constexpr float kPI = 3.14159265358979323846f;
+	constexpr int kInitialHP = 10;
+	constexpr TuboEngine::Math::Vector3 kSpawnPosition{0.0f, 0.0f, 5.0f};
+}
 
 // Enemyモデルの軸補正（モデルの向きがゲーム座標系と一致しない場合のための定数）
 // 90度ズレが「Z軸(ヨー)」ではなく「X軸/ Y軸」で起きるケースがあるため、軸ごとに分けて補正する。
@@ -28,7 +32,7 @@ Enemy::~Enemy() {}
 
 void Enemy::Initialize() {
     Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kEnemy));
-    position_ = {0.0f, 0.0f, 5.0f};
+    position_ = kSpawnPosition;
 	rotation_ = TuboEngine::Math::Vector3(1.56f, 0.0f, 0.0f);
     scale_ = {1.0f, 1.0f, 1.0f};
 
@@ -62,7 +66,7 @@ void Enemy::Initialize() {
     exclamationIcon_->SetGetIsAdjustTextureSize(false);
     exclamationIcon_->SetAnchorPoint({0.5f, 0.5f});
 
-    hp_ = 10; // 調整: 少し耐える
+    hp_ = kInitialHP; // 調整: 少し耐える
 
     idleLookAroundTimer_ = idleLookAroundIntervalSec_;
     idleBackPhase_ = IdleBackPhase::None;
