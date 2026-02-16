@@ -95,7 +95,6 @@ private:
 	///				メンバ変数
 	///--------------------------------------------------
 
-	
 	///  弾のパラメータ ///
 	// 弾の位置
 	TuboEngine::Math::Vector3 position{};
@@ -105,6 +104,9 @@ private:
 	TuboEngine::Math::Vector3 scale{};
 	// 弾の速度
 	TuboEngine::Math::Vector3 velocity{};
+
+	// 3Dオブジェクト
+	std::unique_ptr<Object3d> object3d;
 
 private:
 	// 弾の速度
@@ -146,4 +148,11 @@ public:
 	static int s_damage;
 	// 発射間隔（秒）
 	static float s_fireInterval;
+
+	// 派生弾用: マップ参照（反射/爆風など地形利用向け）
+	MapChipField* GetMapChipField() const { return mapChipField_; }
+
+	// 派生弾用: 発射元プレイヤー情報
+	const TuboEngine::Math::Vector3& GetPlayerPosition() const { return playerPosition_; }
+	const TuboEngine::Math::Vector3& GetPlayerRotation() const { return playerRotation; }
 };

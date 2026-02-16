@@ -26,6 +26,11 @@ public:
 		PlayerBullet::Update();
 	}
 
+	static void DrawImGuiGlobal() {
+		// 現段階では武器側で拡散数/角度を持っているため、ここは将来の移行用ダミー。
+		// UIの置き場所を揃える目的で用意。
+	}
+
 private:
 	TuboEngine::Math::Vector3 fixedPlayerRotation_{};
 	bool fixedSet_ = false;
