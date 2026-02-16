@@ -9,6 +9,12 @@
 #include "engine/graphic/PostEffect/OffScreenRendering.h"
 #include "Weapon/PlayerWeapons.h"
 
+namespace {
+	constexpr int kInitialHP = 5;
+	constexpr float kFixedDeltaTime = 1.0f / 60.0f;
+	constexpr float kMoveSpeed = 0.1f;
+}
+
 //--------------------------------------------------
 // コンストラクタ
 //--------------------------------------------------
@@ -89,7 +95,7 @@ void Player::Initialize() {
 	// プレイヤーの初期速度
 	velocity_ = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
 	// プレイヤーのHP
-	hp_ = 5;
+	hp_ = kInitialHP;
 	// プレイヤーの死亡状態
 	isAlive_ = true;
 
@@ -165,7 +171,7 @@ void Player::Update() {
 		return;
 	}
 
-	const float dt = 1.0f / 60.0f;
+	const float dt = kFixedDeltaTime;
 	const bool wantCaptureMouse = ShouldIgnoreMouseForRotate_();
 
 	UpdateGameplayActive_(dt, wantCaptureMouse);
@@ -253,12 +259,12 @@ void Player::UpdateGameplayActive_(float dt, bool wantCaptureMouse) {
 
 	// Weapon update
 	if (weapon_) {
-		weapon_->Update(*this, 1.0f / 60.0f);
+		weapon_->Update(*this, kFixedDeltaTime);
 	}
 
 	// 発射タイマー更新（旧仕様の名残: weapon側へ移行したので維持のみ）
 	if (bulletTimer_ > 0.0f) {
-		bulletTimer_ -= 1.0f / 60.0f;
+		bulletTimer_ -= kFixedDeltaTime;
 	}
 	Shoot();
 	UpdateBullets_(dt);
@@ -395,16 +401,16 @@ void Player::Move() {
 	}
 	TuboEngine::Math::Vector3 moveDelta = {0.0f, 0.0f, 0.0f};
 	if (Input::GetInstance()->PushKey(DIK_W)) {
-		moveDelta.y -= 0.1f;
+		moveDelta.y -= kMoveSpeed;
 	}
 	if (Input::GetInstance()->PushKey(DIK_S)) {
-		moveDelta.y += 0.1f;
+		moveDelta.y += kMoveSpeed;
 	}
 	if (Input::GetInstance()->PushKey(DIK_A)) {
-		moveDelta.x -= 0.1f;
+		moveDelta.x -= kMoveSpeed;
 	}
 	if (Input::GetInstance()->PushKey(DIK_D)) {
-		moveDelta.x += 0.1f;
+		moveDelta.x += kMoveSpeed;
 	}
 	TuboEngine::Math::Vector3 tryPosition = position_ + moveDelta;
 	if (mapChipField_) {
@@ -573,12 +579,12 @@ void Player::StartDodge() {
 // --- 回避状態更新 ---
 void Player::UpdateDodge() {
 	if (dodgeCooldownTimer_ > 0.0f) {
-		dodgeCooldownTimer_ -= 1.0f / 60.0f;
+		dodgeCooldownTimer_ -= kFixedDeltaTime;
 		if (dodgeCooldownTimer_ < 0.0f)
 			dodgeCooldownTimer_ = 0.0f;
 	}
 	if (isDodging_) {
-		dodgeTimer_ -= 1.0f / 60.0f;
+		dodgeTimer_ -= kFixedDeltaTime;
 		if (dodgeTimer_ <= 0.0f) {
 			isDodging_ = false;
 			dodgeCooldownTimer_ = dodgeCooldown_;

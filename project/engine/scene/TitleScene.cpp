@@ -8,6 +8,11 @@
 #include <algorithm> // std::clamp用
 #include <cmath>     // 追加
 
+namespace {
+	constexpr int kWindowWidth = 1280;
+	constexpr int kWindowHeight = 720;
+}
+
 void TitleScene::Initialize() {
 
 
@@ -26,7 +31,7 @@ void TitleScene::Initialize() {
 	titleUI->Initialize();
 
 	// Scene change animation
-	sceneChangeAnimation = std::make_unique<SceneChangeAnimation>(1280, 720, 80, 1.5f, "barrier.png");
+	sceneChangeAnimation = std::make_unique<SceneChangeAnimation>(kWindowWidth, kWindowHeight, 80, 1.5f, "barrier.png");
 	sceneChangeAnimation->Initialize();
 	isRequestSceneChange = false;
 
@@ -162,8 +167,8 @@ namespace {
 		// ==== 背景アニメーション（線形で矩形を流すアニメーション） ====
 		const int rectRows = 4;
 		const int rectCount = 10;
-		const float screenW = 1280.0f;
-		const float screenH = 720.0f;
+		const float screenW = static_cast<float>(kWindowWidth);
+		const float screenH = static_cast<float>(kWindowHeight);
 
 		const float rectW = 220.0f;
 		const float rectH = 84.0f;
