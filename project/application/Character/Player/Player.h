@@ -11,7 +11,18 @@
 class IParticleEmitter;
 
 ///--------------------------------------------------
-// プレイヤークラス
+/// @brief プレイヤークラス。
+///
+/// @details
+/// 本クラスの責務は、プレイヤーキャラクターの
+/// - 入力に基づく移動/回転/回避（ダッシュ）
+/// - 弾発射などの攻撃処理
+/// - 被弾/無敵時間などの状態管理
+/// - 3D/2D描画（モデル/レティクル）
+/// - 当たり判定（`Collider`）との連携
+/// をまとめて管理することです。
+///
+/// @note 実際の入力取得や演出は実装側（`.cpp`）で行い、本ヘッダは公開APIを定義します。
 ///--------------------------------------------------
 class Player : public BaseCharacter {
 public:
@@ -19,46 +30,88 @@ public:
 	///				メンバ関数
 	///--------------------------------------------------
 
-	// コンストラクタ
+	/** @brief コンストラクタ。 */
 	Player();
-	// デストラクタ
+	/** @brief デストラクタ。 */
 	~Player() override;
 
-	// 初期化のオーバーライド
+	/**
+	 * @brief プレイヤーの初期化。
+	 * @details モデル/当たり判定/各種タイマーやパラメータを初期化します。
+	 */
 	void Initialize() override;
-	// 更新処理のオーバーライド
+	/**
+	 * @brief プレイヤーの更新。
+	 * @details 入力に応じた移動・回避・射撃、各種クールダウンの更新を行います。
+	 */
 	void Update() override;
-	// 描画処理のオーバーライド
+	/**
+	 * @brief プレイヤーの描画。
+	 * @details 3Dモデルとレティクル等の描画を行います。
+	 */
 	void Draw() override;
-	// 衝突時の処理のオーバーライド
+	/**
+	 * @brief 衝突時処理。
+	 * @param other 衝突相手のコライダー。
+	 */
 	void OnCollision(Collider* other) override;
-	// 当たり判定の中心座標を取得のオーバーライド
+	/**
+	 * @brief 当たり判定の中心座標を取得します。
+	 * @return ワールド空間での中心座標。
+	 */
 	TuboEngine::Math::Vector3 GetCenterPosition() const override;
 
-	// ImGuiの描画処理
+	/** @brief ImGuiの描画処理（デバッグ用）。 */
 	void DrawImGui();
 
-	// 弾を撃つ処理
+	/**
+	 * @brief 弾を撃つ処理。
+	 * @details 発射間隔や弾生成、弾初期位置/方向の設定を行います。
+	 */
 	void Shoot();
 
-	// 移動処理
+	/**
+	 * @brief 移動処理。
+	 * @details 入力と地形（MapChip）に基づき位置を更新します。
+	 */
 	void Move();
 
+	/**
+	 * @brief 回転処理。
+	 * @details 入力や照準に基づきプレイヤーの向きを更新します。
+	 */
 	void Rotate();
 
+	/** @brief レティクル描画処理（2D）。 */
 	void ReticleDraw();
 
+	/**
+	 * @brief ダッシュ/回避のリング演出を即時発火します。
+	 */
 	void TriggerDashRing();
 
-	// 斜め視点でもレティクル通りに飛ばすための方向取得関数（地面へレイキャスト）
+	/**
+	 * @brief 斜め視点でもレティクル通りに飛ばすための方向取得関数（地面へレイキャスト）。
+	 * @return レティクルに対応する照準方向ベクトル（正規化される想定）。
+	 */
 	TuboEngine::Math::Vector3 GetAimDirectionFromReticle() const;
 
 
 private:
 	// --- 回避関連 ---
+	/** @brief 回避開始処理（内部用）。 */
 	void StartDodge();
+	/** @brief 回避更新処理（内部用）。 */
 	void UpdateDodge();
+	/**
+	 * @brief 回避可能か判定します（内部用）。
+	 * @return 回避可能ならtrue。
+	 */
 	bool CanDodge() const;
+	/**
+	 * @brief 入力から回避方向を算出します（内部用）。
+	 * @return 回避方向ベクトル。
+	 */
 	TuboEngine::Math::Vector3 GetDodgeInputDirection() const;
 
 public:
@@ -66,56 +119,75 @@ public:
 	///				ゲッター
 	///------------------------------------
 
-	// プレイヤーの位置を取得
+	/** @brief プレイヤーの位置を取得します。 @return 位置。 */
 	TuboEngine::Math::Vector3 GetPosition() const { return position; }
-	// プレイヤーの回転を取得
+	/** @brief プレイヤーの回転を取得します。 @return 回転。 */
 	TuboEngine::Math::Vector3 GetRotation() const { return rotation; }
-	// プレイヤーのスケールを取得
+	/** @brief プレイヤーのスケールを取得します。 @return スケール。 */
 	TuboEngine::Math::Vector3 GetScale() const { return scale; }
-	// プレイヤーの速度を取得
+	/** @brief プレイヤーの速度を取得します。 @return 速度。 */
 	TuboEngine::Math::Vector3 GetVelocity() const { return velocity; }
-	// プレイヤーのHPを取得
+	/** @brief プレイヤーのHPを取得します。 @return HP。 */
 	int GetHP() const { return HP; }
-	// プレイヤーの死亡状態を取得
+	/** @brief 生存状態を取得します。 @return 生存中ならtrue。 */
 	bool GetIsAlive() const { return isAlive; }
-	// プレイヤーの弾のリストを取得
+	/** @brief プレイヤーの弾リストを取得します。 @return 弾リスト参照。 */
 	const std::vector<std::unique_ptr<PlayerBullet>>& GetBullets() const { return bullets; }
+	/** @brief ダッシュ中か取得します。 @return ダッシュ中ならtrue。 */
 	bool IsDashing() const { return isDashing_; } // 既存なら流用、無ければダミー
+	/** @brief 被弾フラグを取得します。 @return 被弾していればtrue。 */
 	bool GetIsHit() const { return isHit; } // 被弾フラグのゲッター
 
 	///-----------------------------------
 	///				セッター
 	///-------------------------------------
 
-	// プレイヤーの位置を設定
+	/** @brief プレイヤーの位置を設定します。 @param position 位置。 */
 	void SetPosition(const TuboEngine::Math::Vector3& position) { this->position = position; }
-	// プレイヤーの回転を設定
+	/** @brief プレイヤーの回転を設定します。 @param rotation 回転。 */
 	void SetRotation(const TuboEngine::Math::Vector3& rotation) { this->rotation = rotation; }
-	// プレイヤーのスケールを設定
+	/** @brief プレイヤーのスケールを設定します。 @param scale スケール。 */
 	void SetScale(const TuboEngine::Math::Vector3& scale) { this->scale = scale; }
-	// プレイヤーの速度を設定
+	/** @brief プレイヤーの速度を設定します。 @param velocity 速度。 */
 	void SetVelocity(const TuboEngine::Math::Vector3& velocity) { this->velocity = velocity; }
-	// プレイヤーのHPを設定
+	/** @brief プレイヤーのHPを設定します。 @param HP HP。 */
 	void SetHP(int HP) { this->HP = HP; }
-	// プレイヤーの死亡状態を設定
+	/** @brief 生存状態を設定します。 @param isAlive 生存中ならtrue。 */
 	void SetIsDead(bool isAlive) { this->isAlive = isAlive; }
-	// カメラを設定
+	/**
+	 * @brief 使用するカメラを設定します。
+	 * @param camera カメラ。
+	 */
 	void SetCamera(Camera* camera) { object3d->SetCamera(camera); camera_ = camera; }
+	/** @brief ダッシュリングの前方オフセット量を設定します。 @param forward 前方オフセット量。 */
 	void SetDashRingOffset(float forward) { dashRingOffsetForward_ = forward; }
 
-	// モデルのアルファ設定
+	/**
+	 * @brief モデルのアルファ（透明度）を設定します。
+	 * @param alpha アルファ値。
+	 */
 	void SetModelAlpha(float alpha) {
 		Vector4 color = object3d->GetModelColor();
 		color.w = alpha;
 		object3d->SetModelColor(color);
 	}
 
-	// 環境マップ設定
+	/**
+	 * @brief 環境マップ（キューブマップ）を設定します。
+	 * @param filePath キューブマップファイルパス。
+	 */
 	void CubeMapSet(const std::string& filePath) { object3d->SetCubeMapFilePath(filePath); }
 
-	// マップチップフィールドを設定
+	/**
+	 * @brief マップチップフィールド参照を設定します。
+	 * @param mapChipField マップチップフィールド。
+	 */
 	void SetMapChipField(MapChipField* mapChipField) { this->mapChipField = mapChipField; }
 
+	/**
+	 * @brief 移動可否（入力ロック）を設定します。
+	 * @param flag ロックするならtrue。
+	 */
 	void SetMovementLocked(bool flag) { isMovementLocked = flag; }
 
 private:
