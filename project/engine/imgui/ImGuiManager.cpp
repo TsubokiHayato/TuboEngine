@@ -16,9 +16,9 @@ void ImGuiManager::Initialize() {
 	// ImGuiのスタイルを設定
 	ImGui::StyleColorsDark();
 	// WinAppが正しく初期化されているか確認
-	assert(WinApp::GetInstance()->GetHWND() != nullptr);
+	assert(TuboEngine::WinApp::GetInstance()->GetHWND() != nullptr);
 	// ImGuiのDirectX12の初期化
-	ImGui_ImplWin32_Init(WinApp::GetInstance()->GetHWND());
+	ImGui_ImplWin32_Init(TuboEngine::WinApp::GetInstance()->GetHWND());
 
 	// descriptorHeapの設定
 	D3D12_DESCRIPTOR_HEAP_DESC desc = {};
@@ -26,11 +26,11 @@ void ImGuiManager::Initialize() {
 	desc.NumDescriptors = 1;
 	desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	// descriptorHeapの生成
-	HRESULT result = DirectXCommon::GetInstance()->GetDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&srvHeap));
+	HRESULT result = TuboEngine::DirectXCommon::GetInstance()->GetDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&srvHeap));
 	assert(SUCCEEDED(result));
 
 	ImGui_ImplDX12_Init(
-	    DirectXCommon::GetInstance()->GetDevice().Get(), static_cast<int>(DirectXCommon::GetInstance()->GetBackBufferCount()), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, srvHeap.Get(),
+	    TuboEngine::DirectXCommon::GetInstance()->GetDevice().Get(), static_cast<int>(TuboEngine::DirectXCommon::GetInstance()->GetBackBufferCount()), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, srvHeap.Get(),
 	    srvHeap->GetCPUDescriptorHandleForHeapStart(), srvHeap->GetGPUDescriptorHandleForHeapStart());
 #endif // USE_IMGUI
 }
@@ -68,7 +68,7 @@ void ImGuiManager::End(){
 void ImGuiManager::Draw() {
 
 #ifdef USE_IMGUI
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = DirectXCommon::GetInstance()->GetCommandList();
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
 
 	// ディスクリプタヒープの配列をセットするコマンド
 	ID3D12DescriptorHeap* ppHeaps[] = {srvHeap.Get()};
