@@ -803,6 +803,8 @@
     </ClInclude>
     <ClInclude Include="application\Weapon\IWeapon.h" />
     <ClInclude Include="application\Weapon\PlayerWeapons.h" />
+    <ClInclude Include="application\Bullet\Player\ShotgunPelletBullet.h" />
+    <ClInclude Include="application\Bullet\Player\PiercingBullet.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli">

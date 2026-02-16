@@ -46,9 +46,6 @@ void Player::ApplyWeaponParams(WeaponType type) {
 	case WeaponType::Normal:
 		weapon_ = PlayerWeapons::CreateNormal();
 		break;
-	case WeaponType::Rapid:
-		weapon_ = PlayerWeapons::CreateRapid();
-		break;
 	case WeaponType::Shotgun:
 		weapon_ = PlayerWeapons::CreateShotgun();
 		break;
@@ -68,13 +65,13 @@ void Player::SetWeaponType(WeaponType type) { ApplyWeaponParams(type); }
 
 void Player::NextWeapon() {
 	int t = static_cast<int>(weaponType_);
-	t = (t + 1) % 3;
+	t = (t + 1) % 2;
 	ApplyWeaponParams(static_cast<WeaponType>(t));
 }
 
 void Player::PrevWeapon() {
 	int t = static_cast<int>(weaponType_);
-	t = (t + 2) % 3;
+	t = (t + 1) % 2;
 	ApplyWeaponParams(static_cast<WeaponType>(t));
 }
 
