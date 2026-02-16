@@ -469,7 +469,7 @@ void ClearScene::ImGuiDraw() {
     // 全体パラメータ
     if (ImGui::DragFloat("Letter Spacing", &letterSpacing_, 1.0f, 10.0f, 400.0f)) {
         // 位置を再計算
-        float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
+		float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
         for (int i = 0; i < static_cast<int>(letterSprites_.size()); ++i) {
             float x = screenW * 0.5f + (i - 2) * letterSpacing_;
             auto pos = letterSprites_[i]->GetPosition();
@@ -478,7 +478,7 @@ void ClearScene::ImGuiDraw() {
         }
     }
     if (ImGui::DragFloat("Letter Y Offset", &letterYOffset_, 1.0f, -600.0f, 600.0f)) {
-        float screenH = static_cast<float>(WinApp::GetInstance()->GetClientHeight());
+		float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
         for (size_t i = 0; i < letterSprites_.size(); ++i) {
             auto pos = letterSprites_[i]->GetPosition();
             float y = screenH * 0.5f + letterYOffset_;
@@ -491,8 +491,8 @@ void ClearScene::ImGuiDraw() {
 
     ImGui::Separator();
     if (ImGui::Button("Reset Positions")) {
-        float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
-        float screenH = static_cast<float>(WinApp::GetInstance()->GetClientHeight());
+		float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
+		float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
         for (int i = 0; i < static_cast<int>(letterSprites_.size()); ++i) {
             float x = screenW * 0.5f + (i - 2) * letterSpacing_;
             float y = screenH * 0.5f + letterYOffset_;
@@ -522,26 +522,26 @@ void ClearScene::ImGuiDraw() {
         std::string header = std::format("Letter {} ({})", static_cast<int>(i), letterTextureNames_[i]);
         if (ImGui::CollapsingHeader(header.c_str())) {
             // Position
-            Vector2 pos = letterSprites_[i]->GetPosition();
+			TuboEngine::Math::Vector2 pos = letterSprites_[i]->GetPosition();
             if (ImGui::DragFloat2(std::format("Position##{}", i).c_str(), &pos.x, 1.0f)) {
                 letterSprites_[i]->SetPosition(pos);
                 letterSprites_[i]->Update();
             }
             // Size
-            Vector2 sz = letterSprites_[i]->GetSize();
+			TuboEngine::Math::Vector2 sz = letterSprites_[i]->GetSize();
             if (ImGui::DragFloat2(std::format("Size##{}", i).c_str(), &sz.x, 1.0f)) {
                 letterSprites_[i]->SetSize(sz);
                 letterSprites_[i]->Update();
             }
             // Color / Alpha
-            Vector4 col = letterSprites_[i]->GetColor();
+			TuboEngine::Math::Vector4 col = letterSprites_[i]->GetColor();
             float colf[4] = { col.x, col.y, col.z, col.w };
             if (ImGui::ColorEdit4(std::format("Color##{}", i).c_str(), colf)) {
                 letterSprites_[i]->SetColor({ colf[0], colf[1], colf[2], colf[3] });
                 letterSprites_[i]->Update();
             }
             // Anchor
-            Vector2 anchor = letterSprites_[i]->GetAnchorPoint();
+			TuboEngine::Math::Vector2 anchor = letterSprites_[i]->GetAnchorPoint();
             if (ImGui::DragFloat2(std::format("Anchor##{}", i).c_str(), &anchor.x, 0.01f, 0.0f, 1.0f)) {
                 letterSprites_[i]->SetAnchorPoint(anchor);
                 letterSprites_[i]->Update();
@@ -568,9 +568,9 @@ void ClearScene::ImGuiDraw() {
     // プレイヤー情報表示
     if (player_) {
         ImGui::Begin("Player (ClearScene)");
-        Vector3 ppos = player_->GetPosition();
-        Vector3 prot = player_->GetRotation();
-        Vector3 pscale = player_->GetScale();
+		TuboEngine::Math::Vector3 ppos = player_->GetPosition();
+		TuboEngine::Math::Vector3 prot = player_->GetRotation();
+		TuboEngine::Math::Vector3 pscale = player_->GetScale();
         ImGui::Text("Position: %.2f, %.2f, %.2f", ppos.x, ppos.y, ppos.z);
         ImGui::Text("Rotation: %.2f, %.2f, %.2f", prot.x, prot.y, prot.z);
         ImGui::Text("Scale: %.2f, %.2f, %.2f", pscale.x, pscale.y, pscale.z);

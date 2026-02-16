@@ -315,7 +315,7 @@ bool Enemy::BuildPathTo(const TuboEngine::Math::Vector3& worldGoal) {
                     grid[nIdx].opened = true;
                     open.push({nIdx, grid[nIdx].f});
                 } else {
-                    // 既にopenedでも新しいfでpushしておく（lazy update）
+                    // 既にOpenedでも新しいfでPushしておく（lazy update）
                     open.push({nIdx, grid[nIdx].f});
                 }
             }
@@ -562,7 +562,7 @@ void Enemy::Update() {
         bullet->Update();
 
     object3d->SetPosition(position);
-    // 描画側へモデル軸の補正を適用（ロジック上のrotationは"前方"のまま）
+    // 描画側へモデル軸の補正を適用（ロジック上のRotationは"前方"のまま）
 	TuboEngine::Math::Vector3 drawRot = rotation;
     drawRot.x = NormalizeAngle(drawRot.x + kEnemyModelRotOffsetX);
     drawRot.y = NormalizeAngle(drawRot.y + kEnemyModelRotOffsetY);
