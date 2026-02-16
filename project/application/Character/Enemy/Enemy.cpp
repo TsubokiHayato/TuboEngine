@@ -204,399 +204,439 @@ static int FindNearestWalkableIndex(MapChipField* field, int gx, int gy) {
     return -1;
 }
 
-bool Enemy::BuildPathTo(const TuboEngine::Math::Vector3& worldGoal) {
-    currentPath_.clear();
-    pathCursor_ = 0;
-    lastPathGoalIndex_ = -1;
+bool Enemy::PreparePathfinding_(const TuboEngine::Math::Vector3& worldGoal, int& outW, int& outH, int& outSX, int& outSY, int& outGX, int& outGY) {
+	currentPath_.clear();
+	pathCursor_ = 0;
+	lastPathGoalIndex_ = -1;
 
-    if (!mapChipField_)
-        return false;
+	if (!mapChipField_) {
+		return false;
+	}
 
-    const int W = (int)mapChipField_->GetNumBlockHorizontal();
-    const int H = (int)mapChipField_->GetNumBlockVirtical();
-    if (W <= 0 || H <= 0)
-        return false;
+	outW = (int)mapChipField_->GetNumBlockHorizontal();
+	outH = (int)mapChipField_->GetNumBlockVirtical();
+	if (outW <= 0 || outH <= 0) {
+		return false;
+	}
 
-    // 始点・終点のタイルインデックス
-    auto sIdx = mapChipField_->GetMapChipIndexSetByPosition(position_);
-    auto gIdx = mapChipField_->GetMapChipIndexSetByPosition(worldGoal);
-    int sx = (int)sIdx.xIndex;
-    int sy = (int)sIdx.yIndex;
-    int gx = (int)gIdx.xIndex;
-    int gy = (int)gIdx.yIndex;
+	auto sIdx = mapChipField_->GetMapChipIndexSetByPosition(position_);
+	auto gIdx = mapChipField_->GetMapChipIndexSetByPosition(worldGoal);
+	outSX = std::clamp((int)sIdx.xIndex, 0, outW - 1);
+	outSY = std::clamp((int)sIdx.yIndex, 0, outH - 1);
+	outGX = std::clamp((int)gIdx.xIndex, 0, outW - 1);
+	outGY = std::clamp((int)gIdx.yIndex, 0, outH - 1);
+	return true;
+}
 
-    // 範囲内へクランプ
-    sx = std::clamp(sx, 0, W - 1);
-    sy = std::clamp(sy, 0, H - 1);
-    gx = std::clamp(gx, 0, W - 1);
-    gy = std::clamp(gy, 0, H - 1);
+bool Enemy::RunAStar_(int W, int H, int sx, int sy, int gFlat, std::vector<int>& outPathFlats) {
+	outPathFlats.clear();
+	std::vector<AStarCell> grid((size_t)W * (size_t)H);
 
-    // 歩行可能でない終点は最近傍の歩行可タイルへ寄せる
-    int gFlat = FindNearestWalkableIndex(mapChipField_, gx, gy);
-    if (gFlat < 0) {
-        return false;
-    }
-    gx = gFlat % W;
-    gy = gFlat / W;
-    lastPathGoalIndex_ = gFlat;
+	int gx = gFlat % W;
+	int gy = gFlat / W;
+	auto Heuristic = [&](int x, int y) {
+		return float(std::abs(x - gx) + std::abs(y - gy));
+	};
 
-    // 始点も歩行可能か確認（不可能なら最近傍の可能タイルへ）
-    if (!IsTileWalkable(mapChipField_, (uint32_t)sx, (uint32_t)sy)) {
-        int sFlat = FindNearestWalkableIndex(mapChipField_, sx, sy);
-        if (sFlat < 0)
-            return false;
-        sx = sFlat % W;
-        sy = sFlat / W;
-    }
+	struct Node { int idx; float f; };
+	struct Cmp { bool operator()(const Node& a, const Node& b) const { return a.f > b.f; } };
+	std::priority_queue<Node, std::vector<Node>, Cmp> open;
 
-    std::vector<AStarCell> grid((size_t)W * (size_t)H);
-    auto Heuristic = [&](int x, int y) {
-        // マンハッタン（4近傍）
-        return float(std::abs(x - gx) + std::abs(y - gy));
-    };
+	int sFlat = Index1D(sx, sy, W);
+	grid[sFlat].g = 0.0f;
+	grid[sFlat].f = Heuristic(sx, sy);
+	grid[sFlat].opened = true;
+	open.push({sFlat, grid[sFlat].f});
 
-    struct Node {
-        int idx;
-        float f;
-    };
-    struct Cmp {
-        bool operator()(const Node& a, const Node& b) const { return a.f > b.f; }
-    };
-    std::priority_queue<Node, std::vector<Node>, Cmp> open;
+	const int kDir[4][2] = {{1,0},{-1,0},{0,1},{0,-1}};
+	int goalFound = -1;
+	while (!open.empty()) {
+		auto cur = open.top();
+		open.pop();
+		int cIdx = cur.idx;
+		if (grid[cIdx].closed) {
+			continue;
+		}
+		grid[cIdx].closed = true;
 
-    int sFlat = Index1D(sx, sy, W);
-    grid[sFlat].g = 0.0f;
-    grid[sFlat].f = Heuristic(sx, sy);
-    grid[sFlat].opened = true;
-    open.push({sFlat, grid[sFlat].f});
+		if (cIdx == gFlat) {
+			goalFound = cIdx;
+			break;
+		}
 
-    const int kDir[4][2] = {
-        {1,  0 },
-        {-1, 0 },
-        {0,  1 },
-        {0,  -1}
-    };
+		int cx = cIdx % W;
+		int cy = cIdx / W;
+		for (auto& d : kDir) {
+			int nx = cx + d[0];
+			int ny = cy + d[1];
+			if (nx < 0 || ny < 0 || nx >= W || ny >= H) {
+				continue;
+			}
+			if (!IsTileWalkable(mapChipField_, (uint32_t)nx, (uint32_t)ny)) {
+				continue;
+			}
+			int nIdx = Index1D(nx, ny, W);
+			if (grid[nIdx].closed) {
+				continue;
+			}
+			float ng = grid[cIdx].g + 1.0f;
+			if (!grid[nIdx].opened || ng < grid[nIdx].g) {
+				grid[nIdx].g = ng;
+				grid[nIdx].f = ng + Heuristic(nx, ny);
+				grid[nIdx].parent = cIdx;
+				grid[nIdx].opened = true;
+				open.push({nIdx, grid[nIdx].f});
+			}
+		}
+	}
 
-    int goalFound = -1;
-    while (!open.empty()) {
-        auto cur = open.top();
-        open.pop();
-        int cIdx = cur.idx;
-        if (grid[cIdx].closed)
-            continue;
-        grid[cIdx].closed = true;
+	if (goalFound < 0) {
+		return false;
+	}
 
-        int cx = cIdx % W;
-        int cy = cIdx / W;
+	std::vector<int> rev;
+	for (int p = goalFound; p >= 0; p = grid[p].parent) {
+		rev.push_back(p);
+		if (p == sFlat) {
+			break;
+		}
+	}
+	std::reverse(rev.begin(), rev.end());
+	outPathFlats = std::move(rev);
+	return true;
+}
 
-        if (cIdx == lastPathGoalIndex_) {
-            goalFound = cIdx;
-            break;
-        }
-
-        for (auto& d : kDir) {
-            int nx = cx + d[0];
-            int ny = cy + d[1];
-            if (nx < 0 || ny < 0 || nx >= W || ny >= H)
-                continue;
-            if (!IsTileWalkable(mapChipField_, (uint32_t)nx, (uint32_t)ny))
-                continue;
-
-            int nIdx = Index1D(nx, ny, W);
-            if (grid[nIdx].closed)
-                continue;
-
-            float ng = grid[cIdx].g + 1.0f; // 4近傑=コスト1
-            if (!grid[nIdx].opened || ng < grid[nIdx].g) {
-                grid[nIdx].g = ng;
-                grid[nIdx].f = ng + Heuristic(nx, ny);
-                grid[nIdx].parent = cIdx;
-                if (!grid[nIdx].opened) {
-                    grid[nIdx].opened = true;
-                    open.push({nIdx, grid[nIdx].f});
-                } else {
-                    // 既にOpenedでも新しいfでPushしておく（lazy update）
-                    open.push({nIdx, grid[nIdx].f});
-                }
-            }
-        }
-    }
-
-    if (goalFound < 0) {
-        return false;
-    }
-
-    // 経路復元（タイル中心のワールド座標列に変換）
-    std::vector<int> rev;
-    for (int p = goalFound; p >= 0; p = grid[p].parent) {
-        rev.push_back(p);
-        if (p == sFlat)
-            break;
-    }
-    std::reverse(rev.begin(), rev.end());
-
-    currentPath_.reserve(rev.size());
-    for (int flat : rev) {
-        int tx = flat % W;
-        int ty = flat / W;
+void Enemy::BuildWorldPathFromFlats_(int W, const std::vector<int>& pathFlats) {
+	currentPath_.clear();	
+	currentPath_.reserve(pathFlats.size());
+	for (int flat : pathFlats) {
+		int tx = flat % W;
+		int ty = flat / W;
 		TuboEngine::Math::Vector3 center = mapChipField_->GetMapChipPositionByIndex((uint32_t)tx, (uint32_t)ty);
-        // Zは現在高度を維持
-        center.z = position_.z;
-        currentPath_.push_back(center);
-    }
-    pathCursor_ = 0;
+		center.z = position_.z;
+		currentPath_.push_back(center);
+	}
+	pathCursor_ = 0;
+	waypointArriveEps_ = std::max(0.1f, MapChipField::GetBlockSize() * 0.25f);
+}
 
-    // ウェイポイント到達判定の緩和（ブロックサイズ依存）
-    waypointArriveEps_ = std::max(0.1f, MapChipField::GetBlockSize() * 0.25f);
-    return !currentPath_.empty();
+bool Enemy::BuildPathTo(const TuboEngine::Math::Vector3& worldGoal) {
+	int W = 0, H = 0;
+	int sx = 0, sy = 0, gx = 0, gy = 0;
+	if (!PreparePathfinding_(worldGoal, W, H, sx, sy, gx, gy)) {
+		return false;
+	}
+
+	int gFlat = FindNearestWalkableIndex(mapChipField_, gx, gy);
+	if (gFlat < 0) {
+		return false;
+	}
+	gx = gFlat % W;
+	gy = gFlat / W;
+	lastPathGoalIndex_ = gFlat;
+
+	if (!IsTileWalkable(mapChipField_, (uint32_t)sx, (uint32_t)sy)) {
+		int sFlat2 = FindNearestWalkableIndex(mapChipField_, sx, sy);
+		if (sFlat2 < 0) {
+			return false;
+		}
+		sx = sFlat2 % W;
+		sy = sFlat2 / W;
+	}
+
+	std::vector<int> pathFlats;
+	if (!RunAStar_(W, H, sx, sy, lastPathGoalIndex_, pathFlats)) {
+		return false;
+	}
+
+	BuildWorldPathFromFlats_(W, pathFlats);
+	return !currentPath_.empty();
+}
+
+bool Enemy::UpdateDeathIfNeeded_() {
+	if (isAlive_) {
+		return false;
+	}
+	if (!deathEffectPlayed_) {
+		EmitDeathParticle();
+		deathEffectPlayed_ = true;
+	}
+	if (deathEmitter_) {
+		deathEmitter_->GetPreset().center = position_;
+	}
+	return true;
+}
+
+void Enemy::UpdatePerception_(float dt, bool& outCanSeePlayer, float& outDistanceToPlayer) {
+	outDistanceToPlayer = 0.0f;
+	if (player_) {
+		TuboEngine::Math::Vector3 toPlayer = player_->GetPosition() - position_;
+		outDistanceToPlayer = std::sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y + toPlayer.z * toPlayer.z);
+	}
+	outCanSeePlayer = CanSeePlayer();
+
+	wasJustFound_ = (!sawPlayerPrev_ && outCanSeePlayer);
+	wasJustLost_ = (sawPlayerPrev_ && !outCanSeePlayer);
+	sawPlayerPrev_ = outCanSeePlayer;
+
+	if (outCanSeePlayer) {
+		lastSeenPlayerPos_ = player_->GetPosition();
+		lastSeenTimer_ = lastSeenDuration_;
+		ClearPath();
+		if (wasJustFound_) {
+			exclamationTimer_ = iconDuration_;
+			questionTimer_ = 0.0f;
+		}
+	} else if (lastSeenTimer_ > 0.0f) {
+		lastSeenTimer_ -= dt;
+		if (wasJustLost_) {
+			questionTimer_ = iconDuration_;
+			exclamationTimer_ = 0.0f;
+		}
+	}
+}
+
+void Enemy::UpdateIcons_(float dt) {
+	if (questionTimer_ > 0.0f) {
+		questionTimer_ -= dt;
+		if (questionTimer_ < 0.0f) questionTimer_ = 0.0f;
+	}
+	if (exclamationTimer_ > 0.0f) {
+		exclamationTimer_ -= dt;
+		if (exclamationTimer_ < 0.0f) exclamationTimer_ = 0.0f;
+	}
+}
+
+void Enemy::UpdateState_(bool canSeePlayer, float distanceToPlayer) {
+	if (!player_) {
+		return;
+	}
+	if (canSeePlayer) {
+		if (distanceToPlayer > moveStartDistance_) {
+			state_ = State::Idle;
+		} else if (distanceToPlayer > shootDistance_) {
+			state_ = State::Chase;
+		} else {
+			state_ = State::Attack;
+		}
+	} else if (lastSeenTimer_ > 0.0f) {
+		state_ = State::Alert;
+	} else if (state_ == State::Alert) {
+		state_ = State::LookAround;
+	} else if (state_ != State::LookAround) {
+		state_ = State::Idle;
+	}
+}
+
+void Enemy::UpdateFacing_(bool canSeePlayer) {
+	if (!player_) {
+		return;
+	}
+	if (!(state_ == State::Chase || state_ == State::Attack || state_ == State::Alert)) {
+		return;
+	}
+	TuboEngine::Math::Vector3 targetPos = (canSeePlayer) ? player_->GetPosition() : lastSeenPlayerPos_;
+	TuboEngine::Math::Vector3 toTarget = targetPos - position_;
+	float angleZ = std::atan2(toTarget.y, toTarget.x);
+	float diff = NormalizeAngle(angleZ - rotation_.z);
+	float maxTurn = turnSpeed_;
+	if (std::fabs(diff) < maxTurn) {
+		rotation_.z = angleZ;
+	} else {
+		rotation_.z += (diff > 0 ? 1 : -1) * maxTurn;
+		rotation_.z = NormalizeAngle(rotation_.z);
+	}
+}
+
+void Enemy::UpdateShooting_(float dt, bool canSeePlayer) {
+	wantShoot_ = (canSeePlayer && (state_ == State::Chase || state_ == State::Attack));
+	if (wantShoot_) {
+		bulletTimer_ += dt;
+	} else {
+		bulletTimer_ = std::min(bulletTimer_, EnemyNormalBullet::s_fireInterval);
+	}
+
+	auto TryFire = [this]() {
+		if (!wantShoot_) return;
+		if (bullet_ && bullet_->GetIsAlive()) return;
+		if (bullet_ && !bullet_->GetIsAlive()) bullet_.reset();
+		if (bulletTimer_ < EnemyNormalBullet::s_fireInterval) return;
+		bulletTimer_ = 0.0f;
+		bullet_ = std::make_unique<EnemyNormalBullet>();
+		bullet_->Initialize(position_);
+		bullet_->SetEnemyPosition(position_);
+		bullet_->SetEnemyRotation(rotation_);
+		bullet_->SetPlayer(player_);
+		bullet_->SetCamera(camera_);
+		bullet_->SetMapChipField(mapChipField_);
+	};
+
+	// 状態ごとの行動で必要な箇所のみ呼ぶため、ここではラムダを保持できない。
+	// 代わりに wantShoot_/bulletTimer_ はここで整えて、各State側で発射判定する。
+	// ※既存挙動: Chase/AttackでのみTryFireが走る
+	if (state_ == State::Chase || state_ == State::Attack) {
+		TryFire();
+	}
+}
+
+void Enemy::UpdateBehaviorByState_(float dt, bool /*canSeePlayer*/) {
+	switch (state_) {
+	case State::Idle: {
+		switch (idleBackPhase_) {
+		case IdleBackPhase::None:
+			idleLookAroundTimer_ -= dt;
+			if (idleLookAroundTimer_ <= 0.0f) {
+				idleBackStartAngle_ = rotation_.z;
+				idleBackTargetAngle_ = NormalizeAngle(idleBackStartAngle_ + kPI);
+				idleBackHoldTimer_ = idleBackHoldSec_;
+				idleBackPhase_ = IdleBackPhase::ToBack;
+			}
+			break;
+		case IdleBackPhase::ToBack: {
+			float diff = NormalizeAngle(idleBackTargetAngle_ - rotation_.z);
+			float turn = std::clamp(diff, -idleBackTurnSpeed_, idleBackTurnSpeed_);
+			rotation_.z = NormalizeAngle(rotation_.z + turn);
+			if (std::fabs(diff) < 0.01f) {
+				rotation_.z = idleBackTargetAngle_;
+				idleBackPhase_ = IdleBackPhase::Hold;
+			}
+		} break;
+		case IdleBackPhase::Hold:
+			idleBackHoldTimer_ -= dt;
+			if (idleBackHoldTimer_ <= 0.0f) idleBackPhase_ = IdleBackPhase::Return;
+			break;
+		case IdleBackPhase::Return: {
+			float diff = NormalizeAngle(idleBackStartAngle_ - rotation_.z);
+			float turn = std::clamp(diff, -idleBackTurnSpeed_, idleBackTurnSpeed_);
+			rotation_.z = NormalizeAngle(rotation_.z + turn);
+			if (std::fabs(diff) < 0.01f) {
+				rotation_.z = idleBackStartAngle_;
+				idleBackPhase_ = IdleBackPhase::None;
+				idleLookAroundTimer_ = idleLookAroundIntervalSec_;
+			}
+		} break;
+		}
+		break;
+	}
+	case State::Alert:
+		idleBackPhase_ = IdleBackPhase::None;
+		break;
+	case State::LookAround: {
+		idleBackPhase_ = IdleBackPhase::None;
+		if (!lookAroundInitialized_) {
+			lookAroundBaseAngle_ = rotation_.z;
+			lookAroundTargetAngle_ = lookAroundBaseAngle_ + lookAroundAngleWidth_;
+			lookAroundDirection_ = 1;
+			lookAroundCount_ = 0;
+			lookAroundInitialized_ = true;
+		}
+		float diff = NormalizeAngle(lookAroundTargetAngle_ - rotation_.z);
+		float turn = std::clamp(diff, -lookAroundSpeed_, lookAroundSpeed_);
+		rotation_.z = NormalizeAngle(rotation_.z + turn);
+		if (std::fabs(diff) < 0.02f) {
+			lookAroundDirection_ *= -1;
+			lookAroundTargetAngle_ = lookAroundBaseAngle_ + lookAroundDirection_ * lookAroundAngleWidth_;
+			lookAroundCount_++;
+			if (lookAroundCount_ >= lookAroundMaxCount_) {
+				lookAroundInitialized_ = false;
+				state_ = State::Patrol;
+			}
+		}
+		break;
+	}
+	case State::Patrol:
+		idleBackPhase_ = IdleBackPhase::None;
+		state_ = State::Idle;
+		break;
+	case State::Chase: {
+		idleBackPhase_ = IdleBackPhase::None;
+		if (player_) {
+			TuboEngine::Math::Vector3 dir = player_->GetPosition() - position_;
+			dir.z = 0.0f;
+			float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+			if (len > 0.1f) {
+				dir.x /= len;
+				dir.y /= len;
+				TuboEngine::Math::Vector3 desiredMove{dir.x * moveSpeed_, dir.y * moveSpeed_, 0.0f};
+				MoveWithCollision(position_, desiredMove, mapChipField_);
+			}
+		}
+		break;
+	}
+	case State::Attack:
+		idleBackPhase_ = IdleBackPhase::None;
+		break;
+	}
+}
+
+void Enemy::UpdateBullet_() {
+	if (bullet_ && bullet_->GetIsAlive()) {
+		bullet_->Update();
+	}
+}
+
+void Enemy::SyncToObject3d_() {
+	object3d_->SetPosition(position_);
+	TuboEngine::Math::Vector3 drawRot = rotation_;
+	drawRot.x = NormalizeAngle(drawRot.x + kEnemyModelRotOffsetX);
+	drawRot.y = NormalizeAngle(drawRot.y + kEnemyModelRotOffsetY);
+	drawRot.z = NormalizeAngle(drawRot.z + kEnemyModelRotOffsetZ);
+	object3d_->SetRotation(drawRot);
+	object3d_->SetScale(scale_);
+	object3d_->SetCamera(camera_);
+	object3d_->Update();
+}
+
+void Enemy::SyncEmitters_() {
+	if (hitEmitter_) hitEmitter_->GetPreset().center = position_;
+	if (deathEmitter_ && !deathEffectPlayed_) deathEmitter_->GetPreset().center = position_;
+}
+
+void Enemy::UpdateHitAndResetFlags_() {
+	if (!wasHit_ && isHit_) {
+		EmitHitParticle();
+	}
+	wasHit_ = isHit_;
+	isHit_ = false;
+}
+
+void Enemy::UpdateIconSprites_() {
+	TuboEngine::Math::Vector3 iconWorldPos = position_;
+	iconWorldPos.z = position_.z;
+	iconWorldPos.y += iconOffsetY_;
+	if (questionTimer_ > 0.0f && questionIcon_) {
+		questionIcon_->SetPosition({iconWorldPos.x, iconWorldPos.y});
+		questionIcon_->SetSize(iconSize_);
+		questionIcon_->Update();
+	}
+	if (exclamationTimer_ > 0.0f && exclamationIcon_) {
+		exclamationIcon_->SetPosition({iconWorldPos.x, iconWorldPos.y});
+		exclamationIcon_->SetSize(iconSize_);
+		exclamationIcon_->Update();
+	}
 }
 
 void Enemy::Update() {
-    // 死亡演出再生後は描画のみ (Update 最低限)
-    if (!isAlive_) {
-        if (!deathEffectPlayed_) {
-            EmitDeathParticle();
-            deathEffectPlayed_ = true;
-        }
-        if (deathEmitter_) {
-            deathEmitter_->GetPreset().center = position_;
-        }
-        return;
-    }
+	if (UpdateDeathIfNeeded_()) {
+		return;
+	}
 
-    const float dt = 1.0f / 60.0f;
+	const float dt = GetFixedDeltaTime_();
+	ApplyKnockback(dt);
 
-    // --- ノックバック適用（先に移動へ反映）---
-    ApplyKnockback(dt);
-
-    float distanceToPlayer = 0.0f;
-	TuboEngine::Math::Vector3 toPlayer = {0, 0, 0};
-    if (player_) {
-        toPlayer = player_->GetPosition() - position_;
-        distanceToPlayer = std::sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y + toPlayer.z * toPlayer.z);
-    }
-    bool canSeePlayer = CanSeePlayer();
-
-    // 視認状態フラグ更新
-    wasJustFound_ = (!sawPlayerPrev_ && canSeePlayer);
-    wasJustLost_  = (sawPlayerPrev_ && !canSeePlayer);
-    sawPlayerPrev_ = canSeePlayer;
-
-    if (canSeePlayer) {
-        lastSeenPlayerPos_ = player_->GetPosition();
-        lastSeenTimer_ = lastSeenDuration_;
-        ClearPath();
-        // 見つけた瞬間にExclamationを表示
-        if (wasJustFound_) {
-            exclamationTimer_ = iconDuration_;
-            questionTimer_ = 0.0f;
-        }
-    } else if (lastSeenTimer_ > 0.0f) {
-        lastSeenTimer_ -= dt;
-        // 見失った瞬間にQuestionを表示
-        if (wasJustLost_) {
-            questionTimer_ = iconDuration_;
-            exclamationTimer_ = 0.0f;
-        }
-    }
-
-    // アイコンタイマー更新
-    if (questionTimer_ > 0.0f) { questionTimer_ -= dt; if (questionTimer_ < 0.0f) questionTimer_ = 0.0f; }
-    if (exclamationTimer_ > 0.0f) { exclamationTimer_ -= dt; if (exclamationTimer_ < 0.0f) exclamationTimer_ = 0.0f; }
-
-    if (player_) {
-        if (canSeePlayer) {
-            if (distanceToPlayer > moveStartDistance_)
-                state_ = State::Idle;
-            else if (distanceToPlayer > shootDistance_)
-                state_ = State::Chase;
-            else
-                state_ = State::Attack;
-        } else if (lastSeenTimer_ > 0.0f)
-            state_ = State::Alert;
-        else if (state_ == State::Alert)
-            state_ = State::LookAround;
-        else if (state_ != State::LookAround)
-            state_ = State::Idle;
-    }
-
-    // プレイヤーの方向を向く（一定速度で回転）
-    if (player_ && (state_ == State::Chase || state_ == State::Attack || state_ == State::Alert)) {
-		TuboEngine::Math::Vector3 targetPos = (canSeePlayer) ? player_->GetPosition() : lastSeenPlayerPos_;
-		TuboEngine::Math::Vector3 toTarget = targetPos - position_;
-        float angleZ = std::atan2(toTarget.y, toTarget.x);
-        float diff = NormalizeAngle(angleZ - rotation_.z);
-        float maxTurn = turnSpeed_;
-        if (std::fabs(diff) < maxTurn)
-            rotation_.z = angleZ;
-        else {
-            rotation_.z += (diff > 0 ? 1 : -1) * maxTurn;
-            rotation_.z = NormalizeAngle(rotation_.z);
-        }
-    }
-
-    // --- 射撃条件評価 ---
-    wantShoot_ = (canSeePlayer && (state_ == State::Chase || state_ == State::Attack));
-
-    // クールダウンタイマー更新
-    if (wantShoot_)
-        bulletTimer_ += dt;
-    else
-        bulletTimer_ = std::min(bulletTimer_, EnemyNormalBullet::s_fireInterval);
-    auto TryFire = [this]() {
-        if (!wantShoot_)
-            return;
-        if (bullet_ && bullet_->GetIsAlive())
-            return;
-        if (bullet_ && !bullet_->GetIsAlive())
-            bullet_.reset();
-        if (bulletTimer_ < EnemyNormalBullet::s_fireInterval)
-            return;
-        bulletTimer_ = 0.0f;
-        bullet_ = std::make_unique<EnemyNormalBullet>();
-        bullet_->Initialize(position_);
-        bullet_->SetEnemyPosition(position_);
-        bullet_->SetEnemyRotation(rotation_);
-        bullet_->SetPlayer(player_);
-        bullet_->SetCamera(camera_);
-        bullet_->SetMapChipField(mapChipField_);
-    };
-
-    // 状態ごとの行動（ノックバック中も自律移動は行うが、速度が小さくなる）
-    switch (state_) {
-    case State::Idle: {
-        switch (idleBackPhase_) {
-        case IdleBackPhase::None:
-            idleLookAroundTimer_ -= dt;
-            if (idleLookAroundTimer_ <= 0.0f) {
-                idleBackStartAngle_ = rotation_.z;
-                idleBackTargetAngle_ = NormalizeAngle(idleBackStartAngle_ + kPI);
-                idleBackHoldTimer_ = idleBackHoldSec_;
-                idleBackPhase_ = IdleBackPhase::ToBack;
-            }
-            break;
-        case IdleBackPhase::ToBack: {
-            float diff = NormalizeAngle(idleBackTargetAngle_ - rotation_.z);
-            float turn = std::clamp(diff, -idleBackTurnSpeed_, idleBackTurnSpeed_);
-            rotation_.z = NormalizeAngle(rotation_.z + turn);
-            if (std::fabs(diff) < 0.01f) {
-                rotation_.z = idleBackTargetAngle_;
-                idleBackPhase_ = IdleBackPhase::Hold;
-            }
-        } break;
-        case IdleBackPhase::Hold:
-            idleBackHoldTimer_ -= dt;
-            if (idleBackHoldTimer_ <= 0.0f)
-                idleBackPhase_ = IdleBackPhase::Return;
-            break;
-        case IdleBackPhase::Return: {
-            float diff = NormalizeAngle(idleBackStartAngle_ - rotation_.z);
-            float turn = std::clamp(diff, -idleBackTurnSpeed_, idleBackTurnSpeed_);
-            rotation_.z = NormalizeAngle(rotation_.z + turn);
-            if (std::fabs(diff) < 0.01f) {
-                rotation_.z = idleBackStartAngle_;
-                idleBackPhase_ = IdleBackPhase::None;
-                idleLookAroundTimer_ = idleLookAroundIntervalSec_;
-            }
-        } break;
-        }
-        break;
-    }
-    case State::Alert: {
-        idleBackPhase_ = IdleBackPhase::None;
-        break;
-    }
-    case State::LookAround: {
-        idleBackPhase_ = IdleBackPhase::None;
-        if (!lookAroundInitialized_) {
-            lookAroundBaseAngle_ = rotation_.z;
-            lookAroundTargetAngle_ = lookAroundBaseAngle_ + lookAroundAngleWidth_;
-            lookAroundDirection_ = 1;
-            lookAroundCount_ = 0;
-            lookAroundInitialized_ = true;
-        }
-        float diff = NormalizeAngle(lookAroundTargetAngle_ - rotation_.z);
-        float turn = std::clamp(diff, -lookAroundSpeed_, lookAroundSpeed_);
-        rotation_.z = NormalizeAngle(rotation_.z + turn);
-        if (std::fabs(diff) < 0.02f) {
-            lookAroundDirection_ *= -1;
-            lookAroundTargetAngle_ = lookAroundBaseAngle_ + lookAroundDirection_ * lookAroundAngleWidth_;
-            lookAroundCount_++;
-            if (lookAroundCount_ >= lookAroundMaxCount_) {
-                lookAroundInitialized_ = false;
-                state_ = State::Patrol;
-            }
-        }
-        break;
-    }
-    case State::Patrol: {
-        idleBackPhase_ = IdleBackPhase::None;
-        state_ = State::Idle;
-        break;
-    }
-    case State::Chase: {
-        idleBackPhase_ = IdleBackPhase::None;
-        if (player_) {
-			TuboEngine::Math::Vector3 dir = player_->GetPosition() - position_;
-            dir.z = 0.0f;
-            float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-            if (len > 0.1f) {
-                dir.x /= len;
-                dir.y /= len;
-				TuboEngine::Math::Vector3 desiredMove{dir.x * moveSpeed_, dir.y * moveSpeed_, 0.0f};
-                MoveWithCollision(position_, desiredMove, mapChipField_);
-            }
-        }
-        TryFire();
-        break;
-    }
-    case State::Attack: {
-        idleBackPhase_ = IdleBackPhase::None;
-        TryFire();
-        break;
-    }
-    }
-
-    if (bullet_ && bullet_->GetIsAlive())
-        bullet_->Update();
-
-    object3d_->SetPosition(position_);
-    // 描画側へモデル軸の補正を適用（ロジック上のRotationは"前方"のまま）
-	TuboEngine::Math::Vector3 drawRot = rotation_;
-    drawRot.x = NormalizeAngle(drawRot.x + kEnemyModelRotOffsetX);
-    drawRot.y = NormalizeAngle(drawRot.y + kEnemyModelRotOffsetY);
-    drawRot.z = NormalizeAngle(drawRot.z + kEnemyModelRotOffsetZ);
-    object3d_->SetRotation(drawRot);
-    object3d_->SetScale(scale_);
-    object3d_->SetCamera(camera_);
-    object3d_->Update();
-
-    // エミッタ中心追随
-    if (hitEmitter_)
-        hitEmitter_->GetPreset().center = position_;
-    if (deathEmitter_ && !deathEffectPlayed_)
-        deathEmitter_->GetPreset().center = position_;
-
-    if (!wasHit_ && isHit_) {
-        EmitHitParticle();
-    }
-    wasHit_ = isHit_;
-    isHit_ = false;
-
-    // アイコン表示更新
-	TuboEngine::Math::Vector3 iconWorldPos = position_;
-	iconWorldPos.z = position_.z;
-    iconWorldPos.y += iconOffsetY_;
-    if (questionTimer_ > 0.0f && questionIcon_) {
-        questionIcon_->SetPosition({iconWorldPos.x, iconWorldPos.y});
-        questionIcon_->SetSize(iconSize_);
-        questionIcon_->Update();
-    }
-    if (exclamationTimer_ > 0.0f && exclamationIcon_) {
-        exclamationIcon_->SetPosition({iconWorldPos.x, iconWorldPos.y});
-        exclamationIcon_->SetSize(iconSize_);
-        exclamationIcon_->Update();
-    }
+	float distanceToPlayer = 0.0f;
+	bool canSeePlayer = false;
+	UpdatePerception_(dt, canSeePlayer, distanceToPlayer);
+	UpdateIcons_(dt);
+	UpdateState_(canSeePlayer, distanceToPlayer);
+	UpdateFacing_(canSeePlayer);
+	UpdateShooting_(dt, canSeePlayer);
+	UpdateBehaviorByState_(dt, canSeePlayer);
+	UpdateBullet_();
+	SyncToObject3d_();
+	SyncEmitters_();
+	UpdateHitAndResetFlags_();
+	UpdateIconSprites_();
 }
 
 void Enemy::ApplyKnockback(float dt) {
@@ -829,7 +869,7 @@ void Enemy::DrawLastSeenMark() {
 
 // 末尾に欠けていた関数を追加
 TuboEngine::Math::Vector3 Enemy::GetCenterPosition() const {
-    // 当たり判定中心（今はスケール考慮せずそのまま）
+    // 当たり判定中心（今はスケール考慮せずそのまま）    
     return position_;
 }
 
