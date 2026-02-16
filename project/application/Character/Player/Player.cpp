@@ -9,6 +9,10 @@
 #include "engine/graphic/PostEffect/OffScreenRendering.h"
 #include "Weapon/PlayerWeapons.h"
 
+// Bullet ImGui
+#include "Bullet/Player/ShotgunPelletBullet.h"
+#include "Bullet/Player/PiercingBullet.h"
+
 namespace {
 	constexpr int kInitialHP = 5;
 	constexpr float kFixedDeltaTime = 1.0f / 60.0f;
@@ -419,7 +423,6 @@ void Player::Move() {
 	}
 }
 
-
 //--------------------------------------------------
 // 回転処理
 //---------------------------------------------------
@@ -550,6 +553,8 @@ void Player::DrawImGui() {
 	ImGui::End();
 	object3d_->DrawImGui("Player");
 	PlayerBullet::DrawImGuiGlobal();
+	ShotgunPelletBullet::DrawImGuiGlobal();
+	PiercingBullet::DrawImGuiGlobal();
 #endif // USE_IMGUI
 }
 
