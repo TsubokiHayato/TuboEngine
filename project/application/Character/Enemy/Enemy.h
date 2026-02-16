@@ -11,37 +11,95 @@ class IParticleEmitter;
 class Player;
 class Sprite; // スプライト前方宣言
 
+/**
+ * @brief 敵キャラクタークラス。
+ *
+ * @details
+ * 本クラスの責務は、敵キャラクターの
+ * - 行動状態（待機/巡回/追跡/攻撃など）の更新
+ * - プレイヤー視認判定（視野角・距離）
+ * - 移動/旋回/射撃の制御
+ * - 被弾/死亡などの状態管理と演出（パーティクル、アイコン）
+ * - 当たり判定（`Collider`）との連携
+ * をまとめて管理することです。
+ */
 class Enemy : public BaseCharacter {
 public:
+    /** @brief コンストラクタ。 */
     Enemy();
+    /** @brief デストラクタ。 */
     ~Enemy() override;
+
+    /** @brief 初期化処理。モデル/状態/各種タイマーを初期化します。 */
     void Initialize() override;
+    /** @brief 更新処理。状態遷移・移動・攻撃・演出の更新を行います。 */
     void Update() override;
+    /** @brief 描画処理。3Dモデルや補助表示を描画します。 */
     void Draw() override;
+
+    /** @brief パーティクル描画（必要な場合のみ分離）。 */
     void ParticleDraw();
+    /** @brief ImGui描画（デバッグ用）。 */
     void DrawImGui();
+
+    /** @brief 移動処理（内部状態に基づく移動）。 */
     void Move();
+
+    /**
+     * @brief プレイヤーを視認できているか判定します。
+     * @return 視認中ならtrue。
+     */
     bool CanSeePlayer();
+
+    /** @brief 視野範囲の可視化（デバッグ用）。 */
     void DrawViewCone();
+    /** @brief 最後に見た位置のマーク描画（デバッグ用）。 */
     void DrawLastSeenMark();
+    /** @brief 状態アイコン描画（疑問符/！など）。 */
     void DrawStateIcon();
+
+    /** @brief 被弾パーティクルの発生。 */
     void EmitHitParticle();
+    /** @brief 死亡パーティクルの発生。 */
     void EmitDeathParticle();
+
+    /**
+     * @brief 衝突時処理。
+     * @param other 衝突相手のコライダー。
+     */
     void OnCollision(Collider* other) override;
+
+	/**
+	 * @brief 当たり判定の中心座標を取得します。
+	 * @return ワールド空間での中心座標。
+	 */
 	TuboEngine::Math::Vector3 GetCenterPosition() const override;
 
+    /** @brief 使用するカメラを設定します。 @param camera カメラ。 */
     void SetCamera(Camera* camera) { camera_ = camera; }
+	/** @brief 位置を取得します。 @return 位置。 */
 	TuboEngine::Math::Vector3 GetPosition() const { return position; }
+	/** @brief 位置を設定します。 @param pos 位置。 */
 	void SetPosition(const TuboEngine::Math::Vector3& pos) { position = pos; }
+	/** @brief 回転を取得します。 @return 回転。 */
 	TuboEngine::Math::Vector3 GetRotation() const { return rotation; }
+	/** @brief 回転を設定します。 @param rot 回転。 */
 	void SetRotation(const TuboEngine::Math::Vector3& rot) { rotation = rot; }
+	/** @brief スケールを取得します。 @return スケール。 */
 	TuboEngine::Math::Vector3 GetScale() const { return scale; }
+	/** @brief スケールを設定します。 @param scl スケール。 */
 	void SetScale(const TuboEngine::Math::Vector3& scl) { scale = scl; }
+    /** @brief 生存状態を取得します。 @return 生存中ならtrue。 */
     bool GetIsAlive() const { return isAlive; }
+    /** @brief 生存状態を設定します。 @param alive 生存中ならtrue。 */
     void SetIsAlive(bool alive) { isAlive = alive; }
+    /** @brief 操作対象のプレイヤー参照を設定します。 @param player プレイヤー。 */
     void SetPlayer(Player* player) { player_ = player; }
+    /** @brief マップチップフィールド参照を設定します。 @param field マップチップフィールド。 */
     void SetMapChipField(MapChipField* field) { mapChipField = field; }
+    /** @brief 現在HPを取得します。 @return HP。 */
     int GetHP() const { return HP; }
+    /** @brief 最大HPを取得します。 @return 最大HP。 */
     int GetMaxHP() const { return 10; }
 
     // 視野角・距離の取得/設定

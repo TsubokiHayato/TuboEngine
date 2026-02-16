@@ -69,6 +69,16 @@ struct LightType {
 };
 
 
+/**
+ * @brief 3Dモデルをワールド空間に配置して描画するための描画オブジェクト。
+ *
+ * @details
+ * - Transform（位置/回転/拡縮）を保持し、更新時にGPU用の行列定数（`TransformationMatrix`）へ反映します。
+ * - `Model` と `Camera` を参照し、描画コマンドを発行します。
+ * - 平行光源/ポイントライト/スポットライト等のライトパラメータを保持し、シェーダへ渡します。
+ *
+ * @note 本クラスは「ゲーム固有の振る舞い」を持たず、描画に必要な状態の保持と反映が責務です。
+ */
 class Object3d
 {
 public:
@@ -76,21 +86,35 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="object3dCommon"></param>
+	/**
+	 * @brief 3Dオブジェクトを初期化し、指定されたモデルをロード/設定します。
+	 * @param modelFileNamePath 読み込むモデルファイルパス（例: `"xxx.obj"`）。
+	 */
 	void Initialize(std::string modelFileNamePath);
 
 	/// <summary>
 	/// 更新処理
 	/// </summary>
+	/**
+	 * @brief Transform/カメラ/ライト等の現在値をGPUリソースへ反映します。
+	 */
 	void Update();
 
 	/// <summary>
 	/// 描画処理
 	/// </summary>
+	/**
+	 * @brief 現在の状態で描画コマンドを発行します。
+	 */
 	void Draw();
 
 	/// <summary>
 	/// ImGuiで全機能をまとめて操作・確認する関数
 	/// </summary>
+	/**
+	 * @brief ImGui上にデバッグUIを表示します。
+	 * @param windowName ImGuiウィンドウ名。
+	 */
 	void DrawImGui(const char* windowName);
 
 	
@@ -98,31 +122,54 @@ public:
 public:
 
 	//Setter
+	/** @brief ワールド拡縮を設定します。 @param scale スケール。 */
 	void SetScale(const TuboEngine::Math::Vector3& scale) { transform.scale = scale; }
+	/** @brief ワールド回転を設定します。 @param rotation 回転（ラジアン想定）。 */
 	void SetRotation(const TuboEngine::Math::Vector3& rotation) { transform.rotate = rotation; }
+	/** @brief ワールド位置を設定します。 @param position 位置。 */
 	void SetPosition(const TuboEngine::Math::Vector3& position) { transform.translate = position; }
 
 	///-------------------------------------------------------------------------------------------------
 	/// Light
 	//平行光源
+	/** @brief 平行光源の色を設定します。 @param color RGBA。 */
 	void SetLightColor(const TuboEngine::Math::Vector4& color) { directionalLightData->color = color; }
+	/** @brief 平行光源の向きを設定します。 @param direction 方向ベクトル。 */
 	void SetLightDirection(const TuboEngine::Math::Vector3& direction) { directionalLightData->direction = direction; }
+	/** @brief 平行光源の強度を設定します。 @param intensity 強度。 */
 	void SetLightIntensity(float intensity) { directionalLightData->intensity = intensity; }
+	/**
+	 * @brief 平行光源の鏡面反射の鋭さ（シェーディング用）を設定します。
+	 * @param shininess シャイニネス。
+	 */
 	void SetLightShininess(float shininess);
 	//ポイントライト
+	/** @brief ポイントライト位置を設定します。 @param position 位置。 */
 	void SetPointLightPosition(const TuboEngine::Math::Vector3& position) { pointLightData->position = position; }
+	/** @brief ポイントライトの色を設定します。 @param color RGBA。 */
 	void SetPointLightColor(const TuboEngine::Math::Vector4& color) { pointLightData->color = color; }
+	/** @brief ポイントライトの強度を設定します。 @param intensity 強度。 */
 	void SetPointLightIntensity(float intensity) { pointLightData->intensity = intensity; }
 	//スポットライト
+	/** @brief スポットライトの色を設定します。 @param color RGBA。 */
 	void SetSpotLightColor(const TuboEngine::Math::Vector4& color) { spotLightData->color = color; }
+	/** @brief スポットライトの位置を設定します。 @param position 位置。 */
 	void SetSpotLightPosition(const TuboEngine::Math::Vector3& position) { spotLightData->position = position; }
+	/** @brief スポットライトの向きを設定します。 @param direction 方向ベクトル。 */
 	void SetSpotLightDirection(const TuboEngine::Math::Vector3& direction) { spotLightData->direction = direction; }
+	/** @brief スポットライトの強度を設定します。 @param intensity 強度。 */
 	void SetSpotLightIntensity(float intensity) { spotLightData->intensity = intensity; }
+	/** @brief スポットライトの到達距離を設定します。 @param distance 最大距離。 */
 	void SetSpotLightDistance(float distance) { spotLightData->distance = distance; }
+	/** @brief スポットライトの減衰率を設定します。 @param decay 減衰率。 */
 	void SetSpotLightDecay(float decay) { spotLightData->decay = decay; }
+	/** @brief スポットライトの開き角（余弦）を設定します。 @param cosAngle cos(角度)。 */
 	void SetSpotLightCosAngle(float cosAngle) { spotLightData->cosAngle = cosAngle; }
 
-
+	/**
+	 * @brief 使用するライト種別を設定します。
+	 * @param type ライト種別（実装依存）。範囲外は0に丸めます。
+	 */
 	void SetLightType(int type) {
 		if (type < 0 || type > 5) {
 			type = 0;
@@ -130,21 +177,45 @@ public:
 		lightTypeData->type = type;
 	}
 
+	/**
+	 * @brief 参照する`Model`を設定します。
+	 * @param model モデルポインタ（`nullptr`不可）。
+	 */
 	void SetModel(Model* model) {
 		assert(model);
 		this->model_ = model;
 	}
+	/**
+	 * @brief ファイルパスからモデルを設定します。
+	 * @param filePath モデルファイルパス。
+	 */
 	void SetModel(const std::string& filePath);
+	/**
+	 * @brief 描画に使用するカメラを設定します。
+	 * @param camera カメラ。
+	 */
 	void SetCamera(Camera* camera) { this->camera = camera; }
+	/**
+	 * @brief 現在設定されているカメラを取得します。
+	 * @return カメラポインタ。
+	 */
 	Camera* GetCamera() const { return camera; }
 
+	/**
+	 * @brief モデルカラー（マテリアル色）を設定します。
+	 * @param color RGBA。
+	 */
 	void SetModelColor(const TuboEngine::Math::Vector4& color);
 
 	//Getter
+	/** @brief ワールド拡縮を取得します。 @return スケール。 */
 	TuboEngine::Math::Vector3 GetScale() const { return transform.scale; }
+	/** @brief ワールド回転を取得します。 @return 回転。 */
 	TuboEngine::Math::Vector3 GetRotation() const { return transform.rotate; }
+	/** @brief ワールド位置を取得します。 @return 位置。 */
 	TuboEngine::Math::Vector3 GetPosition() const { return transform.translate; }
 	//モデルの色
+	/** @brief モデルカラーを取得します。 @return RGBA。 */
 	Vector4 GetModelColor();
 
 
@@ -155,25 +226,89 @@ public:
 	///-------------------------------------------------------------------------------------------------
 	/// Light
 	//平行光源
+	/**
+	 * @brief 平行光源の色を取得します。
+	 * @return RGBA。
+	 */
 	TuboEngine::Math::Vector4 GetLightColor() { return directionalLightData->color; }
+	/**
+	 * @brief 平行光源の向きを取得します。
+	 * @return 方向ベクトル。
+	 */
 	TuboEngine::Math::Vector3 GetLightDirection() { return directionalLightData->direction; }
+	/**
+	 * @brief 平行光源の強度を取得します。
+	 * @return 強度。
+	 */
 	float GetLightIntensity() { return directionalLightData->intensity; }
+	/**
+	 * @brief 現在設定されているライト種別を取得します。
+	 * @return ライト種別。
+	 */
 	int GetLightType() { return lightTypeData->type; }
+	/**
+	 * @brief 平行光源の鏡面反射の鋭さを取得します。
+	 * @return シャイニネス。
+	 */
 	float GetLightShininess();
 	//ポイントライト
+	/**
+	 * @brief ポイントライト位置を取得します。
+	 * @return 位置。
+	 */
 	TuboEngine::Math::Vector3 GetPointLightPosition() { return pointLightData->position; }
+	/**
+	 * @brief ポイントライトの色を取得します。
+	 * @return RGBA。
+	 */
 	TuboEngine::Math::Vector4 GetPointLightColor() { return pointLightData->color; }
+	/**
+	 * @brief ポイントライトの強度を取得します。
+	 * @return 強度。
+	 */
 	float GetPointLightIntensity() { return pointLightData->intensity; }
 	//スポットライト
+	/**
+	 * @brief スポットライトの色を取得します。
+	 * @return RGBA。
+	 */
 	void GetSpotLightColor(TuboEngine::Math::Vector4& color) { color = spotLightData->color; }
+	/**
+	 * @brief スポットライトの位置を取得します。
+	 * @return 位置。
+	 */
 	void GetSpotLightPosition(TuboEngine::Math::Vector3& position) { position = spotLightData->position; }
+	/**
+	 * @brief スポットライトの向きを取得します。
+	 * @return 方向ベクトル。
+	 */
 	void GetSpotLightDirection(TuboEngine::Math::Vector3& direction) { direction = spotLightData->direction; }
+	/**
+	 * @brief スポットライトの強度を取得します。
+	 * @return 強度。
+	 */
 	float GetSpotLightIntensity() { return spotLightData->intensity; }
+	/**
+	 * @brief スポットライトの到達距離を取得します。
+	 * @return 最大距離。
+	 */
 	float GetSpotLightDistance() { return spotLightData->distance; }
+	/**
+	 * @brief スポットライトの減衰率を取得します。
+	 * @return 減衰率。
+	 */
 	float GetSpotLightDecay() { return spotLightData->decay; }
+	/**
+	 * @brief スポットライトの開き角（余弦）を取得します。
+	 * @return cos(角度)。
+	 */
 	float GetSpotLightCosAngle() { return spotLightData->cosAngle; }
 
 
+	/**
+	 * @brief キューブマップ（環境マップ）テクスチャのパスを設定します。
+	 * @param filePath キューブマップファイルパス。
+	 */
 	void SetCubeMapFilePath(const std::string& filePath) {
 		cubeMapFilePath_ = filePath;
 	}
