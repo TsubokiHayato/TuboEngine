@@ -7,6 +7,7 @@
 #include "engine/graphic/Particle/ParticleManager.h"
 #include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 #include "engine/graphic/PostEffect/OffScreenRendering.h"
+#include "Weapon/PlayerWeapons.h"
 
 //--------------------------------------------------
 // コンストラクタ
@@ -33,33 +34,28 @@ Player::~Player() {}
 //--------------------------------------------------
 void Player::ApplyWeaponParams(WeaponType type) {
 	weaponType_ = type;
-	// 基準値（既存のクールダウン/弾速）から武器ごとに調整
-	// ※ PlayerBullet::s_bulletSpeed は既存の弾速として利用
-	weaponBulletSpeed_ = PlayerBullet::s_bulletSpeed;
-	weaponPelletCount_ = 1;
-	weaponSpreadRad_ = 0.0f;
 
+	// Strategy 差し替え（弾クラスも武器側で自由に変更できる）
 	switch (weaponType_) {
 	case WeaponType::Normal:
-		weaponCooldownSec_ = 0.2f;
+		weapon_ = PlayerWeapons::CreateNormal();
 		break;
 	case WeaponType::Rapid:
-		weaponCooldownSec_ = 0.08f;
-		weaponBulletSpeed_ = PlayerBullet::s_bulletSpeed * 0.9f;
+		weapon_ = PlayerWeapons::CreateRapid();
 		break;
 	case WeaponType::Shotgun:
-		weaponCooldownSec_ = 0.5f;
-		weaponPelletCount_ = 6;
-		weaponSpreadRad_ = 0.18f; // 約10度
-		weaponBulletSpeed_ = PlayerBullet::s_bulletSpeed * 0.85f;
+		weapon_ = PlayerWeapons::CreateShotgun();
 		break;
 	default:
-		weaponCooldownSec_ = 0.2f;
+		weapon_ = PlayerWeapons::CreateNormal();
 		break;
 	}
 
-	// 既存の Shoot が参照している cooldownTime_ にも反映
-	cooldownTime_ = weaponCooldownSec_;
+	// 既存のパラメータ互換（ImGui表示/旧処理互換用）
+	weaponCooldownSec_ = cooldownTime_;
+	weaponBulletSpeed_ = PlayerBullet::s_bulletSpeed;
+	weaponPelletCount_ = (weaponType_ == WeaponType::Shotgun) ? 6 : 1;
+	weaponSpreadRad_ = (weaponType_ == WeaponType::Shotgun) ? 0.18f : 0.0f;
 }
 
 void Player::SetWeaponType(WeaponType type) { ApplyWeaponParams(type); }
@@ -114,8 +110,6 @@ void Player::Initialize() {
 	reticleSprite_ = std::make_unique<Sprite>();
 	reticleSprite_->Initialize(reticleFileNamePath);
 
-	bulletTimer_ = 0.0f;
-	// 初期武器
 	weaponSwitchCooldownTimer_ = 0.0f;
 	ApplyWeaponParams(WeaponType::Normal);
 
@@ -257,9 +251,14 @@ void Player::UpdateGameplayActive_(float dt, bool wantCaptureMouse) {
 
 	Move();
 
-	// 発射タイマー更新
+	// Weapon update
+	if (weapon_) {
+		weapon_->Update(*this, 1.0f / 60.0f);
+	}
+
+	// 発射タイマー更新（旧仕様の名残: weapon側へ移行したので維持のみ）
 	if (bulletTimer_ > 0.0f) {
-		bulletTimer_ -= dt;
+		bulletTimer_ -= 1.0f / 60.0f;
 	}
 	Shoot();
 	UpdateBullets_(dt);
@@ -363,40 +362,9 @@ void Player::UpdateLowHpVignette_() {
 // 弾を撃つ処理
 //--------------------------------------------------	
 void Player::Shoot() {
-	if (Input::GetInstance()->IsPressMouse(0) && bulletTimer_ <= 0.0f) {
-		// プレイヤーの現在の回転(Z)から発射方向を作る（Rotateと一貫性を保つ）
-		float ang = rotation_.z;
-		TuboEngine::Math::Vector3 dir{std::sin(ang), std::cos(ang), 0.0f};
-
-		auto spawnBullet = [&](float dirAngleRad) {
-			TuboEngine::Math::Vector3 d{std::sin(ang + dirAngleRad), std::cos(ang + dirAngleRad), 0.0f};
-			auto bullet = std::make_unique<PlayerBullet>();
-			bullet->Initialize(position_);
-			bullet->SetPlayerRotation(rotation_);
-			bullet->SetPlayerPosition(position_);
-			bullet->SetMapChipField(mapChipField_);
-			bullet->SetVelocity({d.x * weaponBulletSpeed_, d.y * weaponBulletSpeed_, d.z * weaponBulletSpeed_});
-			bullet->SetCamera(object3d_->GetCamera());
-			bullets_.push_back(std::move(bullet));
-		};
-
-		if (weaponType_ == WeaponType::Shotgun) {
-			// 中心+左右にばらけさせる
-			int n = std::max(1, weaponPelletCount_);
-			if (n == 1) {
-				spawnBullet(0.0f);
-			} else {
-				for (int i = 0; i < n; ++i) {
-					float t = (n == 1) ? 0.5f : (static_cast<float>(i) / static_cast<float>(n - 1));
-					float offset = (t - 0.5f) * 2.0f * weaponSpreadRad_;
-					spawnBullet(offset);
-				}
-			}
-		} else {
-			spawnBullet(0.0f);
-		}
-
-		bulletTimer_ = weaponCooldownSec_;
+	// Strategy に委譲
+	if (weapon_) {
+		weapon_->TryShoot(*this);
 	}
 }
 
@@ -570,15 +538,9 @@ void Player::DrawImGui() {
 			dashRingEmitter_->Emit(p.burstCount);
 		}
 	}
-	// 武器情報
-	const char* weaponName = "Normal";
-	if (weaponType_ == WeaponType::Rapid) weaponName = "Rapid";
-	if (weaponType_ == WeaponType::Shotgun) weaponName = "Shotgun";
+	const char* weaponName = weapon_ ? weapon_->GetName() : "(null)";
 	ImGui::Separator();
-	ImGui::Text("Weapon: %s", weaponName);
-	ImGui::Text("WeaponCooldown: %.2f", weaponCooldownSec_);
-	ImGui::Text("WeaponBulletSpeed: %.2f", weaponBulletSpeed_);
-	ImGui::Text("Pellets: %d  SpreadRad: %.3f", weaponPelletCount_, weaponSpreadRad_);
+	ImGui::Text("Weapon(Strategy): %s", weaponName);
 	if (ImGui::Button("Next Weapon")) { NextWeapon(); }
 	ImGui::SameLine();
 	if (ImGui::Button("Prev Weapon")) { PrevWeapon(); }

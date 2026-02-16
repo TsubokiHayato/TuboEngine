@@ -5,6 +5,7 @@
 #include"StageScene.h"
 #include"ClearScene.h"
 #include"OverScene.h"
+#include "Input.h"
 
 
 SceneManager* SceneManager::instance = nullptr; // シングルトンインスタンス
@@ -21,7 +22,8 @@ void SceneManager::Initialize(int startSceneNo) {
     } else if (currentSceneNo == STAGE) {
         currentScene = std::make_unique<StageScene>();
     } else if (currentSceneNo == TUTORIAL) {
-        // TutorialもStageSceneを使い、内部StateでTutorialStateを動かす
+        // Tutorialは無効化: Stageにフォールバック
+        currentSceneNo = STAGE;
         currentScene = std::make_unique<StageScene>();
     } else if (currentSceneNo == CLEAR) {
         currentScene = std::make_unique<ClearScene>();
@@ -67,7 +69,8 @@ void SceneManager::Update() {
 			currentScene = std::make_unique<StageScene>();
 			currentScene->Initialize();
 		} else if (currentSceneNo == TUTORIAL) {
-			// チュートリアルもStageSceneを使う
+			// Tutorialは無効化: Stageにフォールバック
+			currentSceneNo = STAGE;
 			currentScene = std::make_unique<StageScene>();
 			currentScene->Initialize();
 		} else if (currentSceneNo == CLEAR) {
@@ -120,6 +123,15 @@ void SceneManager::SpriteDraw() {
 void SceneManager::ImGuiDraw() {
 
 #ifdef USE_IMGUI
+	// F1でImGuiの表示切り替え
+	static bool s_showImGui = true;
+	if (Input::GetInstance()->TriggerKey(DIK_F1)) {
+		s_showImGui = !s_showImGui;
+	}
+	if (!s_showImGui) {
+		return;
+	}
+
 	//現在のシーンがnullptrでない場合
 	if (currentScene) {
 		//ImGui描画
@@ -137,9 +149,6 @@ void SceneManager::ImGuiDraw() {
 	if (ImGui::Button("Stage")) {
 		currentScene->SetSceneNo(STAGE);
 	}
-	if (ImGui::Button("Tutorial")) {
-		currentScene->SetSceneNo(TUTORIAL);
-	}
 	if (ImGui::Button("Clear")) {
 		currentScene->SetSceneNo(CLEAR);
 	}
@@ -148,7 +157,7 @@ void SceneManager::ImGuiDraw() {
 	};
 	ImGui::End();
 
-	#endif // USE_IMGUI
+#endif // USE_IMGUI
 }
 
 void SceneManager::ChangeScene(int sceneNo) {

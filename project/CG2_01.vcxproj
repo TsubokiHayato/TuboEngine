@@ -127,6 +127,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\UI\Title\TitleUI.cpp" />
     <ClCompile Include="application\UI\HP\Enemy\EnemyHpUI.cpp" />
     <ClCompile Include="application\UI\HP\Player\HpUI.cpp" />
+    <ClCompile Include="application\Weapon\PlayerWeapons.cpp" />
     <ClCompile Include="engine\graphic\Particle\Effects\Aura\AuraEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\Effects\ClearConfetti\ClearConfettiEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\Effects\ClearFirework\ClearFireworkEmitter.cpp" />
@@ -250,6 +251,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\StageState\Pause\PauseState.h" />
     <ClInclude Include="application\StageState\Tutorial\TutorialState.h" />
     <ClInclude Include="application\UI\Guide\GuideUI.h" />
+    <ClInclude Include="application\Weapon\IWeapon.h" />
+    <ClInclude Include="application\Weapon\PlayerWeapons.h" />
     <ClInclude Include="engine\graphic\PSO\Blend\BlendPSO.h" />
     <ClInclude Include="engine\scene\SceneType.h" />
     <ClInclude Include="application\scene\StageState\ClearState.h" />

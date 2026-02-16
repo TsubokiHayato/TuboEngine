@@ -363,6 +363,7 @@
     <ClCompile Include="engine\graphic\Particle\Effects\ClearFirework\ClearFireworkEmitter.cpp">
       <Filter>projects\engine\graphic\Particle\Effects\ClearFirework</Filter>
     </ClCompile>
+    <ClCompile Include="application\Weapon\PlayerWeapons.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -800,6 +801,8 @@
     <ClInclude Include="engine\graphic\Particle\Effects\Ring\RingEmitter.h">
       <Filter>projects\engine\graphic\Particle\Effects\Ring</Filter>
     </ClInclude>
+    <ClInclude Include="application\Weapon\IWeapon.h" />
+    <ClInclude Include="application\Weapon\PlayerWeapons.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli">

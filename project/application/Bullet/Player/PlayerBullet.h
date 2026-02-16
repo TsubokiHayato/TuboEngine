@@ -79,6 +79,17 @@ public:
 	// 追加: マップチップフィールド設定
 	void SetMapChipField(MapChipField* field) { mapChipField_ = field; }
 
+	// 派生弾用: 追加効果（貫通/爆発など）を実装するためのフック
+	virtual void OnHitEnemy(Collider* other) { (void)other; }
+
+	// 派生弾用: 衝突で消えるかどうか（貫通弾はfalseにする）
+	virtual bool ShouldDieOnEnemyHit() const { return true; }
+
+protected:
+	// 派生弾で参照できるように
+	bool isAlive = true;
+	bool isHit = false;
+
 private:
 	///--------------------------------------------------
 	///				メンバ変数
@@ -102,9 +113,9 @@ private:
 	float disappearZ = 100.0f;
 
 	// 生存フラグ
-	bool isAlive = true;
+	// bool isAlive = true;
 	// ヒット判定フラグ
-	bool isHit = false;
+	// bool isHit = false;
 
 	/// Player関連 ///
 	// プレイヤーの位置

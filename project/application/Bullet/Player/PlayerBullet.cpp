@@ -127,13 +127,14 @@ TuboEngine::Math::Vector3 PlayerBullet::GetCenterPosition() const {
 // 衝突時の処理
 //--------------------------------------------------
 void PlayerBullet::OnCollision(Collider* other) {
-	
 	// 衝突相手のタイプIDを取得
 	uint32_t typeID = other->GetTypeID();
 	if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy)) {
-		// 敵との衝突処理
-		isHit = true; // 衝突したらヒットフラグを立てる
-		isAlive = false;
+		isHit = true;
+		OnHitEnemy(other);
+		if (ShouldDieOnEnemyHit()) {
+			isAlive = false;
+		}
 	}
 }
 
