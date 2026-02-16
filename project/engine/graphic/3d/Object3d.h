@@ -123,21 +123,21 @@ public:
 
 	//Setter
 	/** @brief ワールド拡縮を設定します。 @param scale スケール。 */
-	void SetScale(const TuboEngine::Math::Vector3& scale) { transform.scale = scale; }
+	void SetScale(const TuboEngine::Math::Vector3& scale) { transform_.scale = scale; }
 	/** @brief ワールド回転を設定します。 @param rotation 回転（ラジアン想定）。 */
-	void SetRotation(const TuboEngine::Math::Vector3& rotation) { transform.rotate = rotation; }
+	void SetRotation(const TuboEngine::Math::Vector3& rotation) { transform_.rotate = rotation; }
 	/** @brief ワールド位置を設定します。 @param position 位置。 */
-	void SetPosition(const TuboEngine::Math::Vector3& position) { transform.translate = position; }
+	void SetPosition(const TuboEngine::Math::Vector3& position) { transform_.translate = position; }
 
 	///-------------------------------------------------------------------------------------------------
 	/// Light
 	//平行光源
 	/** @brief 平行光源の色を設定します。 @param color RGBA。 */
-	void SetLightColor(const TuboEngine::Math::Vector4& color) { directionalLightData->color = color; }
+	void SetLightColor(const TuboEngine::Math::Vector4& color) { directionalLightData_->color = color; }
 	/** @brief 平行光源の向きを設定します。 @param direction 方向ベクトル。 */
-	void SetLightDirection(const TuboEngine::Math::Vector3& direction) { directionalLightData->direction = direction; }
+	void SetLightDirection(const TuboEngine::Math::Vector3& direction) { directionalLightData_->direction = direction; }
 	/** @brief 平行光源の強度を設定します。 @param intensity 強度。 */
-	void SetLightIntensity(float intensity) { directionalLightData->intensity = intensity; }
+	void SetLightIntensity(float intensity) { directionalLightData_->intensity = intensity; }
 	/**
 	 * @brief 平行光源の鏡面反射の鋭さ（シェーディング用）を設定します。
 	 * @param shininess シャイニネス。
@@ -145,26 +145,26 @@ public:
 	void SetLightShininess(float shininess);
 	//ポイントライト
 	/** @brief ポイントライト位置を設定します。 @param position 位置。 */
-	void SetPointLightPosition(const TuboEngine::Math::Vector3& position) { pointLightData->position = position; }
+	void SetPointLightPosition(const TuboEngine::Math::Vector3& position) { pointLightData_->position = position; }
 	/** @brief ポイントライトの色を設定します。 @param color RGBA。 */
-	void SetPointLightColor(const TuboEngine::Math::Vector4& color) { pointLightData->color = color; }
+	void SetPointLightColor(const TuboEngine::Math::Vector4& color) { pointLightData_->color = color; }
 	/** @brief ポイントライトの強度を設定します。 @param intensity 強度。 */
-	void SetPointLightIntensity(float intensity) { pointLightData->intensity = intensity; }
+	void SetPointLightIntensity(float intensity) { pointLightData_->intensity = intensity; }
 	//スポットライト
 	/** @brief スポットライトの色を設定します。 @param color RGBA。 */
-	void SetSpotLightColor(const TuboEngine::Math::Vector4& color) { spotLightData->color = color; }
+	void SetSpotLightColor(const TuboEngine::Math::Vector4& color) { spotLightData_->color = color; }
 	/** @brief スポットライトの位置を設定します。 @param position 位置。 */
-	void SetSpotLightPosition(const TuboEngine::Math::Vector3& position) { spotLightData->position = position; }
+	void SetSpotLightPosition(const TuboEngine::Math::Vector3& position) { spotLightData_->position = position; }
 	/** @brief スポットライトの向きを設定します。 @param direction 方向ベクトル。 */
-	void SetSpotLightDirection(const TuboEngine::Math::Vector3& direction) { spotLightData->direction = direction; }
+	void SetSpotLightDirection(const TuboEngine::Math::Vector3& direction) { spotLightData_->direction = direction; }
 	/** @brief スポットライトの強度を設定します。 @param intensity 強度。 */
-	void SetSpotLightIntensity(float intensity) { spotLightData->intensity = intensity; }
+	void SetSpotLightIntensity(float intensity) { spotLightData_->intensity = intensity; }
 	/** @brief スポットライトの到達距離を設定します。 @param distance 最大距離。 */
-	void SetSpotLightDistance(float distance) { spotLightData->distance = distance; }
+	void SetSpotLightDistance(float distance) { spotLightData_->distance = distance; }
 	/** @brief スポットライトの減衰率を設定します。 @param decay 減衰率。 */
-	void SetSpotLightDecay(float decay) { spotLightData->decay = decay; }
+	void SetSpotLightDecay(float decay) { spotLightData_->decay = decay; }
 	/** @brief スポットライトの開き角（余弦）を設定します。 @param cosAngle cos(角度)。 */
-	void SetSpotLightCosAngle(float cosAngle) { spotLightData->cosAngle = cosAngle; }
+	void SetSpotLightCosAngle(float cosAngle) { spotLightData_->cosAngle = cosAngle; }
 
 	/**
 	 * @brief 使用するライト種別を設定します。
@@ -174,7 +174,7 @@ public:
 		if (type < 0 || type > 5) {
 			type = 0;
 		}
-		lightTypeData->type = type;
+		lightTypeData_->type = type;
 	}
 
 	/**
@@ -194,12 +194,12 @@ public:
 	 * @brief 描画に使用するカメラを設定します。
 	 * @param camera カメラ。
 	 */
-	void SetCamera(Camera* camera) { this->camera = camera; }
+	void SetCamera(Camera* camera) { this->camera_ = camera; }
 	/**
 	 * @brief 現在設定されているカメラを取得します。
 	 * @return カメラポインタ。
 	 */
-	Camera* GetCamera() const { return camera; }
+	Camera* GetCamera() const { return camera_; }
 
 	/**
 	 * @brief モデルカラー（マテリアル色）を設定します。
@@ -209,11 +209,11 @@ public:
 
 	//Getter
 	/** @brief ワールド拡縮を取得します。 @return スケール。 */
-	TuboEngine::Math::Vector3 GetScale() const { return transform.scale; }
+	TuboEngine::Math::Vector3 GetScale() const { return transform_.scale; }
 	/** @brief ワールド回転を取得します。 @return 回転。 */
-	TuboEngine::Math::Vector3 GetRotation() const { return transform.rotate; }
+	TuboEngine::Math::Vector3 GetRotation() const { return transform_.rotate; }
 	/** @brief ワールド位置を取得します。 @return 位置。 */
-	TuboEngine::Math::Vector3 GetPosition() const { return transform.translate; }
+	TuboEngine::Math::Vector3 GetPosition() const { return transform_.translate; }
 	//モデルの色
 	/** @brief モデルカラーを取得します。 @return RGBA。 */
 	Vector4 GetModelColor();
@@ -230,22 +230,22 @@ public:
 	 * @brief 平行光源の色を取得します。
 	 * @return RGBA。
 	 */
-	TuboEngine::Math::Vector4 GetLightColor() { return directionalLightData->color; }
+	TuboEngine::Math::Vector4 GetLightColor() { return directionalLightData_->color; }
 	/**
 	 * @brief 平行光源の向きを取得します。
 	 * @return 方向ベクトル。
 	 */
-	TuboEngine::Math::Vector3 GetLightDirection() { return directionalLightData->direction; }
+	TuboEngine::Math::Vector3 GetLightDirection() { return directionalLightData_->direction; }
 	/**
 	 * @brief 平行光源の強度を取得します。
 	 * @return 強度。
 	 */
-	float GetLightIntensity() { return directionalLightData->intensity; }
+	float GetLightIntensity() { return directionalLightData_->intensity; }
 	/**
 	 * @brief 現在設定されているライト種別を取得します。
 	 * @return ライト種別。
 	 */
-	int GetLightType() { return lightTypeData->type; }
+	int GetLightType() { return lightTypeData_->type; }
 	/**
 	 * @brief 平行光源の鏡面反射の鋭さを取得します。
 	 * @return シャイニネス。
@@ -256,53 +256,53 @@ public:
 	 * @brief ポイントライト位置を取得します。
 	 * @return 位置。
 	 */
-	TuboEngine::Math::Vector3 GetPointLightPosition() { return pointLightData->position; }
+	TuboEngine::Math::Vector3 GetPointLightPosition() { return pointLightData_->position; }
 	/**
 	 * @brief ポイントライトの色を取得します。
 	 * @return RGBA。
 	 */
-	TuboEngine::Math::Vector4 GetPointLightColor() { return pointLightData->color; }
+	TuboEngine::Math::Vector4 GetPointLightColor() { return pointLightData_->color; }
 	/**
 	 * @brief ポイントライトの強度を取得します。
 	 * @return 強度。
 	 */
-	float GetPointLightIntensity() { return pointLightData->intensity; }
+	float GetPointLightIntensity() { return pointLightData_->intensity; }
 	//スポットライト
 	/**
 	 * @brief スポットライトの色を取得します。
 	 * @return RGBA。
 	 */
-	void GetSpotLightColor(TuboEngine::Math::Vector4& color) { color = spotLightData->color; }
+	void GetSpotLightColor(TuboEngine::Math::Vector4& color) { color = spotLightData_->color; }
 	/**
 	 * @brief スポットライトの位置を取得します。
 	 * @return 位置。
 	 */
-	void GetSpotLightPosition(TuboEngine::Math::Vector3& position) { position = spotLightData->position; }
+	void GetSpotLightPosition(TuboEngine::Math::Vector3& position) { position = spotLightData_->position; }
 	/**
 	 * @brief スポットライトの向きを取得します。
 	 * @return 方向ベクトル。
 	 */
-	void GetSpotLightDirection(TuboEngine::Math::Vector3& direction) { direction = spotLightData->direction; }
+	void GetSpotLightDirection(TuboEngine::Math::Vector3& direction) { direction = spotLightData_->direction; }
 	/**
 	 * @brief スポットライトの強度を取得します。
 	 * @return 強度。
 	 */
-	float GetSpotLightIntensity() { return spotLightData->intensity; }
+	float GetSpotLightIntensity() { return spotLightData_->intensity; }
 	/**
 	 * @brief スポットライトの到達距離を取得します。
 	 * @return 最大距離。
 	 */
-	float GetSpotLightDistance() { return spotLightData->distance; }
+	float GetSpotLightDistance() { return spotLightData_->distance; }
 	/**
 	 * @brief スポットライトの減衰率を取得します。
 	 * @return 減衰率。
 	 */
-	float GetSpotLightDecay() { return spotLightData->decay; }
+	float GetSpotLightDecay() { return spotLightData_->decay; }
 	/**
 	 * @brief スポットライトの開き角（余弦）を取得します。
 	 * @return cos(角度)。
 	 */
-	float GetSpotLightCosAngle() { return spotLightData->cosAngle; }
+	float GetSpotLightCosAngle() { return spotLightData_->cosAngle; }
 
 
 	/**
@@ -323,49 +323,46 @@ private:
 	//モデルデータ
 	Model* model_ = nullptr;
 	//カメラ
-	Camera* camera;
-
-
+	Camera* camera_ = nullptr;
 
 	//座標のバッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> transformMatrixResource;
+	Microsoft::WRL::ComPtr <ID3D12Resource> transformMatrixResource_;
 	//座標のバッファリソース内のデータを指すポインタ
-	TransformationMatrix* transformMatrixData = nullptr;
+	TransformationMatrix* transformMatrixData_ = nullptr;
 
 	//平行光源のバッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> directionalLightResource;
+	Microsoft::WRL::ComPtr <ID3D12Resource> directionalLightResource_;
 	//バッファリソース内のデータを指すポインタ
-	DirectionalLight* directionalLightData = nullptr;
+	DirectionalLight* directionalLightData_ = nullptr;
 
 	//ポイントライトのバッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> pointLightResource;
+	Microsoft::WRL::ComPtr <ID3D12Resource> pointLightResource_;
 	//バッファリソース内のデータを指すポインタ
-	PointLight* pointLightData = nullptr;
+	PointLight* pointLightData_ = nullptr;
 
 	//スポットライトのバッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> spotLightResource;
+	Microsoft::WRL::ComPtr <ID3D12Resource> spotLightResource_;
 	//バッファリソース内のデータを指すポインタ
-	SpotLight* spotLightData = nullptr;
+	SpotLight* spotLightData_ = nullptr;
 
 
 	//コマンドリスト
-	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
+	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList_;
 
 	//カメラ座標のバッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> cameraForGPUResource
-		= nullptr;
+	Microsoft::WRL::ComPtr <ID3D12Resource> cameraForGPUResource_ = nullptr;
 	//カメラ座標のバッファリソース内のデータを指すポインタ
-	CameraForGPU* cameraForGPUData = nullptr;
+	CameraForGPU* cameraForGPUData_ = nullptr;
 
 	//ライトの種類
-	Microsoft::WRL::ComPtr <ID3D12Resource> lightTypeResource= nullptr;
+	Microsoft::WRL::ComPtr <ID3D12Resource> lightTypeResource_ = nullptr;
 	//ライトの種類のバッファリソース内のデータを指すポインタ
-	LightType* lightTypeData = nullptr;
+	LightType* lightTypeData_ = nullptr;
 
 	//3Dオブジェクトの座標
-	Transform transform;
+	Transform transform_;
 	//カメラ座標
-	Transform cameraTransform;
+	Transform cameraTransform_;
 
 	// キューブマップのSRVハンドル
 	//デフォルト : ロストック・ラージ空港の4Kキューブマップ

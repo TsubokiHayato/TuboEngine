@@ -120,45 +120,45 @@ public:
 	///------------------------------------
 
 	/** @brief プレイヤーの位置を取得します。 @return 位置。 */
-	TuboEngine::Math::Vector3 GetPosition() const { return position; }
+	TuboEngine::Math::Vector3 GetPosition() const { return position_; }
 	/** @brief プレイヤーの回転を取得します。 @return 回転。 */
-	TuboEngine::Math::Vector3 GetRotation() const { return rotation; }
+	TuboEngine::Math::Vector3 GetRotation() const { return rotation_; }
 	/** @brief プレイヤーのスケールを取得します。 @return スケール。 */
-	TuboEngine::Math::Vector3 GetScale() const { return scale; }
+	TuboEngine::Math::Vector3 GetScale() const { return scale_; }
 	/** @brief プレイヤーの速度を取得します。 @return 速度。 */
-	TuboEngine::Math::Vector3 GetVelocity() const { return velocity; }
+	TuboEngine::Math::Vector3 GetVelocity() const { return velocity_; }
 	/** @brief プレイヤーのHPを取得します。 @return HP。 */
-	int GetHP() const { return HP; }
+	int GetHP() const { return hp_; }
 	/** @brief 生存状態を取得します。 @return 生存中ならtrue。 */
-	bool GetIsAlive() const { return isAlive; }
+	bool GetIsAlive() const { return isAlive_; }
 	/** @brief プレイヤーの弾リストを取得します。 @return 弾リスト参照。 */
-	const std::vector<std::unique_ptr<PlayerBullet>>& GetBullets() const { return bullets; }
+	const std::vector<std::unique_ptr<PlayerBullet>>& GetBullets() const { return bullets_; }
 	/** @brief ダッシュ中か取得します。 @return ダッシュ中ならtrue。 */
 	bool IsDashing() const { return isDashing_; } // 既存なら流用、無ければダミー
 	/** @brief 被弾フラグを取得します。 @return 被弾していればtrue。 */
-	bool GetIsHit() const { return isHit; } // 被弾フラグのゲッター
+	bool GetIsHit() const { return isHit_; } // 被弾フラグのゲッター
 
 	///-----------------------------------
 	///				セッター
 	///-------------------------------------
 
 	/** @brief プレイヤーの位置を設定します。 @param position 位置。 */
-	void SetPosition(const TuboEngine::Math::Vector3& position) { this->position = position; }
+	void SetPosition(const TuboEngine::Math::Vector3& position) { this->position_ = position; }
 	/** @brief プレイヤーの回転を設定します。 @param rotation 回転。 */
-	void SetRotation(const TuboEngine::Math::Vector3& rotation) { this->rotation = rotation; }
+	void SetRotation(const TuboEngine::Math::Vector3& rotation) { this->rotation_ = rotation; }
 	/** @brief プレイヤーのスケールを設定します。 @param scale スケール。 */
-	void SetScale(const TuboEngine::Math::Vector3& scale) { this->scale = scale; }
+	void SetScale(const TuboEngine::Math::Vector3& scale) { this->scale_ = scale; }
 	/** @brief プレイヤーの速度を設定します。 @param velocity 速度。 */
-	void SetVelocity(const TuboEngine::Math::Vector3& velocity) { this->velocity = velocity; }
+	void SetVelocity(const TuboEngine::Math::Vector3& velocity) { this->velocity_ = velocity; }
 	/** @brief プレイヤーのHPを設定します。 @param HP HP。 */
-	void SetHP(int HP) { this->HP = HP; }
+	void SetHP(int HP) { this->hp_ = HP; }
 	/** @brief 生存状態を設定します。 @param isAlive 生存中ならtrue。 */
-	void SetIsDead(bool isAlive) { this->isAlive = isAlive; }
+	void SetIsDead(bool isAlive) { this->isAlive_ = isAlive; }
 	/**
 	 * @brief 使用するカメラを設定します。
 	 * @param camera カメラ。
 	 */
-	void SetCamera(Camera* camera) { object3d->SetCamera(camera); camera_ = camera; }
+	void SetCamera(Camera* camera) { object3d_->SetCamera(camera); camera_ = camera; }
 	/** @brief ダッシュリングの前方オフセット量を設定します。 @param forward 前方オフセット量。 */
 	void SetDashRingOffset(float forward) { dashRingOffsetForward_ = forward; }
 
@@ -167,74 +167,74 @@ public:
 	 * @param alpha アルファ値。
 	 */
 	void SetModelAlpha(float alpha) {
-		Vector4 color = object3d->GetModelColor();
+		Vector4 color = object3d_->GetModelColor();
 		color.w = alpha;
-		object3d->SetModelColor(color);
+		object3d_->SetModelColor(color);
 	}
 
 	/**
 	 * @brief 環境マップ（キューブマップ）を設定します。
 	 * @param filePath キューブマップファイルパス。
 	 */
-	void CubeMapSet(const std::string& filePath) { object3d->SetCubeMapFilePath(filePath); }
+	void CubeMapSet(const std::string& filePath) { object3d_->SetCubeMapFilePath(filePath); }
 
 	/**
 	 * @brief マップチップフィールド参照を設定します。
 	 * @param mapChipField マップチップフィールド。
 	 */
-	void SetMapChipField(MapChipField* mapChipField) { this->mapChipField = mapChipField; }
+	void SetMapChipField(MapChipField* mapChipField) { this->mapChipField_ = mapChipField; }
 
 	/**
 	 * @brief 移動可否（入力ロック）を設定します。
 	 * @param flag ロックするならtrue。
 	 */
-	void SetMovementLocked(bool flag) { isMovementLocked = flag; }
+	void SetMovementLocked(bool flag) { isMovementLocked_ = flag; }
 
 private:
 	///--------------------------------------------------
 	///				引き渡し用変数
 	///--------------------------------------------------
-	MapChipField* mapChipField = nullptr; // マップチップフィールド
+	MapChipField* mapChipField_ = nullptr; // マップチップフィールド
 
 private:
 	///--------------------------------------------------
 	///			メンバ変数
 	///--------------------------------------------------
 
-	std::unique_ptr<Object3d> object3d;                 // 3Dオブジェクト
-	std::vector<std::unique_ptr<PlayerBullet>> bullets; // プレイヤーの弾のリスト
-	float bulletTimer = 0.0f;                           // 発射間隔タイマー
-	float cooldownTime = 0.2f;                          // クールダウン時間（秒）
+	std::unique_ptr<Object3d> object3d_;                 // 3Dオブジェクト
+	std::vector<std::unique_ptr<PlayerBullet>> bullets_; // プレイヤーの弾のリスト
+	float bulletTimer_ = 0.0f;                           // 発射間隔タイマー
+	float cooldownTime_ = 0.2f;                          // クールダウン時間（秒）
 
-	float damageCooldownTimer = 0.0f;                   // ダメージクールダウンタイマー
-	float damageCooldownTime = 1.0f;                    // ダメージクールダウン時間（秒）
+	float damageCooldownTimer_ = 0.0f;                   // ダメージクールダウンタイマー
+	float damageCooldownTime_ = 1.0f;                    // ダメージクールダウン時間（秒）
 
 	// 回避行動
-	bool isDodging = false;                             // 回避中フラグ
-	float dodgeTimer = 0.0f;                            // 回避残り時間
-	float dodgeCooldownTimer = 0.0f;                    // 回避クールダウンタイマー
-	float dodgeDuration = 0.2f;                         // 回避時間（秒）
-	float dodgeCooldown = 1.0f;                         // 回避クールダウン（秒）
-	float dodgeSpeed = 0.5f;                            // 回避速度
+	bool isDodging_ = false;                             // 回避中フラグ
+	float dodgeTimer_ = 0.0f;                            // 回避残り時間
+	float dodgeCooldownTimer_ = 0.0f;                    // 回避クールダウンタイマー
+	float dodgeDuration_ = 0.2f;                         // 回避時間（秒）
+	float dodgeCooldown_ = 1.0f;                         // 回避クールダウン（秒）
+	float dodgeSpeed_ = 0.5f;                            // 回避速度
 
-	TuboEngine::Math::Vector3 dodgeDirection = {0.0f, 0.0f, 0.0f};        // 回避方向
+	TuboEngine::Math::Vector3 dodgeDirection_ = {0.0f, 0.0f, 0.0f};        // 回避方向
 
-	TuboEngine::Math::Vector3 position; // プレイヤーの位置
-	TuboEngine::Math::Vector3 rotation; // プレイヤーの回転
-	TuboEngine::Math::Vector3 scale;    // プレイヤーのスケール
+	TuboEngine::Math::Vector3 position_{}; // プレイヤーの位置
+	TuboEngine::Math::Vector3 rotation_{}; // プレイヤーの回転
+	TuboEngine::Math::Vector3 scale_{};    // プレイヤーのスケール
 
-	TuboEngine::Math::Vector3 velocity; // プレイヤーの速度
-	int HP;           // プレイヤーのHP
-	bool isHit;       // プレイヤーがヒットしたかどうか
-	bool isAlive;      // プレイヤーの死亡状態
+	TuboEngine::Math::Vector3 velocity_{}; // プレイヤーの速度
+	int hp_ = 0;           // プレイヤーのHP
+	bool isHit_ = false;       // プレイヤーがヒットしたかどうか
+	bool isAlive_ = true;      // プレイヤーの死亡状態
 
 	//Reticle
 
-	std::unique_ptr<Sprite> reticleSprite; // スプライト
-	TuboEngine::Math::Vector2 reticlePosition = {0.0f, 0.0f}; // レティクルの位置（画面中央）
-	TuboEngine::Math::Vector2 reticleSize = {50.0f, 50.0f};   // レティクルのサイズ
+	std::unique_ptr<Sprite> reticleSprite_; // スプライト
+	TuboEngine::Math::Vector2 reticlePosition_ = {0.0f, 0.0f}; // レティクルの位置（画面中央）
+	TuboEngine::Math::Vector2 reticleSize_ = {50.0f, 50.0f};   // レティクルのサイズ
 
-	bool isMovementLocked=false;
+	bool isMovementLocked_ = false;
 
 	// --- 追加: 移動軌跡用パーティクルエミッター ---
 	IParticleEmitter* trailEmitter_ = nullptr; // ParticleManager生成管理。解放はマネージャに委譲

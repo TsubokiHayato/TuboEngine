@@ -12,8 +12,16 @@
 // コンストラクタ
 //--------------------------------------------------
 Player::Player()
-    : cooldownTime(0.2f), damageCooldownTimer(0.0f), damageCooldownTime(1.0f), isDodging(false), dodgeTimer(0.0f), dodgeCooldownTimer(0.0f), dodgeDuration(0.2f), dodgeCooldown(1.0f), dodgeSpeed(0.5f),
-      dodgeDirection(0.0f, 0.0f, 0.0f) {}
+    : cooldownTime_(0.2f),
+      damageCooldownTimer_(0.0f),
+      damageCooldownTime_(1.0f),
+      isDodging_(false),
+      dodgeTimer_(0.0f),
+      dodgeCooldownTimer_(0.0f),
+      dodgeDuration_(0.2f),
+      dodgeCooldown_(1.0f),
+      dodgeSpeed_(0.5f),
+      dodgeDirection_(0.0f, 0.0f, 0.0f) {}
 
 //--------------------------------------------------
 // デストラクタ
@@ -28,18 +36,18 @@ void Player::Initialize() {
 	Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kPlayer));
 
 	// プレイヤーの初期位置
-	position = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
+	position_ = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
 	// プレイヤーの初期回転
-	rotation = TuboEngine::Math::Vector3(1.56f, 0.0f, 3.12f);
+	rotation_ = TuboEngine::Math::Vector3(1.56f, 0.0f, 3.12f);
 	// プレイヤーの初期スケール
-	scale = TuboEngine::Math::Vector3(1.0f, 1.0f, 1.0f);
+	scale_ = TuboEngine::Math::Vector3(1.0f, 1.0f, 1.0f);
 
 	// プレイヤーの初期速度
-	velocity = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
+	velocity_ = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
 	// プレイヤーのHP
-	HP = 5;
+	hp_ = 5;
 	// プレイヤーの死亡状態
-	isAlive = true;
+	isAlive_ = true;
 
 	// モデルファイルパス
 	const std::string modelFileNamePath = "player/Player.obj";
@@ -47,26 +55,26 @@ void Player::Initialize() {
 	const std::string reticleFileNamePath = "2D_Reticle.png";
 
 	// 3Dオブジェクト生成・初期化
-	object3d = std::make_unique<Object3d>();
-	object3d->Initialize(modelFileNamePath);
+	object3d_ = std::make_unique<Object3d>();
+	object3d_->Initialize(modelFileNamePath);
 
-	object3d->SetPosition(position);
-	object3d->SetRotation(rotation);
-	object3d->SetScale(scale);
+	object3d_->SetPosition(position_);
+	object3d_->SetRotation(rotation_);
+	object3d_->SetScale(scale_);
 
 	// Reticleの初期化
-	reticleSprite = std::make_unique<Sprite>();
-	reticleSprite->Initialize(reticleFileNamePath);
+	reticleSprite_ = std::make_unique<Sprite>();
+	reticleSprite_->Initialize(reticleFileNamePath);
 
-	bulletTimer = 0.0f;
-	damageCooldownTimer = 0.0f;
-	isDodging = false;
-	dodgeTimer = 0.0f;
-	dodgeCooldownTimer = 0.0f;
-	dodgeDuration = 0.2f;
-	dodgeCooldown = 1.0f;
-	dodgeSpeed = 0.5f;
-	dodgeDirection = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
+	bulletTimer_ = 0.0f;
+	damageCooldownTimer_ = 0.0f;
+	isDodging_ = false;
+	dodgeTimer_ = 0.0f;
+	dodgeCooldownTimer_ = 0.0f;
+	dodgeDuration_ = 0.2f;
+	dodgeCooldown_ = 1.0f;
+	dodgeSpeed_ = 0.5f;
+	dodgeDirection_ = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
 
 	// --- 追加: 軌道トレイル用パーティクルエミッター生成 ---
 	if (!trailEmitter_) {
@@ -84,9 +92,9 @@ void Player::Initialize() {
 		p.maxInstances = 512; // 移動で多発するので少し多め
 		p.billboard = true;
 		p.simulateInWorldSpace = true;
-		p.center = position; // 初期中心
+		p.center = position_; // 初期中心
 		trailEmitter_ = ParticleManager::GetInstance()->CreateEmitter<OrbitTrailEmitter>(p);
-		prevPositionTrail_ = position;
+		prevPositionTrail_ = position_;
 	}
 
 	// ダッシュリングエミッタ作成
@@ -115,12 +123,12 @@ void Player::Initialize() {
 // 更新処理
 //--------------------------------------------------
 void Player::Update() {
-	if (isAlive == false) {
+	if (isAlive_ == false) {
 		// 死亡中でも見た目の姿勢は維持（Object3dへ反映）
-		object3d->SetPosition(position);
-		object3d->SetRotation(rotation);
-		object3d->SetScale(scale);
-		object3d->Update();
+		object3d_->SetPosition(position_);
+		object3d_->SetRotation(rotation_);
+		object3d_->SetScale(scale_);
+		object3d_->Update();
 		return;
 	} // 死亡状態なら更新しない
 
@@ -134,69 +142,62 @@ void Player::Update() {
 	// Clear/Over等の演出シーンでは isMovementLocked=true で入力無効化される。
 	// そのときマウス位置参照の Rotate() を走らせると、意図しない方向を向いたり
 	// レティクルが更新されてしまうため、回転はシーン側が制御する。
-	if (!wantCaptureMouse && !isMovementLocked) {
+	if (!wantCaptureMouse && !isMovementLocked_) {
 		Rotate();
 	}
 
-	if (!isMovementLocked) {
-		// ※isHit は OnCollision で立つ。ここで毎フレーム落とすと「被弾したフレーム」を取り逃すので
-		// 演出検出後に落とす。
+	if (!isMovementLocked_) {
 		// ダメージクールダウンタイマー更新
-		if (damageCooldownTimer > 0.0f) {
-			damageCooldownTimer -= 1.0f / 60.0f;
-			if (damageCooldownTimer < 0.0f)
-				damageCooldownTimer = 0.0f;
+		if (damageCooldownTimer_ > 0.0f) {
+			damageCooldownTimer_ -= 1.0f / 60.0f;
+			if (damageCooldownTimer_ < 0.0f)
+				damageCooldownTimer_ = 0.0f;
 		}
 		UpdateDodge();
-		// 回避入力（SPACEキー）
-		// 長押し(PushKey)だと、クールダウン明けに押しっぱなしで即ダッシュしてしまうので
-		// 押した瞬間(TriggerKey)でのみ開始する。
 		if (CanDodge() && Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			StartDodge();
 		}
 		Move();
-		// Rotate() は上で一度だけ行う（ImGui操作中はスキップ）
 		// 発射タイマー更新
-		if (bulletTimer > 0.0f) {
-			bulletTimer -= 1.0f / 60.0f; // 60FPS前提
+		if (bulletTimer_ > 0.0f) {
+			bulletTimer_ -= 1.0f / 60.0f; // 60FPS前提
 		}
 		Shoot();
 		// 弾の更新
-		for (auto& bullet : bullets) {
-			bullet->SetCamera(object3d->GetCamera());
+		for (auto& bullet : bullets_) {
+			bullet->SetCamera(object3d_->GetCamera());
 			bullet->Update();
 		}
 		// isAlive==false のバレットを削除
-		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const std::unique_ptr<PlayerBullet>& bullet) { return !bullet->GetIsAlive(); }), bullets.end());
-		if (HP <= 0) {
-			isAlive = false; // HPが0以下なら死亡状態にする
+		bullets_.erase(std::remove_if(bullets_.begin(), bullets_.end(), [](const std::unique_ptr<PlayerBullet>& bullet) { return !bullet->GetIsAlive(); }), bullets_.end());
+		if (hp_ <= 0) {
+			isAlive_ = false; // HPが0以下なら死亡状態にする
 		}
 	}
 
 	// 被弾フラグは既存仕様通りこのタイミングで落とす
-	isHit = false;
+	isHit_ = false;
 
-	object3d->SetPosition(position);
-	object3d->SetRotation(rotation);
-	object3d->SetScale(scale);
-	object3d->Update();
+	object3d_->SetPosition(position_);
+	object3d_->SetRotation(rotation_);
+	object3d_->SetScale(scale_);
+	object3d_->Update();
 
-	reticleSprite->SetPosition(reticlePosition);
-	reticleSprite->SetGetIsAdjustTextureSize(true);     // レティクルのサイズを調整する
-	reticleSprite->SetAnchorPoint(TuboEngine::Math::Vector2(0.5f, 0.5f)); // アンカーポイントを中央に設定
-	reticleSprite->Update();
+	reticleSprite_->SetPosition(reticlePosition_);
+	reticleSprite_->SetGetIsAdjustTextureSize(true);     // レティクルのサイズを調整する
+	reticleSprite_->SetAnchorPoint(TuboEngine::Math::Vector2(0.5f, 0.5f)); // アンカーポイントを中央に設定
+	reticleSprite_->Update();
 
 	// --- 追加: トレイルエミッター中心更新 (プレイヤー位置) ---
 	if (trailEmitter_) {
-		trailEmitter_->GetPreset().center = position;
-		prevPositionTrail_ = position;
+		trailEmitter_->GetPreset().center = position_;
+		prevPositionTrail_ = position_;
 	}
 	// 位置追従（カメラ前方オフセット対応）
 	if (dashRingEmitter_) {
 		TuboEngine::Math::Vector3 center = GetPosition();
 		if (camera_) {
 			TuboEngine::Math::Vector3 camRot = camera_->GetRotation();
-			// Z回転のみで前方ベクトル（2D平面想定）
 			TuboEngine::Math::Vector3 forward{std::cos(camRot.z), std::sin(camRot.z), 0.0f};
 			center = center + forward * dashRingOffsetForward_;
 		}
@@ -205,7 +206,7 @@ void Player::Update() {
 
 	// 回避開始タイミングでEmit（立ち上がり検出）
 	static bool wasDodgingPrevLocal = false; // 関数スコープの前フレーム値
-	bool dodgingNow = isDodging;             // 既存の回避フラグを使用
+	bool dodgingNow = isDodging_;             // 既存の回避フラグを使用
 	if (dashRingEmitter_ && dodgingNow && !wasDodgingPrevLocal) {
 		TriggerDashRing();
 		// Dash演出: ポストエフェクトを一時的にRadialBlurへ
@@ -233,7 +234,7 @@ void Player::Update() {
 	// 低HP演出: HP割合が下がるほどビネットを強くする（常時）
 	// ※最大HPが固定(=5)ならこれでOK。将来可変なら getter を追加して置き換える。
 	constexpr float kMaxHpAssumed = 5.0f;
-	float hpRatio = (kMaxHpAssumed > 0.0f) ? (static_cast<float>(HP) / kMaxHpAssumed) : 1.0f;
+	float hpRatio = (kMaxHpAssumed > 0.0f) ? (static_cast<float>(hp_) / kMaxHpAssumed) : 1.0f;
 	hpRatio = std::clamp(hpRatio, 0.0f, 1.0f);
 
 	// 低HP開始ライン以下で 0→1 に正規化（HPが低いほど1に近い）
@@ -267,20 +268,20 @@ void Player::Update() {
 // 弾を撃つ処理
 //--------------------------------------------------	
 void Player::Shoot() {
-	if (Input::GetInstance()->IsPressMouse(0) && bulletTimer <= 0.0f) {
+	if (Input::GetInstance()->IsPressMouse(0) && bulletTimer_ <= 0.0f) {
 		// プレイヤーの現在の回転(Z)から発射方向を作る（Rotateと一貫性を保つ）
-		float ang = rotation.z;
+		float ang = rotation_.z;
 		TuboEngine::Math::Vector3 dir{std::sin(ang), std::cos(ang), 0.0f};
 		// 発射
 		auto bullet = std::make_unique<PlayerBullet>();
-		bullet->Initialize(position);
-		bullet->SetPlayerRotation(rotation);
-		bullet->SetPlayerPosition(position);
-		bullet->SetMapChipField(mapChipField);
+		bullet->Initialize(position_);
+		bullet->SetPlayerRotation(rotation_);
+		bullet->SetPlayerPosition(position_);
+		bullet->SetMapChipField(mapChipField_);
 		// 弾の速度をプレイヤー向きに設定
 		bullet->SetVelocity({dir.x * PlayerBullet::s_bulletSpeed, dir.y * PlayerBullet::s_bulletSpeed, dir.z * PlayerBullet::s_bulletSpeed});
-		bullets.push_back(std::move(bullet));
-		bulletTimer = cooldownTime;
+		bullets_.push_back(std::move(bullet));
+		bulletTimer_ = cooldownTime_;
 	}
 }
 
@@ -288,28 +289,27 @@ void Player::Shoot() {
 // 描画処理
 //--------------------------------------------------	
 void Player::Draw() {
-	for (auto& bullet : bullets) {
+	for (auto& bullet : bullets_) {
 		bullet->Draw();
 	}
-	object3d->Draw();
+	object3d_->Draw();
 }
 
 //--------------------------------------------------
 // 移動処理
 //--------------------------------------------------
 void Player::Move() {
-	if (isDodging) {
-		TuboEngine::Math::Vector3 tryPosition = position + dodgeDirection * dodgeSpeed;
-		if (mapChipField) {
-			float playerWidth = scale.x * MapChipField::GetBlockWidth() - 0.1f;
-			float playerHeight = scale.y * MapChipField::GetBlockHeight() - 0.1f;
-			if (!mapChipField->IsRectBlocked(tryPosition, playerWidth, playerHeight)) {
-				position = tryPosition;
+	if (isDodging_) {
+		TuboEngine::Math::Vector3 tryPosition = position_ + dodgeDirection_ * dodgeSpeed_;
+		if (mapChipField_) {
+			float playerWidth = scale_.x * MapChipField::GetBlockWidth() - 0.1f;
+			float playerHeight = scale_.y * MapChipField::GetBlockHeight() - 0.1f;
+			if (!mapChipField_->IsRectBlocked(tryPosition, playerWidth, playerHeight)) {
+				position_ = tryPosition;
 			}
 		}
 		return;
 	}
-	TuboEngine::Math::Vector3 prevPosition = position;
 	TuboEngine::Math::Vector3 moveDelta = {0.0f, 0.0f, 0.0f};
 	if (Input::GetInstance()->PushKey(DIK_W)) {
 		moveDelta.y -= 0.1f;
@@ -323,12 +323,12 @@ void Player::Move() {
 	if (Input::GetInstance()->PushKey(DIK_D)) {
 		moveDelta.x += 0.1f;
 	}
-	TuboEngine::Math::Vector3 tryPosition = position + moveDelta;
-	if (mapChipField) {
-		float playerWidth = scale.x * MapChipField::GetBlockWidth() - 0.1f;
-		float playerHeight = scale.y * MapChipField::GetBlockHeight() - 0.1f;
-		if (!mapChipField->IsRectBlocked(tryPosition, playerWidth, playerHeight)) {
-			position = tryPosition;
+	TuboEngine::Math::Vector3 tryPosition = position_ + moveDelta;
+	if (mapChipField_) {
+		float playerWidth = scale_.x * MapChipField::GetBlockWidth() - 0.1f;
+		float playerHeight = scale_.y * MapChipField::GetBlockHeight() - 0.1f;
+		if (!mapChipField_->IsRectBlocked(tryPosition, playerWidth, playerHeight)) {
+			position_ = tryPosition;
 		}
 	}
 }
@@ -343,28 +343,26 @@ void Player::Rotate() {
 		return;
 	}
 
-	int screenWidth = static_cast<int>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
-	int screenHeight = static_cast<int>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
 	int mouseX = static_cast<int>(Input::GetInstance()->GetMousePosition().x);
 	int mouseY = static_cast<int>(Input::GetInstance()->GetMousePosition().y);
-	reticlePosition = TuboEngine::Math::Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
+	reticlePosition_ = TuboEngine::Math::Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
 
 	// レイキャストで算出した地面上ターゲット方向で回転を更新（斜め視点対応）
 	TuboEngine::Math::Vector3 aimDir = GetAimDirectionFromReticle();
 	// 反転補正を削除し、レティクル方向と一致させる
 	float angle = std::atan2(aimDir.x, -aimDir.y);
-	rotation.z = 3.12f+angle;
+	rotation_.z = 3.12f+angle;
 }
 
 
-void Player::ReticleDraw() { reticleSprite->Draw(); }
+void Player::ReticleDraw() { reticleSprite_->Draw(); }
 
 //--------------------------------------------------
 // 当たり判定の中心座標を取得
 //--------------------------------------------------
 TuboEngine::Math::Vector3 Player::GetCenterPosition() const {
 	const TuboEngine::Math::Vector3 offset = {0.0f, 0.0f, 0.0f};
-	TuboEngine::Math::Vector3 worldPosition = position + offset;
+	TuboEngine::Math::Vector3 worldPosition = position_ + offset;
 	return worldPosition;
 }
 
@@ -372,23 +370,23 @@ TuboEngine::Math::Vector3 Player::GetCenterPosition() const {
 // 衝突時の処理
 //--------------------------------------------------
 void Player::OnCollision(Collider* other) {
-	if (isDodging) {
+	if (isDodging_) {
 		return;
 	}
 	uint32_t typeID = other->GetTypeID();
-	if (damageCooldownTimer <= 0.0f) {
+	if (damageCooldownTimer_ <= 0.0f) {
 		if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy)) {
-			HP -= 1;
-			isHit = true;
-			damageCooldownTimer = damageCooldownTime;
+			hp_ -= 1;
+			isHit_ = true;
+			damageCooldownTimer_ = damageCooldownTime_;
 		} else if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
-			isHit = true;
-			damageCooldownTimer = damageCooldownTime;
+			isHit_ = true;
+			damageCooldownTimer_ = damageCooldownTime_;
 		}
 	}
 	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
-		HP -= 1;
-		isHit = true;
+		hp_ -= 1;
+		isHit_ = true;
 	}
 }
 
@@ -397,32 +395,32 @@ void Player::OnCollision(Collider* other) {
 //--------------------------------------------------
 void Player::DrawImGui() {
 #ifdef USE_IMGUI
-	position = object3d->GetPosition();
-	rotation = object3d->GetRotation();
-	scale = object3d->GetScale();
+	position_ = object3d_->GetPosition();
+	rotation_ = object3d_->GetRotation();
+	scale_ = object3d_->GetScale();
 	ImGui::Begin("Player");
-	ImGui::Text("HP: %d", HP);
-	ImGui::Text("IsHit: %s", isHit ? "Yes" : "No");
+	ImGui::Text("HP: %d", hp_);
+	ImGui::Text("IsHit: %s", isHit_ ? "Yes" : "No");
 	ImGui::Separator();
-	ImGui::Text("Cooldown: %.2f / %.2f", bulletTimer, cooldownTime);
-	ImGui::Text("%s", (bulletTimer > 0.0f ? "Cooling Down" : "Ready"));
-	ImGui::SliderFloat("Cooldown Time", &cooldownTime, 0.05f, 1.0f, "%.2f sec");
+	ImGui::Text("Cooldown: %.2f / %.2f", bulletTimer_, cooldownTime_);
+	ImGui::Text("%s", (bulletTimer_ > 0.0f ? "Cooling Down" : "Ready"));
+	ImGui::SliderFloat("Cooldown Time", &cooldownTime_, 0.05f, 1.0f, "%.2f sec");
 	ImGui::Separator();
-	ImGui::Text("Damage Cooldown: %.2f / %.2f", damageCooldownTimer, damageCooldownTime);
-	ImGui::Text("%s", (damageCooldownTimer > 0.0f ? "Invincible" : "Vulnerable"));
-	ImGui::SliderFloat("Damage Cooldown Time", &damageCooldownTime, 0.1f, 3.0f, "%.2f sec");
+	ImGui::Text("Damage Cooldown: %.2f / %.2f", damageCooldownTimer_, damageCooldownTime_);
+	ImGui::Text("%s", (damageCooldownTimer_ > 0.0f ? "Invincible" : "Vulnerable"));
+	ImGui::SliderFloat("Damage Cooldown Time", &damageCooldownTime_, 0.1f, 3.0f, "%.2f sec");
 	ImGui::Separator();
-	ImGui::Text("Dodge: %s", isDodging ? "Dodging" : (dodgeCooldownTimer > 0.0f ? "Cooldown" : "Ready"));
-	ImGui::Text("Dodge Timer: %.2f / %.2f", dodgeTimer, dodgeDuration);
-	ImGui::Text("Dodge Cooldown: %.2f / %.2f", dodgeCooldownTimer, dodgeCooldown);
-	ImGui::SliderFloat("Dodge Duration", &dodgeDuration, 0.05f, 0.5f, "%.2f sec");
-	ImGui::SliderFloat("Dodge Cooldown", &dodgeCooldown, 0.2f, 3.0f, "%.2f sec");
-	ImGui::SliderFloat("Dodge Speed", &dodgeSpeed, 0.2f, 2.0f, "%.2f");
+	ImGui::Text("Dodge: %s", isDodging_ ? "Dodging" : (dodgeCooldownTimer_ > 0.0f ? "Cooldown" : "Ready"));
+	ImGui::Text("Dodge Timer: %.2f / %.2f", dodgeTimer_, dodgeDuration_);
+	ImGui::Text("Dodge Cooldown: %.2f / %.2f", dodgeCooldownTimer_, dodgeCooldown_);
+	ImGui::SliderFloat("Dodge Duration", &dodgeDuration_, 0.05f, 0.5f, "%.2f sec");
+	ImGui::SliderFloat("Dodge Cooldown", &dodgeCooldown_, 0.2f, 3.0f, "%.2f sec");
+	ImGui::SliderFloat("Dodge Speed", &dodgeSpeed_, 0.2f, 2.0f, "%.2f");
 	ImGui::Separator();
-	ImGui::Text("Dodge Direction: (%.2f, %.2f)", dodgeDirection.x, dodgeDirection.y);
-	if (mapChipField) {
-		MapChipField::IndexSet index = mapChipField->GetMapChipIndexSetByPosition(position);
-		MapChipType type = mapChipField->GetMapChipTypeByIndex(index.xIndex, index.yIndex);
+	ImGui::Text("Dodge Direction: (%.2f, %.2f)", dodgeDirection_.x, dodgeDirection_.y);
+	if (mapChipField_) {
+		MapChipField::IndexSet index = mapChipField_->GetMapChipIndexSetByPosition(position_);
+		MapChipType type = mapChipField_->GetMapChipTypeByIndex(index.xIndex, index.yIndex);
 		const char* typeStr = "Unknown";
 		if (type == MapChipType::kBlank)
 			typeStr = "Blank";
@@ -458,15 +456,15 @@ void Player::DrawImGui() {
 		}
 	}
 	ImGui::End();
-	object3d->DrawImGui("Player");
+	object3d_->DrawImGui("Player");
 	PlayerBullet::DrawImGuiGlobal();
 #endif // USE_IMGUI
 }
 
 // --- 回避開始 ---
 void Player::StartDodge() {
-	isDodging = true;
-	dodgeTimer = dodgeDuration;
+	isDodging_ = true;
+	dodgeTimer_ = dodgeDuration_;
 	TuboEngine::Math::Vector3 inputDir = GetDodgeInputDirection();
 	if (inputDir.x != 0.0f || inputDir.y != 0.0f) {
 		float len = std::sqrt(inputDir.x * inputDir.x + inputDir.y * inputDir.y);
@@ -474,33 +472,33 @@ void Player::StartDodge() {
 			inputDir.x /= len;
 			inputDir.y /= len;
 		}
-		dodgeDirection = inputDir;
+		dodgeDirection_ = inputDir;
 	} else {
-		float angle = rotation.z;
-		dodgeDirection.x = std::sin(angle);
-		dodgeDirection.y = -std::cos(angle);
-		dodgeDirection.z = 0.0f;
+		float angle = rotation_.z;
+		dodgeDirection_.x = std::sin(angle);
+		dodgeDirection_.y = -std::cos(angle);
+		dodgeDirection_.z = 0.0f;
 	}
 }
 
 // --- 回避状態更新 ---
 void Player::UpdateDodge() {
-	if (dodgeCooldownTimer > 0.0f) {
-		dodgeCooldownTimer -= 1.0f / 60.0f;
-		if (dodgeCooldownTimer < 0.0f)
-			dodgeCooldownTimer = 0.0f;
+	if (dodgeCooldownTimer_ > 0.0f) {
+		dodgeCooldownTimer_ -= 1.0f / 60.0f;
+		if (dodgeCooldownTimer_ < 0.0f)
+			dodgeCooldownTimer_ = 0.0f;
 	}
-	if (isDodging) {
-		dodgeTimer -= 1.0f / 60.0f;
-		if (dodgeTimer <= 0.0f) {
-			isDodging = false;
-			dodgeCooldownTimer = dodgeCooldown;
+	if (isDodging_) {
+		dodgeTimer_ -= 1.0f / 60.0f;
+		if (dodgeTimer_ <= 0.0f) {
+			isDodging_ = false;
+			dodgeCooldownTimer_ = dodgeCooldown_;
 		}
 	}
 }
 
 // --- 回避可能か ---
-bool Player::CanDodge() const { return !isDodging && dodgeCooldownTimer <= 0.0f; }
+bool Player::CanDodge() const { return !isDodging_ && dodgeCooldownTimer_ <= 0.0f; }
 
 // --- 回避入力方向取得 ---
 TuboEngine::Math::Vector3 Player::GetDodgeInputDirection() const {
@@ -567,7 +565,7 @@ TuboEngine::Math::Vector3 Player::GetAimDirectionFromReticle() const {
 	if (std::fabs(rayDir.z) < 1e-5f) { return dir; }
 	float t = (0.0f - rayOrigin.z) / rayDir.z;
 	TuboEngine::Math::Vector3 hit = {rayOrigin.x + rayDir.x * t, rayOrigin.y + rayDir.y * t, 0.0f};
-	TuboEngine::Math::Vector3 aim = {hit.x - position.x, hit.y - position.y, hit.z - position.z};
+	TuboEngine::Math::Vector3 aim = {hit.x - position_.x, hit.y - position_.y, hit.z - position_.z};
 	float ilen = std::sqrt(aim.x * aim.x + aim.y * aim.y + aim.z * aim.z);
 	if (ilen > 0.0f) { aim.x /= ilen; aim.y /= ilen; aim.z /= ilen; }
 	return aim;
