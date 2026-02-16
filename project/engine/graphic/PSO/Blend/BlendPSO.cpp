@@ -88,7 +88,7 @@ void BlendPSO::CreateRootSignature()
 
 	TuboEngine::DirectXCommon::GetInstance()->hr = device->CreateRootSignature(
 		0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
-	assert(SUCCEEDED(DirectXCommon::GetInstance()->hr));
+	assert(SUCCEEDED(TuboEngine::DirectXCommon::GetInstance()->hr));
 
 	rootSignatureCreated_ = true;
 }
@@ -245,7 +245,7 @@ void BlendPSO::CreateOrUpdatePipelineState()
 
 	 TuboEngine::DirectXCommon::GetInstance()->hr = device->CreateGraphicsPipelineState(
 		&graphicPipelineStateDesc, IID_PPV_ARGS(&graphicsPipeLineState));
-	assert(SUCCEEDED(DirectXCommon::GetInstance()->hr));
+	assert(SUCCEEDED(TuboEngine::DirectXCommon::GetInstance()->hr));
 
 	pipelineStateCreated_ = true;
 }

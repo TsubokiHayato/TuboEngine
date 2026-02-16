@@ -250,7 +250,7 @@ void Sprite::DrawImGui(const char* windowName) {
     ImGui::Separator();
     ImGui::Text("Sprite ImGui コントロール"); // セクションタイトル
     // 位置
-    Vector2 pos = GetPosition();
+    TuboEngine::Math::Vector2 pos = GetPosition();
     if (ImGui::DragFloat2("Position", &pos.x, 1.0f)) {
         SetPosition(pos);
     }
@@ -260,12 +260,12 @@ void Sprite::DrawImGui(const char* windowName) {
         SetRotation(rot);
     }
     // サイズ
-    Vector2 sz = GetSize();
+	TuboEngine::Math::Vector2 sz = GetSize();
     if (ImGui::DragFloat2("Size", &sz.x, 1.0f)) {
         SetSize(sz);
     }
     // アンカーポイント
-    Vector2 anchor = GetAnchorPoint();
+	TuboEngine::Math::Vector2 anchor = GetAnchorPoint();
     if (ImGui::DragFloat2("AnchorPoint", &anchor.x, 0.01f, 0.0f, 1.0f)) {
         SetAnchorPoint(anchor);
     }
@@ -280,12 +280,12 @@ void Sprite::DrawImGui(const char* windowName) {
         SetFlipY(flipY);
     }
     // テクスチャ左上座標
-    Vector2 texLT = GetTextureLeftTop();
+	TuboEngine::Math::Vector2 texLT = GetTextureLeftTop();
     if (ImGui::DragFloat2("TextureLeftTop", &texLT.x, 1.0f)) {
         SetTextureLeftTop(texLT);
     }
     // テクスチャ切り出しサイズ
-    Vector2 texSz = GetTextureSize();
+	TuboEngine::Math::Vector2 texSz = GetTextureSize();
     if (ImGui::DragFloat2("TextureSize", &texSz.x, 1.0f)) {
         SetTextureSize(texSz);
     }

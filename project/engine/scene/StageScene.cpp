@@ -323,7 +323,7 @@ void StageScene::ImGuiDraw() {
 				next.field = std::make_unique<MapChipField>();
 				next.field->LoadMapChipCsv(next.csvPath);
 
-				StageBounds nextAtOrigin = ComputeBoundsWorld(Vector3{0, 0, 0}, *next.field);
+				StageBounds nextAtOrigin = ComputeBoundsWorld(TuboEngine::Math::Vector3{0, 0, 0}, *next.field);
 				next.origin = ComputeSpawnOriginFromCenter(centerB, nextAtOrigin, dir, gapX, gapY);
 
 				if (snapX > 0.0f) next.origin.x = std::round(next.origin.x / snapX) * snapX;
@@ -386,14 +386,14 @@ void StageScene::ImGuiDraw() {
 				st.enemies.clear();
 				st.tile = std::make_unique<Tile>();
 
-				Vector3 tilePos = st.origin;
+				TuboEngine::Math::Vector3 tilePos = st.origin;
 				tilePos.z = -1.0f;
 				st.tile->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile30x30.obj");
 				st.tile->SetCamera(followCamera->GetCamera());
 				st.tile->Update();
 
 				ForEachMapChipField(st.field.get(), [&](uint32_t x, uint32_t y, MapChipType type) {
-					Vector3 pos = st.field->GetMapChipPositionByIndex(x, y) + st.origin;
+					TuboEngine::Math::Vector3 pos = st.field->GetMapChipPositionByIndex(x, y) + st.origin;
 					if (type == MapChipType::kBlock) {
 						auto block = std::make_unique<Block>();
 						block->Initialize(pos);
@@ -437,7 +437,7 @@ void StageScene::ImGuiDraw() {
 				st.csvPath = buf;
 			}
 
-			Vector3 origin = st.origin;
+			TuboEngine::Math::Vector3 origin = st.origin;
 			float o[2] = { origin.x, origin.y };
 			if (ImGui::DragFloat2("Origin", o, 0.1f)) {
 				origin.x = o[0];
