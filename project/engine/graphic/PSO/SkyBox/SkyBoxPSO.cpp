@@ -200,7 +200,7 @@ void SkyBoxPSO::CreateGraphicPipeline() {
 	//実際に生成
 	TuboEngine::DirectXCommon::GetInstance()->hr = device->CreateGraphicsPipelineState(&graphicPipelineStateDesc,
 		IID_PPV_ARGS(&graphicsPipeLineState));
-	assert(SUCCEEDED(DirectXCommon::GetInstance()->hr));
+	assert(SUCCEEDED(TuboEngine::DirectXCommon::GetInstance()->hr));
 
 
 }
