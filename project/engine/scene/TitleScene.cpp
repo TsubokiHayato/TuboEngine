@@ -267,8 +267,8 @@ void TitleScene::ImGuiDraw() {
 	// プレイヤー調整（デバッグ用）
 	if (player_) {
 		ImGui::Begin("Player Title Anim");
-		Vector3 ppos = player_->GetPosition();
-		ImGui::Text("Position: %.2f, %.2f, %.2f", ppos.x, ppos.y, ppos.z);
+		TuboEngine::Math::Vector3 playerPos_ = player_->GetPosition();
+		ImGui::Text("Position: %.2f, %.2f, %.2f", playerPos_.x, playerPos_.y, playerPos_.z);
 		ImGui::Text("IntroDone: %d", playerIntroDone_ ? 1 : 0);
 		ImGui::End();
 	}
