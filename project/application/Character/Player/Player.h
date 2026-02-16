@@ -36,7 +36,6 @@ public:
 	// --- Weapon ---
 	enum class WeaponType {
 		Normal = 0,
-		Rapid,
 		Shotgun,
 	};
 
@@ -232,6 +231,24 @@ public:
 		auto bullet = std::make_unique<TBullet>();
 		bullet->Initialize(position_);
 		bullet->SetPlayerRotation(rotation_);
+		bullet->SetPlayerPosition(position_);
+		bullet->SetMapChipField(mapChipField_);
+		bullet->SetVelocity({d.x * bulletSpeed, d.y * bulletSpeed, d.z * bulletSpeed});
+		bullet->SetCamera(object3d_->GetCamera());
+		bullets_.push_back(std::move(bullet));
+	}
+
+	// 追加: 武器側で回転（発射角）を指定して弾を生成したい場合用
+	template<typename TBullet>
+	void SpawnBulletWithRotationZ(float rotationZRad, float angleOffsetRad, float bulletSpeed) {
+		float ang = rotationZRad;
+		TuboEngine::Math::Vector3 d{std::sin(ang + angleOffsetRad), std::cos(ang + angleOffsetRad), 0.0f};
+		auto bullet = std::make_unique<TBullet>();
+		bullet->Initialize(position_);
+		// 弾側は playerRotation.z を参照して進行方向を決めるので、ここで指定
+		TuboEngine::Math::Vector3 rot = rotation_;
+		rot.z = rotationZRad;
+		bullet->SetPlayerRotation(rot);
 		bullet->SetPlayerPosition(position_);
 		bullet->SetMapChipField(mapChipField_);
 		bullet->SetVelocity({d.x * bulletSpeed, d.y * bulletSpeed, d.z * bulletSpeed});

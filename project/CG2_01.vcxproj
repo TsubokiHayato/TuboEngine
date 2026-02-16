@@ -245,6 +245,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\SkyDome\SkyDome.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application\Bullet\Player\PiercingBullet.h" />
+    <ClInclude Include="application\Bullet\Player\ShotgunPelletBullet.h" />
     <ClInclude Include="application\Character\Enemy\RushEnemy.h" />
     <ClInclude Include="application\Character\Player\Player.h" />
     <ClInclude Include="application\Bullet\Player\PlayerBullet.h" />
