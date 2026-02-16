@@ -29,6 +29,54 @@ Player::Player()
 Player::~Player() {}
 
 //--------------------------------------------------
+// 武器パラメータ適用
+//--------------------------------------------------
+void Player::ApplyWeaponParams(WeaponType type) {
+	weaponType_ = type;
+	// 基準値（既存のクールダウン/弾速）から武器ごとに調整
+	// ※ PlayerBullet::s_bulletSpeed は既存の弾速として利用
+	weaponBulletSpeed_ = PlayerBullet::s_bulletSpeed;
+	weaponPelletCount_ = 1;
+	weaponSpreadRad_ = 0.0f;
+
+	switch (weaponType_) {
+	case WeaponType::Normal:
+		weaponCooldownSec_ = 0.2f;
+		break;
+	case WeaponType::Rapid:
+		weaponCooldownSec_ = 0.08f;
+		weaponBulletSpeed_ = PlayerBullet::s_bulletSpeed * 0.9f;
+		break;
+	case WeaponType::Shotgun:
+		weaponCooldownSec_ = 0.5f;
+		weaponPelletCount_ = 6;
+		weaponSpreadRad_ = 0.18f; // 約10度
+		weaponBulletSpeed_ = PlayerBullet::s_bulletSpeed * 0.85f;
+		break;
+	default:
+		weaponCooldownSec_ = 0.2f;
+		break;
+	}
+
+	// 既存の Shoot が参照している cooldownTime_ にも反映
+	cooldownTime_ = weaponCooldownSec_;
+}
+
+void Player::SetWeaponType(WeaponType type) { ApplyWeaponParams(type); }
+
+void Player::NextWeapon() {
+	int t = static_cast<int>(weaponType_);
+	t = (t + 1) % 3;
+	ApplyWeaponParams(static_cast<WeaponType>(t));
+}
+
+void Player::PrevWeapon() {
+	int t = static_cast<int>(weaponType_);
+	t = (t + 2) % 3;
+	ApplyWeaponParams(static_cast<WeaponType>(t));
+}
+
+//--------------------------------------------------
 // 初期化処理
 //--------------------------------------------------
 void Player::Initialize() {
@@ -67,14 +115,9 @@ void Player::Initialize() {
 	reticleSprite_->Initialize(reticleFileNamePath);
 
 	bulletTimer_ = 0.0f;
-	damageCooldownTimer_ = 0.0f;
-	isDodging_ = false;
-	dodgeTimer_ = 0.0f;
-	dodgeCooldownTimer_ = 0.0f;
-	dodgeDuration_ = 0.2f;
-	dodgeCooldown_ = 1.0f;
-	dodgeSpeed_ = 0.5f;
-	dodgeDirection_ = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
+	// 初期武器
+	weaponSwitchCooldownTimer_ = 0.0f;
+	ApplyWeaponParams(WeaponType::Normal);
 
 	// --- 追加: 軌道トレイル用パーティクルエミッター生成 ---
 	if (!trailEmitter_) {
@@ -124,70 +167,125 @@ void Player::Initialize() {
 //--------------------------------------------------
 void Player::Update() {
 	if (isAlive_ == false) {
-		// 死亡中でも見た目の姿勢は維持（Object3dへ反映）
-		object3d_->SetPosition(position_);
-		object3d_->SetRotation(rotation_);
-		object3d_->SetScale(scale_);
-		object3d_->Update();
+		UpdateWhenDead_();
 		return;
-	} // 死亡状態なら更新しない
-
-#ifdef USE_IMGUI
-	// ImGuiの操作中はゲーム側の自動回転（マウス追従）で上書きしない
-	const bool wantCaptureMouse = ImGui::GetIO().WantCaptureMouse;
-#else
-	const bool wantCaptureMouse = false;
-#endif
-
-	// Clear/Over等の演出シーンでは isMovementLocked=true で入力無効化される。
-	// そのときマウス位置参照の Rotate() を走らせると、意図しない方向を向いたり
-	// レティクルが更新されてしまうため、回転はシーン側が制御する。
-	if (!wantCaptureMouse && !isMovementLocked_) {
-		Rotate();
 	}
 
-	if (!isMovementLocked_) {
-		// ダメージクールダウンタイマー更新
-		if (damageCooldownTimer_ > 0.0f) {
-			damageCooldownTimer_ -= 1.0f / 60.0f;
-			if (damageCooldownTimer_ < 0.0f)
-				damageCooldownTimer_ = 0.0f;
-		}
-		UpdateDodge();
-		if (CanDodge() && Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-			StartDodge();
-		}
-		Move();
-		// 発射タイマー更新
-		if (bulletTimer_ > 0.0f) {
-			bulletTimer_ -= 1.0f / 60.0f; // 60FPS前提
-		}
-		Shoot();
-		// 弾の更新
-		for (auto& bullet : bullets_) {
-			bullet->SetCamera(object3d_->GetCamera());
-			bullet->Update();
-		}
-		// isAlive==false のバレットを削除
-		bullets_.erase(std::remove_if(bullets_.begin(), bullets_.end(), [](const std::unique_ptr<PlayerBullet>& bullet) { return !bullet->GetIsAlive(); }), bullets_.end());
-		if (hp_ <= 0) {
-			isAlive_ = false; // HPが0以下なら死亡状態にする
-		}
-	}
+	const float dt = 1.0f / 60.0f;
+	const bool wantCaptureMouse = ShouldIgnoreMouseForRotate_();
+
+	UpdateGameplayActive_(dt, wantCaptureMouse);
 
 	// 被弾フラグは既存仕様通りこのタイミングで落とす
 	isHit_ = false;
 
+	UpdateTransforms_();
+	UpdateReticle_();
+	UpdateEmitters_();
+	UpdateDashRingTrigger_();
+	UpdateDashPostEffect_(dt);
+	UpdateLowHpVignette_();
+}
+
+void Player::UpdateWhenDead_() {
+	// 死亡中でも見た目の姿勢は維持（Object3dへ反映）
 	object3d_->SetPosition(position_);
 	object3d_->SetRotation(rotation_);
 	object3d_->SetScale(scale_);
 	object3d_->Update();
+}
 
+bool Player::ShouldIgnoreMouseForRotate_() const {
+#ifdef USE_IMGUI
+	return ImGui::GetIO().WantCaptureMouse;
+#else
+	return false;
+#endif
+}
+
+void Player::UpdateBullets_(float /*dt*/) {
+	for (auto& bullet : bullets_) {
+		bullet->SetCamera(object3d_->GetCamera());
+		bullet->Update();
+	}
+	bullets_.erase(std::remove_if(bullets_.begin(), bullets_.end(),
+		[](const std::unique_ptr<PlayerBullet>& bullet) { return !bullet->GetIsAlive(); }),
+		bullets_.end());
+}
+
+void Player::UpdateWeaponSwitch_(float dt) {
+	// 武器切替（例: Q/E）
+	if (weaponSwitchCooldownTimer_ > 0.0f) {
+		weaponSwitchCooldownTimer_ -= dt;
+		if (weaponSwitchCooldownTimer_ < 0.0f) {
+			weaponSwitchCooldownTimer_ = 0.0f;
+		}
+	}
+	if (weaponSwitchCooldownTimer_ <= 0.0f) {
+		if (Input::GetInstance()->TriggerKey(DIK_E)) {
+			NextWeapon();
+			weaponSwitchCooldownTimer_ = weaponSwitchCooldownSec_;
+		} else if (Input::GetInstance()->TriggerKey(DIK_Q)) {
+			PrevWeapon();
+			weaponSwitchCooldownTimer_ = weaponSwitchCooldownSec_;
+		}
+	}
+}
+
+void Player::UpdateGameplayActive_(float dt, bool wantCaptureMouse) {
+	// Clear/Over等の演出シーンでは isMovementLocked=true で入力無効化される。
+	if (!wantCaptureMouse && !isMovementLocked_) {
+		Rotate();
+	}
+
+	if (isMovementLocked_) {
+		return;
+	}
+
+	// ダメージクールダウンタイマー更新
+	if (damageCooldownTimer_ > 0.0f) {
+		damageCooldownTimer_ -= dt;
+		if (damageCooldownTimer_ < 0.0f) {
+			damageCooldownTimer_ = 0.0f;
+		}
+	}
+
+	UpdateDodge();
+	if (CanDodge() && Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		StartDodge();
+	}
+
+	Move();
+
+	// 発射タイマー更新
+	if (bulletTimer_ > 0.0f) {
+		bulletTimer_ -= dt;
+	}
+	Shoot();
+	UpdateBullets_(dt);
+
+	if (hp_ <= 0) {
+		isAlive_ = false;
+	}
+
+	UpdateWeaponSwitch_(dt);
+}
+
+void Player::UpdateTransforms_() {
+	object3d_->SetPosition(position_);
+	object3d_->SetRotation(rotation_);
+	object3d_->SetScale(scale_);
+	object3d_->Update();
+}
+
+void Player::UpdateReticle_() {
 	reticleSprite_->SetPosition(reticlePosition_);
-	reticleSprite_->SetGetIsAdjustTextureSize(true);     // レティクルのサイズを調整する
-	reticleSprite_->SetAnchorPoint(TuboEngine::Math::Vector2(0.5f, 0.5f)); // アンカーポイントを中央に設定
+	reticleSprite_->SetGetIsAdjustTextureSize(true);
+	reticleSprite_->SetAnchorPoint(TuboEngine::Math::Vector2(0.5f, 0.5f));
 	reticleSprite_->Update();
+}
 
+void Player::UpdateEmitters_() {
 	// --- 追加: トレイルエミッター中心更新 (プレイヤー位置) ---
 	if (trailEmitter_) {
 		trailEmitter_->GetPreset().center = position_;
@@ -203,52 +301,49 @@ void Player::Update() {
 		}
 		dashRingEmitter_->GetPreset().center = center;
 	}
+}
 
+void Player::UpdateDashRingTrigger_() {
 	// 回避開始タイミングでEmit（立ち上がり検出）
-	static bool wasDodgingPrevLocal = false; // 関数スコープの前フレーム値
-	bool dodgingNow = isDodging_;             // 既存の回避フラグを使用
+	static bool wasDodgingPrevLocal = false;
+	bool dodgingNow = isDodging_;
 	if (dashRingEmitter_ && dodgingNow && !wasDodgingPrevLocal) {
 		TriggerDashRing();
-		// Dash演出: ポストエフェクトを一時的にRadialBlurへ
 		dashPostEffectTimer_ = dashPostEffectDuration_;
 		OffScreenRendering::GetInstance()->SetDashPostEffectEnabled(true);
 	}
 	wasDodgingPrevLocal = dodgingNow;
+}
 
-	// Dashポストエフェクトの時間経過で自動復帰
+void Player::UpdateDashPostEffect_(float dt) {
 	if (dashPostEffectTimer_ > 0.0f) {
-		dashPostEffectTimer_ -= 1.0f / 60.0f;
-		// 0→1 の進行度（開始直後=1、終了直前=0）
+		dashPostEffectTimer_ -= dt;
 		float t = dashPostEffectTimer_ / std::max(0.0001f, dashPostEffectDuration_);
 		t = std::clamp(t, 0.0f, 1.0f);
-		// 立ち上がりで強く、徐々に弱まる（イージング）
 		float eased = t * t; // ease-out
 		OffScreenRendering::GetInstance()->SetDashRadialBlurPower(dashRadialBlurPower_ * eased);
 		if (dashPostEffectTimer_ <= 0.0f) {
 			dashPostEffectTimer_ = 0.0f;
-			OffScreenRendering::GetInstance()->SetDashRadialBlurPower(0.02f); // RadialBlurのデフォルトへ戻す
+			OffScreenRendering::GetInstance()->SetDashRadialBlurPower(0.02f);
 			OffScreenRendering::GetInstance()->SetDashPostEffectEnabled(false);
 		}
 	}
+}
 
-	// 低HP演出: HP割合が下がるほどビネットを強くする（常時）
-	// ※最大HPが固定(=5)ならこれでOK。将来可変なら getter を追加して置き換える。
+void Player::UpdateLowHpVignette_() {
 	constexpr float kMaxHpAssumed = 5.0f;
 	float hpRatio = (kMaxHpAssumed > 0.0f) ? (static_cast<float>(hp_) / kMaxHpAssumed) : 1.0f;
 	hpRatio = std::clamp(hpRatio, 0.0f, 1.0f);
 
-	// 低HP開始ライン以下で 0→1 に正規化（HPが低いほど1に近い）
 	float t = 0.0f;
 	if (hpRatio < lowHpVignetteStartRatio_) {
 		float denom = std::max(0.0001f, lowHpVignetteStartRatio_);
 		t = (lowHpVignetteStartRatio_ - hpRatio) / denom;
 	}
 	t = std::clamp(t, 0.0f, 1.0f);
-	// 強めのカーブ（HP少ない時ほど急激に濃く）
 	float eased = t * t;
 	float targetPower = 0.8f + (lowHpVignetteMaxPower_ - 0.8f) * eased;
 
-	// なめらかに追従
 	if (lowHpVignetteSmoothing_ <= 0.0f) {
 		lowHpVignetteCurrentPower_ = targetPower;
 	} else {
@@ -272,16 +367,36 @@ void Player::Shoot() {
 		// プレイヤーの現在の回転(Z)から発射方向を作る（Rotateと一貫性を保つ）
 		float ang = rotation_.z;
 		TuboEngine::Math::Vector3 dir{std::sin(ang), std::cos(ang), 0.0f};
-		// 発射
-		auto bullet = std::make_unique<PlayerBullet>();
-		bullet->Initialize(position_);
-		bullet->SetPlayerRotation(rotation_);
-		bullet->SetPlayerPosition(position_);
-		bullet->SetMapChipField(mapChipField_);
-		// 弾の速度をプレイヤー向きに設定
-		bullet->SetVelocity({dir.x * PlayerBullet::s_bulletSpeed, dir.y * PlayerBullet::s_bulletSpeed, dir.z * PlayerBullet::s_bulletSpeed});
-		bullets_.push_back(std::move(bullet));
-		bulletTimer_ = cooldownTime_;
+
+		auto spawnBullet = [&](float dirAngleRad) {
+			TuboEngine::Math::Vector3 d{std::sin(ang + dirAngleRad), std::cos(ang + dirAngleRad), 0.0f};
+			auto bullet = std::make_unique<PlayerBullet>();
+			bullet->Initialize(position_);
+			bullet->SetPlayerRotation(rotation_);
+			bullet->SetPlayerPosition(position_);
+			bullet->SetMapChipField(mapChipField_);
+			bullet->SetVelocity({d.x * weaponBulletSpeed_, d.y * weaponBulletSpeed_, d.z * weaponBulletSpeed_});
+			bullet->SetCamera(object3d_->GetCamera());
+			bullets_.push_back(std::move(bullet));
+		};
+
+		if (weaponType_ == WeaponType::Shotgun) {
+			// 中心+左右にばらけさせる
+			int n = std::max(1, weaponPelletCount_);
+			if (n == 1) {
+				spawnBullet(0.0f);
+			} else {
+				for (int i = 0; i < n; ++i) {
+					float t = (n == 1) ? 0.5f : (static_cast<float>(i) / static_cast<float>(n - 1));
+					float offset = (t - 0.5f) * 2.0f * weaponSpreadRad_;
+					spawnBullet(offset);
+				}
+			}
+		} else {
+			spawnBullet(0.0f);
+		}
+
+		bulletTimer_ = weaponCooldownSec_;
 	}
 }
 
@@ -455,6 +570,18 @@ void Player::DrawImGui() {
 			dashRingEmitter_->Emit(p.burstCount);
 		}
 	}
+	// 武器情報
+	const char* weaponName = "Normal";
+	if (weaponType_ == WeaponType::Rapid) weaponName = "Rapid";
+	if (weaponType_ == WeaponType::Shotgun) weaponName = "Shotgun";
+	ImGui::Separator();
+	ImGui::Text("Weapon: %s", weaponName);
+	ImGui::Text("WeaponCooldown: %.2f", weaponCooldownSec_);
+	ImGui::Text("WeaponBulletSpeed: %.2f", weaponBulletSpeed_);
+	ImGui::Text("Pellets: %d  SpreadRad: %.3f", weaponPelletCount_, weaponSpreadRad_);
+	if (ImGui::Button("Next Weapon")) { NextWeapon(); }
+	ImGui::SameLine();
+	if (ImGui::Button("Prev Weapon")) { PrevWeapon(); }
 	ImGui::End();
 	object3d_->DrawImGui("Player");
 	PlayerBullet::DrawImGuiGlobal();

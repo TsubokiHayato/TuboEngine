@@ -30,6 +30,13 @@ public:
 	///				メンバ関数
 	///--------------------------------------------------
 
+	// --- Weapon ---
+	enum class WeaponType {
+		Normal = 0,
+		Rapid,
+		Shotgun,
+	};
+
 	/** @brief コンストラクタ。 */
 	Player();
 	/** @brief デストラクタ。 */
@@ -114,6 +121,20 @@ private:
 	 */
 	TuboEngine::Math::Vector3 GetDodgeInputDirection() const;
 
+	// --- Update helpers (function length reduction) ---
+	void UpdateWhenDead_();
+	bool ShouldIgnoreMouseForRotate_() const;
+	void UpdateGameplayLocked_(float dt);
+	void UpdateGameplayActive_(float dt, bool wantCaptureMouse);
+	void UpdateBullets_(float dt);
+	void UpdateWeaponSwitch_(float dt);
+	void UpdateTransforms_();
+	void UpdateReticle_();
+	void UpdateEmitters_();
+	void UpdateDashPostEffect_(float dt);
+	void UpdateLowHpVignette_();
+	void UpdateDashRingTrigger_();
+
 public:
 	///-----------------------------------
 	///				ゲッター
@@ -137,6 +158,8 @@ public:
 	bool IsDashing() const { return isDashing_; } // 既存なら流用、無ければダミー
 	/** @brief 被弾フラグを取得します。 @return 被弾していればtrue。 */
 	bool GetIsHit() const { return isHit_; } // 被弾フラグのゲッター
+	/** @brief 使用中の武器種別を取得します。 @return 武器種別。 */
+	WeaponType GetWeaponType() const { return weaponType_; }
 
 	///-----------------------------------
 	///				セッター
@@ -189,6 +212,15 @@ public:
 	 * @param flag ロックするならtrue。
 	 */
 	void SetMovementLocked(bool flag) { isMovementLocked_ = flag; }
+
+	/**
+	 * @brief 使用する武器の種別を設定します。
+	 * @param type 武器種別。
+	 */
+	void SetWeaponType(WeaponType type);
+
+	void NextWeapon();
+	void PrevWeapon();
 
 private:
 	///--------------------------------------------------
@@ -260,4 +292,19 @@ private:
 	float lowHpVignetteStartRatio_ = 0.5f; // このHP割合以下から効き始める
 	float lowHpVignetteSmoothing_ = 0.15f; // 追従のなめらかさ（0で即時）
 	float lowHpVignetteCurrentPower_ = 0.8f; // 現在適用中（補間用）
+
+	// --- Weapon state ---
+	WeaponType weaponType_ = WeaponType::Normal;
+
+	// 武器切替入力のチャタリング防止
+	float weaponSwitchCooldownTimer_ = 0.0f;
+	float weaponSwitchCooldownSec_ = 0.2f;
+
+	// 射撃パラメータ（武器で上書きする）
+	float weaponCooldownSec_ = 0.2f;    // 実際に使用する発射間隔
+	float weaponBulletSpeed_ = 0.0f;    // PlayerBullet::s_bulletSpeed を基準に倍率で扱う
+	int weaponPelletCount_ = 1;         // Shotgun用
+	float weaponSpreadRad_ = 0.0f;      // Shotgun用
+
+	void ApplyWeaponParams(WeaponType type);
 };
