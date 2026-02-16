@@ -120,29 +120,29 @@ void Sprite::Update()
 {
 
 	//textureの位置
-	float left = 0.0f - anchorPoint.x;
-	float right = 1.0f - anchorPoint.x;
-	float top = 0.0f - anchorPoint.y;
-	float bottom = 1.0f - anchorPoint.y;
+	float left = 0.0f - anchorPoint_.x;
+	float right = 1.0f - anchorPoint_.x;
+	float top = 0.0f - anchorPoint_.y;
+	float bottom = 1.0f - anchorPoint_.y;
 
 
 	// 左右反転
 	if (isFlipX_) {
-		left = 1.0f - anchorPoint.x;
-		right = 0.0f - anchorPoint.x;
+		left = 1.0f - anchorPoint_.x;
+		right = 0.0f - anchorPoint_.x;
 	}
 	else {
-		left = 0.0f - anchorPoint.x;
-		right = 1.0f - anchorPoint.x;
+		left = 0.0f - anchorPoint_.x;
+		right = 1.0f - anchorPoint_.x;
 	}
 	//上下反転
 	if (isFlipY_) {
-		top = 1.0f - anchorPoint.x;
-		bottom = 0.0f - anchorPoint.x;
+		top = 1.0f - anchorPoint_.x;
+		bottom = 0.0f - anchorPoint_.x;
 	}
 	else {
-		top = 0.0f - anchorPoint.x;
-		bottom = 1.0f - anchorPoint.x;
+		top = 0.0f - anchorPoint_.x;
+		bottom = 1.0f - anchorPoint_.x;
 	}
 
 
@@ -157,7 +157,7 @@ void Sprite::Update()
 	float tex_bottom = (textureLeftTop_.y + textureSize_.y) / metadata.height;
 	
 	//テクスチャの初期サイズを呼び出す関数
-	if (isAdjustTextureSize) {
+	if (isAdjustTextureSize_) {
 		AdjustTextureSize();
 	}
 
@@ -165,8 +165,8 @@ void Sprite::Update()
 	テクスチャの位置、画像位置, 法線ベクトル, 大きさ
 	---------------------------------------*/
 
-	transform.translate = { position.x,position.y,0.0f };
-	transform.rotate = { 0.0f,0.0f,rotation };
+	transform.translate = { position_.x,position_.y,0.0f };
+	transform.rotate = { 0.0f,0.0f,rotation_ };
 
 	vertexData[0].position = { left,bottom,0.0f,1.0f };
 	vertexData[0].texcoord = { tex_left,tex_bottom };
@@ -184,7 +184,7 @@ void Sprite::Update()
 	vertexData[3].texcoord = { tex_right,tex_top };
 	vertexData[3].normal = { 0.0f,0.0f,-1.0f };
 
-	transform.scale = { size.x,size.y,1.0f };
+	transform.scale = { size_.x,size_.y,1.0f };
 
 
 	/*---------
@@ -205,7 +205,6 @@ void Sprite::Update()
 
 
 	commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
-
 
 
 
@@ -238,7 +237,7 @@ void Sprite::AdjustTextureSize()
 	textureSize_.x = static_cast<float>(metadata.width);
 	textureSize_.y = static_cast<float>(metadata.height);
 	
-	size = textureSize_;
+	size_ = textureSize_;
 }
 
 // ImGuiでSpriteの全機能をまとめて操作・確認できる関数

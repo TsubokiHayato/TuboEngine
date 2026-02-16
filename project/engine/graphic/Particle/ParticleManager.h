@@ -6,6 +6,22 @@
 #include <functional>
 #include "IParticleEmitter.h"
 
+/**
+ * @brief パーティクル（エミッター）を一括管理するマネージャ。
+ *
+ * @details
+ * `ParticleManager` は複数の `IParticleEmitter` を所有し、
+ * - 生成（テンプレート/レジストリ経由）
+ * - 毎フレーム更新（`Update()`）
+ * - 描画（`Draw()`）
+ * - シリアライズ（Save/Load）
+ * - 編集支援（ImGui / Undo-Redo / Preview）
+ * をまとめて提供します。
+ *
+ * @note
+ * `CreateEmitter()` で生成したエミッターの寿命はマネージャが管理します。
+ * 返されるポインタは所有権を持たない参照であり、`Remove()` や `Finalize()` 後は無効になります。
+ */
 class ParticleManager {
 public:
     static ParticleManager* GetInstance() {
@@ -15,13 +31,45 @@ public:
 
     ~ParticleManager() { Finalize(); }
 
+    /**
+     * @brief 全エミッターを更新します。
+     * @param dt デルタタイム（秒）。
+     * @param defaultCam エミッター側でカメラ未指定の場合に使用するデフォルトカメラ。
+     *
+     * @details
+     * - 各 `IParticleEmitter` の生成/寿命/アニメーション等を更新します。
+     * - Live Preview が有効な場合はプレビュー用エミッターの更新も行います。
+     */
     void Update(float dt, Camera* defaultCam);
+
+    /**
+     * @brief パーティクルを描画します。
+     *
+     * @details
+     * - 登録されている全エミッターを描画します。
+     * - Live Preview が有効な場合はプレビュー用エミッターも描画します。
+     *
+     * @note
+     * 描画対象/描画順は内部のエミッター配列の順序に依存します。
+     */
     void Draw();
+
     void DrawImGui();
 
     // Registry-based creation
     IParticleEmitter* CreateEmitterByType(const std::string& typeName, const ParticlePreset& preset);
 
+    /**
+     * @brief 指定した型のエミッターを生成して登録します。
+     * @tparam EmitterT `IParticleEmitter` 派生型。
+     * @param preset 生成に使用するプリセット。
+     * @return 生成されたエミッターへの非所有ポインタ。
+     *
+     * @details
+     * - `preset.name` が空の場合は "Emitter" をベースにユニーク名を自動付与します。
+     * - 生成後に `EmitterT::Initialize()` を呼び出します。
+     * - 生成したエミッターは内部コンテナに保持され、`Finalize()` まで生存します。
+     */
     template<typename EmitterT>
     EmitterT* CreateEmitter(const ParticlePreset& preset) {
         ParticlePreset adjusted = preset;
