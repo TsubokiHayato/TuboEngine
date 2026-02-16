@@ -37,48 +37,36 @@ public:
 	/// </summary>
 	void DrawImGui(const char* windowName);
 
-	//getter_Pos
-	    const TuboEngine::Math::Vector2&
-	    GetPosition() const {
-		return position;
-	}
-	//setter_Pos
-	    void SetPosition(const TuboEngine::Math::Vector2& position) { this->position = position; }
+	// getter/setter
+	const TuboEngine::Math::Vector2& GetPosition() const { return position_; }
+	void SetPosition(const TuboEngine::Math::Vector2& position) { position_ = position; }
 
+	const float& GetRotation()const { return rotation_; }
+	void SetRotation(const float& rotation) { rotation_ = rotation; }
 
-	//getter_Rotation
-	const float& GetRotation()const { return rotation; }
-	//setter_Rotation
-	void SetRotation(const float& rotation) { this->rotation = rotation; }
-
-	//getter_Color
 	const TuboEngine::Math::Vector4& GetColor() const { return materialData->color; }
-	//setter_Color
 	void SetColor(const TuboEngine::Math::Vector4& color) { materialData->color = color; }
 
+	const TuboEngine::Math::Vector2& GetSize() const { return size_; }
+	void SetSize(const TuboEngine::Math::Vector2& size) { size_ = size; }
 
-	//getter_Size
-	const TuboEngine::Math::Vector2& GetSize() const { return size; }
-	//setter_Size
-	void SetSize(const TuboEngine::Math::Vector2& size) { this->size = size; }
-
-	const TuboEngine::Math::Vector2& GetAnchorPoint() const { return anchorPoint; }
-	void SetAnchorPoint(const TuboEngine::Math::Vector2& anchorPoint) { this->anchorPoint = anchorPoint; }
+	const TuboEngine::Math::Vector2& GetAnchorPoint() const { return anchorPoint_; }
+	void SetAnchorPoint(const TuboEngine::Math::Vector2& anchorPoint) { anchorPoint_ = anchorPoint; }
 
 	const bool& GetFlipX()const { return isFlipX_; }
-	void SetFlipX(const bool& isFlipX) { this->isFlipX_ = isFlipX; }
+	void SetFlipX(const bool& isFlipX) { isFlipX_ = isFlipX; }
 
 	const bool& GetFlipY()const { return isFlipY_; }
-	void SetFlipY(const bool& isFlipY) { this->isFlipY_ = isFlipY; }
+	void SetFlipY(const bool& isFlipY) { isFlipY_ = isFlipY; }
 
 	const TuboEngine::Math::Vector2& GetTextureLeftTop() const { return textureLeftTop_; }
-	void SetTextureLeftTop(const TuboEngine::Math::Vector2& textureLeftTop) { this->textureLeftTop_ = textureLeftTop; }
+	void SetTextureLeftTop(const TuboEngine::Math::Vector2& textureLeftTop) { textureLeftTop_ = textureLeftTop; }
 
 	const TuboEngine::Math::Vector2& GetTextureSize() const { return textureSize_; }
-	void SetTextureSize(const TuboEngine::Math::Vector2& textureSize) { this->textureSize_ = textureSize; }
+	void SetTextureSize(const TuboEngine::Math::Vector2& textureSize) { textureSize_ = textureSize; }
 
-	const bool& GetIsAdjustTextureSize()const { return isAdjustTextureSize; }
-	void SetGetIsAdjustTextureSize(const bool& isAdjustTextureSize) { this->isAdjustTextureSize = isAdjustTextureSize; }
+	const bool& GetIsAdjustTextureSize()const { return isAdjustTextureSize_; }
+	void SetGetIsAdjustTextureSize(const bool& isAdjustTextureSize) { isAdjustTextureSize_ = isAdjustTextureSize; }
 	
 	/// <summary>
 	/// テクスチャから初期サイズを得る
@@ -92,7 +80,6 @@ public:
 	const std::string& GetTexture() const { return textureFilePath_; }
 
 private:
-	
 	//バッファリソース
 	Microsoft::WRL::ComPtr <ID3D12Resource> vertexResource;
 	Microsoft::WRL::ComPtr <ID3D12Resource> indexResource;
@@ -125,9 +112,9 @@ private:
 	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
 
 
-	TuboEngine::Math::Vector2 position = {};
-	float rotation = {};
-	TuboEngine::Math::Vector2 size = {640.0f, 360.0f};
+	TuboEngine::Math::Vector2 position_ = {};
+	float rotation_ = {};
+	TuboEngine::Math::Vector2 size_ = {640.0f, 360.0f};
 
 	//テクスチャ番号
 	uint32_t textureIndex = 0;
@@ -138,7 +125,7 @@ private:
 	　　 拡張機能
 	-----------*/
 	//アンカーポイント
-	TuboEngine::Math::Vector2 anchorPoint = {};
+	TuboEngine::Math::Vector2 anchorPoint_ = {};
 	//左右フリップ
 	bool isFlipX_ = false;
 	//上下フリップ
@@ -148,6 +135,6 @@ private:
 	//テクスチャ切り出しサイズ
 	TuboEngine::Math::Vector2 textureSize_ = {100.0f, 100.0f};
 	//初期サイズにするフラグ
-	bool isAdjustTextureSize;
+	bool isAdjustTextureSize_ = false;
 };
 
