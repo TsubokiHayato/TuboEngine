@@ -359,7 +359,29 @@ void TutorialState::SpriteDraw(StageScene* scene) {
 	scene->GetPlayer()->ReticleDraw();
 }
 
-void TutorialState::ImGuiDraw(StageScene* /*scene*/) {
+void TutorialState::ImGuiDraw(StageScene* scene) {
+#ifdef USE_IMGUI
+	if (!scene) {
+		return;
+	}
+
+	ImGui::Begin("Tutorial Debug");
+	ImGui::Text("Step: %d", step_);
+	ImGui::Text("Elapsed: %.2f", elapsed_);
+	ImGui::Text("Built: %s", built_ ? "Yes" : "No");
+	ImGui::Separator();
+	ImGui::Text("Controls: [Enter]=Next  [Backspace]=Prev  [Esc]=Title  [F1]=Toggle ImGui");
+
+	if (scene->GetPlayer()) {
+		ImGui::Separator();
+		ImGui::Text("Player");	
+		scene->GetPlayer()->DrawImGui();
+	}
+
+	ImGui::Separator();
+	ImGui::Text("Enemies: %zu", scene->GetEnemies().size());
+	ImGui::End();
+#endif
 }
 
 void TutorialState::ParticleDraw(StageScene* scene) {

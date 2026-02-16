@@ -7,8 +7,11 @@
 #include "engine/graphic/Particle/ParticleManager.h"
 #include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 #include "Camera.h"
+#include <memory>
+
 // 前方宣言（ヘッダ依存軽減）
 class IParticleEmitter;
+class IWeapon;
 
 ///--------------------------------------------------
 /// @brief プレイヤークラス。
@@ -222,6 +225,20 @@ public:
 	void NextWeapon();
 	void PrevWeapon();
 
+	template<typename TBullet>
+	void SpawnBullet(float angleOffsetRad, float bulletSpeed) {
+		float ang = rotation_.z;
+		TuboEngine::Math::Vector3 d{std::sin(ang + angleOffsetRad), std::cos(ang + angleOffsetRad), 0.0f};
+		auto bullet = std::make_unique<TBullet>();
+		bullet->Initialize(position_);
+		bullet->SetPlayerRotation(rotation_);
+		bullet->SetPlayerPosition(position_);
+		bullet->SetMapChipField(mapChipField_);
+		bullet->SetVelocity({d.x * bulletSpeed, d.y * bulletSpeed, d.z * bulletSpeed});
+		bullet->SetCamera(object3d_->GetCamera());
+		bullets_.push_back(std::move(bullet));
+	}
+
 private:
 	///--------------------------------------------------
 	///				引き渡し用変数
@@ -295,6 +312,7 @@ private:
 
 	// --- Weapon state ---
 	WeaponType weaponType_ = WeaponType::Normal;
+	std::unique_ptr<IWeapon> weapon_;
 
 	// 武器切替入力のチャタリング防止
 	float weaponSwitchCooldownTimer_ = 0.0f;

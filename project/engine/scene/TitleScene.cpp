@@ -142,9 +142,6 @@ void TitleScene::Update() {
 			case SceneType::Select:
 				next = STAGE;
 				break;
-			case SceneType::Tutorial:
-				next = TUTORIAL;
-				break;
 			default:
 				next = TITLE;
 				break;
