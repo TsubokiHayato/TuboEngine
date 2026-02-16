@@ -97,7 +97,7 @@ void PlayerBullet::Update() {
 	}
 
 	// プレイヤーから離れすぎたら消滅
-	if (isAlive && Distance(position, playerPostion_) > s_disappearRadius) {
+	if (isAlive && Distance(position, playerPosition_) > s_disappearRadius) {
 		isAlive = false;
 	}
 
