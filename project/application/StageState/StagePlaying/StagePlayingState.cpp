@@ -189,21 +189,38 @@ void StagePlayingState::SpriteDraw(StageScene* scene) {
 }
 
 void StagePlayingState::ImGuiDraw(StageScene* scene) {
-
+#ifdef USE_IMGUI
 	scene->GetFollowCamera()->DrawImGui();
+
+	// ---- Player Weapon only ----
+	if (auto* p = scene->GetPlayer()) {
+		ImGui::Begin("Player Weapon");
+		ImGui::Text("WeaponType(enum): %d", static_cast<int>(p->GetWeaponType()));
+		ImGui::Text("Bullets: %zu", p->GetBullets().size());
+		ImGui::Separator();
+		if (ImGui::Button("Prev Weapon")) {
+			p->PrevWeapon();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Next Weapon")) {
+			p->NextWeapon();
+		}
+		ImGui::End();
+	}
+
+	// 既存の詳細ImGui
 	scene->GetPlayer()->DrawImGui();
 
 	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
-	// EnemyのImgui
 	for (auto& enemy : enemies) {
 		enemy->DrawImGui();
 	}
 
 	std::vector<std::unique_ptr<Block>>& blocks_ = scene->GetBlocks();
-	// ブロックのImGui
 	for (auto& block : blocks_) {
 		block->DrawImGui();
 	}
+#endif // USE_IMGUI
 }
 
 void StagePlayingState::ParticleDraw(StageScene* scene) {
