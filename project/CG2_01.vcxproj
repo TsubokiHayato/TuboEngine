@@ -124,6 +124,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\StageState\StageStateManager.cpp" />
     <ClCompile Include="application\StageState\Tutorial\TutorialState.cpp" />
     <ClCompile Include="application\UI\Guide\GuideUI.cpp" />
+    <ClCompile Include="application\UI\PlayerStatusRingUI\PlayerStatusRingUI.cpp" />
     <ClCompile Include="application\UI\Title\TitleUI.cpp" />
     <ClCompile Include="application\UI\HP\Enemy\EnemyHpUI.cpp" />
     <ClCompile Include="application\UI\HP\Player\HpUI.cpp" />
@@ -250,9 +251,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Character\Enemy\RushEnemy.h" />
     <ClInclude Include="application\Character\Player\Player.h" />
     <ClInclude Include="application\Bullet\Player\PlayerBullet.h" />
+    <ClInclude Include="application\StageScene.h" />
     <ClInclude Include="application\StageState\Pause\PauseState.h" />
     <ClInclude Include="application\StageState\Tutorial\TutorialState.h" />
     <ClInclude Include="application\UI\Guide\GuideUI.h" />
+    <ClInclude Include="application\UI\PlayerStatusRingUI\PlayerStatusRingUI.h" />
     <ClInclude Include="application\Weapon\IWeapon.h" />
     <ClInclude Include="application\Weapon\PlayerWeapons.h" />
     <ClInclude Include="engine\graphic\PSO\Blend\BlendPSO.h" />
@@ -435,6 +438,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <Text Include="application\Resources\UI\README_PlayerRingUI.txt" />
     <Text Include="externals\imgui\LICENSE.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
