@@ -35,6 +35,7 @@
 #include "application/UI/HP/Player/HpUI.h"
 #include "application/UI/HP/Enemy/EnemyHpUI.h"
 #include "application/UI/Guide/GuideUI.h"
+#include "application/UI/PlayerStatusRingUI/PlayerStatusRingUI.h"
 
 #include <string>
 #include <vector>
@@ -194,6 +195,7 @@ private:
 	std::unique_ptr<HpUI> hpUI_;
 	std::unique_ptr<EnemyHpUI> enemyHpUI_;
 	std::unique_ptr<GuideUI> guideUI_;
+	std::unique_ptr<PlayerStatusRingUI> playerRingUI_;
 
 	// Multi-stage layout data (debug / editor)
 	bool useMultiStageLayout_ = true;

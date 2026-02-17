@@ -101,7 +101,8 @@ void StageScene::Initialize() {
 
 	mapChipField_ = std::make_unique<MapChipField>();
 	player_ = std::make_unique<Player>();
-	followCamera = std::make_unique<Camera>();
+	// followCamera must be FollowTopDownCamera
+	followCamera = std::make_unique<FollowTopDownCamera>();
 	camera = std::make_unique<Camera>();
 	collisionManager_ = std::make_unique<CollisionManager>();
 	stateManager_ = std::make_unique<StageStateManager>();
