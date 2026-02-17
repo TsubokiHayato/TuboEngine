@@ -3,6 +3,7 @@
 #include "Collider/CollisionManager.h"
 #include "LineManager.h"
 #include "ParticleManager.h" // 追加: パーティクル描画/更新
+#include "application/UI/PlayerStatusRingUI/PlayerStatusRingUI.h"
 
 namespace {
 StageScene::StageBounds ComputeBoundsWorld(const TuboEngine::Math::Vector3& origin, const MapChipField& field) {
@@ -100,7 +101,7 @@ void StageScene::Initialize() {
 
 	mapChipField_ = std::make_unique<MapChipField>();
 	player_ = std::make_unique<Player>();
-	followCamera = std::make_unique<FollowTopDownCamera>();
+	followCamera = std::make_unique<Camera>();
 	camera = std::make_unique<Camera>();
 	collisionManager_ = std::make_unique<CollisionManager>();
 	stateManager_ = std::make_unique<StageStateManager>();
@@ -158,6 +159,10 @@ void StageScene::Initialize() {
 	// Guide UI (WASD)
 	guideUI_ = std::make_unique<GuideUI>();
 	guideUI_->Initialize();
+
+	// Player ring UI
+	playerRingUI_ = std::make_unique<PlayerStatusRingUI>();
+	playerRingUI_->Initialize();
 }
 
 void StageScene::Update() {
@@ -186,6 +191,8 @@ void StageScene::Update() {
 	if (enemyHpUI_) { enemyHpUI_->Update(enemies, followCamera->GetCamera()); }
 	// Guide UI 更新
 	if (guideUI_) { guideUI_->Update(); }
+	// Player ring UI 更新（プレイヤー周囲）
+	if (playerRingUI_) { playerRingUI_->Update(player_.get(), followCamera->GetCamera()); }
 }
 
 void StageScene::Finalize() {}
@@ -239,6 +246,8 @@ void StageScene::SpriteDraw() {
 	if (enemyHpUI_) { enemyHpUI_->Draw(); }
 	// Guide UI 描画
 	if (guideUI_) { guideUI_->Draw(); }
+	// Player ring UI 描画
+	if (playerRingUI_) { playerRingUI_->Draw(); }
 	
 	// アニメーション描画
 	if (sceneChangeAnimation_) {
