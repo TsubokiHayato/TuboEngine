@@ -3,8 +3,7 @@
 #include "Vector3.h"
 #include <chrono>
 #include <memory>
-
-class Sprite;
+#include "Sprite.h"
 class StageScene;
 
 /// <summary>
@@ -35,6 +34,6 @@ private:
 	float readyDuration_ = 0.8f;
 	float startDuration_ = 0.6f;
 
-	std::unique_ptr<Sprite> readySprite_;
-	std::unique_ptr<Sprite> startSprite_;
+	std::unique_ptr<TuboEngine::Sprite> readySprite_;
+	std::unique_ptr<TuboEngine::Sprite> startSprite_;
 };
