@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include "Sprite.h"
 
 #include "Vector2.h"
 #include "Vector3.h"
@@ -11,7 +12,6 @@
 
 class Camera;
 class Player;
-class Sprite;
 class SceneChangeAnimation;
 
 class ClearScene : public IScene {
@@ -61,15 +61,15 @@ public:
 
 private:
     // カメラ
-    std::unique_ptr<Camera> camera;
+	std::unique_ptr<Camera> camera;
     Transform cameraTransform{};
 
     // プレイヤー
     std::unique_ptr<Player> player_;
 
     // 文字スプライト
-    std::vector<std::unique_ptr<Sprite>> letterSprites_;
-    std::vector<Vector2> letterBaseSizes_;
+	std::vector<std::unique_ptr<TuboEngine::Sprite>> letterSprites_;
+	std::vector<TuboEngine::Math::Vector2> letterBaseSizes_;
     std::vector<std::string> letterTextureNames_;
     float letterSpacing_ = 120.0f;
     float letterYOffset_ = 0.0f;
@@ -83,8 +83,8 @@ private:
 
     // クリア（退場）演出
     struct LetterClearAnim {
-        Vector2 startPos{};
-        Vector2 velocity{};
+		TuboEngine::Math::Vector2 startPos{};
+		TuboEngine::Math::Vector2 velocity{};
         float delay = 0.0f;
         float life = 0.6f;
         float startAlpha = 1.0f;
@@ -113,12 +113,12 @@ private:
     float spaceAnimDuration_ = 1.0f;
     float spaceJumpHeight_ = 0.5f;
     bool spaceLaunchRight_ = true;
-    Vector3 spaceOrigPos_{};
-    Vector3 spaceOrigRot_{};
-    Vector3 spaceOrigScale_{};
+	TuboEngine::Math::Vector3 spaceOrigPos_{};
+	TuboEngine::Math::Vector3 spaceOrigRot_{};
+	TuboEngine::Math::Vector3 spaceOrigScale_{};
 
     // UI
-    std::unique_ptr<Sprite> restartSprite_;
+	std::unique_ptr<TuboEngine::Sprite> restartSprite_;
 
 private:
     void SetupLettersClearAnim(); // 文字のクリア演出初期化

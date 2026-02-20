@@ -2,7 +2,6 @@
 
 #include "ImGuiManager.h"
 #include "Input.h"
-#include "Sprite.h"
 #include "StageScene.h"
 #include "TextureManager.h"
 #include <cmath>
@@ -55,16 +54,16 @@ void PauseState::Enter(StageScene* /*scene*/) {
 	gPoseAlpha = 0.0f;
 
 	// Simple textures (reuse existing ones).
-	TextureManager::GetInstance()->LoadTexture("barrier.png");
-	TextureManager::GetInstance()->LoadTexture("TitleUI/Start.png");
-	TextureManager::GetInstance()->LoadTexture("TitleUI/Exit.png");
-	TextureManager::GetInstance()->LoadTexture("PoseUI/Pose.png");
-	TextureManager::GetInstance()->LoadTexture("PoseUI/ReturnGame.png");
-	TextureManager::GetInstance()->LoadTexture("PoseUI/ReStart.png");
-	TextureManager::GetInstance()->LoadTexture("PoseUI/ReturnTitle.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("barrier.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("TitleUI/Start.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("TitleUI/Exit.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("PoseUI/Pose.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("PoseUI/ReturnGame.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("PoseUI/ReStart.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("PoseUI/ReturnTitle.png");
 
 	// 追加: 背景（半透明グレー）
-	background_ = std::make_unique<Sprite>();
+	background_ = std::make_unique<TuboEngine::Sprite>();
 	background_->Initialize("barrier.png");
 	background_->SetAnchorPoint({0.0f, 0.0f});
 	background_->SetSize({kScreenW, kScreenH});
@@ -72,7 +71,7 @@ void PauseState::Enter(StageScene* /*scene*/) {
 	background_->SetColor({0.0f, 0.0f, 0.0f, gBackgroundAlpha});
 	background_->Update();
 
-	blackout_ = std::make_unique<Sprite>();
+	blackout_ = std::make_unique<TuboEngine::Sprite>();
 	blackout_->Initialize("PoseUI/Pose.png");
 	blackout_->SetAnchorPoint({0.5f, 0.0f});    // Xは中央、Yは上揃え
 	blackout_->SetGetIsAdjustTextureSize(true); // テクスチャ実サイズ（サイズ調整しない）
@@ -81,21 +80,21 @@ void PauseState::Enter(StageScene* /*scene*/) {
 	blackout_->Update();
 
 	// Menu labels
-	resumeText_ = std::make_unique<Sprite>();
+	resumeText_ = std::make_unique<TuboEngine::Sprite>();
 	resumeText_->Initialize("PoseUI/ReturnGame.png");
 	resumeText_->SetAnchorPoint({0.0f, 0.5f});
 	resumeText_->SetGetIsAdjustTextureSize(true);
 	resumeText_->SetPosition({gItemX, gResumeY});
 	resumeText_->Update();
 
-	restartText_ = std::make_unique<Sprite>();
+	restartText_ = std::make_unique<TuboEngine::Sprite>();
 	restartText_->Initialize("PoseUI/ReStart.png");
 	restartText_->SetAnchorPoint({0.0f, 0.5f});
 	restartText_->SetGetIsAdjustTextureSize(true);
 	restartText_->SetPosition({gItemX, gRestartY});
 	restartText_->Update();
 
-	titleText_ = std::make_unique<Sprite>();
+	titleText_ = std::make_unique<TuboEngine::Sprite>();
 	titleText_->Initialize("PoseUI/ReturnTitle.png");
 	titleText_->SetAnchorPoint({0.0f, 0.5f});
 	titleText_->SetGetIsAdjustTextureSize(true);
@@ -103,7 +102,7 @@ void PauseState::Enter(StageScene* /*scene*/) {
 	titleText_->Update();
 
 	// Cursor: small white rectangle
-	cursor_ = std::make_unique<Sprite>();
+	cursor_ = std::make_unique<TuboEngine::Sprite>();
 	cursor_->Initialize("barrier.png");
 	cursor_->SetAnchorPoint({1.0f, 0.5f});
 	cursor_->SetSize({gCursorSize, gCursorSize});
@@ -113,7 +112,7 @@ void PauseState::Enter(StageScene* /*scene*/) {
 }
 
 void PauseState::Update(StageScene* scene) {
-	auto* input = Input::GetInstance();
+	auto* input = TuboEngine::Input::GetInstance();
 
 	// 既にシーンチェンジ演出中なら、完了待ち
 	if (scene && scene->GetIsRequestSceneChange()) {

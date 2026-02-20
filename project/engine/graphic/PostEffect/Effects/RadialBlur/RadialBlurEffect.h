@@ -6,7 +6,7 @@
 
 struct RadialBlurParams
 {
-	Vector2 radialBlurCenter; // 中心座標
+	TuboEngine::Math::Vector2 radialBlurCenter; // 中心座標
 	float radialBlurPower;  // 効果の強さ
 	float pad[2]; // 16バイトアライメント
 
@@ -24,7 +24,7 @@ public:
 
 	// Dash等の演出用にパラメータを外部から操作
 	void SetPower(float power);
-	void SetCenter(const Vector2& center);
+	void SetCenter(const TuboEngine::Math::Vector2 & center);
 	float GetPower() const;
 
 private:

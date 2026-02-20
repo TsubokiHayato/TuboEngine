@@ -15,6 +15,6 @@ void Collider::Update() {}
 ///						　	 描画処理
 /// -------------------------------------------------------------
 void Collider::Draw() {
-	Vector3 center = GetCenterPosition();
+	TuboEngine::Math::Vector3 center = GetCenterPosition();
 	LineManager::GetInstance()->DrawSphere(center, radius_, defaultColor, 16);
 }

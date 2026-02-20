@@ -8,9 +8,9 @@ namespace {
 // 弾のデフォルト速度
 constexpr float kDefaultBulletSpeed = 2.0f;
 // 弾のデフォルトスケール
-constexpr Vector3 kDefaultBulletScale = {1.0f, 1.0f, 1.0f};
+constexpr TuboEngine::Math::Vector3 kDefaultBulletScale = {1.0f, 1.0f, 1.0f};
 // 弾のデフォルト回転
-constexpr Vector3 kDefaultBulletRotation = {0.0f, 0.0f, 0.0f};
+constexpr TuboEngine::Math::Vector3 kDefaultBulletRotation = {0.0f, 0.0f, 0.0f};
 // 弾が消滅するZ座標
 constexpr float kBulletDisappearZ = 100.0f;
 } // namespace
@@ -19,15 +19,15 @@ constexpr float kBulletDisappearZ = 100.0f;
 float PlayerBullet::s_disappearRadius = 100.0f;
 float PlayerBullet::s_bulletSpeed = 2.0f;
 float PlayerBullet::s_disappearZ = 100.0f;
-Vector3 PlayerBullet::s_scale = {1.0f, 1.0f, 1.0f};
-Vector3 PlayerBullet::s_rotation = {0.0f, 0.0f, 0.0f};
+TuboEngine::Math::Vector3 PlayerBullet::s_scale = {1.0f, 1.0f, 1.0f};
+TuboEngine::Math::Vector3 PlayerBullet::s_rotation = {0.0f, 0.0f, 0.0f};
 int PlayerBullet::s_damage = 1;
 float PlayerBullet::s_fireInterval = 0.2f;
 
 //--------------------------------------------------
 // 2点間の距離を計算する関数
 //--------------------------------------------------
-static float Distance(const Vector3& a, const Vector3& b) {
+static float Distance(const TuboEngine::Math::Vector3& a, const TuboEngine::Math::Vector3& b) {
 	float dx = a.x - b.x;
 	float dy = a.y - b.y;
 	float dz = a.z - b.z;
@@ -37,7 +37,7 @@ static float Distance(const Vector3& a, const Vector3& b) {
 //--------------------------------------------------
 // 初期化処理
 //--------------------------------------------------
-void PlayerBullet::Initialize( const Vector3& startPos) {
+void PlayerBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
 	// 衝突判定のタイプIDを設定
 	Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon));
 	// 弾の初期位置を設定
@@ -57,7 +57,7 @@ void PlayerBullet::Initialize( const Vector3& startPos) {
 	// モデルファイル名
 	const std::string modelFileNamePath = "star.obj";
 	// 3Dオブジェクト生成・初期化
-	object3d = std::make_unique<Object3d>();
+	object3d = std::make_unique<TuboEngine::Object3d>();
 	object3d->Initialize(modelFileNamePath);
 }
 
@@ -78,16 +78,16 @@ void PlayerBullet::Update() {
 	velocity.z = 0.0f;
 
 	// 今フレームの移動量
-	Vector3 desiredMove = velocity; // dt(=1) 前提
+	TuboEngine::Math::Vector3 desiredMove = velocity; // dt(=1) 前提
 	float moveLen2D = std::sqrt(desiredMove.x * desiredMove.x + desiredMove.y * desiredMove.y);
 
 	// ブロック貫通防止用サブステップ
 	float tileSize = (mapChipField_) ? MapChipField::GetBlockSize() : 1.0f;
 	int subSteps = std::max(1, int(std::ceil(moveLen2D / (tileSize * 0.5f))));
-	Vector3 stepMove = desiredMove / float(subSteps);
+	TuboEngine::Math::Vector3 stepMove = desiredMove / float(subSteps);
 
 	for (int i = 0; i < subSteps; ++i) {
-		Vector3 nextPos = position + stepMove;
+		TuboEngine::Math::Vector3 nextPos = position + stepMove;
 		if (mapChipField_ && mapChipField_->IsBlocked(nextPos)) {
 			isAlive = false;
 			break;
@@ -97,7 +97,7 @@ void PlayerBullet::Update() {
 	}
 
 	// プレイヤーから離れすぎたら消滅
-	if (isAlive && Distance(position, playerPostion_) > s_disappearRadius) {
+	if (isAlive && Distance(position, playerPosition_) > s_disappearRadius) {
 		isAlive = false;
 	}
 
@@ -117,9 +117,9 @@ void PlayerBullet::Draw() { object3d->Draw(); }
 //--------------------------------------------------
 // 当たり判定の中心座標を取得
 //--------------------------------------------------
-Vector3 PlayerBullet::GetCenterPosition() const {
-	const Vector3 offset = {0.0f, 0.0f, 0.0f}; // プレイヤーの中心を考慮
-	Vector3 worldPosition = position + offset;
+TuboEngine::Math::Vector3 PlayerBullet::GetCenterPosition() const {
+	const TuboEngine::Math::Vector3 offset = {0.0f, 0.0f, 0.0f}; // プレイヤーの中心を考慮
+	TuboEngine::Math::Vector3 worldPosition = position + offset;
 	return worldPosition;
 }
 

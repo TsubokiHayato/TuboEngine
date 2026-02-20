@@ -17,7 +17,7 @@ public:
 	///--------------------------------------------------
 
 	// 初期化処理
-	void Initialize(const Vector3& startPos) override;
+	void Initialize(const TuboEngine::Math::Vector3& startPos) override;
 
 	// 更新処理
 	void Update() override;
@@ -39,7 +39,7 @@ public:
 	/// 当たり判定の中心座標を取得
 	/// </summary>
 	// 当たり判定の中心座標を返す
-	virtual Vector3 GetCenterPosition() const override;
+	virtual TuboEngine::Math::Vector3 GetCenterPosition() const override;
 
 	///--------------------------------------------------
 	///				ゲッター&セッター
@@ -49,32 +49,32 @@ public:
 	bool GetIsAlive() const { return isAlive; }
 
 	// 位置取得
-	const Vector3& GetPosition() const { return position; }
+	const TuboEngine::Math::Vector3& GetPosition() const { return position; }
 	// 位置設定
-	void SetPosition(const Vector3& position) { this->position = position; }
+	void SetPosition(const TuboEngine::Math::Vector3& position) { this->position = position; }
 
 	// 回転取得
-	const Vector3& GetRotation() const { return rotation; }
+	const TuboEngine::Math::Vector3& GetRotation() const { return rotation; }
 	// 回転設定
-	void SetRotation(const Vector3& rotation) { this->rotation = rotation; }
+	void SetRotation(const TuboEngine::Math::Vector3& rotation) { this->rotation = rotation; }
 
 	// スケール取得
-	const Vector3& GetScale() const { return scale; }
+	const TuboEngine::Math::Vector3& GetScale() const { return scale; }
 	// スケール設定
-	void SetScale(const Vector3& scale) { this->scale = scale; }
+	void SetScale(const TuboEngine::Math::Vector3& scale) { this->scale = scale; }
 
 	// 速度取得
-	const Vector3& GetVelocity() const { return velocity; }
+	const TuboEngine::Math::Vector3& GetVelocity() const { return velocity; }
 	// 速度設定
-	void SetVelocity(const Vector3& velocity) { this->velocity = velocity; }
+	void SetVelocity(const TuboEngine::Math::Vector3& velocity) { this->velocity = velocity; }
 
 	// カメラ設定
 	void SetCamera(Camera* camera) { object3d->SetCamera(camera); }
 
 	// プレイヤーの位置を設定
-	void SetPlayerPosition(const Vector3& playerPosition) { playerPostion_ = playerPosition; }
+	void SetPlayerPosition(const TuboEngine::Math::Vector3& playerPosition) { playerPosition_ = playerPosition; }
 	// プレイヤーの回転を設定
-	void SetPlayerRotation(const Vector3& rotation) { playerRotation = rotation; }
+	void SetPlayerRotation(const TuboEngine::Math::Vector3& rotation) { playerRotation = rotation; }
 
 	// 追加: マップチップフィールド設定
 	void SetMapChipField(MapChipField* field) { mapChipField_ = field; }
@@ -87,13 +87,13 @@ private:
 	
 	///  弾のパラメータ ///
 	// 弾の位置
-	Vector3 position{};
+	TuboEngine::Math::Vector3 position{};
 	// 弾の回転
-	Vector3 rotation{};
+	TuboEngine::Math::Vector3 rotation{};
 	// 弾のスケール
-	Vector3 scale{};
+	TuboEngine::Math::Vector3 scale{};
 	// 弾の速度
-	Vector3 velocity{};
+	TuboEngine::Math::Vector3 velocity{};
 
 private:
 	// 弾の速度
@@ -108,9 +108,9 @@ private:
 
 	/// Player関連 ///
 	// プレイヤーの位置
-	Vector3 playerPostion_ = {};
+	TuboEngine::Math::Vector3 playerPosition_ = {};
 	// プレイヤーの回転
-	Vector3 playerRotation = {};
+	TuboEngine::Math::Vector3 playerRotation = {};
 
 	// 追加: マップチップフィールド
 	MapChipField* mapChipField_ = nullptr;
@@ -127,9 +127,9 @@ public:
 	// 消滅するZ座標
 	static float s_disappearZ;
 	// 弾のスケール
-	static Vector3 s_scale;
+	static TuboEngine::Math::Vector3 s_scale;
 	// 弾の回転
-	static Vector3 s_rotation;
+	static TuboEngine::Math::Vector3 s_rotation;
 
 	// ダメージ量
 	static int s_damage;

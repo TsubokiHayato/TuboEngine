@@ -11,7 +11,7 @@
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 
-void Object3d::Initialize(std::string modelFileNamePath) {
+void TuboEngine::Object3d::Initialize(std::string modelFileNamePath) {
 	
 	this->camera = Object3dCommon::GetInstance()->GetDefaultCamera();
 
@@ -21,7 +21,7 @@ void Object3d::Initialize(std::string modelFileNamePath) {
 #pragma region TransformMatrixResourced
 
 	// WVP用のリソースを作る
-	transformMatrixResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
+	transformMatrixResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	// データを書き込む
 	transformMatrixData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -34,7 +34,7 @@ void Object3d::Initialize(std::string modelFileNamePath) {
 
 #pragma region DirectionalLightData
 	// 平行光源用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	directionalLightResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(DirectionalLight));
+	directionalLightResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(DirectionalLight));
 	// 平行光源用にデータを書き込む
 	directionalLightData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -50,7 +50,7 @@ void Object3d::Initialize(std::string modelFileNamePath) {
 #pragma region PointLight
 
 	// ポイントライト用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	pointLightResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(PointLight));
+	pointLightResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(PointLight));
 	// 平行光源用にデータを書き込む
 	pointLightData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -65,7 +65,7 @@ void Object3d::Initialize(std::string modelFileNamePath) {
 #pragma region SpotLight
 
 	// スポットライト用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	spotLightResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(SpotLight));
+	spotLightResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(SpotLight));
 	// 平行光源用にデータを書き込む
 	spotLightData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -73,7 +73,7 @@ void Object3d::Initialize(std::string modelFileNamePath) {
 	// デフォルト値
 	spotLightData->color = {1.0f, 1.0f, 1.0f, 1.0f};
 	spotLightData->position = {2.0f, 1.25f, 0.0f};
-	spotLightData->direction = Vector3::Normalize({-1.0f, -1.0f, 0.0f});
+	spotLightData->direction = TuboEngine::Math::Vector3::Normalize({-1.0f, -1.0f, 0.0f});
 	spotLightData->intensity = 4.0f;
 	spotLightData->distance = 7.0f;
 	spotLightData->decay = 2.0f;
@@ -83,7 +83,7 @@ void Object3d::Initialize(std::string modelFileNamePath) {
 
 #pragma region cameraWorldPos
 	// 平行光源用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	cameraForGPUResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGPU));
+	cameraForGPUResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGPU));
 	// 平行光源用にデータを書き込む
 	cameraForGPUData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -94,7 +94,7 @@ void Object3d::Initialize(std::string modelFileNamePath) {
 
 #pragma region LightType
 	// ライトの種類
-	lightTypeResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(LightType));
+	lightTypeResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(LightType));
 	// 平行光源用にデータを書き込む
 	lightTypeData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -120,16 +120,17 @@ void Object3d::Initialize(std::string modelFileNamePath) {
 	};
 }
 
-void Object3d::Update() {
+void TuboEngine::Object3d::Update() {
 
 	cameraForGPUData->worldPosition = camera->GetTranslate();
 
 	// 行列を更新する
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera->GetScale(), camera->GetRotation(), camera->GetTranslate());
-	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(WinApp::GetInstance()->GetClientWidth()) / float(WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+	TuboEngine::Math::Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	TuboEngine::Math::Matrix4x4 cameraMatrix = MakeAffineMatrix(camera->GetScale(), camera->GetRotation(), camera->GetTranslate());
+	TuboEngine::Math::Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	TuboEngine::Math::Matrix4x4 projectionMatrix =
+	    MakePerspectiveMatrix(0.45f, float(TuboEngine::WinApp::GetInstance()->GetClientWidth()) / float(TuboEngine::WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
+	TuboEngine::Math::Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
 	if (camera) {
 		const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
@@ -138,14 +139,14 @@ void Object3d::Update() {
 		worldViewProjectionMatrix = worldMatrix;
 	}
 	// 行列を更新する
-	Matrix4x4 localMatrix = model_->GetRootNodeLocalMatrix();
+	TuboEngine::Math::Matrix4x4 localMatrix = model_->GetRootNodeLocalMatrix();
 	transformMatrixData->WVP = model_->GetRootNodeLocalMatrix() * worldMatrix * Multiply(viewMatrix, projectionMatrix);
 	transformMatrixData->World = model_->GetRootNodeLocalMatrix() * worldMatrix;
 
-	commandList = DirectXCommon::GetInstance()->GetCommandList();
+	commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
 }
 
-void Object3d::Draw() {
+void TuboEngine::Object3d::Draw() {
 
 	// TransformMatrix (b0, VertexShader)
 	commandList->SetGraphicsRootConstantBufferView(1, transformMatrixResource->GetGPUVirtualAddress());
@@ -178,29 +179,29 @@ void Object3d::Draw() {
 	}
 }
 
-void Object3d::DrawImGui(const char* windowName) {
+void TuboEngine::Object3d::DrawImGui(const char* windowName) {
 #ifdef USE_IMGUI
     ImGui::Begin(windowName);
 
     ImGui::Separator();
     ImGui::Text("Object3d ImGui コントロール");
     // 位置
-    Vector3 pos = GetPosition();
+    TuboEngine::Math::Vector3 pos = GetPosition();
     if (ImGui::DragFloat3("Position", &pos.x, 0.1f)) {
         SetPosition(pos);
     }
     // 回転
-    Vector3 rot = GetRotation();
+    TuboEngine::Math::Vector3 rot = GetRotation();
     if (ImGui::DragFloat3("Rotation", &rot.x, 0.01f)) {
         SetRotation(rot);
     }
     // スケール
-    Vector3 scale = GetScale();
+    TuboEngine::Math::Vector3 scale = GetScale();
     if (ImGui::DragFloat3("Scale", &scale.x, 0.01f)) {
         SetScale(scale);
     }
     // モデル色
-    Vector4 color = GetModelColor();
+    TuboEngine::Math::Vector4 color = GetModelColor();
     if (ImGui::ColorEdit4("Color", &color.x)) {
         SetModelColor(color);
     }
@@ -280,12 +281,12 @@ void Object3d::DrawImGui(const char* windowName) {
 #endif // USE_IMGUI
 }
 
-void Object3d::SetLightShininess(float shininess) { model_->SetModelShininess(shininess); }
+void TuboEngine::Object3d::SetLightShininess(float shininess) { model_->SetModelShininess(shininess); }
 
-void Object3d::SetModel(const std::string& filePath) { model_ = ModelManager::GetInstance()->FindModel(filePath); }
+void TuboEngine::Object3d::SetModel(const std::string& filePath) { model_ = ModelManager::GetInstance()->FindModel(filePath); }
 
-void Object3d::SetModelColor(const Vector4& color) { model_->SetModelColor(color); }
+void TuboEngine::Object3d::SetModelColor(const Vector4& color) { model_->SetModelColor(color); }
 
-Vector4 Object3d::GetModelColor() { return model_->GetModelColor(); }
+Vector4 TuboEngine::Object3d::GetModelColor() { return model_->GetModelColor(); }
 
-float Object3d::GetLightShininess() { return model_->GetModelShininess(); }
+float TuboEngine::Object3d::GetLightShininess() { return model_->GetModelShininess(); }

@@ -3,8 +3,10 @@
 #include "Vector4.h"
 #include <cstdint>
 
+
+
 /// -------------------------------------------------------------
-///						　当たり判定クラス
+///					　当たり判定クラス
 /// -------------------------------------------------------------
 class Collider {
 public: /// ---------- 純粋仮想関数 ---------- ///
@@ -15,7 +17,7 @@ public: /// ---------- 純粋仮想関数 ---------- ///
 	virtual void OnCollision([[maybe_unused]] Collider* other) {}
 
 	// 中心座標を取得する純粋仮想関数
-	virtual Vector3 GetCenterPosition() const = 0;
+	virtual TuboEngine::Math::Vector3 GetCenterPosition() const = 0;
 
 public: /// ---------- デバッグ用メンバ関数 ---------- ///
 	// 初期化処理
@@ -42,7 +44,7 @@ public: /// ---------- 取得 ---------- ///
 	void SetRadius(float radius) { radius_ = radius; }
 
 	// 色を設定
-	void SetColor(const Vector4& color) { defaultColor = color; }
+	void SetColor(const TuboEngine::Math::Vector4& color) { defaultColor = color; }
 
 private: /// ---------- メンバ変数 ---------- ///
 	// 衝突半径
@@ -51,5 +53,6 @@ private: /// ---------- メンバ変数 ---------- ///
 	// 識別ID
 	uint32_t typeID_ = 0u;
 
-	Vector4 defaultColor = {1.0f, 1.0f, 1.0f, 1.0f};
+	TuboEngine::Math::Vector4 defaultColor = {1.0f, 1.0f, 1.0f, 1.0f};
 };
+

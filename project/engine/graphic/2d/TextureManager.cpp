@@ -3,20 +3,20 @@
 #include<iostream>
 
 
-TextureManager* TextureManager::instance = nullptr;
-uint32_t TextureManager::kSRVIndexTop = 1;
-void TextureManager::Initialize() {
+TuboEngine::TextureManager* TuboEngine::TextureManager::instance = nullptr;
+uint32_t TuboEngine::TextureManager::kSRVIndexTop = 1;
+void TuboEngine::TextureManager::Initialize() {
 	
 	
 	textureDatas.reserve(SrvManager::kMaxSRVCount);
 	directoryPath_ = "Resources/Textures/";
 }
-void TextureManager::LoadTexture(const std::string& filePath) {
+void TuboEngine::TextureManager::LoadTexture(const std::string& filePath) {
 	fullPath_ = directoryPath_ + filePath;
 
 	// 読み込み済みテクスチャを検索
 	if (textureDatas.contains(fullPath_)) {
-		// 読み込み済みなら早期return
+		// 読み込み済みなら早期Return
 		return;
 	}
 
@@ -56,7 +56,7 @@ void TextureManager::LoadTexture(const std::string& filePath) {
 
 	textureData.filePath = fullPath_;
 	textureData.metadata = mipImages.GetMetadata();
-	textureData.resource = DirectXCommon::GetInstance()->CreateTextureResource(textureData.metadata);
+	textureData.resource = TuboEngine::DirectXCommon::GetInstance()->CreateTextureResource(textureData.metadata);
 
 	// テクスチャデータの要素番号をSRVのインデックスとする
 	textureData.srvIndex = SrvManager::GetInstance()->Allocate();
@@ -82,15 +82,15 @@ void TextureManager::LoadTexture(const std::string& filePath) {
 
 
 	// SRVの生成
-	Microsoft::WRL::ComPtr<ID3D12Device> device = DirectXCommon::GetInstance()->GetDevice();
+	Microsoft::WRL::ComPtr<ID3D12Device> device = TuboEngine::DirectXCommon::GetInstance()->GetDevice();
 	device->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = DirectXCommon::GetInstance()->UploadTextureData(textureData.resource, mipImages);
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = TuboEngine::DirectXCommon::GetInstance()->UploadTextureData(textureData.resource, mipImages);
 
-	DirectXCommon::GetInstance()->CommandExecution();
+	TuboEngine::DirectXCommon::GetInstance()->CommandExecution();
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& filePath) {
+D3D12_GPU_DESCRIPTOR_HANDLE TuboEngine::TextureManager::GetSrvHandleGPU(const std::string& filePath) {
 	fullPath_ = directoryPath_ + filePath;
 	auto it = textureDatas.find(fullPath_);
 	if (it == textureDatas.end()) {
@@ -101,7 +101,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& f
 	return textureData.srvHandleGPU;
 }
 
-const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filePath) {
+const DirectX::TexMetadata& TuboEngine::TextureManager::GetMetaData(const std::string& filePath) {
 	fullPath_ = directoryPath_ + filePath;
 	if (!textureDatas.contains(fullPath_)) {
 		std::cerr << "Texture not found: " << fullPath_ << std::endl;
@@ -112,7 +112,7 @@ const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& fileP
 	return textureData.metadata;
 }
 
-uint32_t TextureManager::GetSrvIndex(const std::string& filePath) {
+uint32_t TuboEngine::TextureManager::GetSrvIndex(const std::string& filePath) {
 	fullPath_ = directoryPath_ + filePath;
 	if (!textureDatas.contains(fullPath_)) {
 		std::cerr << "Texture not found: " << fullPath_ << std::endl;
@@ -124,14 +124,14 @@ uint32_t TextureManager::GetSrvIndex(const std::string& filePath) {
 }
 
 
-TextureManager* TextureManager::GetInstance() {
+TuboEngine::TextureManager* TuboEngine::TextureManager::GetInstance() {
 	if (instance == nullptr) {
 		instance = new TextureManager;
 	}
 	return instance;
 }
 
-void TextureManager::Finalize() {
+void TuboEngine::TextureManager::Finalize() {
 
 
 	textureDatas.clear();

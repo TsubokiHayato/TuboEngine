@@ -1,8 +1,10 @@
 #pragma once
 #include "Enemy.h"
 #include <DirectXMath.h>
+#include"Sprite.h"
 
-class Player; // 前方宣言 (詳細はcpp内でinclude)
+// 前方宣言
+class Player; 
 class MapChipField;
 class Collider;
 
@@ -74,7 +76,7 @@ private:
     float reactionDuration_ = 0.65f;    // リアクション秒数
     float reactionTimer_ = 0.0f;       // 残りリアクション時間
     float reactionBackoffSpeed_ = 0.25f; // ノックバック速度
-    Vector3 reactionDir_ {0.0f, 0.0f, 0.0f}; // リアクション方向（反射方向）
+	TuboEngine::Math::Vector3 reactionDir_{0.0f, 0.0f, 0.0f}; // リアクション方向（反射方向）
     bool  endedRushWithoutWall_ = false; // 壁非ヒットで突進タイマー終了した直後フラグ
 
     // 直前のリアクションソース（振り向き制御用）
@@ -84,11 +86,11 @@ private:
     // プレビュー表示
     bool  showDashPreview_ = true;     // チャージ中に突進到達予測を表示
 
-    Vector3 rushDir_ {1.0f, 0.0f, 0.0f}; // 突進の固定進行方向
+    TuboEngine::Math::Vector3 rushDir_{1.0f, 0.0f, 0.0f}; // 突進の固定進行方向
 
     // --- Helpers ---
     static float NormalizeAngle(float angle);
-    static void MoveWithCollision(Vector3& positionRef, const Vector3& desiredMove, MapChipField* field);
+	static void MoveWithCollision(TuboEngine::Math::Vector3& positionRef, const TuboEngine::Math::Vector3& desiredMove, MapChipField* field);
 
     // Update helpers (readability)
     void UpdatePerceptionAndTimers(float dt, bool& canSeePlayer, float& distanceToPlayer);
@@ -98,7 +100,7 @@ private:
     void HandlePrepare(float dt);
     void HandleRushing(float dt);
     void HandleReacting(float dt);
-    bool CheckWallHit(const Vector3& desiredMove, Vector3& outHitNormal) const;
+	bool CheckWallHit(const TuboEngine::Math::Vector3& desiredMove, TuboEngine::Math::Vector3& outHitNormal) const;
     void ApplyChargeAndVisuals(float dt);
     void DrawDebugGizmos();
 

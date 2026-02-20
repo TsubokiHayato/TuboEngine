@@ -40,7 +40,7 @@ public:
 	// インデックスからマップチップ種別を取得
 	MapChipType GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex) const ;
 	// インデックスからマップチップの座標を取得
-	Vector3 GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex);
+	TuboEngine::Math::Vector3 GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex);
 	
 	uint32_t GetNumBlockVirtical() const { return static_cast<uint32_t>(mapChipData_.data.size()); }
 	uint32_t GetNumBlockHorizontal() const { return mapChipData_.data.empty() ? 0 : static_cast<uint32_t>(mapChipData_.data[0].size()); }
@@ -64,7 +64,7 @@ public:
 	};
 
 	// 座標からマップチップのインデックスセットを取得
-	IndexSet GetMapChipIndexSetByPosition(const Vector3& position) const;
+	IndexSet GetMapChipIndexSetByPosition(const TuboEngine::Math::Vector3& position) const;
 	// インデックスから矩形領域を取得
 	Rect GetRectByIndex(uint32_t xIndex, uint32_t yIndex);
 
@@ -72,13 +72,13 @@ public:
 	void SetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex, MapChipType mapChipType);
 
 	// 指定座標が通行可能か判定
-	bool IsWalkable(const Vector3& position) const;
+	bool IsWalkable(const TuboEngine::Math::Vector3& position) const;
 
 	// 指定座標が通行不可（壁など）か判定
-	bool IsBlocked(const Vector3& position) const;
+	bool IsBlocked(const TuboEngine::Math::Vector3& position) const;
 
 	// 指定矩形領域（プレイヤーの四隅など）が衝突しているか判定
-	bool IsRectBlocked(const Vector3& center, float width, float height) const;
+	bool IsRectBlocked(const TuboEngine::Math::Vector3& center, float width, float height) const;
 
 	// ImGuiの描画処理
 	void DrawImGui(const char* windowName = "MapChipField");

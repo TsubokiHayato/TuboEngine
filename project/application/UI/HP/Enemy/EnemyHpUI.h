@@ -18,13 +18,13 @@ public:
 
 private:
     struct EnemyBar {
-        std::vector<std::unique_ptr<Sprite>> frames; // per-HP frame
-        std::vector<std::unique_ptr<Sprite>> fills;  // per-HP fill
+		std::vector<std::unique_ptr<TuboEngine::Sprite>> frames; // per-HP frame
+		std::vector<std::unique_ptr<TuboEngine::Sprite>> fills;  // per-HP fill
         bool visible = false;
         int maxHp = 0;
         int currentHp = 0;
         float animatedHp = 0.0f; // animated HP for smooth shrink
-        Vector2 basePos{};
+		TuboEngine::Math::Vector2 basePos{};
     };
 
     std::vector<EnemyBar> bars_;

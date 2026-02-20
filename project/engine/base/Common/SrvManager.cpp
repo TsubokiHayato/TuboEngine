@@ -9,9 +9,9 @@ void SrvManager::Initialize()
 {
 	
 	//ディスクリプタヒープの生成
-	descriptorHeap = DirectXCommon::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
+	descriptorHeap = TuboEngine::DirectXCommon::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
 	//ディスクリプタサイズの取得
-	descriptorSize = DirectXCommon::GetInstance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	descriptorSize = TuboEngine::DirectXCommon::GetInstance()->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 
 
@@ -41,7 +41,7 @@ void SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, Microsoft::WRL::ComPtr
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = mipLevels;
 	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-	DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(pResource.Get(), &srvDesc, handleCPU);
+	TuboEngine::DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(pResource.Get(), &srvDesc, handleCPU);
 }
 
 ///=============================================================================
@@ -61,14 +61,14 @@ void SrvManager::CreateSRVForStructuredBuffer(uint32_t index, Microsoft::WRL::Co
 	srvDesc.Buffer.FirstElement = 0;
 	srvDesc.Buffer.NumElements = elements;
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(pResource.Get(), &srvDesc, GetCPUDescriptorHandle(index));
+	TuboEngine::DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(pResource.Get(), &srvDesc, GetCPUDescriptorHandle(index));
 }
 void SrvManager::PreDraw()
 {
 	//ディスクリプタヒープのインデックスをリセット
 	ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap.Get() };
 	//SRV用のディスクリプタヒープを指定する
-	DirectXCommon::GetInstance()->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
+	TuboEngine::DirectXCommon::GetInstance()->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
 }
 
 

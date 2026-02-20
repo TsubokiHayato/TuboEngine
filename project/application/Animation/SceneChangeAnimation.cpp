@@ -57,7 +57,7 @@ void SceneChangeAnimation::InitializeBlocks() {
 
 	// --- テクスチャ準備 ---
 	// 全ブロックで共通なので、ループの外で一度だけロード。
-	TextureManager::GetInstance()->LoadTexture(m_blockTexturePath);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(m_blockTexturePath);
 
 	// --- ブロック生成 ---
 	for (int y = 0; y < rows; ++y) {
@@ -84,7 +84,7 @@ void SceneChangeAnimation::InitializeBlocks() {
 			block.delay = (m_duration * kDelayDurationRatio) * (progress + randomOffset * (1.0f - progress));
 
 			// --- スプライト生成 ---
-			block.sprite = std::make_unique<Sprite>();
+			block.sprite = std::make_unique<TuboEngine::Sprite>();
 			block.sprite->Initialize(m_blockTexturePath);
 
 			// このスプライトは「ブロックサイズ」で描画するため、テクスチャサイズ自動調整は無効。

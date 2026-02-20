@@ -14,14 +14,14 @@ namespace {
 void StagePlayingState::Enter(StageScene* scene) {
 
 	// Pause guide UI (show how to open pause)
-	TextureManager::GetInstance()->LoadTexture(kPauseGuideTex);
-	pauseGuideSprite_ = std::make_unique<Sprite>();
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(kPauseGuideTex);
+	pauseGuideSprite_ = std::make_unique<TuboEngine::Sprite>();
 	pauseGuideSprite_->Initialize(kPauseGuideTex);
 
 	// 右上に収まるように画面サイズから計算（anchor=右上）
 	const float margin = 20.0f;
-	Vector2 spriteSize = pauseGuideSprite_->GetSize()/3;
-	const float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
+	TuboEngine::Math::Vector2 spriteSize = pauseGuideSprite_->GetSize() / 3;
+	const float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
 	pauseGuideSprite_->SetSize({spriteSize.x, spriteSize.y});
 	pauseGuideSprite_->SetPosition({screenW - spriteSize.x, margin});
 	pauseGuideSprite_->SetColor({1.0f, 1.0f, 1.0f, 0.9f});
@@ -31,7 +31,7 @@ void StagePlayingState::Enter(StageScene* scene) {
 void StagePlayingState::Update(StageScene* scene) {
 
 	// ESCでポーズへ
-	if (Input::GetInstance()->TriggerKey(DIK_ESCAPE)) {
+	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_ESCAPE)) {
 		if (scene && scene->GetStageStateManager()) {
 			scene->GetStageStateManager()->ChangeState(StageType::Pause, scene);
 		}

@@ -94,13 +94,13 @@ private:
 	// 各ボタンのY座標リスト
 	std::vector<float> buttonYPositions_;
 	// セレクターのオフセット（ボタン横の表示位置調整用）
-	std::vector<Vector2> selectorOffsets_;
+	std::vector<TuboEngine::Math::Vector2> selectorOffsets_;
 
 	// 各種ボタン・セレクターのスプライト
-	std::unique_ptr<Sprite> LogoSprite_;
-	std::unique_ptr<Sprite> StartButtonSprite_;
-	std::unique_ptr<Sprite> TutorialButtonSprite_;
-	std::unique_ptr<Sprite> QuitButtonSprite_;
+	std::unique_ptr<TuboEngine::Sprite> LogoSprite_;
+	std::unique_ptr<TuboEngine::Sprite> StartButtonSprite_;
+	std::unique_ptr<TuboEngine::Sprite> TutorialButtonSprite_;
+	std::unique_ptr<TuboEngine::Sprite> QuitButtonSprite_;
 
 	// オプション表示中フラグ
 	bool showOption_ = false;

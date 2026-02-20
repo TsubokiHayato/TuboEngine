@@ -6,15 +6,15 @@
 
 void Framework::Initialize() {
 
-	WinApp::GetInstance()->Initialize();
+	TuboEngine::WinApp::GetInstance()->Initialize();
 
 	//DirectX共通部分
 
 
-	DirectXCommon::GetInstance()->Initialize();
+	TuboEngine::DirectXCommon::GetInstance()->Initialize();
 
 	// リソースの有効性を確認
-	if (!DirectXCommon::GetInstance()->GetDevice() || !DirectXCommon::GetInstance()->GetCommandList()) {
+	if (!TuboEngine::DirectXCommon::GetInstance()->GetDevice() || !TuboEngine::DirectXCommon::GetInstance()->GetCommandList()) {
 		throw std::runtime_error("DirectXリソースの初期化に失敗しました。");
 	}
 
@@ -42,7 +42,7 @@ void Framework::Initialize() {
 
 
 	//テクスチャマネージャーの初期化
-	TextureManager::GetInstance()->Initialize();
+	TuboEngine::TextureManager::GetInstance()->Initialize();
 
 	//モデルマネージャーの初期化
 	ModelManager::GetInstance()->initialize();
@@ -51,7 +51,7 @@ void Framework::Initialize() {
 	AudioCommon::GetInstance()->Initialize();
 
 	//入力初期化
-	Input::GetInstance()->Initialize(WinApp::GetInstance()->GetHWND());
+	TuboEngine::Input::GetInstance()->Initialize(TuboEngine::WinApp::GetInstance()->GetHWND());
 
 	//オフスクリーンレンダリングの初期化
 	OffScreenRendering::GetInstance()->Initialize();
@@ -60,7 +60,7 @@ void Framework::Initialize() {
 	LineManager::GetInstance()->Initialize();
 
 	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
-	TextureManager::GetInstance()->LoadTexture(testDDSTextureHandle);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(testDDSTextureHandle);
 
 	//シーンマネージャーの初期化
 	SceneManager::GetInstance()->Initialize(STAGE); // タイトルシーンから開始
@@ -68,11 +68,11 @@ void Framework::Initialize() {
 }
 void Framework::Update() {
 	//メッセージ処理
-	if (WinApp::GetInstance()->ProcessMessage()) {
+	if (TuboEngine::WinApp::GetInstance()->ProcessMessage()) {
 		endRequest = true;
 	}
 	//入力の更新
-	Input::GetInstance()->Update();
+	TuboEngine::Input::GetInstance()->Update();
 	
 	//シーンマネージャーの更新
 	SceneManager::GetInstance()->Update();
@@ -95,14 +95,14 @@ void Framework::Finalize() {
 	ImGuiManager::GetInstance()->Finalize();
 #endif // USE_IMGUI
 
-	Input::GetInstance()->Finalize();
+	TuboEngine::Input::GetInstance()->Finalize();
 
 	// パーティクルマネージャの明示解放（エミッター内のGPUリソースを先に解放する）
-	ParticleManager::GetInstance()->Finalize();
+	TuboEngine::ParticleManager::GetInstance()->Finalize();
 
-	TextureManager::GetInstance()->Finalize();
+	TuboEngine::TextureManager::GetInstance()->Finalize();
 	ModelManager::GetInstance()->Finalize();
-	CloseHandle(DirectXCommon::GetInstance()->GetFenceEvent());
+	CloseHandle(TuboEngine::DirectXCommon::GetInstance()->GetFenceEvent());
 
 	OffScreenRendering::GetInstance()->Finalize();
 	SrvManager::GetInstance()->Finalize();
@@ -111,12 +111,12 @@ void Framework::Finalize() {
 	ParticleCommon::GetInstance()->Finalize();
 	SpriteCommon::GetInstance()->Finalize();
 	Object3dCommon::GetInstance()->Finalize();
-	SkyBoxCommon::GetInstance()->Finalize();
+	TuboEngine::SkyBoxCommon::GetInstance()->Finalize();
 	LineManager::GetInstance()->Finalize();
 	
 	AudioCommon::GetInstance()->Finalize();
-	DirectXCommon::GetInstance()->Finalize();
-	WinApp::GetInstance()->Finalize();
+	TuboEngine::DirectXCommon::GetInstance()->Finalize();
+	TuboEngine::WinApp::GetInstance()->Finalize();
 }
 
 
@@ -144,7 +144,7 @@ void Framework::Run() {
 
 void Framework::FrameworkSwapChainPreDraw() {
 	//描画前処理
-	DirectXCommon::GetInstance()->PreDraw();
+	TuboEngine::DirectXCommon::GetInstance()->PreDraw();
 
 }
 
@@ -156,7 +156,7 @@ void Framework::FrameworkSwapChainPostDraw() {
 
 	OffScreenRendering::GetInstance()->TransitionRenderTextureToRenderTarget();
 	//描画
-	DirectXCommon::GetInstance()->PostDraw();
+	TuboEngine::DirectXCommon::GetInstance()->PostDraw();
 }
 
 void Framework::ImguiPreDraw() {

@@ -1,6 +1,8 @@
 #pragma once
 #include "Vector4.h"
 
+namespace TuboEngine::Math {
+
 struct Matrix4x4 {
     float m[4][4];
 
@@ -25,3 +27,5 @@ struct Matrix4x4 {
         return result;
     }
 };
+
+} // namespace TuboEngine::Math

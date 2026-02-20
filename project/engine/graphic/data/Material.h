@@ -3,6 +3,9 @@
 #include "Vector4.h"
 #include "Matrix4x4.h"
 
+using TuboEngine::Math::Matrix4x4;
+using TuboEngine::Math::Vector4;
+
 //マテリアル
 struct Material {
 	//	色

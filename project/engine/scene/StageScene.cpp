@@ -5,7 +5,7 @@
 #include "ParticleManager.h" // 追加: パーティクル描画/更新
 
 namespace {
-	StageScene::StageBounds ComputeBoundsWorld(const Vector3& origin, const MapChipField& field) {
+StageScene::StageBounds ComputeBoundsWorld(const TuboEngine::Math::Vector3& origin, const MapChipField& field) {
 		const float w = static_cast<float>(field.GetNumBlockHorizontal()) * MapChipField::GetBlockWidth();
 		const float h = static_cast<float>(field.GetNumBlockVirtical()) * MapChipField::GetBlockHeight();
 		StageScene::StageBounds b;
@@ -31,12 +31,12 @@ namespace {
 		Right,
 	};
 
-	Vector3 ComputeSpawnOriginFromCenter(const StageScene::StageBounds& center, const StageScene::StageBounds& nextAtOrigin,
+	TuboEngine::Math::Vector3 ComputeSpawnOriginFromCenter(const StageScene::StageBounds& center, const StageScene::StageBounds& nextAtOrigin,
 		NeighborDir dir, float gapX, float gapY) {
 		const float nextW = nextAtOrigin.right - nextAtOrigin.left;
 		const float nextH = nextAtOrigin.top - nextAtOrigin.bottom;
 
-		Vector3 origin{0.0f, 0.0f, 0.0f};
+		TuboEngine::Math::Vector3 origin{0.0f, 0.0f, 0.0f};
 
 		switch (dir) {
 		case NeighborDir::Right:
@@ -67,10 +67,10 @@ namespace {
 	}
 
 	void DrawBounds(const StageScene::StageBounds& b, float z, const Vector4& color) {
-		Vector3 p0{b.left, b.bottom, z};
-		Vector3 p1{b.right, b.bottom, z};
-		Vector3 p2{b.right, b.top, z};
-		Vector3 p3{b.left, b.top, z};
+	    TuboEngine::Math::Vector3 p0{b.left, b.bottom, z};
+	    TuboEngine::Math::Vector3 p1{b.right, b.bottom, z};
+	    TuboEngine::Math::Vector3 p2{b.right, b.top, z};
+	    TuboEngine::Math::Vector3 p3{b.left, b.top, z};
 		auto* lm = LineManager::GetInstance();
 		lm->DrawLine(p0, p1, color);
 		lm->DrawLine(p1, p2, color);
@@ -137,8 +137,8 @@ void StageScene::Initialize() {
 
 	// HP UI (Player)
 	hpUI_ = std::make_unique<HpUI>();
-	TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
-	TextureManager::GetInstance()->LoadTexture("HP.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("HP.png");
 	int maxHp = 5; // Player 初期HPに合わせる
 	hpUI_->Initialize("HPBarFrame.png", "HP.png", maxHp);
 	hpUI_->SetPosition({20.0f, 20.0f});
@@ -148,8 +148,8 @@ void StageScene::Initialize() {
 
 	// Enemy HP UI
 	enemyHpUI_ = std::make_unique<EnemyHpUI>();
-	TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
-	TextureManager::GetInstance()->LoadTexture("HP.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("HP.png");
 	enemyHpUI_->Initialize("HPBarFrame.png", "HP.png");
 	enemyHpUI_->SetYOffset(-24.0f);
 	enemyHpUI_->SetScale(0.45f);
@@ -178,7 +178,7 @@ void StageScene::Update() {
 	CheckAllCollisions();
 
 	// 追加: プレイヤーが存在すればパーティクル更新 (Trail 用)
-	ParticleManager::GetInstance()->Update(1.0f/60.0f, followCamera->GetCamera());
+	TuboEngine::ParticleManager::GetInstance()->Update(1.0f / 60.0f, followCamera->GetCamera());
 
 	// HP UI 更新
 	if (hpUI_) { hpUI_->Update(player_.get()); }
@@ -323,7 +323,7 @@ void StageScene::ImGuiDraw() {
 				next.field = std::make_unique<MapChipField>();
 				next.field->LoadMapChipCsv(next.csvPath);
 
-				StageBounds nextAtOrigin = ComputeBoundsWorld(Vector3{0, 0, 0}, *next.field);
+				StageBounds nextAtOrigin = ComputeBoundsWorld(TuboEngine::Math::Vector3{0, 0, 0}, *next.field);
 				next.origin = ComputeSpawnOriginFromCenter(centerB, nextAtOrigin, dir, gapX, gapY);
 
 				if (snapX > 0.0f) next.origin.x = std::round(next.origin.x / snapX) * snapX;
@@ -386,14 +386,14 @@ void StageScene::ImGuiDraw() {
 				st.enemies.clear();
 				st.tile = std::make_unique<Tile>();
 
-				Vector3 tilePos = st.origin;
+				TuboEngine::Math::Vector3 tilePos = st.origin;
 				tilePos.z = -1.0f;
 				st.tile->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile30x30.obj");
 				st.tile->SetCamera(followCamera->GetCamera());
 				st.tile->Update();
 
 				ForEachMapChipField(st.field.get(), [&](uint32_t x, uint32_t y, MapChipType type) {
-					Vector3 pos = st.field->GetMapChipPositionByIndex(x, y) + st.origin;
+					TuboEngine::Math::Vector3 pos = st.field->GetMapChipPositionByIndex(x, y) + st.origin;
 					if (type == MapChipType::kBlock) {
 						auto block = std::make_unique<Block>();
 						block->Initialize(pos);
@@ -437,7 +437,7 @@ void StageScene::ImGuiDraw() {
 				st.csvPath = buf;
 			}
 
-			Vector3 origin = st.origin;
+			TuboEngine::Math::Vector3 origin = st.origin;
 			float o[2] = { origin.x, origin.y };
 			if (ImGui::DragFloat2("Origin", o, 0.1f)) {
 				origin.x = o[0];
@@ -486,7 +486,7 @@ void StageScene::ParticleDraw() {
 		stateManager_->ParticleDraw(this);
 	}
 	// 追加: 全エミッター描画 (PlayerTrail 含む)
-	ParticleManager::GetInstance()->Draw();
+	TuboEngine::ParticleManager::GetInstance()->Draw();
 }
 void StageScene::CheckAllCollisions() {
 	/// 衝突マネージャのリセット ///

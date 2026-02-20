@@ -2,10 +2,8 @@
 #include "Bullet/Player/PlayerBullet.h"
 #include "Character/Player/Player.h"
 #include "Collider/CollisionTypeId.h"
-#include "Enemy.h"
 #include "ImGuiManager.h"
 #include "LineManager.h"
-#include "Sprite.h"
 #include "TextureManager.h"
 #include <algorithm>
 #include <cmath>
@@ -30,16 +28,16 @@ Enemy::~Enemy() {}
 void Enemy::Initialize() {
     Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kEnemy));
     position = {0.0f, 0.0f, 5.0f};
-	rotation = Vector3(1.56f, 0.0f, 0.0f);
+	rotation = TuboEngine::Math::Vector3(1.56f, 0.0f, 0.0f);
     scale = {1.0f, 1.0f, 1.0f};
 
-    object3d = std::make_unique<Object3d>();
+    object3d = std::make_unique<TuboEngine::Object3d>();
     const std::string modelFileNamePath = "player/player.obj";
     object3d->Initialize(modelFileNamePath);
     object3d->SetPosition(position);
     // 初期化時にも描画補正を適用
     {
-        Vector3 drawRot = rotation;
+		TuboEngine::Math::Vector3 drawRot = rotation;
         drawRot.x = drawRot.x + kEnemyModelRotOffsetX;
         drawRot.y = drawRot.y + kEnemyModelRotOffsetY;
         drawRot.z = drawRot.z + kEnemyModelRotOffsetZ;
@@ -49,16 +47,18 @@ void Enemy::Initialize() {
 	object3d->SetModelColor({1.0f, 0.0f, 0.0f, 1.0f});
 
     std::string particleTextureHandle = "gradationLine.png";
-    TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
 
     // Icons
-    TextureManager::GetInstance()->LoadTexture("Question.png");
-    TextureManager::GetInstance()->LoadTexture("Exclamation.png");
-    questionIcon_ = std::make_unique<Sprite>();
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("Question.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("Exclamation.png");
+
+	questionIcon_ = std::make_unique<TuboEngine::Sprite>();
     questionIcon_->Initialize("Question.png");
     questionIcon_->SetGetIsAdjustTextureSize(false);
     questionIcon_->SetAnchorPoint({0.5f, 0.5f});
-    exclamationIcon_ = std::make_unique<Sprite>();
+
+	exclamationIcon_ = std::make_unique<TuboEngine::Sprite>();
     exclamationIcon_->Initialize("Exclamation.png");
     exclamationIcon_->SetGetIsAdjustTextureSize(false);
     exclamationIcon_->SetAnchorPoint({0.5f, 0.5f});
@@ -91,7 +91,7 @@ void Enemy::Initialize() {
         p.colorStart = {1.0f, 0.6f, 0.2f, 0.9f};
         p.colorEnd = {1.0f, 1.0f, 0.4f, 0.0f};
         p.center = position;
-        hitEmitter_ = ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
+		hitEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
     }
     // 追加: ヒット時の小さなリングを別エミッタで生成（既存と併用）
     if (!hitRingEmitter_) {
@@ -108,7 +108,7 @@ void Enemy::Initialize() {
         p.colorStart = {1.0f, 0.5f, 0.2f, 0.9f};
         p.colorEnd   = {1.0f, 0.9f, 0.6f, 0.0f};
         p.center = position;
-        hitRingEmitter_ = ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
+		hitRingEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
     }
     // 死亡時: 大きなリング (一度だけ)
     if (!deathEmitter_) {
@@ -125,7 +125,7 @@ void Enemy::Initialize() {
         p.colorStart = {1.0f, 0.3f, 0.2f, 0.9f};
         p.colorEnd = {1.0f, 0.8f, 0.1f, 0.0f};
         p.center = position;
-        deathEmitter_ = ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
+		deathEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
     }
 }
 
@@ -137,7 +137,7 @@ static float NormalizeAngle(float angle) {
     return angle;
 }
 
-static void MoveWithCollision(Vector3& position, const Vector3& desiredMove, MapChipField* field) {
+static void MoveWithCollision(TuboEngine::Math::Vector3& position, const TuboEngine::Math::Vector3& desiredMove, MapChipField* field) {
     if (!field) {
         position = position + desiredMove;
         return;
@@ -147,14 +147,14 @@ static void MoveWithCollision(Vector3& position, const Vector3& desiredMove, Map
     const float height = tile * 0.8f;
     float moveLen2D = std::sqrt(desiredMove.x * desiredMove.x + desiredMove.y * desiredMove.y);
     int subSteps = std::max(1, int(std::ceil(moveLen2D / (tile * 0.5f))));
-    Vector3 step = desiredMove / float(subSteps);
+	TuboEngine::Math::Vector3 step = desiredMove / float(subSteps);
     for (int i = 0; i < subSteps; ++i) {
-        Vector3 nextX = position;
+		TuboEngine::Math::Vector3 nextX = position;
         nextX.x += step.x;
         if (!field->IsRectBlocked(nextX, width, height)) {
             position = nextX;
         }
-        Vector3 nextY = position;
+		TuboEngine::Math::Vector3 nextY = position;
         nextY.y += step.y;
         if (!field->IsRectBlocked(nextY, width, height)) {
             position = nextY;
@@ -175,7 +175,7 @@ static bool IsTileWalkable(MapChipField* field, uint32_t x, uint32_t y) {
         return false;
     if (x >= field->GetNumBlockHorizontal() || y >= field->GetNumBlockVirtical())
         return false;
-    Vector3 center = field->GetMapChipPositionByIndex(x, y);
+	TuboEngine::Math::Vector3 center = field->GetMapChipPositionByIndex(x, y);
     return !field->IsBlocked(center);
 }
 static int FindNearestWalkableIndex(MapChipField* field, int gx, int gy) {
@@ -204,7 +204,7 @@ static int FindNearestWalkableIndex(MapChipField* field, int gx, int gy) {
     return -1;
 }
 
-bool Enemy::BuildPathTo(const Vector3& worldGoal) {
+bool Enemy::BuildPathTo(const TuboEngine::Math::Vector3& worldGoal) {
     currentPath_.clear();
     pathCursor_ = 0;
     lastPathGoalIndex_ = -1;
@@ -315,7 +315,7 @@ bool Enemy::BuildPathTo(const Vector3& worldGoal) {
                     grid[nIdx].opened = true;
                     open.push({nIdx, grid[nIdx].f});
                 } else {
-                    // 既にopenedでも新しいfでpushしておく（lazy update）
+                    // 既にOpenedでも新しいfでPushしておく（lazy update）
                     open.push({nIdx, grid[nIdx].f});
                 }
             }
@@ -339,7 +339,7 @@ bool Enemy::BuildPathTo(const Vector3& worldGoal) {
     for (int flat : rev) {
         int tx = flat % W;
         int ty = flat / W;
-        Vector3 center = mapChipField->GetMapChipPositionByIndex((uint32_t)tx, (uint32_t)ty);
+		TuboEngine::Math::Vector3 center = mapChipField->GetMapChipPositionByIndex((uint32_t)tx, (uint32_t)ty);
         // Zは現在高度を維持
         center.z = position.z;
         currentPath_.push_back(center);
@@ -370,7 +370,7 @@ void Enemy::Update() {
     ApplyKnockback(dt);
 
     float distanceToPlayer = 0.0f;
-    Vector3 toPlayer = {0, 0, 0};
+	TuboEngine::Math::Vector3 toPlayer = {0, 0, 0};
     if (player_) {
         toPlayer = player_->GetPosition() - position;
         distanceToPlayer = std::sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y + toPlayer.z * toPlayer.z);
@@ -422,8 +422,8 @@ void Enemy::Update() {
 
     // プレイヤーの方向を向く（一定速度で回転）
     if (player_ && (state_ == State::Chase || state_ == State::Attack || state_ == State::Alert)) {
-        Vector3 targetPos = (canSeePlayer) ? player_->GetPosition() : lastSeenPlayerPos;
-        Vector3 toTarget = targetPos - position;
+		TuboEngine::Math::Vector3 targetPos = (canSeePlayer) ? player_->GetPosition() : lastSeenPlayerPos;
+		TuboEngine::Math::Vector3 toTarget = targetPos - position;
         float angleZ = std::atan2(toTarget.y, toTarget.x);
         float diff = NormalizeAngle(angleZ - rotation.z);
         float maxTurn = turnSpeed_;
@@ -538,13 +538,13 @@ void Enemy::Update() {
     case State::Chase: {
         idleBackPhase_ = IdleBackPhase::None;
         if (player_) {
-            Vector3 dir = player_->GetPosition() - position;
+			TuboEngine::Math::Vector3 dir = player_->GetPosition() - position;
             dir.z = 0.0f;
             float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
             if (len > 0.1f) {
                 dir.x /= len;
                 dir.y /= len;
-                Vector3 desiredMove{dir.x * moveSpeed_, dir.y * moveSpeed_, 0.0f};
+				TuboEngine::Math::Vector3 desiredMove{dir.x * moveSpeed_, dir.y * moveSpeed_, 0.0f};
                 MoveWithCollision(position, desiredMove, mapChipField);
             }
         }
@@ -562,8 +562,8 @@ void Enemy::Update() {
         bullet->Update();
 
     object3d->SetPosition(position);
-    // 描画側へモデル軸の補正を適用（ロジック上のrotationは"前方"のまま）
-    Vector3 drawRot = rotation;
+    // 描画側へモデル軸の補正を適用（ロジック上のRotationは"前方"のまま）
+	TuboEngine::Math::Vector3 drawRot = rotation;
     drawRot.x = NormalizeAngle(drawRot.x + kEnemyModelRotOffsetX);
     drawRot.y = NormalizeAngle(drawRot.y + kEnemyModelRotOffsetY);
     drawRot.z = NormalizeAngle(drawRot.z + kEnemyModelRotOffsetZ);
@@ -585,7 +585,8 @@ void Enemy::Update() {
     isHit = false;
 
     // アイコン表示更新
-    Vector3 iconWorldPos = position; iconWorldPos.z = position.z;
+	TuboEngine::Math::Vector3 iconWorldPos = position;
+	iconWorldPos.z = position.z;
     iconWorldPos.y += iconOffsetY_;
     if (questionTimer_ > 0.0f && questionIcon_) {
         questionIcon_->SetPosition({iconWorldPos.x, iconWorldPos.y});
@@ -601,7 +602,7 @@ void Enemy::Update() {
 
 void Enemy::ApplyKnockback(float dt) {
     if (knockbackTimer_ > 0.0f) {
-        Vector3 kbStep = {knockbackVelocity_.x * dt, knockbackVelocity_.y * dt, 0.0f};
+		TuboEngine::Math::Vector3 kbStep = {knockbackVelocity_.x * dt, knockbackVelocity_.y * dt, 0.0f};
         MoveWithCollision(position, kbStep, mapChipField);
         knockbackVelocity_.x *= knockbackDamping_;
         knockbackVelocity_.y *= knockbackDamping_;
@@ -646,11 +647,12 @@ void Enemy::OnCollision(Collider* other) {
     }
 
     // ノックバック（弾位置基準）
-    Vector3 hitPos;
+	TuboEngine::Math::Vector3 hitPos;
     if (auto* bullet = dynamic_cast<PlayerBullet*>(other)) hitPos = bullet->GetCenterPosition();
     else if (player_) hitPos = player_->GetPosition();
     else hitPos = position;
-    Vector3 away = position - hitPos; away.z = 0.0f;
+	TuboEngine::Math::Vector3 away = position - hitPos;
+	away.z = 0.0f;
     float len = std::sqrt(away.x * away.x + away.y * away.y);
     if (len > 0.001f) { away.x /= len; away.y /= len; }
     const float tile = MapChipField::GetBlockSize();
@@ -720,9 +722,9 @@ bool Enemy::CanSeePlayer() {
     if (!player_ || !mapChipField)
         return false;
 
-    Vector3 from = position;
-    Vector3 to = player_->GetPosition();
-    Vector3 dirToPlayer = to - from;
+    TuboEngine::Math::Vector3 from = position;
+	TuboEngine::Math::Vector3 to = player_->GetPosition();
+	TuboEngine::Math::Vector3 dirToPlayer = to - from;
     dirToPlayer.z = 0.0f;
 
     // 距離判定
@@ -733,26 +735,26 @@ bool Enemy::CanSeePlayer() {
     // 視野角判定
     // ここは「モデル見た目」ではなく「ロジック上の前方」に合わせるため、
     // 描画補正オフセットは適用しない。
-    Vector3 forward = {std::cos(rotation.z), std::sin(rotation.z), 0.0f};
-    float dot = Vector3::Dot(Vector3::Normalize(forward), Vector3::Normalize(dirToPlayer));
+	TuboEngine::Math::Vector3 forward = {std::cos(rotation.z), std::sin(rotation.z), 0.0f};
+	float dot = TuboEngine::Math::Vector3::Dot(TuboEngine::Math::Vector3::Normalize(forward), TuboEngine::Math::Vector3::Normalize(dirToPlayer));
     dot = std::clamp(dot, -1.0f, 1.0f); // acosの安全化
     float angleToPlayer = std::acos(dot) * 180.0f / kPI;
     if (angleToPlayer > kViewAngleDeg / 2.0f)
         return false;
 
     // レイ遮蔽物判定 (簡易サンプリング)
-    Vector2 start = {from.x, from.y};
-    Vector2 end = {to.x, to.y};
+	TuboEngine::Math::Vector2 start = {from.x, from.y};
+	TuboEngine::Math::Vector2 end = {to.x, to.y};
     const float step = 0.5f;
-    Vector2 dir = end - start;
+	TuboEngine::Math::Vector2 dir = end - start;
     float length = std::sqrt(dir.x * dir.x + dir.y * dir.y);
     if (length < 0.001f)
         return true;
     dir.x /= length;
     dir.y /= length;
     for (float t = 0.0f; t <= length; t += step) {
-        Vector2 pos2 = start + dir * t;
-        Vector3 checkPos = {pos2.x, pos2.y, from.z};
+		TuboEngine::Math::Vector2 pos2 = start + dir * t;
+		TuboEngine::Math::Vector3 checkPos = {pos2.x, pos2.y, from.z};
         if (mapChipField->IsBlocked(checkPos)) {
             return false; // 壁などで遮られている
         }
@@ -763,7 +765,7 @@ bool Enemy::CanSeePlayer() {
 void Enemy::DrawViewCone() {
     float halfRad = (kViewAngleDeg / 2.0f) * kPI / 180.0f;
     float baseAngle = rotation.z;
-    Vector3 center = position;
+	TuboEngine::Math::Vector3 center = position;
 
     Vector4 colNone = {1.0f, 1.0f, 0.0f, 0.7f};
     Vector4 colAware = {1.0f, 0.6f, 0.0f, 0.8f};
@@ -773,35 +775,35 @@ void Enemy::DrawViewCone() {
 
     for (int i = 0; i < kViewLineDiv; ++i) {
         float a0 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i) / kViewLineDiv);
-        Vector3 p0 = center + Vector3{std::cos(a0) * kViewDistance, std::sin(a0) * kViewDistance, 0.0f};
+		TuboEngine::Math::Vector3 p0 = center + TuboEngine::Math::Vector3{std::cos(a0) * kViewDistance, std::sin(a0) * kViewDistance, 0.0f};
         p0.z = center.z;
         LineManager::GetInstance()->DrawLine(center, p0, coneColor);
     }
     for (int i = 0; i < kViewLineDiv - 1; ++i) {
         float a0 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i) / kViewLineDiv);
         float a1 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i + 1) / kViewLineDiv);
-        Vector3 p0 = center + Vector3{std::cos(a0) * kViewDistance, std::sin(a0) * kViewDistance, 0.0f};
-        Vector3 p1 = center + Vector3{std::cos(a1) * kViewDistance, std::sin(a1) * kViewDistance, 0.0f};
+		TuboEngine::Math::Vector3 p0 = center + TuboEngine::Math::Vector3{std::cos(a0) * kViewDistance, std::sin(a0) * kViewDistance, 0.0f};
+		TuboEngine::Math::Vector3 p1 = center + TuboEngine::Math::Vector3{std::cos(a1) * kViewDistance, std::sin(a1) * kViewDistance, 0.0f};
         p0.z = p1.z = center.z;
         LineManager::GetInstance()->DrawLine(p0, p1, coneColor);
     }
 
     // レイサンプルはデバッグフラグがONかつプレイヤーが存在する時のみ描画
     if (showRaySamples_ && player_ && mapChipField) {
-        Vector2 start = {center.x, center.y};
-        Vector2 end = {player_->GetPosition().x, player_->GetPosition().y};
+		TuboEngine::Math::Vector2 start = {center.x, center.y};
+		TuboEngine::Math::Vector2 end = {player_->GetPosition().x, player_->GetPosition().y};
         const float step = 0.5f;
-        Vector2 dir = end - start;
+		TuboEngine::Math::Vector2 dir = end - start;
         float length = std::sqrt(dir.x * dir.x + dir.y * dir.y);
         if (length > 0.001f) {
             dir.x /= length; dir.y /= length;
             for (float t = 0.0f; t <= length; t += step) {
-                Vector2 pos2 = start + dir * t;
-                Vector3 checkPos = {pos2.x, pos2.y, center.z};
+				TuboEngine::Math::Vector2 pos2 = start + dir * t;
+				TuboEngine::Math::Vector3 checkPos = {pos2.x, pos2.y, center.z};
                 bool blocked = mapChipField->IsBlocked(checkPos);
                 Vector4 dotCol = blocked ? Vector4{1.0f, 0.1f, 0.1f, 1.0f} : Vector4{0.2f, 1.0f, 0.2f, 1.0f};
-                Vector3 pA = {checkPos.x - 0.05f, checkPos.y - 0.05f, checkPos.z};
-                Vector3 pB = {checkPos.x + 0.05f, checkPos.y + 0.05f, checkPos.z};
+				TuboEngine::Math::Vector3 pA = {checkPos.x - 0.05f, checkPos.y - 0.05f, checkPos.z};
+				TuboEngine::Math::Vector3 pB = {checkPos.x + 0.05f, checkPos.y + 0.05f, checkPos.z};
                 LineManager::GetInstance()->DrawLine(pA, pB, dotCol);
             }
         }
@@ -813,23 +815,23 @@ void Enemy::DrawLastSeenMark() {
         return;
     constexpr Vector4 kLastSeenColor = {1.0f, 0.2f, 0.2f, 1.0f};
     constexpr float kLastSeenMarkSize = 0.5f;
-    const Vector3& center = lastSeenPlayerPos;
+	const TuboEngine::Math::Vector3& center = lastSeenPlayerPos;
     // 十字
-    LineManager::GetInstance()->DrawLine(center + Vector3{-kLastSeenMarkSize, 0.0f, 0.0f}, center + Vector3{kLastSeenMarkSize, 0.0f, 0.0f}, kLastSeenColor);
-    LineManager::GetInstance()->DrawLine(center + Vector3{0.0f, -kLastSeenMarkSize, 0.0f}, center + Vector3{0.0f, kLastSeenMarkSize, 0.0f}, kLastSeenColor);
+	LineManager::GetInstance()->DrawLine(center + TuboEngine::Math::Vector3{-kLastSeenMarkSize, 0.0f, 0.0f}, center + TuboEngine::Math::Vector3{kLastSeenMarkSize, 0.0f, 0.0f}, kLastSeenColor);
+	LineManager::GetInstance()->DrawLine(center + TuboEngine::Math::Vector3{0.0f, -kLastSeenMarkSize, 0.0f}, center + TuboEngine::Math::Vector3{0.0f, kLastSeenMarkSize, 0.0f}, kLastSeenColor);
     // 外周円
     constexpr int circleDiv = 16;
     for (int i = 0; i < circleDiv; ++i) {
         float a0 = (2.0f * kPI) * (float(i) / circleDiv);
         float a1 = (2.0f * kPI) * (float(i + 1) / circleDiv);
-        Vector3 p0 = center + Vector3{std::cos(a0) * kLastSeenMarkSize, std::sin(a0) * kLastSeenMarkSize, 0.0f};
-        Vector3 p1 = center + Vector3{std::cos(a1) * kLastSeenMarkSize, std::sin(a1) * kLastSeenMarkSize, 0.0f};
+		TuboEngine::Math::Vector3 p0 = center + TuboEngine::Math::Vector3{std::cos(a0) * kLastSeenMarkSize, std::sin(a0) * kLastSeenMarkSize, 0.0f};
+		TuboEngine::Math::Vector3 p1 = center + TuboEngine::Math::Vector3{std::cos(a1) * kLastSeenMarkSize, std::sin(a1) * kLastSeenMarkSize, 0.0f};
         LineManager::GetInstance()->DrawLine(p0, p1, kLastSeenColor);
     }
 }
 
 // 末尾に欠けていた関数を追加
-Vector3 Enemy::GetCenterPosition() const {
+TuboEngine::Math::Vector3 Enemy::GetCenterPosition() const {
     // 当たり判定中心（今はスケール考慮せずそのまま）
     return position;
 }
@@ -838,9 +840,9 @@ void Enemy::DrawStateIcon() {
     // 状態に応じた簡易アイコンラインを頭上に描画
     if (!isAlive)
         return;
-    Vector3 base = position;
+	TuboEngine::Math::Vector3 base = position;
     base.z += 0.0f; // 2D平面なのでそのまま
-    Vector3 upPos = base + Vector3{0, 0, 0};
+	TuboEngine::Math::Vector3 upPos = base + TuboEngine::Math::Vector3{0, 0, 0};
     // 色を状態で切替
     Vector4 col;
     switch (state_) {
@@ -865,10 +867,10 @@ void Enemy::DrawStateIcon() {
     }
     float s = 0.4f;
     // 菱形
-    Vector3 p0 = base + Vector3{0, -s, 0};
-    Vector3 p1 = base + Vector3{s, 0, 0};
-    Vector3 p2 = base + Vector3{0, s, 0};
-    Vector3 p3 = base + Vector3{-s, 0, 0};
+	TuboEngine::Math::Vector3 p0 = base + TuboEngine::Math::Vector3{0, -s, 0};
+	TuboEngine::Math::Vector3 p1 = base + TuboEngine::Math::Vector3{s, 0, 0};
+	TuboEngine::Math::Vector3 p2 = base + TuboEngine::Math::Vector3{0, s, 0};
+	TuboEngine::Math::Vector3 p3 = base + TuboEngine::Math::Vector3{-s, 0, 0};
     LineManager::GetInstance()->DrawLine(p0, p1, col);
     LineManager::GetInstance()->DrawLine(p1, p2, col);
     LineManager::GetInstance()->DrawLine(p2, p3, col);
