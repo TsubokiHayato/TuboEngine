@@ -8,7 +8,7 @@ void SkyBox::Initialize(const std::string& textureFilePath) {
 	textureFilePath_ = textureFilePath;//このテクスチャはdds形式であることを想定している
 
 	// テクスチャロード
-	TextureManager::GetInstance()->LoadTexture(textureFilePath_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(textureFilePath_);
 
 
 
@@ -152,7 +152,7 @@ void SkyBox::Draw() {
 	//TransformationMatrixCBufferの設定
 	commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_->GetGPUVirtualAddress());
 
-	commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureFilePath_));
+	commandList->SetGraphicsRootDescriptorTable(2, TuboEngine::TextureManager::GetInstance()->GetSrvHandleGPU(textureFilePath_));
 	//描画
 	commandList->DrawIndexedInstanced(36, 1, 0, 0, 0);
 

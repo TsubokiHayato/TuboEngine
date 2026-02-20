@@ -188,7 +188,7 @@ void Animator::Draw() {
 
 	// 例: キューブマップSRVをt1（gCubeTexture）にバインド
 	// gCubeTexture (t1, PixelShader)
-	commandList->SetGraphicsRootDescriptorTable(3, TextureManager::GetInstance()->GetSrvHandleGPU(cubeMapFilePath_));
+	commandList->SetGraphicsRootDescriptorTable(3, TuboEngine::TextureManager::GetInstance()->GetSrvHandleGPU(cubeMapFilePath_));
 	// DirectionalLight (b1, PixelShader)
 	commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
 	// Camera (b2, PixelShader)

@@ -3,7 +3,6 @@
 #include "StageScene.h"
 #include "TextureManager.h"
 #include "Input.h"
-#include "Sprite.h"
 
 namespace {
 	template<typename Func>
@@ -31,12 +30,12 @@ void TutorialState::Enter(StageScene* scene) {
 
 void TutorialState::InitializeTutorialSprites() {
 	// Use textures placed under the Tutorial folder.
-	TextureManager::GetInstance()->LoadTexture("Tutorial/WelcomeTutorial.png");
-	TextureManager::GetInstance()->LoadTexture("Tutorial/tutorial(Move).png");
-	TextureManager::GetInstance()->LoadTexture("Tutorial/Tutorial(Attack).png");
-	TextureManager::GetInstance()->LoadTexture("Tutorial/Tutorial(Dash).png");
-	TextureManager::GetInstance()->LoadTexture("Tutorial/HowtoNext.png");
-	TextureManager::GetInstance()->LoadTexture("Tutorial/TitleBack.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("Tutorial/WelcomeTutorial.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("Tutorial/tutorial(Move).png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("Tutorial/Tutorial(Attack).png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("Tutorial/Tutorial(Dash).png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("Tutorial/HowtoNext.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("Tutorial/TitleBack.png");
 
 	// Layout (1280x720)
 	const float leftX = 60.0f;
@@ -46,7 +45,7 @@ void TutorialState::InitializeTutorialSprites() {
 	const TuboEngine::Math::Vector2 pagePos{leftX, baseY};
 
 	// Welcome
-	tutorialHeaderSprite_ = std::make_unique<Sprite>();
+	tutorialHeaderSprite_ = std::make_unique<TuboEngine::Sprite>();
 	tutorialHeaderSprite_->Initialize("Tutorial/WelcomeTutorial.png");
 	tutorialHeaderSprite_->SetAnchorPoint({0.0f, 0.0f});
 	tutorialHeaderSprite_->SetGetIsAdjustTextureSize(true);
@@ -54,7 +53,7 @@ void TutorialState::InitializeTutorialSprites() {
 	tutorialHeaderSprite_->Update();
 
 	// Move
-	tutorialMoveSprite_ = std::make_unique<Sprite>();
+	tutorialMoveSprite_ = std::make_unique<TuboEngine::Sprite>();
 	tutorialMoveSprite_->Initialize("Tutorial/tutorial(Move).png");
 	tutorialMoveSprite_->SetAnchorPoint({0.0f, 0.0f});
 	tutorialMoveSprite_->SetGetIsAdjustTextureSize(true);
@@ -62,7 +61,7 @@ void TutorialState::InitializeTutorialSprites() {
 	tutorialMoveSprite_->Update();
 
 	// Attack
-	tutorialAttackSprite_ = std::make_unique<Sprite>();
+	tutorialAttackSprite_ = std::make_unique<TuboEngine::Sprite>();
 	tutorialAttackSprite_->Initialize("Tutorial/Tutorial(Attack).png");
 	tutorialAttackSprite_->SetAnchorPoint({0.0f, 0.0f});
 	tutorialAttackSprite_->SetGetIsAdjustTextureSize(true);
@@ -70,7 +69,7 @@ void TutorialState::InitializeTutorialSprites() {
 	tutorialAttackSprite_->Update();
 
 	// Dash
-	tutorialDashSprite_ = std::make_unique<Sprite>();
+	tutorialDashSprite_ = std::make_unique<TuboEngine::Sprite>();
 	tutorialDashSprite_->Initialize("Tutorial/Tutorial(Dash).png");
 	tutorialDashSprite_->SetAnchorPoint({0.0f, 0.0f});
 	tutorialDashSprite_->SetGetIsAdjustTextureSize(true);
@@ -78,7 +77,7 @@ void TutorialState::InitializeTutorialSprites() {
 	tutorialDashSprite_->Update();
 
 	// HowtoNext: small
-	howtoNextSprite_ = std::make_unique<Sprite>();
+	howtoNextSprite_ = std::make_unique<TuboEngine::Sprite>();
 	howtoNextSprite_->Initialize("Tutorial/HowtoNext.png");
 	howtoNextSprite_->SetAnchorPoint({0.0f, 0.0f});
 	howtoNextSprite_->SetGetIsAdjustTextureSize(true);
@@ -87,7 +86,7 @@ void TutorialState::InitializeTutorialSprites() {
 	howtoNextSprite_->Update();
 
 	// TitleBack: bottom-left (small)
-	titleBackSprite_ = std::make_unique<Sprite>();
+	titleBackSprite_ = std::make_unique<TuboEngine::Sprite>();
 	titleBackSprite_->Initialize("Tutorial/TitleBack.png");
 	titleBackSprite_->SetAnchorPoint({0.0f, 1.0f});
 	titleBackSprite_->SetGetIsAdjustTextureSize(true);
@@ -206,19 +205,19 @@ void TutorialState::Update(StageScene* scene) {
 	// Page control
 	// Enter : next page
 	// Backspace : previous page
-	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
+	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_RETURN)) {
 		if (step_ < kMaxStep) {
 			step_++;
 		}
 	}
-	if (Input::GetInstance()->TriggerKey(DIK_BACK)) {
+	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_BACK)) {
 		if (step_ > 0) {
 			step_--;
 		}
 	}
 
 	// ESCでタイトルへ戻る
-	if (Input::GetInstance()->TriggerKey(DIK_ESCAPE)) {
+	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_ESCAPE)) {
 		scene->SetSceneNo(TITLE);
 		return;
 	}

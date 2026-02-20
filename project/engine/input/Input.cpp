@@ -6,15 +6,15 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "xinput.lib")
 
-Input* Input::instance = nullptr;
-Input* Input::GetInstance() {
+TuboEngine::Input* TuboEngine::Input::instance = nullptr;
+TuboEngine::Input* TuboEngine::Input::GetInstance() {
 	if (instance == nullptr) {
 		instance = new Input();
 	}
 	return instance;
 }
 
-void Input::Initialize(HWND hwnd) {
+void TuboEngine::Input::Initialize(HWND hwnd) {
 	hwnd_ = hwnd;
 
 	HRESULT hr = DirectInput8Create(GetModuleHandle(nullptr), DIRECTINPUT_VERSION, IID_IDirectInput8, reinterpret_cast<void**>(dInput_.GetAddressOf()), nullptr);
@@ -46,7 +46,7 @@ void Input::Initialize(HWND hwnd) {
 	SetupJoysticks();
 }
 
-void Input::Update() {
+void TuboEngine::Input::Update() {
 	// キーボード
 	keyPre_ = key_;
 	HRESULT hr = devKeyboard_->Acquire();
@@ -99,7 +99,7 @@ void Input::Update() {
 	// 必要に応じて新規接続の再列挙（例: 一定フレームごとにSetupJoysticks()を呼ぶ）
 }
 
-void Input::FlushTriggers() {
+void TuboEngine::Input::FlushTriggers() {
 	// 現在→前回へ同期することで、Trigger判定を出さない
 	keyPre_ = key_;
 	mousePre_ = mouse_;
@@ -108,7 +108,7 @@ void Input::FlushTriggers() {
 	}
 }
 
-void Input::Finalize() {
+void TuboEngine::Input::Finalize() {
 	if (devKeyboard_) {
 		devKeyboard_->Unacquire();
 		devKeyboard_.Reset();
@@ -131,7 +131,7 @@ void Input::Finalize() {
 	instance = nullptr;
 }
 
-void Input::ShowInputDebugWindow() {
+void TuboEngine::Input::ShowInputDebugWindow() {
 
 #ifdef USE_IMGUI
 	Input* input = Input::GetInstance();
@@ -198,24 +198,24 @@ void Input::ShowInputDebugWindow() {
 }
 
 // キーボード
-bool Input::PushKey(BYTE keyNumber) const { return (key_[keyNumber] & 0x80) != 0; }
+bool TuboEngine::Input::PushKey(BYTE keyNumber) const { return (key_[keyNumber] & 0x80) != 0; }
 
-bool Input::TriggerKey(BYTE keyNumber) const { return ((key_[keyNumber] & 0x80) != 0) && ((keyPre_[keyNumber] & 0x80) == 0); }
+bool TuboEngine::Input::TriggerKey(BYTE keyNumber) const { return ((key_[keyNumber] & 0x80) != 0) && ((keyPre_[keyNumber] & 0x80) == 0); }
 
 // マウス
-bool Input::IsPressMouse(int32_t button) const {
+bool TuboEngine::Input::IsPressMouse(int32_t button) const {
 	if (button < 0 || button >= 8)
 		return false;
 	return (mouse_.rgbButtons[button] & 0x80) != 0;
 }
 
-bool Input::IsTriggerMouse(int32_t button) const {
+bool TuboEngine::Input::IsTriggerMouse(int32_t button) const {
 	if (button < 0 || button >= 8)
 		return false;
 	return ((mouse_.rgbButtons[button] & 0x80) != 0) && ((mousePre_.rgbButtons[button] & 0x80) == 0);
 }
 
-Input::MouseMove Input::GetMouseMove() const {
+TuboEngine::Input::MouseMove TuboEngine::Input::GetMouseMove() const {
 	MouseMove move;
 	move.lX = mouse_.lX;
 	move.lY = mouse_.lY;
@@ -223,54 +223,54 @@ Input::MouseMove Input::GetMouseMove() const {
 	return move;
 }
 
-int32_t Input::GetWheel() const { return static_cast<int32_t>(mouse_.lZ); }
+int32_t TuboEngine::Input::GetWheel() const { return static_cast<int32_t>(mouse_.lZ); }
 
 // --- ジョイスティック関連は必要に応じて実装してください ---
-bool Input::GetJoystickState(int32_t stickNo, DIJOYSTATE2& out) const {
+bool TuboEngine::Input::GetJoystickState(int32_t stickNo, DIJOYSTATE2& out) const {
 	if (stickNo < 0 || stickNo >= static_cast<int32_t>(devJoysticks_.size()))
 		return false;
 	out = devJoysticks_[stickNo].state_.directInput_;
 	return true;
 }
 
-bool Input::GetJoystickStatePrevious(int32_t stickNo, DIJOYSTATE2& out) const {
+bool TuboEngine::Input::GetJoystickStatePrevious(int32_t stickNo, DIJOYSTATE2& out) const {
 	if (stickNo < 0 || stickNo >= static_cast<int32_t>(devJoysticks_.size()))
 		return false;
 	out = devJoysticks_[stickNo].statePre_.directInput_;
 	return true;
 }
 
-bool Input::GetJoystickState(int32_t stickNo, XINPUT_STATE& out) const {
+bool TuboEngine::Input::GetJoystickState(int32_t stickNo, XINPUT_STATE& out) const {
 	if (stickNo < 0 || stickNo >= static_cast<int32_t>(devJoysticks_.size()))
 		return false;
 	out = devJoysticks_[stickNo].state_.xInput_;
 	return true;
 }
 
-bool Input::GetJoystickStatePrevious(int32_t stickNo, XINPUT_STATE& out) const {
+bool TuboEngine::Input::GetJoystickStatePrevious(int32_t stickNo, XINPUT_STATE& out) const {
 	if (stickNo < 0 || stickNo >= static_cast<int32_t>(devJoysticks_.size()))
 		return false;
 	out = devJoysticks_[stickNo].statePre_.xInput_;
 	return true;
 }
 
-void Input::SetJoystickDeadZone(int32_t stickNo, int32_t deadZoneL, int32_t deadZoneR) {
+void TuboEngine::Input::SetJoystickDeadZone(int32_t stickNo, int32_t deadZoneL, int32_t deadZoneR) {
 	if (stickNo < 0 || stickNo >= static_cast<int32_t>(devJoysticks_.size()))
 		return;
 	devJoysticks_[stickNo].deadZoneL_ = deadZoneL;
 	devJoysticks_[stickNo].deadZoneR_ = deadZoneR;
 }
 
-size_t Input::GetNumberOfJoysticks() const { return devJoysticks_.size(); }
+size_t TuboEngine::Input::GetNumberOfJoysticks() const { return devJoysticks_.size(); }
 
-bool Input::IsPadConnected(int32_t stickNo) const {
+bool TuboEngine::Input::IsPadConnected(int32_t stickNo) const {
 	if (stickNo < 0 || stickNo >= static_cast<int32_t>(devJoysticks_.size()))
 		return false;
 	return devJoysticks_[stickNo].isConnected_;
 }
 
 // --- ジョイスティック列挙 ---
-BOOL CALLBACK Input::EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance, VOID* pContext) noexcept {
+BOOL CALLBACK TuboEngine::Input::EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance, VOID* pContext) noexcept {
 	auto* input = reinterpret_cast<Input*>(pContext);
 
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> device;
@@ -294,7 +294,7 @@ BOOL CALLBACK Input::EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance,
 	return DIENUM_CONTINUE;
 }
 
-void Input::SetupJoysticks() {
+void TuboEngine::Input::SetupJoysticks() {
 	devJoysticks_.clear();
 	if (dInput_) {
 		dInput_->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksCallback, this, DIEDFL_ATTACHEDONLY);

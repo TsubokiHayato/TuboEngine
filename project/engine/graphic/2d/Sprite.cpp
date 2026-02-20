@@ -6,8 +6,7 @@
 #include "externals/imgui/imgui_impl_win32.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 
-void Sprite::Initialize(std::string textureFilePath)
-{
+void TuboEngine::Sprite::Initialize(std::string textureFilePath) {
 	
 	
 	textureFilePath_ = textureFilePath;
@@ -116,8 +115,7 @@ void Sprite::Initialize(std::string textureFilePath)
 	AdjustTextureSize();
 }
 
-void Sprite::Update()
-{
+void TuboEngine::Sprite::Update() {
 
 	//textureの位置
 	float left = 0.0f - anchorPoint.x;
@@ -212,7 +210,7 @@ void Sprite::Update()
 }
 
 
-void Sprite::Draw(){
+void TuboEngine::Sprite::Draw() {
 
 	
 
@@ -230,8 +228,7 @@ void Sprite::Draw(){
 
 }
 
-void Sprite::AdjustTextureSize()
-{
+void TuboEngine::Sprite::AdjustTextureSize() {
 
 	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureFilePath_);
 
@@ -242,7 +239,7 @@ void Sprite::AdjustTextureSize()
 }
 
 // ImGuiでSpriteの全機能をまとめて操作・確認できる関数
-void Sprite::DrawImGui(const char* windowName) {
+void TuboEngine::Sprite::DrawImGui(const char* windowName) {
 #ifdef USE_IMGUI
 
 	const char* windowName_ = windowName;

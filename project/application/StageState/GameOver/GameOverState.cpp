@@ -26,8 +26,8 @@ void GameOverState::Enter(StageScene* scene) {
 	}
 
 	// 暗転スプライト準備（維持）
-	TextureManager::GetInstance()->LoadTexture("barrier.png");
-	blackoutSprite_ = std::make_unique<Sprite>();
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("barrier.png");
+	blackoutSprite_ = std::make_unique<TuboEngine::Sprite>();
 	blackoutSprite_->Initialize("barrier.png");
 	blackoutSprite_->SetSize({1280.0f, 720.0f});
 	blackoutSprite_->SetColor({0.0f, 0.0f, 0.0f, 0.0f});

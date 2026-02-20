@@ -29,12 +29,12 @@ void HpUI::Initialize(const std::string& frameTexturePath, const std::string& fi
 	frameSprites_.reserve(maxHp_);
 	fillSprites_.reserve(maxHp_);
 	for (int i = 0; i < maxHp_; ++i) {
-		auto fr = std::make_unique<Sprite>();
+		auto fr = std::make_unique<TuboEngine::Sprite>();
 		fr->Initialize(frameTexturePath);
 		fr->AdjustTextureSize();
 		fr->SetAnchorPoint({0.0f, 0.0f});
 		frameSprites_.push_back(std::move(fr));
-		auto fi = std::make_unique<Sprite>();
+		auto fi = std::make_unique<TuboEngine::Sprite>();
 		fi->Initialize(fillTexturePath);
 		fi->AdjustTextureSize();
 		fi->SetAnchorPoint({0.0f, 0.0f});
