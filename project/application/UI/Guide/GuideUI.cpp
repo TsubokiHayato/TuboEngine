@@ -24,7 +24,7 @@ namespace {
 
 static float AbsF(float v) { return (v >= 0.0f) ? v : -v; }
 
-const std::string& GuideUI::SelectMouseIconTexture(const Input::MouseMove& move) const {
+const std::string& GuideUI::SelectMouseIconTexture(const TuboEngine::Input::MouseMove& move) const {
 	const float ax = AbsF(static_cast<float>(move.lX));
 	const float ay = AbsF(static_cast<float>(move.lY));
 
@@ -52,89 +52,89 @@ void GuideUI::Initialize() {
 	texMouse_ = "external/Keyboard & Mouse/Default/mouse_left.png";
 	texMouseRight_ = "external/Keyboard & Mouse/Default/mouse_right.png";
 
-	TextureManager::GetInstance()->LoadTexture(texW_);
-	TextureManager::GetInstance()->LoadTexture(texWOutline_);
-	TextureManager::GetInstance()->LoadTexture(texA_);
-	TextureManager::GetInstance()->LoadTexture(texAOutline_);
-	TextureManager::GetInstance()->LoadTexture(texS_);
-	TextureManager::GetInstance()->LoadTexture(texSOutline_);
-	TextureManager::GetInstance()->LoadTexture(texD_);
-	TextureManager::GetInstance()->LoadTexture(texDOutline_);
-	TextureManager::GetInstance()->LoadTexture(texSpace_);
-	TextureManager::GetInstance()->LoadTexture(texSpaceOutline_);
-	TextureManager::GetInstance()->LoadTexture(texMouseSmall_);
-	TextureManager::GetInstance()->LoadTexture(texMouseMove_);
-	TextureManager::GetInstance()->LoadTexture(texMouse_);
-	TextureManager::GetInstance()->LoadTexture(texMouseRight_);
+TuboEngine::TextureManager::GetInstance()->LoadTexture(texW_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texWOutline_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texA_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texAOutline_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texS_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texSOutline_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texD_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texDOutline_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texSpace_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texSpaceOutline_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texMouseSmall_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texMouseMove_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texMouse_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texMouseRight_);
 
 	// Guide label textures
 	const std::string texMoveGuide = "GuideUI/moveGuide.png";
 	const std::string texDashGuide = "GuideUI/DashGuide.png";
 	const std::string texAimGuide = "GuideUI/AimGuide.png";
 	const std::string texShotGuide = "GuideUI/shotGuide.png";
-	TextureManager::GetInstance()->LoadTexture(texMoveGuide);
-	TextureManager::GetInstance()->LoadTexture(texDashGuide);
-	TextureManager::GetInstance()->LoadTexture(texAimGuide);
-	TextureManager::GetInstance()->LoadTexture(texShotGuide);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texMoveGuide);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texDashGuide);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texAimGuide);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(texShotGuide);
 
-	keyW_ = std::make_unique<Sprite>();
+	keyW_ = std::make_unique<TuboEngine::Sprite>();
 	keyW_->Initialize(texW_);
-	keyW_->SetAnchorPoint({ 0.0f, 0.0f });
-	keyW_->SetSize({ kKeySize, kKeySize });
+	keyW_->SetAnchorPoint({0.0f, 0.0f});
+	keyW_->SetSize({kKeySize, kKeySize});
 
-	keyA_ = std::make_unique<Sprite>();
+	keyA_ = std::make_unique<TuboEngine::Sprite>();
 	keyA_->Initialize(texA_);
-	keyA_->SetAnchorPoint({ 0.0f, 0.0f });
-	keyA_->SetSize({ kKeySize, kKeySize });
+	keyA_->SetAnchorPoint({0.0f, 0.0f});
+	keyA_->SetSize({kKeySize, kKeySize});
 
-	keyS_ = std::make_unique<Sprite>();
+	keyS_ = std::make_unique<TuboEngine::Sprite>();
 	keyS_->Initialize(texS_);
-	keyS_->SetAnchorPoint({ 0.0f, 0.0f });
-	keyS_->SetSize({ kKeySize, kKeySize });
+	keyS_->SetAnchorPoint({0.0f, 0.0f});
+	keyS_->SetSize({kKeySize, kKeySize});
 
-	keyD_ = std::make_unique<Sprite>();
+	keyD_ = std::make_unique<TuboEngine::Sprite>();
 	keyD_->Initialize(texD_);
-	keyD_->SetAnchorPoint({ 0.0f, 0.0f });
-	keyD_->SetSize({ kKeySize, kKeySize });
+	keyD_->SetAnchorPoint({0.0f, 0.0f});
+	keyD_->SetSize({kKeySize, kKeySize});
 
-	labelMove_ = std::make_unique<Sprite>();
+	labelMove_ = std::make_unique<TuboEngine::Sprite>();
 	labelMove_->Initialize(texMoveGuide);
 	labelMove_->SetAnchorPoint({ 0.0f, 0.0f });
 	labelMove_->SetGetIsAdjustTextureSize(true);
 	labelMove_->Update();
 
 	// SPACE (Dash)
-	keySpace_ = std::make_unique<Sprite>();
+	keySpace_ = std::make_unique<TuboEngine::Sprite>();
 	keySpace_->Initialize(texSpace_);
-	keySpace_->SetAnchorPoint({ 0.0f, 0.0f });
+	keySpace_->SetAnchorPoint({0.0f, 0.0f});
 	keySpace_->SetGetIsAdjustTextureSize(true); // テクスチャの実サイズにする（引き伸ばさない）
 	keySpace_->Update();
 
-	labelDash_ = std::make_unique<Sprite>();
+	labelDash_ = std::make_unique<TuboEngine::Sprite>();
 	labelDash_->Initialize(texDashGuide);
-	labelDash_->SetAnchorPoint({ 0.0f, 0.0f });
+	labelDash_->SetAnchorPoint({0.0f, 0.0f});
 	labelDash_->SetGetIsAdjustTextureSize(true);
 	labelDash_->Update();
 
 	// Mouse (Aim)
-	mouseIcon_ = std::make_unique<Sprite>();
+	mouseIcon_ = std::make_unique<TuboEngine::Sprite>();
 	mouseIcon_->Initialize(texMouseSmall_);
 	mouseIcon_->SetAnchorPoint({ 0.0f, 0.0f });
 	mouseIcon_->SetSize({ kMouseW, kMouseH });
 
-	labelAim_ = std::make_unique<Sprite>();
+	labelAim_ = std::make_unique<TuboEngine::Sprite>();
 	labelAim_->Initialize(texAimGuide);
-	labelAim_->SetAnchorPoint({ 0.0f, 0.0f });
+	labelAim_->SetAnchorPoint({0.0f, 0.0f});
 	labelAim_->SetGetIsAdjustTextureSize(true);
 	labelAim_->Update();
 
 	// Mouse (Shoot)
-	mouseShootIcon_ = std::make_unique<Sprite>();
+	mouseShootIcon_ = std::make_unique<TuboEngine::Sprite>();
 	mouseShootIcon_->Initialize(texMouse_);
-	mouseShootIcon_->SetAnchorPoint({ 0.0f, 0.0f });
-	mouseShootIcon_->SetSize({ kMouseShootW, kMouseShootH });
+	mouseShootIcon_->SetAnchorPoint({0.0f, 0.0f});
+	mouseShootIcon_->SetSize({kMouseShootW, kMouseShootH});
 
-	labelShoot_ = std::make_unique<Sprite>();
+	labelShoot_ = std::make_unique<TuboEngine::Sprite>();
 	labelShoot_->Initialize(texShotGuide);
 	labelShoot_->SetAnchorPoint({ 0.0f, 0.0f });
 	labelShoot_->SetGetIsAdjustTextureSize(true);
@@ -146,7 +146,7 @@ void GuideUI::Initialize() {
 	Update();
 }
 
-void GuideUI::UpdateKeySpriteState(Sprite* sprite, const std::string& normalTex, const std::string& outlineTex, bool pressed) const {
+void GuideUI::UpdateKeySpriteState(TuboEngine::Sprite* sprite, const std::string& normalTex, const std::string& outlineTex, bool pressed) const {
 	if (!sprite) {
 		return;
 	}
@@ -236,7 +236,7 @@ void GuideUI::Update() {
 		labelShoot_->SetPosition({ left + kMouseShootW + labelGapX, mouseShootTopY });
 	}
 
-	auto* input = Input::GetInstance();
+	auto* input = TuboEngine::Input::GetInstance();
 
 	// マウスアイコンは移動方向で切り替える
 	if (mouseIcon_) {
