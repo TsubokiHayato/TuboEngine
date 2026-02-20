@@ -8,7 +8,7 @@ ParticleInfo ClearFireworkEmitter::GenerateParticle() {
     std::uniform_real_distribution<float> cx(preset_.posMin.x, preset_.posMax.x);
     std::uniform_real_distribution<float> cy(preset_.posMin.y, preset_.posMax.y);
     std::uniform_real_distribution<float> cz(preset_.posMin.z, preset_.posMax.z);
-    Vector3 center = preset_.emitterTransform.translate + Vector3{ cx(rng_), cy(rng_), cz(rng_) };
+	TuboEngine::Math::Vector3 center = preset_.emitterTransform.translate + TuboEngine::Math::Vector3{cx(rng_), cy(rng_), cz(rng_)};
     p.transform.translate = center;
 
     // スケール小さめ

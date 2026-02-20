@@ -363,6 +363,8 @@
     <ClCompile Include="engine\graphic\Particle\Effects\ClearFirework\ClearFireworkEmitter.cpp">
       <Filter>projects\engine\graphic\Particle\Effects\ClearFirework</Filter>
     </ClCompile>
+    <ClCompile Include="application\Weapon\PlayerWeapons.cpp" />
+    <ClCompile Include="application\UI\PlayerStatusRingUI\PlayerStatusRingUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -800,6 +802,12 @@
     <ClInclude Include="engine\graphic\Particle\Effects\Ring\RingEmitter.h">
       <Filter>projects\engine\graphic\Particle\Effects\Ring</Filter>
     </ClInclude>
+    <ClInclude Include="application\Weapon\IWeapon.h" />
+    <ClInclude Include="application\Weapon\PlayerWeapons.h" />
+    <ClInclude Include="application\Bullet\Player\ShotgunPelletBullet.h" />
+    <ClInclude Include="application\Bullet\Player\PiercingBullet.h" />
+    <ClInclude Include="application\UI\PlayerStatusRingUI\PlayerStatusRingUI.h" />
+    <ClInclude Include="application\StageScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli">
@@ -1030,5 +1038,7 @@
     <Text Include="externals\imgui\LICENSE.txt">
       <Filter>projects\external\imgui</Filter>
     </Text>
+    <Text Include="application\Resources\UI\README_PlayerRingUI.txt" />
+    <Text Include="application\Resources\UI\README_PlayerRingUI_Segments.txt" />
   </ItemGroup>
 </Project>

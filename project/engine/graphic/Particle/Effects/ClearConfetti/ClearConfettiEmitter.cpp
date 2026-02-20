@@ -7,7 +7,7 @@ ParticleInfo ClearConfettiEmitter::GenerateParticle() {
     std::uniform_real_distribution<float> dx(preset_.posMin.x, preset_.posMax.x);
     std::uniform_real_distribution<float> dy(preset_.posMin.y, preset_.posMax.y);
     std::uniform_real_distribution<float> dz(preset_.posMin.z, preset_.posMax.z);
-    p.transform.translate = preset_.emitterTransform.translate + Vector3{dx(rng_), dy(rng_), dz(rng_)};
+	p.transform.translate = preset_.emitterTransform.translate + TuboEngine::Math::Vector3{dx(rng_), dy(rng_), dz(rng_)};
 
     // スケール: 少しばらつかせる（start を基準）
     std::uniform_real_distribution<float> sx(preset_.scaleStart.x * 0.8f, preset_.scaleStart.x * 1.2f);

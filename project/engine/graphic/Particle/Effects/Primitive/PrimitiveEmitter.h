@@ -46,7 +46,7 @@ protected:
 		float rx = std::uniform_real_distribution<float>(preset_.posMin.x, preset_.posMax.x)(rng_);
 		float ry = std::uniform_real_distribution<float>(preset_.posMin.y, preset_.posMax.y)(rng_);
 		float rz = std::uniform_real_distribution<float>(preset_.posMin.z, preset_.posMax.z)(rng_);
-		p.transform.translate = preset_.center + Vector3{rx, ry, rz};
+		p.transform.translate = preset_.center + TuboEngine::Math::Vector3{rx, ry, rz};
 
         p.velocity = {
             std::uniform_real_distribution<float>(preset_.velMin.x,preset_.velMax.x)(rng_),

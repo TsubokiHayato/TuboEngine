@@ -3,6 +3,8 @@
 #include<cstdint>
 #include<windows.h>
 
+namespace TuboEngine {
+
 //! アプリケーションウィンドウ管理クラス（シングルトン）
 class WinApp
 {
@@ -87,3 +89,5 @@ private:
     static const int32_t kClientHeight = 720;
 
 };
+
+} // namespace TuboEngine

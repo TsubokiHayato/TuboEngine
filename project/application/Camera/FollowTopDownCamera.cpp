@@ -34,7 +34,7 @@ void FollowTopDownCamera::StartIntroZoom(float startZoom, float endZoom, float d
 	zoom_ = std::max(zoomMin_, std::min(zoomMax_, introZoomStart_));
 }
 
-void FollowTopDownCamera::Initialize(Player* target, const Vector3& offset, float followSpeed) {
+void FollowTopDownCamera::Initialize(Player* target, const TuboEngine::Math::Vector3& offset, float followSpeed) {
 	target_ = target;
 	offset_ = offset;
 	followSpeed_ = followSpeed;
@@ -62,7 +62,7 @@ void FollowTopDownCamera::SnapToTarget() {
 	}
 
 	// target位置に対して、現在の回転/ズームを反映したオフセットで即配置
-	Vector3 rotatedOffset = offset_;
+	TuboEngine::Math::Vector3 rotatedOffset = offset_;
 	{
 		using namespace DirectX;
 		XMVECTOR off = XMVectorSet(offset_.x, offset_.y, offset_.z, 0.0f);
@@ -76,7 +76,7 @@ void FollowTopDownCamera::SnapToTarget() {
 		rotatedOffset.z = XMVectorGetZ(offR);
 	}
 
-	Vector3 desiredPos = target_->GetPosition() + rotatedOffset * zoom_;
+	TuboEngine::Math::Vector3 desiredPos = target_->GetPosition() + rotatedOffset * zoom_;
 	AvoidObstacles(desiredPos);
 
 	if (useBounds_) {
@@ -117,15 +117,15 @@ void FollowTopDownCamera::Update() {
 	}
 
 	// プレイヤーの位置を取得
-	Vector3 targetPos = target_->GetPosition();
+	TuboEngine::Math::Vector3 targetPos = target_->GetPosition();
 
 	// 注視点オフセット
-	Vector3 lookAt = targetPos + lookAtOffset_;
+	TuboEngine::Math::Vector3 lookAt = targetPos + lookAtOffset_;
 	(void)lookAt;
 
 	// 回転に応じてオフセットを回転させる（斜め視点対応）
 	// rotation_はラジアン想定。順序: Z->X->Y（右手座標系）
-	Vector3 rotatedOffset = offset_;
+	TuboEngine::Math::Vector3 rotatedOffset = offset_;
 	{
 		using namespace DirectX;
 		XMVECTOR off = XMVectorSet(offset_.x, offset_.y, offset_.z, 0.0f);
@@ -140,7 +140,7 @@ void FollowTopDownCamera::Update() {
 	}
 
 	// 目標カメラ位置（ズーム対応）
-	Vector3 desiredPos = targetPos + rotatedOffset * zoom_;
+	TuboEngine::Math::Vector3 desiredPos = targetPos + rotatedOffset * zoom_;
 
 	// 障害物回避（雛形）
 	AvoidObstacles(desiredPos);
@@ -153,8 +153,8 @@ void FollowTopDownCamera::Update() {
 	}
 
 	// 線形補間で滑らかに追従
-	Vector3 currentPos = camera_->GetTranslate();
-	Vector3 newPos = currentPos + (desiredPos - currentPos) * followSpeed_;
+	TuboEngine::Math::Vector3 currentPos = camera_->GetTranslate();
+	TuboEngine::Math::Vector3 newPos = currentPos + (desiredPos - currentPos) * followSpeed_;
 
 	// カメラシェイク
 	if (shakeTime_ > 0.0f) {
@@ -211,13 +211,13 @@ void FollowTopDownCamera::DrawImGui() {
 #endif // USE_IMGUI
 }
 
-void FollowTopDownCamera::SetRotation(const Vector3& rotation) { rotation_ = rotation; }
+void FollowTopDownCamera::SetRotation(const TuboEngine::Math::Vector3& rotation) { rotation_ = rotation; }
 void FollowTopDownCamera::SetTarget(Player* target) { target_ = target; }
-void FollowTopDownCamera::SetOffset(const Vector3& offset) { offset_ = offset; }
+void FollowTopDownCamera::SetOffset(const TuboEngine::Math::Vector3& offset) { offset_ = offset; }
 void FollowTopDownCamera::SetFollowSpeed(float speed) { followSpeed_ = speed; }
-void FollowTopDownCamera::SetLookAtOffset(const Vector3& offset) { lookAtOffset_ = offset; }
+void FollowTopDownCamera::SetLookAtOffset(const TuboEngine::Math::Vector3& offset) { lookAtOffset_ = offset; }
 void FollowTopDownCamera::SetZoom(float zoom) { zoom_ = std::max(zoomMin_, std::min(zoomMax_, zoom)); }
-void FollowTopDownCamera::SetBounds(const Vector3& min, const Vector3& max) {
+void FollowTopDownCamera::SetBounds(const TuboEngine::Math::Vector3& min, const TuboEngine::Math::Vector3& max) {
 	boundsMin_ = min;
 	boundsMax_ = max;
 	useBounds_ = true;
@@ -229,7 +229,7 @@ void FollowTopDownCamera::Shake(float intensity, float duration) {
 }
 
 // 障害物回避の雛形（実装はゲームごとに要カスタマイズ）
-void FollowTopDownCamera::AvoidObstacles(Vector3& desiredPos) {
+void FollowTopDownCamera::AvoidObstacles(TuboEngine::Math::Vector3& desiredPos) {
 	// ここにレイキャスト等で障害物を検出し、desiredPosを調整する処理を実装
 	// 今は何もしない
 }

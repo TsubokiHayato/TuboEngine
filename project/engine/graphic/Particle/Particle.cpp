@@ -88,7 +88,8 @@ void Particle::Update() {
 	// ビュー行列の取得
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 	// プロジェクション行列の取得
-	Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(WinApp::GetInstance()->GetClientWidth()) / float(WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
+	Matrix4x4 projectionMatrix =
+	    MakePerspectiveMatrix(0.45f, float(TuboEngine::WinApp::GetInstance()->GetClientWidth()) / float(TuboEngine::WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
 	// ビュープロジェクション行列の取得
 	Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 
@@ -111,7 +112,7 @@ void Particle::Update() {
 	// パーティクルの更新
 	for (auto& group : particleGroups) {
 		// テクスチャサイズの取得
-		Vector2 textureSize = group.second.textureSize;
+		TuboEngine::Math::Vector2 textureSize = group.second.textureSize;
 		// インスタンス数の初期化
 		for (auto it = group.second.particleList.begin(); it != group.second.particleList.end();) {
 			// パーティクルの参照
@@ -158,7 +159,7 @@ void Particle::Update() {
 /// 描画処理
 /// </summary>
 void Particle::Draw() {
-	ID3D12GraphicsCommandList* commandList = DirectXCommon::GetInstance()->GetCommandList().Get();
+	ID3D12GraphicsCommandList* commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList().Get();
 
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 
@@ -166,8 +167,8 @@ void Particle::Draw() {
 	for (auto& group : particleGroups) {
 		if (group.second.instanceCount == 0) continue; // インスタンスが無い場合はスキップ
 
-		Vector2 textureLeftTop = group.second.textureLeftTop;
-		Vector2 textureSize = group.second.textureSize;
+		TuboEngine::Math::Vector2 textureLeftTop = group.second.textureLeftTop;
+		TuboEngine::Math::Vector2 textureSize = group.second.textureSize;
 
 		// マテリアルCBufferの場所を設定
 		commandList->SetGraphicsRootConstantBufferView(0, materialBuffer_->GetGPUVirtualAddress());
@@ -192,7 +193,7 @@ void Particle::Draw() {
 /// <param name="name">パーティクル名</param>
 /// <param name="position">生成位置</param>
 /// <param name="count">生成数</param>
-void Particle::Emit(const std::string name, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime, uint32_t count) {
+void Particle::Emit(const std::string name, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime, uint32_t count) {
 	if (particleGroups.find(name) == particleGroups.end()) {
 		// パーティクルグループが存在しない場合はエラーを出力して終了
 		assert("Specified particle group does not exist!");
@@ -259,7 +260,7 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 
 	// テクスチャサイズを取得
 	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureFilePath);
-	Vector2 textureSize = { static_cast<float>(metadata.width), static_cast<float>(metadata.height) };
+	TuboEngine::Math::Vector2 textureSize = {static_cast<float>(metadata.width), static_cast<float>(metadata.height)};
 
 	// サイズを設定（指定があればそれを使用、なければテクスチャサイズを使用）
 	if (customTextureSize.x > 0.0f && customTextureSize.y > 0.0f) {
@@ -269,7 +270,7 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 	}
 
 	// インスタンシング用リソースの生成
-	newGroup.instancingResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
+	newGroup.instancingResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
 
 	newGroup.instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&newGroup.instancingDataPtr));
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
@@ -355,10 +356,10 @@ void Particle::CreateVertexDataForCylinder() {
 
 		//texcoord
 
-		Vector2 texcoordTop = { u, 0.0f };
-		Vector2 texcoordBottom = { u, 1.0f };
-		Vector2 texcoordTopNext = { uNext, 0.0f };
-		Vector2 texcoordBottomNext = { uNext, 1.0f };
+		TuboEngine::Math::Vector2 texcoordTop = {u, 0.0f};
+		TuboEngine::Math::Vector2 texcoordBottom = {u, 1.0f};
+		TuboEngine::Math::Vector2 texcoordTopNext = {uNext, 0.0f};
+		TuboEngine::Math::Vector2 texcoordBottomNext = {uNext, 1.0f};
 
 		//vを反転
 
@@ -412,7 +413,7 @@ void Particle::CreateVertexDataForOriginal() {
 /// </summary>
 void Particle::CreateVertexBufferView() {
 	// 頂点バッファの作成
-	vertexBuffer_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
+	vertexBuffer_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
 
 	// 頂点バッファビューの作成
 	// リソースの先頭のアドレスから使う
@@ -428,7 +429,7 @@ void Particle::CreateVertexBufferView() {
 /// </summary>
 void Particle::CreateMaterialData() {
 	// マテリアル用のリソースを作成
-	materialBuffer_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
+	materialBuffer_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
 
 	// 書き込むためのアドレスを取得
 	materialBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
@@ -449,7 +450,8 @@ void Particle::CreateMaterialData() {
 /// <param name="currentTime">経過時間</param>
 /// <returns>新しいパーティクル情報</returns>
 /// 
-ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo
+    Particle::CreateNewParticle(std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
@@ -469,7 +471,8 @@ ParticleInfo Particle::CreateNewParticle(std::mt19937& randomEngine, const Trans
 	return particle;
 }
 
-ParticleInfo Particle::CreateNewParticleForPrimitive(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo Particle::CreateNewParticleForPrimitive(
+    std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
@@ -496,7 +499,8 @@ ParticleInfo Particle::CreateNewParticleForPrimitive(std::mt19937& randomEngine,
 	return particle;
 }
 
-ParticleInfo Particle::CreateNewParticleForRing(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo
+    Particle::CreateNewParticleForRing(std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
@@ -516,7 +520,8 @@ ParticleInfo Particle::CreateNewParticleForRing(std::mt19937& randomEngine, cons
 	return particle;
 }
 
-ParticleInfo Particle::CreateNewParticleForCylinder(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo Particle::CreateNewParticleForCylinder(
+    std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
@@ -536,7 +541,8 @@ ParticleInfo Particle::CreateNewParticleForCylinder(std::mt19937& randomEngine, 
 	return particle;
 }
 
-ParticleInfo Particle::CreateNewParticleForOriginal(std::mt19937& randomEngine, const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime) {
+ParticleInfo Particle::CreateNewParticleForOriginal(
+    std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 	return ParticleInfo();
 }
 

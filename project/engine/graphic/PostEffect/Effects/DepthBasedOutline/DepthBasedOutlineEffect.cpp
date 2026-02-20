@@ -7,7 +7,7 @@ void DepthBasedOutlineEffect::Initialize() {
 	pso_->Initialize();
 
 	// 定数バッファ作成（projectionMatrix用）
-	materialCB_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(ToonDepthOutlineParams));
+	materialCB_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(ToonDepthOutlineParams));
 	materialCB_->Map(0, nullptr, reinterpret_cast<void**>(&materialCBData_));
 	// 初期値（単位行列）
 	materialCBData_->projectionInverse = MakeIdentity4x4();
@@ -24,12 +24,12 @@ void DepthBasedOutlineEffect::Initialize() {
 	depthTextureSRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	depthTextureSRVDesc.Texture2D.MipLevels = 1;
 
-	DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(
-	    DirectXCommon::GetInstance()->GetDepthStencliResouece().Get(), &depthTextureSRVDesc, DirectXCommon::GetInstance()->GetSRVCPUDescriptorHandle(1));
+	TuboEngine::DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(
+	    TuboEngine::DirectXCommon::GetInstance()->GetDepthStencliResouece().Get(), &depthTextureSRVDesc, TuboEngine::DirectXCommon::GetInstance()->GetSRVCPUDescriptorHandle(1));
 }
 
 void DepthBasedOutlineEffect::Update() {
-	// 必要に応じてprojectionMatrixを更新
+	// 必要に応じてProjectionMatrixを更新
 	// 例: カメラや画面サイズに応じて行列をセット
 	materialCBData_->projectionInverse = Inverse(camera_->GetProjectionMatrix());
 }
@@ -59,5 +59,5 @@ void DepthBasedOutlineEffect::SetMainCamera(Camera* camera) {
 void DepthBasedOutlineEffect::Draw(ID3D12GraphicsCommandList* commandList) {
 	pso_->DrawSettingsCommon();
 	commandList->SetGraphicsRootConstantBufferView(1, materialCB_->GetGPUVirtualAddress());
-	commandList->SetGraphicsRootDescriptorTable(2, DirectXCommon::GetInstance()->GetSRVGPUDescriptorHandle(1));
+	commandList->SetGraphicsRootDescriptorTable(2, TuboEngine::DirectXCommon::GetInstance()->GetSRVGPUDescriptorHandle(1));
 }

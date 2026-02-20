@@ -9,15 +9,15 @@ constexpr float kPI = 3.14159265358979323846f;
 
 namespace {
 constexpr float kDefaultBulletSpeed   = 0.5f;                       // デフォルトの弾の速度
-constexpr Vector3 kDefaultBulletScale = {1.0f, 1.0f, 1.0f};         // デフォルトの弾の大きさ
-constexpr Vector3 kDefaultBulletRotation = {0.0f, 0.0f, 0.0f};      // デフォルトの弾の回転
+constexpr TuboEngine::Math::Vector3 kDefaultBulletScale = {1.0f, 1.0f, 1.0f};    // デフォルトの弾の大きさ
+constexpr TuboEngine::Math::Vector3 kDefaultBulletRotation = {0.0f, 0.0f, 0.0f}; // デフォルトの弾の回転
 constexpr float kBulletDisappearZ = 100.0f;
 }
 
 float EnemyNormalBullet::s_bulletSpeed      = kDefaultBulletSpeed;
 float EnemyNormalBullet::s_disappearZ       = kBulletDisappearZ;
-Vector3 EnemyNormalBullet::s_scale          = kDefaultBulletScale;
-Vector3 EnemyNormalBullet::s_rotation       = kDefaultBulletRotation;
+TuboEngine::Math::Vector3 EnemyNormalBullet::s_scale = kDefaultBulletScale;
+TuboEngine::Math::Vector3 EnemyNormalBullet::s_rotation = kDefaultBulletRotation;
 float EnemyNormalBullet::s_disappearRadius  = 50.0f;
 int   EnemyNormalBullet::s_damage           = 1;
 float EnemyNormalBullet::s_fireInterval     = 1.0f;
@@ -25,7 +25,7 @@ float EnemyNormalBullet::s_fireInterval     = 1.0f;
 //--------------------------------------------------
 // 初期化
 //--------------------------------------------------
-void EnemyNormalBullet::Initialize(const Vector3& startPos) {
+void EnemyNormalBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
     Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon));
     position     = startPos;
     velocity     = {};
@@ -62,16 +62,16 @@ void EnemyNormalBullet::Update() {
     velocity.y  =  std::cosf(angle) * bulletSpeed;
     velocity.z  = 0.0f;
 
-    Vector3 desiredMove = velocity;
+    TuboEngine::Math::Vector3 desiredMove = velocity;
 
     // タイルサイズ取得（なければ1.0f）
     float tileSize = (mapChipField_) ? MapChipField::GetBlockSize() : 1.0f;
     float moveLen2D = std::sqrt(desiredMove.x * desiredMove.x + desiredMove.y * desiredMove.y);
     int subSteps = std::max(1, int(std::ceil(moveLen2D / (tileSize * 0.5f))));
-    Vector3 stepMove = desiredMove / float(subSteps);
+	TuboEngine::Math::Vector3 stepMove = desiredMove / float(subSteps);
 
     for (int i = 0; i < subSteps && isAlive; ++i) {
-        Vector3 nextPos = position + stepMove;
+		TuboEngine::Math::Vector3 nextPos = position + stepMove;
 
         // マップ衝突判定（境界外 / Block に当たったら消滅）
         if (mapChipField_ && mapChipField_->IsBlocked(nextPos)) {
@@ -86,7 +86,7 @@ void EnemyNormalBullet::Update() {
             // 半径はプレイヤー/弾のCollider設定に合わせて調整
             const float bulletR  = 0.5f;    // Initialize で SetRadius と一致させる
             const float playerR  = 1.0f;    // プレイヤー半径（未設定なら1.0f目安）
-            Vector3 pc = player_->GetCenterPosition();
+			TuboEngine::Math::Vector3 pc = player_->GetCenterPosition();
             float dx = position.x - pc.x;
             float dy = position.y - pc.y;
             float rSum = bulletR + playerR;
@@ -102,7 +102,7 @@ void EnemyNormalBullet::Update() {
 
     // プレイヤーから一定距離で消滅
     if (isAlive && player_) {
-        Vector3 p = player_->GetPosition();
+		TuboEngine::Math::Vector3 p = player_->GetPosition();
         float dx = position.x - p.x;
         float dy = position.y - p.y;
         float dist = std::sqrt(dx * dx + dy * dy);
@@ -161,7 +161,7 @@ void EnemyNormalBullet::OnCollision(Collider* other) {
 //--------------------------------------------------
 // 当たり判定中心
 //--------------------------------------------------
-Vector3 EnemyNormalBullet::GetCenterPosition() const {
+TuboEngine::Math::Vector3 EnemyNormalBullet::GetCenterPosition() const {
     return position;
 }
 

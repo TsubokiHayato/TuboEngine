@@ -3,8 +3,8 @@
 void BlendPSO::Initialize(BlendMode blendMode)
 {
 	blendMode_ = blendMode;
-	device = DirectXCommon::GetInstance()->GetDevice();
-	commandList = DirectXCommon::GetInstance()->GetCommandList();
+	device = TuboEngine::DirectXCommon::GetInstance()->GetDevice();
+	commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
 
 	// Create root signature and compile shaders once
 	CreateRootSignature();
@@ -78,17 +78,17 @@ void BlendPSO::CreateRootSignature()
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
-	DirectXCommon::GetInstance()->hr = D3D12SerializeRootSignature(
+	TuboEngine::DirectXCommon::GetInstance()->hr = D3D12SerializeRootSignature(
 		&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 
-	if (FAILED(DirectXCommon::GetInstance()->hr)) {
-		Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+	if (FAILED(TuboEngine::DirectXCommon::GetInstance()->hr)) {
+		TuboEngine::Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 
-	DirectXCommon::GetInstance()->hr = device->CreateRootSignature(
+	TuboEngine::DirectXCommon::GetInstance()->hr = device->CreateRootSignature(
 		0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
-	assert(SUCCEEDED(DirectXCommon::GetInstance()->hr));
+	assert(SUCCEEDED(TuboEngine::DirectXCommon::GetInstance()->hr));
 
 	rootSignatureCreated_ = true;
 }
@@ -173,11 +173,11 @@ void BlendPSO::CreateOrUpdatePipelineState()
 
 	// Compile shaders once
 	if (!shadersCompiled_) {
-		vertexShaderBlob = DirectXCommon::GetInstance()->CompileShader(
+		vertexShaderBlob = TuboEngine::DirectXCommon::GetInstance()->CompileShader(
 			L"Resources/Shaders/Object3d.VS.hlsl", L"vs_6_0");
 		assert(vertexShaderBlob != nullptr);
 
-		pixelShaderBlob = DirectXCommon::GetInstance()->CompileShader(
+		pixelShaderBlob = TuboEngine::DirectXCommon::GetInstance()->CompileShader(
 			L"Resources/Shaders/Object3d.PS.hlsl", L"ps_6_0");
 		assert(pixelShaderBlob != nullptr);
 
@@ -243,9 +243,9 @@ void BlendPSO::CreateOrUpdatePipelineState()
 		pipelineStateCreated_ = false;
 	}
 
-	DirectXCommon::GetInstance()->hr = device->CreateGraphicsPipelineState(
+	 TuboEngine::DirectXCommon::GetInstance()->hr = device->CreateGraphicsPipelineState(
 		&graphicPipelineStateDesc, IID_PPV_ARGS(&graphicsPipeLineState));
-	assert(SUCCEEDED(DirectXCommon::GetInstance()->hr));
+	assert(SUCCEEDED(TuboEngine::DirectXCommon::GetInstance()->hr));
 
 	pipelineStateCreated_ = true;
 }

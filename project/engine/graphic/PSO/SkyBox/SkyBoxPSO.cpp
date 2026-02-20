@@ -2,8 +2,8 @@
 
 void SkyBoxPSO::Initialize() {
 	
-	device = DirectXCommon::GetInstance()->GetDevice();
-	commandList = DirectXCommon::GetInstance()->GetCommandList();
+	device = TuboEngine::DirectXCommon::GetInstance()->GetDevice();
+	commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
 
 
 	//グラフィックスパイプラインの作成
@@ -68,17 +68,17 @@ void SkyBoxPSO::CreateRootSignature() {
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
-	DirectXCommon::GetInstance()->hr = D3D12SerializeRootSignature(&descriptionRootSignature,
+TuboEngine::DirectXCommon::GetInstance()->hr = D3D12SerializeRootSignature(&descriptionRootSignature,
 		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 
-	if (FAILED(DirectXCommon::GetInstance()->hr)) {
-		Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+	if (FAILED(TuboEngine::DirectXCommon::GetInstance()->hr)) {
+	TuboEngine::Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 	// バイナリを元に作成
-	DirectXCommon::GetInstance()->hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
+	TuboEngine::DirectXCommon::GetInstance()->hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
 		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
-	assert(SUCCEEDED(DirectXCommon::GetInstance()->hr));
+	assert(SUCCEEDED(TuboEngine::DirectXCommon::GetInstance()->hr));
 }
 
 void SkyBoxPSO::CreateGraphicPipeline() {
@@ -143,11 +143,11 @@ void SkyBoxPSO::CreateGraphicPipeline() {
 	-------------------*/
 
 	//Shaderをコンパイルする
-	vertexShaderBlob = DirectXCommon::GetInstance()->CompileShader(L"Resources/Shaders/SkyBox.VS.hlsl",
+	vertexShaderBlob = TuboEngine::DirectXCommon::GetInstance()->CompileShader(L"Resources/Shaders/SkyBox.VS.hlsl",
 		L"vs_6_0");
 	assert(vertexShaderBlob != nullptr);
 
-	pixelShaderBlob = DirectXCommon::GetInstance()->CompileShader(L"Resources/Shaders/SkyBox.PS.hlsl",
+	pixelShaderBlob = TuboEngine::DirectXCommon::GetInstance()->CompileShader(L"Resources/Shaders/SkyBox.PS.hlsl",
 		L"ps_6_0");
 	assert(pixelShaderBlob != nullptr);
 
@@ -198,9 +198,9 @@ void SkyBoxPSO::CreateGraphicPipeline() {
 	graphicPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	//実際に生成
-	DirectXCommon::GetInstance()->hr = device->CreateGraphicsPipelineState(&graphicPipelineStateDesc,
+	TuboEngine::DirectXCommon::GetInstance()->hr = device->CreateGraphicsPipelineState(&graphicPipelineStateDesc,
 		IID_PPV_ARGS(&graphicsPipeLineState));
-	assert(SUCCEEDED(DirectXCommon::GetInstance()->hr));
+	assert(SUCCEEDED(TuboEngine::DirectXCommon::GetInstance()->hr));
 
 
 }

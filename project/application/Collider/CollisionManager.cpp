@@ -103,11 +103,11 @@ void CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* collide
 /// -------------------------------------------------------------
 bool CollisionManager::CheckSphereCollision(Collider* colliderA, Collider* colliderB) {
 	// コライダーAの座標を取得
-	Vector3 positionA = colliderA->GetCenterPosition();
+	TuboEngine::Math::Vector3 positionA = colliderA->GetCenterPosition();
 	// コライダーBの座標を取得
-	Vector3 positionB = colliderB->GetCenterPosition();
+	TuboEngine::Math::Vector3 positionB = colliderB->GetCenterPosition();
 	// 座標の差分ベクトル
-	Vector3 subtract = positionB - positionA;
+	TuboEngine::Math::Vector3 subtract = positionB - positionA;
 	// AとBの距離を求める
 	float distance = subtract.Length();
 	// コライダーAとコライダーBの半径の加算

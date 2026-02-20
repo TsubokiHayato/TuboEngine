@@ -158,8 +158,8 @@ void GuideUI::Update() {
 		return;
 	}
 
-	const float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
-	const float screenH = static_cast<float>(WinApp::GetInstance()->GetClientHeight());
+	const float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
+	const float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
 	const float cell = (kKeySize + kKeyGap);
 	const float rowGap = kRowGap;
 	const float labelGapX = kLabelGapX;
@@ -243,7 +243,7 @@ void GuideUI::Update() {
 		const auto move = input->GetMouseMove();
 		mouseIcon_->SetTexture(SelectMouseIconTexture(move));
 	}
-	// 射撃: 右クリック押下ならmouse_right、それ以外はmouse（左用）
+	// 射撃: 右クリック押下ならMouse_right、それ以外はMouse（左用）
 	if (mouseShootIcon_) {
 		const bool right = input->IsPressMouse(1);
 		mouseShootIcon_->SetTexture(right ? texMouseRight_ : texMouse_);

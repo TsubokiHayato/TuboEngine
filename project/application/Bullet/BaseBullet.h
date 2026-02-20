@@ -8,7 +8,7 @@ class BaseBullet :public Collider {
 public:
 	virtual ~BaseBullet() = default;
 
-	virtual void Initialize(const Vector3& startPos) = 0;
+	virtual void Initialize(const TuboEngine::Math::Vector3& startPos) = 0;
 	virtual void Update() = 0;
 	virtual void Draw() = 0;
 
@@ -21,15 +21,15 @@ public:
 
 	/// <summary>
 	/// 当たり判定の中心座標を取得
-	virtual Vector3 GetCenterPosition() const override;
+	virtual TuboEngine::Math::Vector3 GetCenterPosition() const override;
 
 	bool IsAlive() const { return isAlive; }
 
 protected:
-	Vector3 position;
-	Vector3 velocity;
-	Vector3 rotation;
-	Vector3 scale;
+	TuboEngine::Math::Vector3 position;
+	TuboEngine::Math::Vector3 velocity;
+	TuboEngine::Math::Vector3 rotation;
+	TuboEngine::Math::Vector3 scale;
 	bool isAlive = false;
 	std::unique_ptr<Object3d> object3d;
 };

@@ -2,7 +2,6 @@
 #include "Bullet/Player/PlayerBullet.h"
 #include "Character/Player/Player.h"
 #include "Collider/CollisionTypeId.h"
-#include "Enemy.h"
 #include "ImGuiManager.h"
 #include "LineManager.h"
 #include "Sprite.h"
@@ -15,7 +14,13 @@
 #include "engine/graphic/Particle/Effects/Primitive/PrimitiveEmitter.h"
 #include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 
-constexpr float kPI = 3.14159265358979323846f;
+namespace {
+	constexpr float kPI = 3.14159265358979323846f;
+	constexpr int kInitialHP = 10;
+	constexpr TuboEngine::Math::Vector3 kSpawnPosition{0.0f, 0.0f, 5.0f};
+	constexpr Vector4 kModelColorRed{1.0f, 0.0f, 0.0f, 1.0f};
+	constexpr float kInitialRotationX = 1.56f;
+}
 
 // Enemyモデルの軸補正（モデルの向きがゲーム座標系と一致しない場合のための定数）
 // 90度ズレが「Z軸(ヨー)」ではなく「X軸/ Y軸」で起きるケースがあるため、軸ごとに分けて補正する。
@@ -29,24 +34,24 @@ Enemy::~Enemy() {}
 
 void Enemy::Initialize() {
     Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kEnemy));
-    position = {0.0f, 0.0f, 5.0f};
-	rotation = Vector3(1.56f, 0.0f, 0.0f);
-    scale = {1.0f, 1.0f, 1.0f};
+    position_ = kSpawnPosition;
+	rotation_ = TuboEngine::Math::Vector3(kInitialRotationX, 0.0f, 0.0f);
+    scale_ = {1.0f, 1.0f, 1.0f};
 
-    object3d = std::make_unique<Object3d>();
+    object3d_ = std::make_unique<Object3d>();
     const std::string modelFileNamePath = "player/player.obj";
-    object3d->Initialize(modelFileNamePath);
-    object3d->SetPosition(position);
+    object3d_->Initialize(modelFileNamePath);
+    object3d_->SetPosition(position_);
     // 初期化時にも描画補正を適用
     {
-        Vector3 drawRot = rotation;
+		TuboEngine::Math::Vector3 drawRot = rotation_;
         drawRot.x = drawRot.x + kEnemyModelRotOffsetX;
         drawRot.y = drawRot.y + kEnemyModelRotOffsetY;
         drawRot.z = drawRot.z + kEnemyModelRotOffsetZ;
-        object3d->SetRotation(drawRot);
+        object3d_->SetRotation(drawRot);
     }
-    object3d->SetScale(scale);
-	object3d->SetModelColor({1.0f, 0.0f, 0.0f, 1.0f});
+    object3d_->SetScale(scale_);
+	object3d_->SetModelColor(kModelColorRed);
 
     std::string particleTextureHandle = "gradationLine.png";
     TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
@@ -63,13 +68,13 @@ void Enemy::Initialize() {
     exclamationIcon_->SetGetIsAdjustTextureSize(false);
     exclamationIcon_->SetAnchorPoint({0.5f, 0.5f});
 
-    HP = 10; // 調整: 少し耐える
+    hp_ = kInitialHP; // 調整: 少し耐える
 
-    idleLookAroundTimer = idleLookAroundIntervalSec;
+    idleLookAroundTimer_ = idleLookAroundIntervalSec_;
     idleBackPhase_ = IdleBackPhase::None;
-    idleBackHoldTimer = 0.0f;
-    idleBackStartAngle = rotation.z;
-    idleBackTargetAngle = rotation.z;
+    idleBackHoldTimer_ = 0.0f;
+    idleBackStartAngle_ = rotation_.z;
+    idleBackTargetAngle_ = rotation_.z;
 
     // ノックバック初期化
     knockbackTimer_ = 0.0f;
@@ -90,7 +95,7 @@ void Enemy::Initialize() {
         p.scaleEnd = {0.05f, 0.05f, 0.05f};
         p.colorStart = {1.0f, 0.6f, 0.2f, 0.9f};
         p.colorEnd = {1.0f, 1.0f, 0.4f, 0.0f};
-        p.center = position;
+        p.center = position_;
         hitEmitter_ = ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
     }
     // 追加: ヒット時の小さなリングを別エミッタで生成（既存と併用）
@@ -107,7 +112,7 @@ void Enemy::Initialize() {
         p.scaleEnd   = {0.4f, 0.4f, 1.0f};
         p.colorStart = {1.0f, 0.5f, 0.2f, 0.9f};
         p.colorEnd   = {1.0f, 0.9f, 0.6f, 0.0f};
-        p.center = position;
+        p.center = position_;
         hitRingEmitter_ = ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
     }
     // 死亡時: 大きなリング (一度だけ)
@@ -124,7 +129,7 @@ void Enemy::Initialize() {
         p.scaleEnd = {1.4f, 1.4f, 1.4f};
         p.colorStart = {1.0f, 0.3f, 0.2f, 0.9f};
         p.colorEnd = {1.0f, 0.8f, 0.1f, 0.0f};
-        p.center = position;
+        p.center = position_;
         deathEmitter_ = ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
     }
 }
@@ -137,7 +142,7 @@ static float NormalizeAngle(float angle) {
     return angle;
 }
 
-static void MoveWithCollision(Vector3& position, const Vector3& desiredMove, MapChipField* field) {
+static void MoveWithCollision(TuboEngine::Math::Vector3& position, const TuboEngine::Math::Vector3& desiredMove, MapChipField* field) {
     if (!field) {
         position = position + desiredMove;
         return;
@@ -147,14 +152,14 @@ static void MoveWithCollision(Vector3& position, const Vector3& desiredMove, Map
     const float height = tile * 0.8f;
     float moveLen2D = std::sqrt(desiredMove.x * desiredMove.x + desiredMove.y * desiredMove.y);
     int subSteps = std::max(1, int(std::ceil(moveLen2D / (tile * 0.5f))));
-    Vector3 step = desiredMove / float(subSteps);
+	TuboEngine::Math::Vector3 step = desiredMove / float(subSteps);
     for (int i = 0; i < subSteps; ++i) {
-        Vector3 nextX = position;
+		TuboEngine::Math::Vector3 nextX = position;
         nextX.x += step.x;
         if (!field->IsRectBlocked(nextX, width, height)) {
             position = nextX;
         }
-        Vector3 nextY = position;
+		TuboEngine::Math::Vector3 nextY = position;
         nextY.y += step.y;
         if (!field->IsRectBlocked(nextY, width, height)) {
             position = nextY;
@@ -175,7 +180,7 @@ static bool IsTileWalkable(MapChipField* field, uint32_t x, uint32_t y) {
         return false;
     if (x >= field->GetNumBlockHorizontal() || y >= field->GetNumBlockVirtical())
         return false;
-    Vector3 center = field->GetMapChipPositionByIndex(x, y);
+	TuboEngine::Math::Vector3 center = field->GetMapChipPositionByIndex(x, y);
     return !field->IsBlocked(center);
 }
 static int FindNearestWalkableIndex(MapChipField* field, int gx, int gy) {
@@ -204,405 +209,445 @@ static int FindNearestWalkableIndex(MapChipField* field, int gx, int gy) {
     return -1;
 }
 
-bool Enemy::BuildPathTo(const Vector3& worldGoal) {
-    currentPath_.clear();
-    pathCursor_ = 0;
-    lastPathGoalIndex_ = -1;
+bool Enemy::PreparePathfinding_(const TuboEngine::Math::Vector3& worldGoal, int& outW, int& outH, int& outSX, int& outSY, int& outGX, int& outGY) {
+	currentPath_.clear();
+	pathCursor_ = 0;
+	lastPathGoalIndex_ = -1;
 
-    if (!mapChipField)
-        return false;
+	if (!mapChipField_) {
+		return false;
+	}
 
-    const int W = (int)mapChipField->GetNumBlockHorizontal();
-    const int H = (int)mapChipField->GetNumBlockVirtical();
-    if (W <= 0 || H <= 0)
-        return false;
+	outW = (int)mapChipField_->GetNumBlockHorizontal();
+	outH = (int)mapChipField_->GetNumBlockVirtical();
+	if (outW <= 0 || outH <= 0) {
+		return false;
+	}
 
-    // 始点・終点のタイルインデックス
-    auto sIdx = mapChipField->GetMapChipIndexSetByPosition(position);
-    auto gIdx = mapChipField->GetMapChipIndexSetByPosition(worldGoal);
-    int sx = (int)sIdx.xIndex;
-    int sy = (int)sIdx.yIndex;
-    int gx = (int)gIdx.xIndex;
-    int gy = (int)gIdx.yIndex;
+	auto sIdx = mapChipField_->GetMapChipIndexSetByPosition(position_);
+	auto gIdx = mapChipField_->GetMapChipIndexSetByPosition(worldGoal);
+	outSX = std::clamp((int)sIdx.xIndex, 0, outW - 1);
+	outSY = std::clamp((int)sIdx.yIndex, 0, outH - 1);
+	outGX = std::clamp((int)gIdx.xIndex, 0, outW - 1);
+	outGY = std::clamp((int)gIdx.yIndex, 0, outH - 1);
+	return true;
+}
 
-    // 範囲内へクランプ
-    sx = std::clamp(sx, 0, W - 1);
-    sy = std::clamp(sy, 0, H - 1);
-    gx = std::clamp(gx, 0, W - 1);
-    gy = std::clamp(gy, 0, H - 1);
+bool Enemy::RunAStar_(int W, int H, int sx, int sy, int gFlat, std::vector<int>& outPathFlats) {
+	outPathFlats.clear();
+	std::vector<AStarCell> grid((size_t)W * (size_t)H);
 
-    // 歩行可能でない終点は最近傍の歩行可タイルへ寄せる
-    int gFlat = FindNearestWalkableIndex(mapChipField, gx, gy);
-    if (gFlat < 0) {
-        return false;
-    }
-    gx = gFlat % W;
-    gy = gFlat / W;
-    lastPathGoalIndex_ = gFlat;
+	int gx = gFlat % W;
+	int gy = gFlat / W;
+	auto Heuristic = [&](int x, int y) {
+		return float(std::abs(x - gx) + std::abs(y - gy));
+	};
 
-    // 始点も歩行可能か確認（不可能なら最近傍の可能タイルへ）
-    if (!IsTileWalkable(mapChipField, (uint32_t)sx, (uint32_t)sy)) {
-        int sFlat = FindNearestWalkableIndex(mapChipField, sx, sy);
-        if (sFlat < 0)
-            return false;
-        sx = sFlat % W;
-        sy = sFlat / W;
-    }
+	struct Node { int idx; float f; };
+	struct Cmp { bool operator()(const Node& a, const Node& b) const { return a.f > b.f; } };
+	std::priority_queue<Node, std::vector<Node>, Cmp> open;
 
-    std::vector<AStarCell> grid((size_t)W * (size_t)H);
-    auto Heuristic = [&](int x, int y) {
-        // マンハッタン（4近傍）
-        return float(std::abs(x - gx) + std::abs(y - gy));
-    };
+	int sFlat = Index1D(sx, sy, W);
+	grid[sFlat].g = 0.0f;
+	grid[sFlat].f = Heuristic(sx, sy);
+	grid[sFlat].opened = true;
+	open.push({sFlat, grid[sFlat].f});
 
-    struct Node {
-        int idx;
-        float f;
-    };
-    struct Cmp {
-        bool operator()(const Node& a, const Node& b) const { return a.f > b.f; }
-    };
-    std::priority_queue<Node, std::vector<Node>, Cmp> open;
+	const int kDir[4][2] = {{1,0},{-1,0},{0,1},{0,-1}};
+	int goalFound = -1;
+	while (!open.empty()) {
+		auto cur = open.top();
+		open.pop();
+		int cIdx = cur.idx;
+		if (grid[cIdx].closed) {
+			continue;
+		}
+		grid[cIdx].closed = true;
 
-    int sFlat = Index1D(sx, sy, W);
-    grid[sFlat].g = 0.0f;
-    grid[sFlat].f = Heuristic(sx, sy);
-    grid[sFlat].opened = true;
-    open.push({sFlat, grid[sFlat].f});
+		if (cIdx == gFlat) {
+			goalFound = cIdx;
+			break;
+		}
 
-    const int kDir[4][2] = {
-        {1,  0 },
-        {-1, 0 },
-        {0,  1 },
-        {0,  -1}
-    };
+		int cx = cIdx % W;
+		int cy = cIdx / W;
+		for (auto& d : kDir) {
+			int nx = cx + d[0];
+			int ny = cy + d[1];
+			if (nx < 0 || ny < 0 || nx >= W || ny >= H) {
+				continue;
+			}
+			if (!IsTileWalkable(mapChipField_, (uint32_t)nx, (uint32_t)ny)) {
+				continue;
+			}
+			int nIdx = Index1D(nx, ny, W);
+			if (grid[nIdx].closed) {
+				continue;
+			}
+			float ng = grid[cIdx].g + 1.0f;
+			if (!grid[nIdx].opened || ng < grid[nIdx].g) {
+				grid[nIdx].g = ng;
+				grid[nIdx].f = ng + Heuristic(nx, ny);
+				grid[nIdx].parent = cIdx;
+				grid[nIdx].opened = true;
+				open.push({nIdx, grid[nIdx].f});
+			}
+		}
+	}
 
-    int goalFound = -1;
-    while (!open.empty()) {
-        auto cur = open.top();
-        open.pop();
-        int cIdx = cur.idx;
-        if (grid[cIdx].closed)
-            continue;
-        grid[cIdx].closed = true;
+	if (goalFound < 0) {
+		return false;
+	}
 
-        int cx = cIdx % W;
-        int cy = cIdx / W;
+	std::vector<int> rev;
+	for (int p = goalFound; p >= 0; p = grid[p].parent) {
+		rev.push_back(p);
+		if (p == sFlat) {
+			break;
+		}
+	}
+	std::reverse(rev.begin(), rev.end());
+	outPathFlats = std::move(rev);
+	return true;
+}
 
-        if (cIdx == lastPathGoalIndex_) {
-            goalFound = cIdx;
-            break;
-        }
+void Enemy::BuildWorldPathFromFlats_(int W, const std::vector<int>& pathFlats) {
+	currentPath_.clear();	
+	currentPath_.reserve(pathFlats.size());
+	for (int flat : pathFlats) {
+		int tx = flat % W;
+		int ty = flat / W;
+		TuboEngine::Math::Vector3 center = mapChipField_->GetMapChipPositionByIndex((uint32_t)tx, (uint32_t)ty);
+		center.z = position_.z;
+		currentPath_.push_back(center);
+	}
+	pathCursor_ = 0;
+	waypointArriveEps_ = std::max(0.1f, MapChipField::GetBlockSize() * 0.25f);
+}
 
-        for (auto& d : kDir) {
-            int nx = cx + d[0];
-            int ny = cy + d[1];
-            if (nx < 0 || ny < 0 || nx >= W || ny >= H)
-                continue;
-            if (!IsTileWalkable(mapChipField, (uint32_t)nx, (uint32_t)ny))
-                continue;
+bool Enemy::BuildPathTo(const TuboEngine::Math::Vector3& worldGoal) {
+	int W = 0, H = 0;
+	int sx = 0, sy = 0, gx = 0, gy = 0;
+	if (!PreparePathfinding_(worldGoal, W, H, sx, sy, gx, gy)) {
+		return false;
+	}
 
-            int nIdx = Index1D(nx, ny, W);
-            if (grid[nIdx].closed)
-                continue;
+	int gFlat = FindNearestWalkableIndex(mapChipField_, gx, gy);
+	if (gFlat < 0) {
+		return false;
+	}
+	gx = gFlat % W;
+	gy = gFlat / W;
+	lastPathGoalIndex_ = gFlat;
 
-            float ng = grid[cIdx].g + 1.0f; // 4近傑=コスト1
-            if (!grid[nIdx].opened || ng < grid[nIdx].g) {
-                grid[nIdx].g = ng;
-                grid[nIdx].f = ng + Heuristic(nx, ny);
-                grid[nIdx].parent = cIdx;
-                if (!grid[nIdx].opened) {
-                    grid[nIdx].opened = true;
-                    open.push({nIdx, grid[nIdx].f});
-                } else {
-                    // 既にopenedでも新しいfでpushしておく（lazy update）
-                    open.push({nIdx, grid[nIdx].f});
-                }
-            }
-        }
-    }
+	if (!IsTileWalkable(mapChipField_, (uint32_t)sx, (uint32_t)sy)) {
+		int sFlat2 = FindNearestWalkableIndex(mapChipField_, sx, sy);
+		if (sFlat2 < 0) {
+			return false;
+		}
+		sx = sFlat2 % W;
+		sy = sFlat2 / W;
+	}
 
-    if (goalFound < 0) {
-        return false;
-    }
+	std::vector<int> pathFlats;
+	if (!RunAStar_(W, H, sx, sy, lastPathGoalIndex_, pathFlats)) {
+		return false;
+	}
 
-    // 経路復元（タイル中心のワールド座標列に変換）
-    std::vector<int> rev;
-    for (int p = goalFound; p >= 0; p = grid[p].parent) {
-        rev.push_back(p);
-        if (p == sFlat)
-            break;
-    }
-    std::reverse(rev.begin(), rev.end());
+	BuildWorldPathFromFlats_(W, pathFlats);
+	return !currentPath_.empty();
+}
 
-    currentPath_.reserve(rev.size());
-    for (int flat : rev) {
-        int tx = flat % W;
-        int ty = flat / W;
-        Vector3 center = mapChipField->GetMapChipPositionByIndex((uint32_t)tx, (uint32_t)ty);
-        // Zは現在高度を維持
-        center.z = position.z;
-        currentPath_.push_back(center);
-    }
-    pathCursor_ = 0;
+bool Enemy::UpdateDeathIfNeeded_() {
+	if (isAlive_) {
+		return false;
+	}
+	if (!deathEffectPlayed_) {
+		EmitDeathParticle();
+		deathEffectPlayed_ = true;
+	}
+	if (deathEmitter_) {
+		deathEmitter_->GetPreset().center = position_;
+	}
+	return true;
+}
 
-    // ウェイポイント到達判定の緩和（ブロックサイズ依存）
-    waypointArriveEps_ = std::max(0.1f, MapChipField::GetBlockSize() * 0.25f);
-    return !currentPath_.empty();
+void Enemy::UpdatePerception_(float dt, bool& outCanSeePlayer, float& outDistanceToPlayer) {
+	outDistanceToPlayer = 0.0f;
+	if (player_) {
+		TuboEngine::Math::Vector3 toPlayer = player_->GetPosition() - position_;
+		outDistanceToPlayer = std::sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y + toPlayer.z * toPlayer.z);
+	}
+	outCanSeePlayer = CanSeePlayer();
+
+	wasJustFound_ = (!sawPlayerPrev_ && outCanSeePlayer);
+	wasJustLost_ = (sawPlayerPrev_ && !outCanSeePlayer);
+	sawPlayerPrev_ = outCanSeePlayer;
+
+	if (outCanSeePlayer) {
+		lastSeenPlayerPos_ = player_->GetPosition();
+		lastSeenTimer_ = lastSeenDuration_;
+		ClearPath();
+		if (wasJustFound_) {
+			exclamationTimer_ = iconDuration_;
+			questionTimer_ = 0.0f;
+		}
+	} else if (lastSeenTimer_ > 0.0f) {
+		lastSeenTimer_ -= dt;
+		if (wasJustLost_) {
+			questionTimer_ = iconDuration_;
+			exclamationTimer_ = 0.0f;
+		}
+	}
+}
+
+void Enemy::UpdateIcons_(float dt) {
+	if (questionTimer_ > 0.0f) {
+		questionTimer_ -= dt;
+		if (questionTimer_ < 0.0f) questionTimer_ = 0.0f;
+	}
+	if (exclamationTimer_ > 0.0f) {
+		exclamationTimer_ -= dt;
+		if (exclamationTimer_ < 0.0f) exclamationTimer_ = 0.0f;
+	}
+}
+
+void Enemy::UpdateState_(bool canSeePlayer, float distanceToPlayer) {
+	if (!player_) {
+		return;
+	}
+	if (canSeePlayer) {
+		if (distanceToPlayer > moveStartDistance_) {
+			state_ = State::Idle;
+		} else if (distanceToPlayer > shootDistance_) {
+			state_ = State::Chase;
+		} else {
+			state_ = State::Attack;
+		}
+	} else if (lastSeenTimer_ > 0.0f) {
+		state_ = State::Alert;
+	} else if (state_ == State::Alert) {
+		state_ = State::LookAround;
+	} else if (state_ != State::LookAround) {
+		state_ = State::Idle;
+	}
+}
+
+void Enemy::UpdateFacing_(bool canSeePlayer) {
+	if (!player_) {
+		return;
+	}
+	if (!(state_ == State::Chase || state_ == State::Attack || state_ == State::Alert)) {
+		return;
+	}
+	TuboEngine::Math::Vector3 targetPos = (canSeePlayer) ? player_->GetPosition() : lastSeenPlayerPos_;
+	TuboEngine::Math::Vector3 toTarget = targetPos - position_;
+	float angleZ = std::atan2(toTarget.y, toTarget.x);
+	float diff = NormalizeAngle(angleZ - rotation_.z);
+	float maxTurn = turnSpeed_;
+	if (std::fabs(diff) < maxTurn) {
+		rotation_.z = angleZ;
+	} else {
+		rotation_.z += (diff > 0 ? 1 : -1) * maxTurn;
+		rotation_.z = NormalizeAngle(rotation_.z);
+	}
+}
+
+void Enemy::UpdateShooting_(float dt, bool canSeePlayer) {
+	wantShoot_ = (canSeePlayer && (state_ == State::Chase || state_ == State::Attack));
+	if (wantShoot_) {
+		bulletTimer_ += dt;
+	} else {
+		bulletTimer_ = std::min(bulletTimer_, EnemyNormalBullet::s_fireInterval);
+	}
+
+	auto TryFire = [this]() {
+		if (!wantShoot_) return;
+		if (bullet_ && bullet_->GetIsAlive()) return;
+		if (bullet_ && !bullet_->GetIsAlive()) bullet_.reset();
+		if (bulletTimer_ < EnemyNormalBullet::s_fireInterval) return;
+		bulletTimer_ = 0.0f;
+		bullet_ = std::make_unique<EnemyNormalBullet>();
+		bullet_->Initialize(position_);
+		bullet_->SetEnemyPosition(position_);
+		bullet_->SetEnemyRotation(rotation_);
+		bullet_->SetPlayer(player_);
+		bullet_->SetCamera(camera_);
+		bullet_->SetMapChipField(mapChipField_);
+	};
+
+	// 状態ごとの行動で必要な箇所のみ呼ぶため、ここではラムダを保持できない。
+	// 代わりに wantShoot_/bulletTimer_ はここで整えて、各State側で発射判定する。
+	// ※既存挙動: Chase/AttackでのみTryFireが走る
+	if (state_ == State::Chase || state_ == State::Attack) {
+		TryFire();
+	}
+}
+
+void Enemy::UpdateBehaviorByState_(float dt, bool /*canSeePlayer*/) {
+	switch (state_) {
+	case State::Idle: {
+		switch (idleBackPhase_) {
+		case IdleBackPhase::None:
+			idleLookAroundTimer_ -= dt;
+			if (idleLookAroundTimer_ <= 0.0f) {
+				idleBackStartAngle_ = rotation_.z;
+				idleBackTargetAngle_ = NormalizeAngle(idleBackStartAngle_ + kPI);
+				idleBackHoldTimer_ = idleBackHoldSec_;
+				idleBackPhase_ = IdleBackPhase::ToBack;
+			}
+			break;
+		case IdleBackPhase::ToBack: {
+			float diff = NormalizeAngle(idleBackTargetAngle_ - rotation_.z);
+			float turn = std::clamp(diff, -idleBackTurnSpeed_, idleBackTurnSpeed_);
+			rotation_.z = NormalizeAngle(rotation_.z + turn);
+			if (std::fabs(diff) < 0.01f) {
+				rotation_.z = idleBackTargetAngle_;
+				idleBackPhase_ = IdleBackPhase::Hold;
+			}
+		} break;
+		case IdleBackPhase::Hold:
+			idleBackHoldTimer_ -= dt;
+			if (idleBackHoldTimer_ <= 0.0f) idleBackPhase_ = IdleBackPhase::Return;
+			break;
+		case IdleBackPhase::Return: {
+			float diff = NormalizeAngle(idleBackStartAngle_ - rotation_.z);
+			float turn = std::clamp(diff, -idleBackTurnSpeed_, idleBackTurnSpeed_);
+			rotation_.z = NormalizeAngle(rotation_.z + turn);
+			if (std::fabs(diff) < 0.01f) {
+				rotation_.z = idleBackStartAngle_;
+				idleBackPhase_ = IdleBackPhase::None;
+				idleLookAroundTimer_ = idleLookAroundIntervalSec_;
+			}
+		} break;
+		}
+		break;
+	}
+	case State::Alert:
+		idleBackPhase_ = IdleBackPhase::None;
+		break;
+	case State::LookAround: {
+		idleBackPhase_ = IdleBackPhase::None;
+		if (!lookAroundInitialized_) {
+			lookAroundBaseAngle_ = rotation_.z;
+			lookAroundTargetAngle_ = lookAroundBaseAngle_ + lookAroundAngleWidth_;
+			lookAroundDirection_ = 1;
+			lookAroundCount_ = 0;
+			lookAroundInitialized_ = true;
+		}
+		float diff = NormalizeAngle(lookAroundTargetAngle_ - rotation_.z);
+		float turn = std::clamp(diff, -lookAroundSpeed_, lookAroundSpeed_);
+		rotation_.z = NormalizeAngle(rotation_.z + turn);
+		if (std::fabs(diff) < 0.02f) {
+			lookAroundDirection_ *= -1;
+			lookAroundTargetAngle_ = lookAroundBaseAngle_ + lookAroundDirection_ * lookAroundAngleWidth_;
+			lookAroundCount_++;
+			if (lookAroundCount_ >= lookAroundMaxCount_) {
+				lookAroundInitialized_ = false;
+				state_ = State::Patrol;
+			}
+		}
+		break;
+	}
+	case State::Patrol:
+		idleBackPhase_ = IdleBackPhase::None;
+		state_ = State::Idle;
+		break;
+	case State::Chase: {
+		idleBackPhase_ = IdleBackPhase::None;
+		if (player_) {
+			TuboEngine::Math::Vector3 dir = player_->GetPosition() - position_;
+			dir.z = 0.0f;
+			float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+			if (len > 0.1f) {
+				dir.x /= len;
+				dir.y /= len;
+				TuboEngine::Math::Vector3 desiredMove{dir.x * moveSpeed_, dir.y * moveSpeed_, 0.0f};
+				MoveWithCollision(position_, desiredMove, mapChipField_);
+			}
+		}
+		break;
+	}
+	case State::Attack:
+		idleBackPhase_ = IdleBackPhase::None;
+		break;
+	}
+}
+
+void Enemy::UpdateBullet_() {
+	if (bullet_ && bullet_->GetIsAlive()) {
+		bullet_->Update();
+	}
+}
+
+void Enemy::SyncToObject3d_() {
+	object3d_->SetPosition(position_);
+	TuboEngine::Math::Vector3 drawRot = rotation_;
+	drawRot.x = NormalizeAngle(drawRot.x + kEnemyModelRotOffsetX);
+	drawRot.y = NormalizeAngle(drawRot.y + kEnemyModelRotOffsetY);
+	drawRot.z = NormalizeAngle(drawRot.z + kEnemyModelRotOffsetZ);
+	object3d_->SetRotation(drawRot);
+	object3d_->SetScale(scale_);
+	object3d_->SetCamera(camera_);
+	object3d_->Update();
+}
+
+void Enemy::SyncEmitters_() {
+	if (hitEmitter_) hitEmitter_->GetPreset().center = position_;
+	if (deathEmitter_ && !deathEffectPlayed_) deathEmitter_->GetPreset().center = position_;
+}
+
+void Enemy::UpdateHitAndResetFlags_() {
+	if (!wasHit_ && isHit_) {
+		EmitHitParticle();
+	}
+	wasHit_ = isHit_;
+	isHit_ = false;
+}
+
+void Enemy::UpdateIconSprites_() {
+	TuboEngine::Math::Vector3 iconWorldPos = position_;
+	iconWorldPos.z = position_.z;
+	iconWorldPos.y += iconOffsetY_;
+	if (questionTimer_ > 0.0f && questionIcon_) {
+		questionIcon_->SetPosition({iconWorldPos.x, iconWorldPos.y});
+		questionIcon_->SetSize(iconSize_);
+		questionIcon_->Update();
+	}
+	if (exclamationTimer_ > 0.0f && exclamationIcon_) {
+		exclamationIcon_->SetPosition({iconWorldPos.x, iconWorldPos.y});
+		exclamationIcon_->SetSize(iconSize_);
+		exclamationIcon_->Update();
+	}
 }
 
 void Enemy::Update() {
-    // 死亡演出再生後は描画のみ (Update 最低限)
-    if (!isAlive) {
-        if (!deathEffectPlayed_) {
-            EmitDeathParticle();
-            deathEffectPlayed_ = true;
-        }
-        if (deathEmitter_) {
-            deathEmitter_->GetPreset().center = position;
-        }
-        return;
-    }
+	if (UpdateDeathIfNeeded_()) {
+		return;
+	}
 
-    const float dt = 1.0f / 60.0f;
+	const float dt = GetFixedDeltaTime_();
+	ApplyKnockback(dt);
 
-    // --- ノックバック適用（先に移動へ反映）---
-    ApplyKnockback(dt);
-
-    float distanceToPlayer = 0.0f;
-    Vector3 toPlayer = {0, 0, 0};
-    if (player_) {
-        toPlayer = player_->GetPosition() - position;
-        distanceToPlayer = std::sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y + toPlayer.z * toPlayer.z);
-    }
-    bool canSeePlayer = CanSeePlayer();
-
-    // 視認状態フラグ更新
-    wasJustFound_ = (!sawPlayerPrev_ && canSeePlayer);
-    wasJustLost_  = (sawPlayerPrev_ && !canSeePlayer);
-    sawPlayerPrev_ = canSeePlayer;
-
-    if (canSeePlayer) {
-        lastSeenPlayerPos = player_->GetPosition();
-        lastSeenTimer = kLastSeenDuration;
-        ClearPath();
-        // 見つけた瞬間にExclamationを表示
-        if (wasJustFound_) {
-            exclamationTimer_ = iconDuration_;
-            questionTimer_ = 0.0f;
-        }
-    } else if (lastSeenTimer > 0.0f) {
-        lastSeenTimer -= dt;
-        // 見失った瞬間にQuestionを表示
-        if (wasJustLost_) {
-            questionTimer_ = iconDuration_;
-            exclamationTimer_ = 0.0f;
-        }
-    }
-
-    // アイコンタイマー更新
-    if (questionTimer_ > 0.0f) { questionTimer_ -= dt; if (questionTimer_ < 0.0f) questionTimer_ = 0.0f; }
-    if (exclamationTimer_ > 0.0f) { exclamationTimer_ -= dt; if (exclamationTimer_ < 0.0f) exclamationTimer_ = 0.0f; }
-
-    if (player_) {
-        if (canSeePlayer) {
-            if (distanceToPlayer > moveStartDistance_)
-                state_ = State::Idle;
-            else if (distanceToPlayer > shootDistance_)
-                state_ = State::Chase;
-            else
-                state_ = State::Attack;
-        } else if (lastSeenTimer > 0.0f)
-            state_ = State::Alert;
-        else if (state_ == State::Alert)
-            state_ = State::LookAround;
-        else if (state_ != State::LookAround)
-            state_ = State::Idle;
-    }
-
-    // プレイヤーの方向を向く（一定速度で回転）
-    if (player_ && (state_ == State::Chase || state_ == State::Attack || state_ == State::Alert)) {
-        Vector3 targetPos = (canSeePlayer) ? player_->GetPosition() : lastSeenPlayerPos;
-        Vector3 toTarget = targetPos - position;
-        float angleZ = std::atan2(toTarget.y, toTarget.x);
-        float diff = NormalizeAngle(angleZ - rotation.z);
-        float maxTurn = turnSpeed_;
-        if (std::fabs(diff) < maxTurn)
-            rotation.z = angleZ;
-        else {
-            rotation.z += (diff > 0 ? 1 : -1) * maxTurn;
-            rotation.z = NormalizeAngle(rotation.z);
-        }
-    }
-
-    // --- 射撃条件評価 ---
-    wantShoot_ = (canSeePlayer && (state_ == State::Chase || state_ == State::Attack));
-
-    // クールダウンタイマー更新
-    if (wantShoot_)
-        bulletTimer_ += dt;
-    else
-        bulletTimer_ = std::min(bulletTimer_, EnemyNormalBullet::s_fireInterval);
-    auto TryFire = [this]() {
-        if (!wantShoot_)
-            return;
-        if (bullet && bullet->GetIsAlive())
-            return;
-        if (bullet && !bullet->GetIsAlive())
-            bullet.reset();
-        if (bulletTimer_ < EnemyNormalBullet::s_fireInterval)
-            return;
-        bulletTimer_ = 0.0f;
-        bullet = std::make_unique<EnemyNormalBullet>();
-        bullet->Initialize(position);
-        bullet->SetEnemyPosition(position);
-        bullet->SetEnemyRotation(rotation);
-        bullet->SetPlayer(player_);
-        bullet->SetCamera(camera_);
-        bullet->SetMapChipField(mapChipField);
-    };
-
-    // 状態ごとの行動（ノックバック中も自律移動は行うが、速度が小さくなる）
-    switch (state_) {
-    case State::Idle: {
-        switch (idleBackPhase_) {
-        case IdleBackPhase::None:
-            idleLookAroundTimer -= dt;
-            if (idleLookAroundTimer <= 0.0f) {
-                idleBackStartAngle = rotation.z;
-                idleBackTargetAngle = NormalizeAngle(idleBackStartAngle + kPI);
-                idleBackHoldTimer = idleBackHoldSec;
-                idleBackPhase_ = IdleBackPhase::ToBack;
-            }
-            break;
-        case IdleBackPhase::ToBack: {
-            float diff = NormalizeAngle(idleBackTargetAngle - rotation.z);
-            float turn = std::clamp(diff, -idleBackTurnSpeed, idleBackTurnSpeed);
-            rotation.z = NormalizeAngle(rotation.z + turn);
-            if (std::fabs(diff) < 0.01f) {
-                rotation.z = idleBackTargetAngle;
-                idleBackPhase_ = IdleBackPhase::Hold;
-            }
-        } break;
-        case IdleBackPhase::Hold:
-            idleBackHoldTimer -= dt;
-            if (idleBackHoldTimer <= 0.0f)
-                idleBackPhase_ = IdleBackPhase::Return;
-            break;
-        case IdleBackPhase::Return: {
-            float diff = NormalizeAngle(idleBackStartAngle - rotation.z);
-            float turn = std::clamp(diff, -idleBackTurnSpeed, idleBackTurnSpeed);
-            rotation.z = NormalizeAngle(rotation.z + turn);
-            if (std::fabs(diff) < 0.01f) {
-                rotation.z = idleBackStartAngle;
-                idleBackPhase_ = IdleBackPhase::None;
-                idleLookAroundTimer = idleLookAroundIntervalSec;
-            }
-        } break;
-        }
-        break;
-    }
-    case State::Alert: {
-        idleBackPhase_ = IdleBackPhase::None;
-        break;
-    }
-    case State::LookAround: {
-        idleBackPhase_ = IdleBackPhase::None;
-        if (!lookAroundInitialized) {
-            lookAroundBaseAngle = rotation.z;
-            lookAroundTargetAngle = lookAroundBaseAngle + lookAroundAngleWidth;
-            lookAroundDirection = 1;
-            lookAroundCount = 0;
-            lookAroundInitialized = true;
-        }
-        float diff = NormalizeAngle(lookAroundTargetAngle - rotation.z);
-        float turn = std::clamp(diff, -lookAroundSpeed, lookAroundSpeed);
-        // 誤って固定値加算/二重更新されていたので、1回だけ更新
-        rotation.z = NormalizeAngle(rotation.z + turn);
-        if (std::fabs(diff) < 0.02f) {
-            lookAroundDirection *= -1;
-            lookAroundTargetAngle = lookAroundBaseAngle + lookAroundDirection * lookAroundAngleWidth;
-            lookAroundCount++;
-            if (lookAroundCount >= lookAroundMaxCount) {
-                lookAroundInitialized = false;
-                state_ = State::Patrol;
-            }
-        }
-        break;
-    }
-    case State::Patrol: {
-        idleBackPhase_ = IdleBackPhase::None;
-        state_ = State::Idle;
-        break;
-    }
-    case State::Chase: {
-        idleBackPhase_ = IdleBackPhase::None;
-        if (player_) {
-            Vector3 dir = player_->GetPosition() - position;
-            dir.z = 0.0f;
-            float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-            if (len > 0.1f) {
-                dir.x /= len;
-                dir.y /= len;
-                Vector3 desiredMove{dir.x * moveSpeed_, dir.y * moveSpeed_, 0.0f};
-                MoveWithCollision(position, desiredMove, mapChipField);
-            }
-        }
-        TryFire();
-        break;
-    }
-    case State::Attack: {
-        idleBackPhase_ = IdleBackPhase::None;
-        TryFire();
-        break;
-    }
-    }
-
-    if (bullet && bullet->GetIsAlive())
-        bullet->Update();
-
-    object3d->SetPosition(position);
-    // 描画側へモデル軸の補正を適用（ロジック上のrotationは"前方"のまま）
-    Vector3 drawRot = rotation;
-    drawRot.x = NormalizeAngle(drawRot.x + kEnemyModelRotOffsetX);
-    drawRot.y = NormalizeAngle(drawRot.y + kEnemyModelRotOffsetY);
-    drawRot.z = NormalizeAngle(drawRot.z + kEnemyModelRotOffsetZ);
-    object3d->SetRotation(drawRot);
-    object3d->SetScale(scale);
-    object3d->SetCamera(camera_);
-    object3d->Update();
-
-    // エミッタ中心追随
-    if (hitEmitter_)
-        hitEmitter_->GetPreset().center = position;
-    if (deathEmitter_ && !deathEffectPlayed_)
-        deathEmitter_->GetPreset().center = position;
-
-    if (!wasHit && isHit) {
-        EmitHitParticle();
-    }
-    wasHit = isHit;
-    isHit = false;
-
-    // アイコン表示更新
-    Vector3 iconWorldPos = position; iconWorldPos.z = position.z;
-    iconWorldPos.y += iconOffsetY_;
-    if (questionTimer_ > 0.0f && questionIcon_) {
-        questionIcon_->SetPosition({iconWorldPos.x, iconWorldPos.y});
-        questionIcon_->SetSize(iconSize_);
-        questionIcon_->Update();
-    }
-    if (exclamationTimer_ > 0.0f && exclamationIcon_) {
-        exclamationIcon_->SetPosition({iconWorldPos.x, iconWorldPos.y});
-        exclamationIcon_->SetSize(iconSize_);
-        exclamationIcon_->Update();
-    }
+	float distanceToPlayer = 0.0f;
+	bool canSeePlayer = false;
+	UpdatePerception_(dt, canSeePlayer, distanceToPlayer);
+	UpdateIcons_(dt);
+	UpdateState_(canSeePlayer, distanceToPlayer);
+	UpdateFacing_(canSeePlayer);
+	UpdateShooting_(dt, canSeePlayer);
+	UpdateBehaviorByState_(dt, canSeePlayer);
+	UpdateBullet_();
+	SyncToObject3d_();
+	SyncEmitters_();
+	UpdateHitAndResetFlags_();
+	UpdateIconSprites_();
 }
 
 void Enemy::ApplyKnockback(float dt) {
     if (knockbackTimer_ > 0.0f) {
-        Vector3 kbStep = {knockbackVelocity_.x * dt, knockbackVelocity_.y * dt, 0.0f};
-        MoveWithCollision(position, kbStep, mapChipField);
+		TuboEngine::Math::Vector3 kbStep = {knockbackVelocity_.x * dt, knockbackVelocity_.y * dt, 0.0f};
+        MoveWithCollision(position_, kbStep, mapChipField_);
         knockbackVelocity_.x *= knockbackDamping_;
         knockbackVelocity_.y *= knockbackDamping_;
         knockbackTimer_ -= dt;
@@ -614,14 +659,12 @@ void Enemy::ApplyKnockback(float dt) {
 }
 
 void Enemy::EmitHitParticle() {
-    // 既存のヒットスパーク
     if (hitEmitter_) {
-        hitEmitter_->GetPreset().center = position;
+        hitEmitter_->GetPreset().center = position_;
         hitEmitter_->Emit(hitEmitter_->GetPreset().burstCount);
     }
-    // 追加の小リング（既存と併用）
     if (hitRingEmitter_) {
-        hitRingEmitter_->GetPreset().center = position;
+        hitRingEmitter_->GetPreset().center = position_;
         hitRingEmitter_->Emit(hitRingEmitter_->GetPreset().burstCount);
     }
 }
@@ -636,8 +679,8 @@ void Enemy::OnCollision(Collider* other) {
     if (!other) return;
     const uint32_t typeID = other->GetTypeID();
     if (typeID != static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon)) return;
-    isHit = true;
-    HP -= PlayerBullet::s_damage;
+    isHit_ = true;
+    hp_ -= PlayerBullet::s_damage;
 
     // 視認してないときに攻撃されたら Question と Exclamation を同時に表示
     if (!sawPlayerPrev_) {
@@ -646,11 +689,12 @@ void Enemy::OnCollision(Collider* other) {
     }
 
     // ノックバック（弾位置基準）
-    Vector3 hitPos;
+	TuboEngine::Math::Vector3 hitPos;
     if (auto* bullet = dynamic_cast<PlayerBullet*>(other)) hitPos = bullet->GetCenterPosition();
     else if (player_) hitPos = player_->GetPosition();
-    else hitPos = position;
-    Vector3 away = position - hitPos; away.z = 0.0f;
+    else hitPos = position_;
+	TuboEngine::Math::Vector3 away = position_ - hitPos;
+	away.z = 0.0f;
     float len = std::sqrt(away.x * away.x + away.y * away.y);
     if (len > 0.001f) { away.x /= len; away.y /= len; }
     const float tile = MapChipField::GetBlockSize();
@@ -659,25 +703,25 @@ void Enemy::OnCollision(Collider* other) {
     knockbackVelocity_.y = away.y * speed;
     knockbackTimer_ = 0.12f;
 
-    if (HP <= 0 && isAlive) {
-        isAlive = false;
+    if (hp_ <= 0 && isAlive_) {
+        isAlive_ = false;
         EmitDeathParticle();
         deathEffectPlayed_ = true;
     }
     if (state_ == State::Idle || state_ == State::Alert) {
-        if (player_) { lastSeenPlayerPos = player_->GetPosition(); lastSeenTimer = kLastSeenDuration; }
+        if (player_) { lastSeenPlayerPos_ = player_->GetPosition(); lastSeenTimer_ = lastSeenDuration_; }
         state_ = State::Chase;
     }
 }
 
 void Enemy::Draw() {
-    if (isAlive == false) { /* 死亡後は通常モデル非表示 */
+    if (isAlive_ == false) { /* 死亡後は通常モデル非表示 */
         return;
     }
-    if (object3d)
-        object3d->Draw();
-    if (bullet)
-        bullet->Draw();
+    if (object3d_)
+        object3d_->Draw();
+    if (bullet_)
+        bullet_->Draw();
     DrawViewCone();
     DrawLastSeenMark();
     DrawStateIcon();
@@ -688,9 +732,9 @@ void Enemy::ParticleDraw() { /* legacy */ }
 void Enemy::DrawImGui() {
 #ifdef USE_IMGUI
     ImGui::Begin("Enemy");
-    ImGui::Text("Pos:(%.2f,%.2f,%.2f)", position.x, position.y, position.z);
-    ImGui::Text("HP:%d", HP);
-    ImGui::Text("Alive:%s", isAlive ? "Yes" : "No");
+    ImGui::Text("Pos:(%.2f,%.2f,%.2f)", position_.x, position_.y, position_.z);
+    ImGui::Text("HP:%d", hp_);
+    ImGui::Text("Alive:%s", isAlive_ ? "Yes" : "No");
     ImGui::Text("State:%d", (int)state_);
     if (hitEmitter_) { auto& p = hitEmitter_->GetPreset(); ImGui::Text("HitEmitter rate:%.1f", p.emitRate); }
     if (deathEmitter_) { auto& p = deathEmitter_->GetPreset(); ImGui::Text("DeathEmitter life:[%.2f,%.2f]", p.lifeMin, p.lifeMax); }
@@ -717,43 +761,43 @@ void Enemy::DrawImGui() {
 }
 
 bool Enemy::CanSeePlayer() {
-    if (!player_ || !mapChipField)
+    if (!player_ || !mapChipField_)
         return false;
 
-    Vector3 from = position;
-    Vector3 to = player_->GetPosition();
-    Vector3 dirToPlayer = to - from;
+    TuboEngine::Math::Vector3 from = position_;
+	TuboEngine::Math::Vector3 to = player_->GetPosition();
+	TuboEngine::Math::Vector3 dirToPlayer = to - from;
     dirToPlayer.z = 0.0f;
 
     // 距離判定
     float distance = std::sqrt(dirToPlayer.x * dirToPlayer.x + dirToPlayer.y * dirToPlayer.y);
-    if (distance > kViewDistance)
+    if (distance > viewDistance_)
         return false;
 
     // 視野角判定
     // ここは「モデル見た目」ではなく「ロジック上の前方」に合わせるため、
     // 描画補正オフセットは適用しない。
-    Vector3 forward = {std::cos(rotation.z), std::sin(rotation.z), 0.0f};
-    float dot = Vector3::Dot(Vector3::Normalize(forward), Vector3::Normalize(dirToPlayer));
+	TuboEngine::Math::Vector3 forward = {std::cos(rotation_.z), std::sin(rotation_.z), 0.0f};
+	float dot = TuboEngine::Math::Vector3::Dot(TuboEngine::Math::Vector3::Normalize(forward), TuboEngine::Math::Vector3::Normalize(dirToPlayer));
     dot = std::clamp(dot, -1.0f, 1.0f); // acosの安全化
     float angleToPlayer = std::acos(dot) * 180.0f / kPI;
-    if (angleToPlayer > kViewAngleDeg / 2.0f)
+    if (angleToPlayer > viewAngleDeg_ / 2.0f)
         return false;
 
     // レイ遮蔽物判定 (簡易サンプリング)
-    Vector2 start = {from.x, from.y};
-    Vector2 end = {to.x, to.y};
+	TuboEngine::Math::Vector2 start = {from.x, from.y};
+	TuboEngine::Math::Vector2 end = {to.x, to.y};
     const float step = 0.5f;
-    Vector2 dir = end - start;
+	TuboEngine::Math::Vector2 dir = end - start;
     float length = std::sqrt(dir.x * dir.x + dir.y * dir.y);
     if (length < 0.001f)
         return true;
     dir.x /= length;
     dir.y /= length;
     for (float t = 0.0f; t <= length; t += step) {
-        Vector2 pos2 = start + dir * t;
-        Vector3 checkPos = {pos2.x, pos2.y, from.z};
-        if (mapChipField->IsBlocked(checkPos)) {
+		TuboEngine::Math::Vector2 pos2 = start + dir * t;
+		TuboEngine::Math::Vector3 checkPos = {pos2.x, pos2.y, from.z};
+        if (mapChipField_->IsBlocked(checkPos)) {
             return false; // 壁などで遮られている
         }
     }
@@ -761,47 +805,47 @@ bool Enemy::CanSeePlayer() {
 }
 
 void Enemy::DrawViewCone() {
-    float halfRad = (kViewAngleDeg / 2.0f) * kPI / 180.0f;
-    float baseAngle = rotation.z;
-    Vector3 center = position;
+    float halfRad = (viewAngleDeg_ / 2.0f) * kPI / 180.0f;
+    float baseAngle = rotation_.z;
+	TuboEngine::Math::Vector3 center = position_;
 
     Vector4 colNone = {1.0f, 1.0f, 0.0f, 0.7f};
     Vector4 colAware = {1.0f, 0.6f, 0.0f, 0.8f};
     Vector4 colFound = {1.0f, 0.2f, 0.2f, 0.9f};
     bool canSee = CanSeePlayer();
-    Vector4 coneColor = canSee ? colFound : (lastSeenTimer > 0.0f ? colAware : colNone);
+    Vector4 coneColor = canSee ? colFound : (lastSeenTimer_ > 0.0f ? colAware : colNone);
 
-    for (int i = 0; i < kViewLineDiv; ++i) {
-        float a0 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i) / kViewLineDiv);
-        Vector3 p0 = center + Vector3{std::cos(a0) * kViewDistance, std::sin(a0) * kViewDistance, 0.0f};
+    for (int i = 0; i < viewLineDiv_; ++i) {
+        float a0 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i) / viewLineDiv_);
+		TuboEngine::Math::Vector3 p0 = center + TuboEngine::Math::Vector3{std::cos(a0) * viewDistance_, std::sin(a0) * viewDistance_, 0.0f};
         p0.z = center.z;
         LineManager::GetInstance()->DrawLine(center, p0, coneColor);
     }
-    for (int i = 0; i < kViewLineDiv - 1; ++i) {
-        float a0 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i) / kViewLineDiv);
-        float a1 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i + 1) / kViewLineDiv);
-        Vector3 p0 = center + Vector3{std::cos(a0) * kViewDistance, std::sin(a0) * kViewDistance, 0.0f};
-        Vector3 p1 = center + Vector3{std::cos(a1) * kViewDistance, std::sin(a1) * kViewDistance, 0.0f};
+    for (int i = 0; i < viewLineDiv_ - 1; ++i) {
+        float a0 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i) / viewLineDiv_);
+        float a1 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i + 1) / viewLineDiv_);
+		TuboEngine::Math::Vector3 p0 = center + TuboEngine::Math::Vector3{std::cos(a0) * viewDistance_, std::sin(a0) * viewDistance_, 0.0f};
+		TuboEngine::Math::Vector3 p1 = center + TuboEngine::Math::Vector3{std::cos(a1) * viewDistance_, std::sin(a1) * viewDistance_, 0.0f};
         p0.z = p1.z = center.z;
         LineManager::GetInstance()->DrawLine(p0, p1, coneColor);
     }
 
     // レイサンプルはデバッグフラグがONかつプレイヤーが存在する時のみ描画
-    if (showRaySamples_ && player_ && mapChipField) {
-        Vector2 start = {center.x, center.y};
-        Vector2 end = {player_->GetPosition().x, player_->GetPosition().y};
+    if (showRaySamples_ && player_ && mapChipField_) {
+		TuboEngine::Math::Vector2 start = {center.x, center.y};
+		TuboEngine::Math::Vector2 end = {player_->GetPosition().x, player_->GetPosition().y};
         const float step = 0.5f;
-        Vector2 dir = end - start;
+		TuboEngine::Math::Vector2 dir = end - start;
         float length = std::sqrt(dir.x * dir.x + dir.y * dir.y);
         if (length > 0.001f) {
             dir.x /= length; dir.y /= length;
             for (float t = 0.0f; t <= length; t += step) {
-                Vector2 pos2 = start + dir * t;
-                Vector3 checkPos = {pos2.x, pos2.y, center.z};
-                bool blocked = mapChipField->IsBlocked(checkPos);
+				TuboEngine::Math::Vector2 pos2 = start + dir * t;
+				TuboEngine::Math::Vector3 checkPos = {pos2.x, pos2.y, center.z};
+                bool blocked = mapChipField_->IsBlocked(checkPos);
                 Vector4 dotCol = blocked ? Vector4{1.0f, 0.1f, 0.1f, 1.0f} : Vector4{0.2f, 1.0f, 0.2f, 1.0f};
-                Vector3 pA = {checkPos.x - 0.05f, checkPos.y - 0.05f, checkPos.z};
-                Vector3 pB = {checkPos.x + 0.05f, checkPos.y + 0.05f, checkPos.z};
+				TuboEngine::Math::Vector3 pA = {checkPos.x - 0.05f, checkPos.y - 0.05f, checkPos.z};
+				TuboEngine::Math::Vector3 pB = {checkPos.x + 0.05f, checkPos.y + 0.05f, checkPos.z};
                 LineManager::GetInstance()->DrawLine(pA, pB, dotCol);
             }
         }
@@ -809,39 +853,40 @@ void Enemy::DrawViewCone() {
 }
 
 void Enemy::DrawLastSeenMark() {
-    if (lastSeenTimer <= 0.0f)
+    if (lastSeenTimer_ <= 0.0f)
         return;
     constexpr Vector4 kLastSeenColor = {1.0f, 0.2f, 0.2f, 1.0f};
     constexpr float kLastSeenMarkSize = 0.5f;
-    const Vector3& center = lastSeenPlayerPos;
+	const TuboEngine::Math::Vector3& center = lastSeenPlayerPos_;
     // 十字
-    LineManager::GetInstance()->DrawLine(center + Vector3{-kLastSeenMarkSize, 0.0f, 0.0f}, center + Vector3{kLastSeenMarkSize, 0.0f, 0.0f}, kLastSeenColor);
-    LineManager::GetInstance()->DrawLine(center + Vector3{0.0f, -kLastSeenMarkSize, 0.0f}, center + Vector3{0.0f, kLastSeenMarkSize, 0.0f}, kLastSeenColor);
+	LineManager::GetInstance()->DrawLine(center + TuboEngine::Math::Vector3{-kLastSeenMarkSize, 0.0f, 0.0f}, center + TuboEngine::Math::Vector3{kLastSeenMarkSize, 0.0f, 0.0f}, kLastSeenColor);
+	LineManager::GetInstance()->DrawLine(center + TuboEngine::Math::Vector3{0.0f, -kLastSeenMarkSize, 0.0f}, center + TuboEngine::Math::Vector3{0.0f, kLastSeenMarkSize, 0.0f}, kLastSeenColor);
     // 外周円
     constexpr int circleDiv = 16;
     for (int i = 0; i < circleDiv; ++i) {
         float a0 = (2.0f * kPI) * (float(i) / circleDiv);
         float a1 = (2.0f * kPI) * (float(i + 1) / circleDiv);
-        Vector3 p0 = center + Vector3{std::cos(a0) * kLastSeenMarkSize, std::sin(a0) * kLastSeenMarkSize, 0.0f};
-        Vector3 p1 = center + Vector3{std::cos(a1) * kLastSeenMarkSize, std::sin(a1) * kLastSeenMarkSize, 0.0f};
+		TuboEngine::Math::Vector3 p0 = center + TuboEngine::Math::Vector3{std::cos(a0) * kLastSeenMarkSize, std::sin(a0) * kLastSeenMarkSize, 0.0f};
+		TuboEngine::Math::Vector3 p1 = center + TuboEngine::Math::Vector3{std::cos(a1) * kLastSeenMarkSize, std::sin(a1) * kLastSeenMarkSize, 0.0f};
         LineManager::GetInstance()->DrawLine(p0, p1, kLastSeenColor);
     }
 }
 
 // 末尾に欠けていた関数を追加
-Vector3 Enemy::GetCenterPosition() const {
-    // 当たり判定中心（今はスケール考慮せずそのまま）
-    return position;
+TuboEngine::Math::Vector3 Enemy::GetCenterPosition() const {
+    // 当たり判定中心（今はスケール考慮せずそのまま）    
+    return position_;
 }
 
 void Enemy::DrawStateIcon() {
     // 状態に応じた簡易アイコンラインを頭上に描画
-    if (!isAlive)
+    if (!isAlive_)
         return;
-    Vector3 base = position;
+	TuboEngine::Math::Vector3 base = position_;
     base.z += 0.0f; // 2D平面なのでそのまま
-    Vector3 upPos = base + Vector3{0, 0, 0};
-    // 色を状態で切替
+	TuboEngine::Math::Vector3 upPos = base + TuboEngine::Math::Vector3{0, 0, 0};
+    (void)upPos;
+
     Vector4 col;
     switch (state_) {
     case State::Idle:
@@ -865,10 +910,10 @@ void Enemy::DrawStateIcon() {
     }
     float s = 0.4f;
     // 菱形
-    Vector3 p0 = base + Vector3{0, -s, 0};
-    Vector3 p1 = base + Vector3{s, 0, 0};
-    Vector3 p2 = base + Vector3{0, s, 0};
-    Vector3 p3 = base + Vector3{-s, 0, 0};
+	TuboEngine::Math::Vector3 p0 = base + TuboEngine::Math::Vector3{0, -s, 0};
+	TuboEngine::Math::Vector3 p1 = base + TuboEngine::Math::Vector3{s, 0, 0};
+	TuboEngine::Math::Vector3 p2 = base + TuboEngine::Math::Vector3{0, s, 0};
+	TuboEngine::Math::Vector3 p3 = base + TuboEngine::Math::Vector3{-s, 0, 0};
     LineManager::GetInstance()->DrawLine(p0, p1, col);
     LineManager::GetInstance()->DrawLine(p1, p2, col);
     LineManager::GetInstance()->DrawLine(p2, p3, col);

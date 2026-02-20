@@ -4,9 +4,9 @@
 //座標
 struct Transform {
 	//拡大率
-	Vector3 scale;
+	TuboEngine::Math::Vector3 scale;
 	//回転
-	Vector3 rotate;
+	TuboEngine::Math::Vector3 rotate;
 	//平行移動
-	Vector3 translate;
+	TuboEngine::Math::Vector3 translate;
 };

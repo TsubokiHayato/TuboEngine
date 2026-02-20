@@ -3,9 +3,10 @@
 #include "Collider/CollisionManager.h"
 #include "LineManager.h"
 #include "ParticleManager.h" // 追加: パーティクル描画/更新
+#include "application/UI/PlayerStatusRingUI/PlayerStatusRingUI.h"
 
 namespace {
-	StageScene::StageBounds ComputeBoundsWorld(const Vector3& origin, const MapChipField& field) {
+StageScene::StageBounds ComputeBoundsWorld(const TuboEngine::Math::Vector3& origin, const MapChipField& field) {
 		const float w = static_cast<float>(field.GetNumBlockHorizontal()) * MapChipField::GetBlockWidth();
 		const float h = static_cast<float>(field.GetNumBlockVirtical()) * MapChipField::GetBlockHeight();
 		StageScene::StageBounds b;
@@ -31,12 +32,12 @@ namespace {
 		Right,
 	};
 
-	Vector3 ComputeSpawnOriginFromCenter(const StageScene::StageBounds& center, const StageScene::StageBounds& nextAtOrigin,
+	TuboEngine::Math::Vector3 ComputeSpawnOriginFromCenter(const StageScene::StageBounds& center, const StageScene::StageBounds& nextAtOrigin,
 		NeighborDir dir, float gapX, float gapY) {
 		const float nextW = nextAtOrigin.right - nextAtOrigin.left;
 		const float nextH = nextAtOrigin.top - nextAtOrigin.bottom;
 
-		Vector3 origin{0.0f, 0.0f, 0.0f};
+		TuboEngine::Math::Vector3 origin{0.0f, 0.0f, 0.0f};
 
 		switch (dir) {
 		case NeighborDir::Right:
@@ -67,10 +68,10 @@ namespace {
 	}
 
 	void DrawBounds(const StageScene::StageBounds& b, float z, const Vector4& color) {
-		Vector3 p0{b.left, b.bottom, z};
-		Vector3 p1{b.right, b.bottom, z};
-		Vector3 p2{b.right, b.top, z};
-		Vector3 p3{b.left, b.top, z};
+	    TuboEngine::Math::Vector3 p0{b.left, b.bottom, z};
+	    TuboEngine::Math::Vector3 p1{b.right, b.bottom, z};
+	    TuboEngine::Math::Vector3 p2{b.right, b.top, z};
+	    TuboEngine::Math::Vector3 p3{b.left, b.top, z};
 		auto* lm = LineManager::GetInstance();
 		lm->DrawLine(p0, p1, color);
 		lm->DrawLine(p1, p2, color);
@@ -100,6 +101,7 @@ void StageScene::Initialize() {
 
 	mapChipField_ = std::make_unique<MapChipField>();
 	player_ = std::make_unique<Player>();
+	// followCamera must be FollowTopDownCamera
 	followCamera = std::make_unique<FollowTopDownCamera>();
 	camera = std::make_unique<Camera>();
 	collisionManager_ = std::make_unique<CollisionManager>();
@@ -158,6 +160,10 @@ void StageScene::Initialize() {
 	// Guide UI (WASD)
 	guideUI_ = std::make_unique<GuideUI>();
 	guideUI_->Initialize();
+
+	// Player ring UI
+	playerRingUI_ = std::make_unique<PlayerStatusRingUI>();
+	playerRingUI_->Initialize();
 }
 
 void StageScene::Update() {
@@ -186,6 +192,8 @@ void StageScene::Update() {
 	if (enemyHpUI_) { enemyHpUI_->Update(enemies, followCamera->GetCamera()); }
 	// Guide UI 更新
 	if (guideUI_) { guideUI_->Update(); }
+	// Player ring UI 更新（プレイヤー周囲）
+	if (playerRingUI_) { playerRingUI_->Update(player_.get(), followCamera->GetCamera()); }
 }
 
 void StageScene::Finalize() {}
@@ -239,6 +247,8 @@ void StageScene::SpriteDraw() {
 	if (enemyHpUI_) { enemyHpUI_->Draw(); }
 	// Guide UI 描画
 	if (guideUI_) { guideUI_->Draw(); }
+	// Player ring UI 描画
+	if (playerRingUI_) { playerRingUI_->Draw(); }
 	
 	// アニメーション描画
 	if (sceneChangeAnimation_) {
@@ -323,7 +333,7 @@ void StageScene::ImGuiDraw() {
 				next.field = std::make_unique<MapChipField>();
 				next.field->LoadMapChipCsv(next.csvPath);
 
-				StageBounds nextAtOrigin = ComputeBoundsWorld(Vector3{0, 0, 0}, *next.field);
+				StageBounds nextAtOrigin = ComputeBoundsWorld(TuboEngine::Math::Vector3{0, 0, 0}, *next.field);
 				next.origin = ComputeSpawnOriginFromCenter(centerB, nextAtOrigin, dir, gapX, gapY);
 
 				if (snapX > 0.0f) next.origin.x = std::round(next.origin.x / snapX) * snapX;
@@ -386,14 +396,14 @@ void StageScene::ImGuiDraw() {
 				st.enemies.clear();
 				st.tile = std::make_unique<Tile>();
 
-				Vector3 tilePos = st.origin;
+				TuboEngine::Math::Vector3 tilePos = st.origin;
 				tilePos.z = -1.0f;
 				st.tile->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile30x30.obj");
 				st.tile->SetCamera(followCamera->GetCamera());
 				st.tile->Update();
 
 				ForEachMapChipField(st.field.get(), [&](uint32_t x, uint32_t y, MapChipType type) {
-					Vector3 pos = st.field->GetMapChipPositionByIndex(x, y) + st.origin;
+					TuboEngine::Math::Vector3 pos = st.field->GetMapChipPositionByIndex(x, y) + st.origin;
 					if (type == MapChipType::kBlock) {
 						auto block = std::make_unique<Block>();
 						block->Initialize(pos);
@@ -437,7 +447,7 @@ void StageScene::ImGuiDraw() {
 				st.csvPath = buf;
 			}
 
-			Vector3 origin = st.origin;
+			TuboEngine::Math::Vector3 origin = st.origin;
 			float o[2] = { origin.x, origin.y };
 			if (ImGui::DragFloat2("Origin", o, 0.1f)) {
 				origin.x = o[0];

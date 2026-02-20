@@ -6,19 +6,19 @@
 #include <algorithm>
 #include <cmath>
 
-static Vector2 WorldToScreen(const Vector3& world, const Camera* cam) {
+static TuboEngine::Math::Vector2 WorldToScreen(const TuboEngine::Math::Vector3& world, const Camera* cam) {
     if (!cam) return {0,0};
-    const Matrix4x4& vp = cam->GetViewProjectionMatrix();
-    Vector3 v = TransformCoord(world, vp);
-    int sw = (int)WinApp::GetInstance()->GetClientWidth();
-    int sh = (int)WinApp::GetInstance()->GetClientHeight();
-    Vector2 screen;
+	const TuboEngine::Math::Matrix4x4& vp = cam->GetViewProjectionMatrix();
+	TuboEngine::Math::Vector3 v = TransformCoord(world, vp);
+	int sw = (int)TuboEngine::WinApp::GetInstance()->GetClientWidth();
+	int sh = (int)TuboEngine::WinApp::GetInstance()->GetClientHeight();
+	TuboEngine::Math::Vector2 screen;
     screen.x = (v.x * 0.5f + 0.5f) * sw;
     screen.y = (-v.y * 0.5f + 0.5f) * sh;
     return screen;
 }
 
-static Vector4 RatioColor(float ratio) {
+static TuboEngine::Math::Vector4 RatioColor(float ratio) {
     if (ratio < 0.0f) ratio = 0.0f; if (ratio > 1.0f) ratio = 1.0f;
     if (ratio < 0.5f) { float t = ratio / 0.5f; return {1.0f, t, 0.0f, 1.0f}; }
     else { float t = (ratio - 0.5f) / 0.5f; return {1.0f - t, 1.0f, 0.0f, 1.0f}; }
@@ -54,21 +54,22 @@ void EnemyHpUI::Update(const std::vector<std::unique_ptr<Enemy>>& enemies, Camer
             bar.animatedHp = (float)currentHp;
         }
         // position above enemy head
-        Vector3 pos = e->GetPosition(); pos.y += 2.5f;
-        Vector2 screen = WorldToScreen(pos, cam);
+		TuboEngine::Math::Vector3 pos = e->GetPosition();
+		pos.y += 2.5f;
+		TuboEngine::Math::Vector2 screen = WorldToScreen(pos, cam);
         screen.x = std::round(screen.x); screen.y = std::round(screen.y);
         float iconSize = 32.0f * scale_;
         float totalWidth = iconSize * maxHp + spacing_ * (maxHp - 1);
-        Vector2 base = { screen.x - totalWidth / 2.0f, screen.y + yOffset_ };
+		TuboEngine::Math::Vector2 base = {screen.x - totalWidth / 2.0f, screen.y + yOffset_};
         bar.basePos = base;
         float ratio = maxHp > 0 ? bar.animatedHp / (float)maxHp : 0.0f;
-        Vector4 fillCol = RatioColor(ratio);
+		TuboEngine::Math::Vector4 fillCol = RatioColor(ratio);
         int fullIcons = (int)std::floor(bar.animatedHp);
         float partial = bar.animatedHp - (float)fullIcons;
         float innerW = (32.0f - 4.0f) * scale_;
         float innerH = (32.0f - 4.0f) * scale_;
         for (int h = 0; h < maxHp; ++h) {
-            Vector2 p = { base.x + h * (iconSize + spacing_), base.y };
+			TuboEngine::Math::Vector2 p = {base.x + h * (iconSize + spacing_), base.y};
             auto& fr = bar.frames[h]; fr->SetPosition(p); fr->SetSize({iconSize, iconSize}); fr->Update();
             auto& fi = bar.fills[h]; fi->SetPosition({ p.x + 2.0f * scale_, p.y + 2.0f * scale_ });
             if (h < fullIcons) {

@@ -35,6 +35,7 @@
 #include "application/UI/HP/Player/HpUI.h"
 #include "application/UI/HP/Enemy/EnemyHpUI.h"
 #include "application/UI/Guide/GuideUI.h"
+#include "application/UI/PlayerStatusRingUI/PlayerStatusRingUI.h"
 
 #include <string>
 #include <vector>
@@ -127,7 +128,7 @@ public:
 
 	struct StageInstance {
 		std::string csvPath;
-		Vector3 origin{0.0f, 0.0f, 0.0f};
+		TuboEngine::Math::Vector3 origin{0.0f, 0.0f, 0.0f};
 		bool visible = true;
 
 		std::unique_ptr<MapChipField> field;
@@ -162,9 +163,9 @@ private:
 
 	std::unique_ptr<FollowTopDownCamera> followCamera;
 	std::unique_ptr<Camera> camera = nullptr;
-	Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
-	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
-	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
+	TuboEngine::Math::Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
+	TuboEngine::Math::Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
+	TuboEngine::Math::Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
 
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<Enemy> enemy_ = nullptr;
@@ -194,6 +195,7 @@ private:
 	std::unique_ptr<HpUI> hpUI_;
 	std::unique_ptr<EnemyHpUI> enemyHpUI_;
 	std::unique_ptr<GuideUI> guideUI_;
+	std::unique_ptr<PlayerStatusRingUI> playerRingUI_;
 
 	// Multi-stage layout data (debug / editor)
 	bool useMultiStageLayout_ = true;

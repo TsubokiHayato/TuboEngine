@@ -1,6 +1,7 @@
 #pragma once
-#include <cmath> // 修正: sqrt関数を使用するために必要
+#include <cmath> // sqrt
 
+namespace TuboEngine::Math {
 
 struct Vector4
 {
@@ -140,3 +141,5 @@ struct Vector4
 
 
 };
+
+} // namespace TuboEngine::Math

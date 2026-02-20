@@ -1,5 +1,8 @@
-#include "skyBoxCommon.h"
+#include "SkyBoxCommon.h"
 #include "SkyBox/SkyBoxPSO.h"
+
+namespace TuboEngine {
+
 SkyBoxCommon* SkyBoxCommon::instance = nullptr; // シングルトンインスタンス
 void SkyBoxCommon::Initialize() {
 
@@ -16,3 +19,5 @@ void SkyBoxCommon::Finalize() {
 }
 
 void SkyBoxCommon::DrawSettingsCommon() { pso->DrawSettingsCommon(); }
+
+} // namespace TuboEngine

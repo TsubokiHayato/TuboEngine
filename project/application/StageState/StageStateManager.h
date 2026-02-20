@@ -11,6 +11,9 @@
 #include "StageType.h"
 #include <map>
 #include <memory>
+
+
+
 class StageStateManager {
 
 	///---------------------------------------------------------
@@ -47,3 +50,5 @@ private:
 	std::map<StageType, std::unique_ptr<IStageState>> states_;
 	IStageState* currentState_;
 };
+
+

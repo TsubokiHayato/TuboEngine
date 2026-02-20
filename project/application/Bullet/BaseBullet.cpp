@@ -2,4 +2,4 @@
 
 void BaseBullet::OnCollision(Collider* other) {}
 
-Vector3 BaseBullet::GetCenterPosition() const { return Vector3(); }
+TuboEngine::Math::Vector3 BaseBullet::GetCenterPosition() const { return TuboEngine::Math::Vector3(); }

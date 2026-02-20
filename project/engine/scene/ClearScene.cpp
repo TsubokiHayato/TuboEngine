@@ -19,7 +19,7 @@ static float Clamp01(float v) { return v < 0.0f ? 0.0f : (v > 1.0f ? 1.0f : v); 
 // イージング関数（軽いイーズアウト）
 static float EaseOutQuad(float t) { return 1.0f - (1.0f - t) * (1.0f - t); }
 // 補助 Lerp
-static Vector3 LerpVec(const Vector3& a, const Vector3& b, float t) {
+static TuboEngine::Math::Vector3 LerpVec(const TuboEngine::Math::Vector3& a, const TuboEngine::Math::Vector3& b, float t) {
     return { a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t };
 }
 
@@ -31,9 +31,9 @@ void ClearScene::SetupLettersClearAnim() {
     letterClearAnims_.clear();
     letterClearAnims_.resize(letterSprites_.size());
 
-    const float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
-    const float screenH = static_cast<float>(WinApp::GetInstance()->GetClientHeight());
-    const Vector2 screenCenter = { screenW * 0.5f, screenH * 0.5f };
+    const float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
+	const float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
+	const TuboEngine::Math::Vector2 screenCenter = {screenW * 0.5f, screenH * 0.5f};
 
     std::random_device rd;
     std::mt19937 rng(rd());
@@ -45,11 +45,11 @@ void ClearScene::SetupLettersClearAnim() {
         LetterClearAnim anim{};
 
         // 現在の位置を開始点に
-        const Vector2 pos = letterSprites_[i]->GetPosition();
+		const TuboEngine::Math::Vector2 pos = letterSprites_[i]->GetPosition();
         anim.startPos = pos;
 
         // 画面中心→文字のベクトル（外側方向）
-        Vector2 outward = { pos.x - screenCenter.x, pos.y - screenCenter.y };
+		TuboEngine::Math::Vector2 outward = {pos.x - screenCenter.x, pos.y - screenCenter.y};
         float len = std::sqrt(outward.x * outward.x + outward.y * outward.y);
         if (len > 1e-3f) {
             outward.x /= len;
@@ -59,7 +59,7 @@ void ClearScene::SetupLettersClearAnim() {
         }
 
         // 上方向成分を加える＋少しランダム
-        Vector2 vel = {
+		TuboEngine::Math::Vector2 vel = {
             outward.x * lettersClearOutwardSpeed_ + jitterSpd(rng),
             -lettersClearUpwardSpeed_ + outward.y * (lettersClearOutwardSpeed_ * 0.25f) + jitterSpd(rng) * 0.25f
         };
@@ -102,7 +102,7 @@ void ClearScene::Initialize() {
     // 「カメラ正面（画面奥方向）」を向く回転を明示的に指定しておく。
     // 本プロジェクトの移動/弾方向は rotation.z を基準にしているため z のみ整える。
     {
-        Vector3 r = player_->GetRotation();
+		TuboEngine::Math::Vector3 r = player_->GetRotation();
         r.x = 0.0f;
         r.y = 0.0f;
         r.z = 0.0f;
@@ -112,8 +112,8 @@ void ClearScene::Initialize() {
     player_->Update();
 
     // 画面中心を取得して配置する
-    float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
-    float screenH = static_cast<float>(WinApp::GetInstance()->GetClientHeight());
+	float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
+	float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
 
     // CLEAR 文字スプライトの生成
     const char letters[5] = { 'C','L','E','A','R' };
@@ -129,7 +129,7 @@ void ClearScene::Initialize() {
 
         TextureManager::GetInstance()->LoadTexture(tex);
         const auto& meta = TextureManager::GetInstance()->GetMetaData(tex);
-        Vector2 texSize = { static_cast<float>(meta.width), static_cast<float>(meta.height) };
+		TuboEngine::Math::Vector2 texSize = {static_cast<float>(meta.width), static_cast<float>(meta.height)};
 
         s->Initialize(tex);
 
@@ -141,7 +141,7 @@ void ClearScene::Initialize() {
 
         // 初期サイズ（ピクセル）をセットして保存
         const float initialScale = 0.9f;
-        Vector2 initSize = { texSize.x * initialScale, texSize.y * initialScale };
+		TuboEngine::Math::Vector2 initSize = {texSize.x * initialScale, texSize.y * initialScale};
         s->SetSize(initSize);
         s->SetColor({1.0f, 1.0f, 1.0f, 0.0f}); // 初期は透明（フェードイン演出があるため）
         s->Update();
@@ -224,14 +224,14 @@ void ClearScene::Update() {
         // ClearScene中はマウスの位置でプレイヤー回転を決めない（入力無効・演出専用）
         // Player::Update() 内部で Rotate() が走る可能性があるため、ここで固定値を入れる。
         {
-            Vector3 fixedRot = player_->GetRotation();
+			TuboEngine::Math::Vector3 fixedRot = player_->GetRotation();
             fixedRot.z = 0.0f;
             player_->SetRotation(fixedRot);
         }
 
-        Vector3 pos = player_->GetPosition();
-        Vector3 rot = player_->GetRotation();
-        Vector3 scl = player_->GetScale();
+      TuboEngine::Math::Vector3 pos = player_->GetPosition();
+		TuboEngine::Math::Vector3 rot = player_->GetRotation();
+	  TuboEngine::Math::Vector3 scl = player_->GetScale();
 
         // ベースのゆらぎ（常時）
         const float bobAmp = 0.6f;
@@ -260,7 +260,7 @@ void ClearScene::Update() {
                 float lateral = (spaceLaunchRight_ ? 1.0f : -1.0f) * (30.0f + 20.0f * u); // だんだん加速
                 float upward = ease * (spaceJumpHeight_ * 6.0f); // 大きく上がる
                 float forward = -ease * 50.0f; // カメラ手前から飛び出して奥へ
-                Vector3 target = { spaceOrigPos_.x + lateral, spaceOrigPos_.y + upward, spaceOrigPos_.z + forward };
+				TuboEngine::Math::Vector3 target = {spaceOrigPos_.x + lateral, spaceOrigPos_.y + upward, spaceOrigPos_.z + forward};
                 pos = LerpVec(spaceOrigPos_, target, ease);
                 rot.z = spaceOrigRot_.z + 6.0f * ease; // くるくる回る
                 // 少し伸びる
@@ -287,7 +287,7 @@ void ClearScene::Update() {
             else {
                 // 完全に画面外に到達した扱いにする
                 // 位置を極端に遠ざけて見えないようにする
-                Vector3 farPos = pos;
+				TuboEngine::Math::Vector3 farPos = pos;
                 farPos.x += (spaceLaunchRight_ ? 1.0f : -1.0f) * 200.0f;
                 farPos.z -= 300.0f;
                 player_->SetPosition(farPos);
@@ -357,7 +357,7 @@ void ClearScene::Update() {
                 float scale = 0.6f + 0.4f * t;
 
                 // base size はピクセル単位。アニメーション時は掛け算する
-                Vector2 base = letterBaseSizes_[i];
+				TuboEngine::Math::Vector2 base = letterBaseSizes_[i];
                 letterSprites_[i]->SetSize({ base.x * scale, base.y * scale });
 
                 letterSprites_[i]->SetColor({ 1.0f, 1.0f, 1.0f, t });
@@ -382,14 +382,14 @@ void ClearScene::Update() {
             float ease = EaseOutQuad(t);
 
             // 位置
-            Vector2 pos = {
+			TuboEngine::Math::Vector2 pos = {
                 anim.startPos.x + anim.velocity.x * ease,
                 anim.startPos.y + anim.velocity.y * ease
             };
             letterSprites_[i]->SetPosition(pos);
 
             // スケール（サイズ）
-            Vector2 base = letterBaseSizes_[i];
+			TuboEngine::Math::Vector2 base = letterBaseSizes_[i];
             float scale = LerpF(1.0f, lettersClearEndScale_, ease);
             letterSprites_[i]->SetSize({ base.x * scale, base.y * scale });
 
@@ -469,7 +469,7 @@ void ClearScene::ImGuiDraw() {
     // 全体パラメータ
     if (ImGui::DragFloat("Letter Spacing", &letterSpacing_, 1.0f, 10.0f, 400.0f)) {
         // 位置を再計算
-        float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
+		float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
         for (int i = 0; i < static_cast<int>(letterSprites_.size()); ++i) {
             float x = screenW * 0.5f + (i - 2) * letterSpacing_;
             auto pos = letterSprites_[i]->GetPosition();
@@ -478,7 +478,7 @@ void ClearScene::ImGuiDraw() {
         }
     }
     if (ImGui::DragFloat("Letter Y Offset", &letterYOffset_, 1.0f, -600.0f, 600.0f)) {
-        float screenH = static_cast<float>(WinApp::GetInstance()->GetClientHeight());
+		float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
         for (size_t i = 0; i < letterSprites_.size(); ++i) {
             auto pos = letterSprites_[i]->GetPosition();
             float y = screenH * 0.5f + letterYOffset_;
@@ -491,8 +491,8 @@ void ClearScene::ImGuiDraw() {
 
     ImGui::Separator();
     if (ImGui::Button("Reset Positions")) {
-        float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
-        float screenH = static_cast<float>(WinApp::GetInstance()->GetClientHeight());
+		float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
+		float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
         for (int i = 0; i < static_cast<int>(letterSprites_.size()); ++i) {
             float x = screenW * 0.5f + (i - 2) * letterSpacing_;
             float y = screenH * 0.5f + letterYOffset_;
@@ -522,26 +522,26 @@ void ClearScene::ImGuiDraw() {
         std::string header = std::format("Letter {} ({})", static_cast<int>(i), letterTextureNames_[i]);
         if (ImGui::CollapsingHeader(header.c_str())) {
             // Position
-            Vector2 pos = letterSprites_[i]->GetPosition();
+			TuboEngine::Math::Vector2 pos = letterSprites_[i]->GetPosition();
             if (ImGui::DragFloat2(std::format("Position##{}", i).c_str(), &pos.x, 1.0f)) {
                 letterSprites_[i]->SetPosition(pos);
                 letterSprites_[i]->Update();
             }
             // Size
-            Vector2 sz = letterSprites_[i]->GetSize();
+			TuboEngine::Math::Vector2 sz = letterSprites_[i]->GetSize();
             if (ImGui::DragFloat2(std::format("Size##{}", i).c_str(), &sz.x, 1.0f)) {
                 letterSprites_[i]->SetSize(sz);
                 letterSprites_[i]->Update();
             }
             // Color / Alpha
-            Vector4 col = letterSprites_[i]->GetColor();
+			TuboEngine::Math::Vector4 col = letterSprites_[i]->GetColor();
             float colf[4] = { col.x, col.y, col.z, col.w };
             if (ImGui::ColorEdit4(std::format("Color##{}", i).c_str(), colf)) {
                 letterSprites_[i]->SetColor({ colf[0], colf[1], colf[2], colf[3] });
                 letterSprites_[i]->Update();
             }
             // Anchor
-            Vector2 anchor = letterSprites_[i]->GetAnchorPoint();
+			TuboEngine::Math::Vector2 anchor = letterSprites_[i]->GetAnchorPoint();
             if (ImGui::DragFloat2(std::format("Anchor##{}", i).c_str(), &anchor.x, 0.01f, 0.0f, 1.0f)) {
                 letterSprites_[i]->SetAnchorPoint(anchor);
                 letterSprites_[i]->Update();
@@ -568,9 +568,9 @@ void ClearScene::ImGuiDraw() {
     // プレイヤー情報表示
     if (player_) {
         ImGui::Begin("Player (ClearScene)");
-        Vector3 ppos = player_->GetPosition();
-        Vector3 prot = player_->GetRotation();
-        Vector3 pscale = player_->GetScale();
+		TuboEngine::Math::Vector3 ppos = player_->GetPosition();
+		TuboEngine::Math::Vector3 prot = player_->GetRotation();
+		TuboEngine::Math::Vector3 pscale = player_->GetScale();
         ImGui::Text("Position: %.2f, %.2f, %.2f", ppos.x, ppos.y, ppos.z);
         ImGui::Text("Rotation: %.2f, %.2f, %.2f", prot.x, prot.y, prot.z);
         ImGui::Text("Scale: %.2f, %.2f, %.2f", pscale.x, pscale.y, pscale.z);

@@ -37,46 +37,36 @@ public:
 	/// </summary>
 	void DrawImGui(const char* windowName);
 
+	// getter/setter
+	const TuboEngine::Math::Vector2& GetPosition() const { return position_; }
+	void SetPosition(const TuboEngine::Math::Vector2& position) { position_ = position; }
 
-	//getter_Pos
-	const Vector2& GetPosition()const { return position; }
-	//setter_Pos
-	void SetPosition(const Vector2& position) { this->position = position; }
+	const float& GetRotation()const { return rotation_; }
+	void SetRotation(const float& rotation) { rotation_ = rotation; }
 
+	const TuboEngine::Math::Vector4& GetColor() const { return materialData_->color; }
+	void SetColor(const TuboEngine::Math::Vector4& color) { materialData_->color = color; }
 
-	//getter_Rotation
-	const float& GetRotation()const { return rotation; }
-	//setter_Rotation
-	void SetRotation(const float& rotation) { this->rotation = rotation; }
+	const TuboEngine::Math::Vector2& GetSize() const { return size_; }
+	void SetSize(const TuboEngine::Math::Vector2& size) { size_ = size; }
 
-	//getter_Color
-	const Vector4& GetColor()const { return materialData->color;}
-	//setter_Color
-	void SetColor(const Vector4& color) { materialData->color = color; }
-
-
-	//getter_Size
-	const Vector2& GetSize()const { return size; }
-	//setter_Size
-	void SetSize(const Vector2& size) { this->size = size; }
-
-	const Vector2& GetAnchorPoint()const { return anchorPoint; }
-	void SetAnchorPoint(const Vector2& anchorPoint) { this->anchorPoint = anchorPoint; }
+	const TuboEngine::Math::Vector2& GetAnchorPoint() const { return anchorPoint_; }
+	void SetAnchorPoint(const TuboEngine::Math::Vector2& anchorPoint) { anchorPoint_ = anchorPoint; }
 
 	const bool& GetFlipX()const { return isFlipX_; }
-	void SetFlipX(const bool& isFlipX) { this->isFlipX_ = isFlipX; }
+	void SetFlipX(const bool& isFlipX) { isFlipX_ = isFlipX; }
 
 	const bool& GetFlipY()const { return isFlipY_; }
-	void SetFlipY(const bool& isFlipY) { this->isFlipY_ = isFlipY; }
+	void SetFlipY(const bool& isFlipY) { isFlipY_ = isFlipY; }
 
-	const Vector2& GetTextureLeftTop()const { return textureLeftTop_; }
-	void SetTextureLeftTop(const Vector2& textureLeftTop) { this->textureLeftTop_ = textureLeftTop; }
+	const TuboEngine::Math::Vector2& GetTextureLeftTop() const { return textureLeftTop_; }
+	void SetTextureLeftTop(const TuboEngine::Math::Vector2& textureLeftTop) { textureLeftTop_ = textureLeftTop; }
 
-	const Vector2& GetTextureSize()const { return textureSize_; }
-	void SetTextureSize(const Vector2& textureSize) { this->textureSize_ = textureSize; }
+	const TuboEngine::Math::Vector2& GetTextureSize() const { return textureSize_; }
+	void SetTextureSize(const TuboEngine::Math::Vector2& textureSize) { textureSize_ = textureSize; }
 
-	const bool& GetIsAdjustTextureSize()const { return isAdjustTextureSize; }
-	void SetGetIsAdjustTextureSize(const bool& isAdjustTextureSize) { this->isAdjustTextureSize = isAdjustTextureSize; }
+	const bool& GetIsAdjustTextureSize()const { return isAdjustTextureSize_; }
+	void SetGetIsAdjustTextureSize(const bool& isAdjustTextureSize) { isAdjustTextureSize_ = isAdjustTextureSize; }
 	
 	/// <summary>
 	/// テクスチャから初期サイズを得る
@@ -90,45 +80,44 @@ public:
 	const std::string& GetTexture() const { return textureFilePath_; }
 
 private:
-	
 	//バッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> vertexResource;
-	Microsoft::WRL::ComPtr <ID3D12Resource> indexResource;
+	Microsoft::WRL::ComPtr <ID3D12Resource> vertexResource_;
+	Microsoft::WRL::ComPtr <ID3D12Resource> indexResource_;
 
 	//バッファリソース内のデータを指すポインタ
-	VertexData* vertexData = nullptr;
-	uint32_t* indexData = nullptr;
+	VertexData* vertexData_ = nullptr;
+	uint32_t* indexData_ = nullptr;
 	//バッファリソースの使い道を補足するバッファビュー
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
-	D3D12_INDEX_BUFFER_VIEW indexBufferView;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
+	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
 
 	//バッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> materialResource;
+	Microsoft::WRL::ComPtr <ID3D12Resource> materialResource_;
 	//バッファリソース内のデータを指すポインタ
-	Material* materialData = nullptr;
+	Material* materialData_ = nullptr;
 
 	//バッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> transformationMatrixResource;
+	Microsoft::WRL::ComPtr <ID3D12Resource> transformationMatrixResource_;
 	//バッファリソース内のデータを指すポインタ
-	TransformationMatrix* transformationMatrixData = nullptr;
+	TransformationMatrix* transformationMatrixData_ = nullptr;
 
 
-	Transform uvTransFormMatrix{
+	Transform uvTransFormMatrix_{
 		{1.0f,1.0f,1.0f},
 		{0.0f,0.0f,0.0f},
 		{0.0f,0.0f,0.0f},
 	};
-	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	Transform transform_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
-	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
+	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList_;
 
 
-	Vector2 position = {};
-	float rotation = {};
-	Vector2 size = { 640.0f,360.0f };
+	TuboEngine::Math::Vector2 position_ = {};
+	float rotation_ = {};
+	TuboEngine::Math::Vector2 size_ = {640.0f, 360.0f};
 
 	//テクスチャ番号
-	uint32_t textureIndex = 0;
+	uint32_t textureIndex_ = 0;
 
 	std::string textureFilePath_;
 
@@ -136,16 +125,16 @@ private:
 	　　 拡張機能
 	-----------*/
 	//アンカーポイント
-	Vector2 anchorPoint = {};
+	TuboEngine::Math::Vector2 anchorPoint_ = {};
 	//左右フリップ
 	bool isFlipX_ = false;
 	//上下フリップ
 	bool isFlipY_ = false;
 	//テクスチャ左上座標
-	Vector2 textureLeftTop_ = {};
+	TuboEngine::Math::Vector2 textureLeftTop_ = {};
 	//テクスチャ切り出しサイズ
-	Vector2 textureSize_ = { 100.0f,100.0f };
+	TuboEngine::Math::Vector2 textureSize_ = {100.0f, 100.0f};
 	//初期サイズにするフラグ
-	bool isAdjustTextureSize;
+	bool isAdjustTextureSize_ = false;
 };
 

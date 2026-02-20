@@ -14,8 +14,8 @@
 /// Line描画用頂点構造体
 ///----------------------------------------------------
 struct LineVertex {
-    Vector3 position;
-    Vector4 color;
+	TuboEngine::Math::Vector3 position;
+	TuboEngine::Math::Vector4 color;
 };
 
 class Camera;
@@ -35,7 +35,7 @@ public:
     ///<summary>頂点情報クリア</summary>
     void ClearLines();
     ///<summary>ライン描画用頂点追加</summary>
-    void DrawLine(const Vector3& start, const Vector3& end, const Vector4& color);
+	void DrawLine(const TuboEngine::Math::Vector3& start, const TuboEngine::Math::Vector3& end, const TuboEngine::Math::Vector4& color);
 
 private:
     ///<summary>頂点バッファ生成</summary>
@@ -49,17 +49,17 @@ public:
     ///<summary>Transformの取得</summary>
     Transform GetTransform() const { return transform_; }
     ///<summary>スケールの設定</summary>
-    void SetScale(const Vector3& scale) { transform_.scale = scale; }
+	void SetScale(const TuboEngine::Math::Vector3& scale) { transform_.scale = scale; }
     ///<summary>スケールの取得</summary>
-    const Vector3& GetScale() const { return transform_.scale; }
+	const TuboEngine::Math::Vector3& GetScale() const { return transform_.scale; }
     ///<summary>回転の設定</summary>
-    void SetRotation(const Vector3& rotate) { transform_.rotate = rotate; }
+	void SetRotation(const TuboEngine::Math::Vector3& rotate) { transform_.rotate = rotate; }
     ///<summary>回転の取得</summary>
-    const Vector3& GetRotation() const { return transform_.rotate; }
+	const TuboEngine::Math::Vector3& GetRotation() const { return transform_.rotate; }
     ///<summary>位置の設定</summary>
-    void SetPosition(const Vector3& translate) { transform_.translate = translate; }
+	void SetPosition(const TuboEngine::Math::Vector3& translate) { transform_.translate = translate; }
     ///<summary>位置の取得</summary>
-    const Vector3& GetPosition() const { return transform_.translate; }
+	const TuboEngine::Math::Vector3& GetPosition() const { return transform_.translate; }
     ///<summary>カメラの設定</summary>
     void SetCamera(Camera* camera) { this->camera_ = camera; }
 

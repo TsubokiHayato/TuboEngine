@@ -16,9 +16,9 @@ struct AnimationCurve {
 };
 
 struct NodeAnimation {
-	AnimationCurve<Vector3> translate; // 位置のアニメーションカーブ
-	AnimationCurve<Quaternion> rotate; // 回転のアニメーションカーブ
-	AnimationCurve<Vector3> scale;     // スケールのアニメーションカーブ
+	AnimationCurve<TuboEngine::Math::Vector3> translate; // 位置のアニメーションカーブ
+	AnimationCurve<TuboEngine::Math::Quaternion> rotate; // 回転のアニメーションカーブ
+	AnimationCurve<TuboEngine::Math::Vector3> scale;     // スケールのアニメーションカーブ
 };
 
 struct Animation {
