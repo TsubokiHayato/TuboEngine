@@ -14,13 +14,13 @@ void ToonEffect::Initialize() {
 	pso_->Initialize();
 
 	// 定数バッファ作成
-	toonCB_ = DirectXCommon::GetInstance()->CreateBufferResource((sizeof(ToonParams) + 255) & ~255);
+	toonCB_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource((sizeof(ToonParams) + 255) & ~255);
 	toonCB_->Map(0, nullptr, reinterpret_cast<void**>(&toonParams_));
 	// デフォルト値
 	toonParams_->stepCount = 3;
 	toonParams_->toonRate = 0.5f; // トゥーンレートの初期値
-	toonParams_->shadowColor = Vector3(0.0f, 0.0f, 0.0f); // シャドウカラーの初期値
-	toonParams_->highlightColor = Vector3(0.0f, 0.0f, 0.0f); // シャドウカラーの初期値
+	toonParams_->shadowColor = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f); // シャドウカラーの初期値
+	toonParams_->highlightColor = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f); // シャドウカラーの初期値
 
 	// SRV作成（インデックス1にSRVを作成）
 	D3D12_SHADER_RESOURCE_VIEW_DESC depthTextureSRVDesc{};
@@ -29,8 +29,8 @@ void ToonEffect::Initialize() {
 	depthTextureSRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	depthTextureSRVDesc.Texture2D.MipLevels = 1;
 
-	DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(
-	    DirectXCommon::GetInstance()->GetDepthStencliResouece().Get(), &depthTextureSRVDesc, DirectXCommon::GetInstance()->GetSRVCPUDescriptorHandle(1));
+	TuboEngine::DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(
+	    TuboEngine::DirectXCommon::GetInstance()->GetDepthStencliResouece().Get(), &depthTextureSRVDesc, TuboEngine::DirectXCommon::GetInstance()->GetSRVCPUDescriptorHandle(1));
 }
 
 void ToonEffect::Update() {
@@ -52,7 +52,7 @@ void ToonEffect::Draw(ID3D12GraphicsCommandList* commandList) {
 	pso_->DrawSettingsCommon();
 	// SRV等のセットはマネージャ側で
 	commandList->SetGraphicsRootConstantBufferView(1, toonCB_->GetGPUVirtualAddress());
-	commandList->SetGraphicsRootDescriptorTable(2, DirectXCommon::GetInstance()->GetSRVGPUDescriptorHandle(1));
+	commandList->SetGraphicsRootDescriptorTable(2, TuboEngine::DirectXCommon::GetInstance()->GetSRVGPUDescriptorHandle(1));
 }
 
 void ToonEffect::SetMainCamera(Camera* camera) {

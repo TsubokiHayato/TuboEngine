@@ -7,7 +7,7 @@
 struct DissolveParams
 {
 	float dissolveThreshold; // 0.0～1.0で制御
-	Vector3 edgeColor; // 追加: エッジの色
+	TuboEngine::Math::Vector3 edgeColor; // 追加: エッジの色
 	float edgeStrength; // 追加: エッジの強さ
 	float edgeWidth; // 追加: エッジの幅
 };

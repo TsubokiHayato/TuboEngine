@@ -59,9 +59,9 @@ public:
 
 private:
 	std::unique_ptr<Camera> camera;
-	Vector3 cameraPosition = {0.0f, 0.0f, -10.0f};
-	Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
-	Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
+	TuboEngine::Math::Vector3 cameraPosition = {0.0f, 0.0f, -10.0f};
+	TuboEngine::Math::Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
+	TuboEngine::Math::Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
 
 	// --- ここを追加 ---
 	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation;
@@ -75,7 +75,7 @@ private:
 	float playerIntroTimer_ = 0.0f;
 	float playerIntroDuration_ = 1.6f; // 端から来て止まる時間
 
-	// 呼吸やhopなどのパラメータ
+	// 呼吸やHopなどのパラメータ
 	float playerIdleTime_ = 0.0f;
 	float time_ = 0.0f; // 背景アニメーション用タイマー
 };

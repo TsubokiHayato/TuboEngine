@@ -33,7 +33,7 @@ std::map<std::string, MapChipType> mapChipTable = {
 //--------------------------------------------------
 // 座標からマップチップインデックスセットを取得
 //--------------------------------------------------
-MapChipField::IndexSet MapChipField::GetMapChipIndexSetByPosition(const Vector3& position) const {
+MapChipField::IndexSet MapChipField::GetMapChipIndexSetByPosition(const TuboEngine::Math::Vector3& position) const {
     IndexSet indexSet = {};
     indexSet.xIndex = static_cast<uint32_t>((position.x + kBlockWidth_ / 2) / kBlockWidth_);
     indexSet.yIndex = static_cast<uint32_t>((position.y + kBlockHeight_ / 2) / kBlockHeight_);
@@ -44,7 +44,7 @@ MapChipField::IndexSet MapChipField::GetMapChipIndexSetByPosition(const Vector3&
 // インデックスから矩形領域を取得
 //--------------------------------------------------
 MapChipField::Rect MapChipField::GetRectByIndex(uint32_t xIndex, uint32_t yIndex) {
-	Vector3 center = GetMapChipPositionByIndex(xIndex, yIndex);
+	TuboEngine::Math::Vector3 center = GetMapChipPositionByIndex(xIndex, yIndex);
 
 	Rect rect;
 	rect.left = center.x - kBlockWidth_ / 2.0f;
@@ -131,8 +131,8 @@ MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex
 //--------------------------------------------------
 // インデックスからマップチップの座標を取得
 //--------------------------------------------------
-Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex) {
-    return Vector3(
+TuboEngine::Math::Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex) {
+	return TuboEngine::Math::Vector3(
         kBlockWidth_ * xIndex,      // X: 右へ+
         kBlockHeight_ * yIndex,     // Y: 上へ+
         0.0f                        // Z: 高さ（固定）
@@ -157,7 +157,7 @@ void MapChipField::SetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex, MapCh
 //--------------------------------------------------
 // 指定座標が通行可能か判定
 //--------------------------------------------------
-bool MapChipField::IsWalkable(const Vector3& position) const {
+bool MapChipField::IsWalkable(const TuboEngine::Math::Vector3& position) const {
     IndexSet index = GetMapChipIndexSetByPosition(position);
     MapChipType type = GetMapChipTypeByIndex(index.xIndex, index.yIndex);
     // kBlockは通行不可
@@ -167,7 +167,7 @@ bool MapChipField::IsWalkable(const Vector3& position) const {
 //--------------------------------------------------
 // 指定座標が通行不可（壁など）か判定（境界外は通行不可扱いにする例）
 //--------------------------------------------------
-bool MapChipField::IsBlocked(const Vector3& position) const {
+bool MapChipField::IsBlocked(const TuboEngine::Math::Vector3& position) const {
     IndexSet index = GetMapChipIndexSetByPosition(position);
 
     // 実データで境界チェック（範囲外はブロック扱い）
@@ -186,13 +186,13 @@ bool MapChipField::IsBlocked(const Vector3& position) const {
 //--------------------------------------------------
 // 指定矩形領域（プレイヤーの四隅など）が衝突しているか判定
 //--------------------------------------------------
-bool MapChipField::IsRectBlocked(const Vector3& center, float width, float height) const {
+bool MapChipField::IsRectBlocked(const TuboEngine::Math::Vector3& center, float width, float height) const {
     // 四隅の座標を計算
-    std::array<Vector3, 4> corners = {
-        Vector3(center.x + width / 2.0f, center.y - height / 2.0f, center.z), // 右下
-        Vector3(center.x - width / 2.0f, center.y - height / 2.0f, center.z), // 左下
-        Vector3(center.x + width / 2.0f, center.y + height / 2.0f, center.z), // 右上
-        Vector3(center.x - width / 2.0f, center.y + height / 2.0f, center.z)  // 左上
+	std::array<TuboEngine::Math::Vector3, 4> corners = {
+	    TuboEngine::Math::Vector3(center.x + width / 2.0f, center.y - height / 2.0f, center.z), // 右下
+	    TuboEngine::Math::Vector3(center.x - width / 2.0f, center.y - height / 2.0f, center.z), // 左下
+	    TuboEngine::Math::Vector3(center.x + width / 2.0f, center.y + height / 2.0f, center.z), // 右上
+	    TuboEngine::Math::Vector3(center.x - width / 2.0f, center.y + height / 2.0f, center.z)  // 左上
     };
     for (const auto& pos : corners) {
         if (IsBlocked(pos)) {

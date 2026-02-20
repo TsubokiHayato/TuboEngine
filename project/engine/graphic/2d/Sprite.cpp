@@ -6,8 +6,7 @@
 #include "externals/imgui/imgui_impl_win32.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 
-void Sprite::Initialize(std::string textureFilePath)
-{
+void TuboEngine::Sprite::Initialize(std::string textureFilePath) {
 	
 	
 	textureFilePath_ = textureFilePath;
@@ -16,7 +15,7 @@ void Sprite::Initialize(std::string textureFilePath)
 
 #pragma region SpriteResource
 
-	vertexResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * 6);
+	vertexResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * 6);
 
 	//頂点バッファビューを作成する
 
@@ -61,7 +60,7 @@ void Sprite::Initialize(std::string textureFilePath)
 	vertexData[3].normal = { 0.0f,0.0f,1.0f };
 
 
-	transformationMatrixResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
+	transformationMatrixResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	//データを書き込む
 	transformationMatrixData = nullptr;
 
@@ -78,7 +77,7 @@ void Sprite::Initialize(std::string textureFilePath)
 #pragma region indexResourceSprite
 
 	//WVP用のリソースを作る
-	indexResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t) * 6);
+	indexResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(uint32_t) * 6);
 	indexBufferView.BufferLocation = indexResource->GetGPUVirtualAddress();
 
 	indexBufferView.SizeInBytes = sizeof(uint32_t) * 6;
@@ -98,8 +97,7 @@ void Sprite::Initialize(std::string textureFilePath)
 
 #pragma region Material_Resource_Sprite
 	//マテリアル用のリソースを作る。今回はColor1つ分のサイズを用意する
-	materialResource =
-		DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
+	materialResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
 	//マテリアルにデータを書き込む
 	//書き込むためのアドレスを取得
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
@@ -117,8 +115,7 @@ void Sprite::Initialize(std::string textureFilePath)
 	AdjustTextureSize();
 }
 
-void Sprite::Update()
-{
+void TuboEngine::Sprite::Update() {
 
 	//textureの位置
 	float left = 0.0f - anchorPoint.x;
@@ -197,14 +194,15 @@ void Sprite::Update()
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 viewMatrix = MakeIdentity4x4();
-	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::GetInstance()->GetClientWidth()), float(WinApp::GetInstance()->GetClientHeight()), 0.0f, 100.0f);
+	Matrix4x4 projectionMatrix =
+	    MakeOrthographicMatrix(0.0f, 0.0f, float(TuboEngine::WinApp::GetInstance()->GetClientWidth()), float(TuboEngine::WinApp::GetInstance()->GetClientHeight()), 0.0f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData->WVP = worldViewProjectionMatrix;
 	transformationMatrixData->World = worldMatrix;
 
 
 
-	commandList = DirectXCommon::GetInstance()->GetCommandList();
+	commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
 
 
 
@@ -212,7 +210,7 @@ void Sprite::Update()
 }
 
 
-void Sprite::Draw(){
+void TuboEngine::Sprite::Draw() {
 
 	
 
@@ -230,8 +228,7 @@ void Sprite::Draw(){
 
 }
 
-void Sprite::AdjustTextureSize()
-{
+void TuboEngine::Sprite::AdjustTextureSize() {
 
 	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureFilePath_);
 
@@ -242,7 +239,7 @@ void Sprite::AdjustTextureSize()
 }
 
 // ImGuiでSpriteの全機能をまとめて操作・確認できる関数
-void Sprite::DrawImGui(const char* windowName) {
+void TuboEngine::Sprite::DrawImGui(const char* windowName) {
 #ifdef USE_IMGUI
 
 	const char* windowName_ = windowName;
@@ -250,7 +247,7 @@ void Sprite::DrawImGui(const char* windowName) {
     ImGui::Separator();
     ImGui::Text("Sprite ImGui コントロール"); // セクションタイトル
     // 位置
-    Vector2 pos = GetPosition();
+    TuboEngine::Math::Vector2 pos = GetPosition();
     if (ImGui::DragFloat2("Position", &pos.x, 1.0f)) {
         SetPosition(pos);
     }
@@ -260,12 +257,12 @@ void Sprite::DrawImGui(const char* windowName) {
         SetRotation(rot);
     }
     // サイズ
-    Vector2 sz = GetSize();
+	TuboEngine::Math::Vector2 sz = GetSize();
     if (ImGui::DragFloat2("Size", &sz.x, 1.0f)) {
         SetSize(sz);
     }
     // アンカーポイント
-    Vector2 anchor = GetAnchorPoint();
+	TuboEngine::Math::Vector2 anchor = GetAnchorPoint();
     if (ImGui::DragFloat2("AnchorPoint", &anchor.x, 0.01f, 0.0f, 1.0f)) {
         SetAnchorPoint(anchor);
     }
@@ -280,12 +277,12 @@ void Sprite::DrawImGui(const char* windowName) {
         SetFlipY(flipY);
     }
     // テクスチャ左上座標
-    Vector2 texLT = GetTextureLeftTop();
+	TuboEngine::Math::Vector2 texLT = GetTextureLeftTop();
     if (ImGui::DragFloat2("TextureLeftTop", &texLT.x, 1.0f)) {
         SetTextureLeftTop(texLT);
     }
     // テクスチャ切り出しサイズ
-    Vector2 texSz = GetTextureSize();
+	TuboEngine::Math::Vector2 texSz = GetTextureSize();
     if (ImGui::DragFloat2("TextureSize", &texSz.x, 1.0f)) {
         SetTextureSize(texSz);
     }

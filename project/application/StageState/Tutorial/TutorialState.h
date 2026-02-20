@@ -2,8 +2,7 @@
 #include "StageState/IStageState.h"
 #include <string>
 #include <memory>
-
-class Sprite;
+#include"Sprite.h"
 
 // TutorialState:
 // - 他Stateと合併しない「独立したState」
@@ -28,10 +27,10 @@ private:
 	std::string tutorialCsvPath_ = "Resources/Tutorial.csv";
 
 	// Tutorial UI sprites (text baked into textures)
-	std::unique_ptr<Sprite> tutorialHeaderSprite_;
-	std::unique_ptr<Sprite> tutorialMoveSprite_;
-	std::unique_ptr<Sprite> tutorialAttackSprite_;
-	std::unique_ptr<Sprite> tutorialDashSprite_;
-	std::unique_ptr<Sprite> howtoNextSprite_;
-	std::unique_ptr<Sprite> titleBackSprite_;
+	std::unique_ptr<TuboEngine::Sprite> tutorialHeaderSprite_;
+	std::unique_ptr<TuboEngine::Sprite> tutorialMoveSprite_;
+	std::unique_ptr<TuboEngine::Sprite> tutorialAttackSprite_;
+	std::unique_ptr<TuboEngine::Sprite> tutorialDashSprite_;
+	std::unique_ptr<TuboEngine::Sprite> howtoNextSprite_;
+	std::unique_ptr<TuboEngine::Sprite> titleBackSprite_;
 };

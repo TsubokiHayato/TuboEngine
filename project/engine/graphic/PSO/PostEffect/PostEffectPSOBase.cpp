@@ -3,16 +3,16 @@
 
 void PostEffectPSOBase::Initialize() {
 	
-	device_ = DirectXCommon::GetInstance()->GetDevice();
-	commandList_ = DirectXCommon::GetInstance()->GetCommandList();
+	device_ = TuboEngine::DirectXCommon::GetInstance()->GetDevice();
+	commandList_ = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
 }
 
 void PostEffectPSOBase::CreateGraphicPipeline(const std::wstring& vsPath, const std::wstring& psPath) {
 	CreateRootSignature();
 
 	// シェーダーのコンパイル
-	vertexShaderBlob_ = DirectXCommon::GetInstance()->CompileShader(vsPath, L"vs_6_0");
-	pixelShaderBlob_ = DirectXCommon::GetInstance()->CompileShader(psPath, L"ps_6_0");
+	vertexShaderBlob_ = TuboEngine::DirectXCommon::GetInstance()->CompileShader(vsPath, L"vs_6_0");
+	pixelShaderBlob_ = TuboEngine::DirectXCommon::GetInstance()->CompileShader(psPath, L"ps_6_0");
 	assert(vertexShaderBlob_ && pixelShaderBlob_);
 
 	// PSO設定
