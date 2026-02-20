@@ -2,6 +2,7 @@
 #include <cmath>
 #include <numbers>
 
+namespace TuboEngine::Math {
 
 class Quaternion {
 public:
@@ -70,8 +71,8 @@ public:
         // 球面線形補間
         float theta_0 = std::acos(dot);      // 角度
         float theta = theta_0 * t;           // tに応じた角度
-        float sin_theta = std::sin(theta);   // tに応じたsin
-        float sin_theta_0 = std::sin(theta_0); // 元のsin
+        float sin_theta = std::sin(theta);   // tに応じたSin
+        float sin_theta_0 = std::sin(theta_0); // 元のSin
         float s0 = std::cos(theta) - dot * sin_theta / sin_theta_0;
         float s1 = sin_theta / sin_theta_0;
         Quaternion result(
@@ -89,3 +90,5 @@ public:
         return result;
     }
 };
+
+} // namespace TuboEngine::Math

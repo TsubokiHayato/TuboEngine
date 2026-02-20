@@ -2,6 +2,7 @@
 #include "StageState/IStageState.h"
 #include <memory>
 #include "Animation/SceneChangeAnimation.h"
+#include"Object3d.h"
 
 class Player;
 class StageScene; 
@@ -38,7 +39,7 @@ private:
 	float tiltTarget_ = 1.3f;     // 目標の傾き角（rad）
 	float tiltSpeed_ = 1.2f;      // 傾き速度（rad/sec）
 	float fallMoveSpeed_ = 0.5f;  // 倒れる方向への移動速度
-	Vector3 fallDir_ = {0.0f, 0.0f, 0.0f};
+	TuboEngine::Math::Vector3 fallDir_ = {0.0f, 0.0f, 0.0f};
 
 	// 目が回る（Dizzy）演出
 	float dizzyDuration_ = 3.6f;  // 目が回る演出の長さ
@@ -46,16 +47,16 @@ private:
 	float orbitSpeed_ = 8.0f;     // 図形の回転速度(rad/sec)
 	float orbitRadius_ = 1.5f;    // 軌道半径
 	float orbitHeightZ_ = 0.8f;  // 見やすいように手前に
-	std::unique_ptr<class Object3d> dizzy1_;
-	std::unique_ptr<class Object3d> dizzy2_;
+	std::unique_ptr<TuboEngine::Object3d> dizzy1_;
+	std::unique_ptr<TuboEngine::Object3d> dizzy2_;
 	float dizzyAlpha_ = 1.0f;     // フェードアウト用
 
 	// GameOver時の正面カメラ設定（リクエストに合わせて狙い値へイージング）
 	float initialYaw_ = 0.0f;     // GameOver開始時のプレイヤー向き（Z軸）
-	Vector3 camStartOffset_ = {0.0f, 0.0f, 0.0f};
-	Vector3 camTargetOffset_ = {0.0f, 15.0f, 5.0f};
-	Vector3 camStartRot_ = {0.0f, 0.0f, 0.0f};
-	Vector3 camTargetRot_ = {1.9f, 0.0f, 0.0f};
+	TuboEngine::Math::Vector3 camStartOffset_ = {0.0f, 0.0f, 0.0f};
+	TuboEngine::Math::Vector3 camTargetOffset_ = {0.0f, 15.0f, 5.0f};
+	TuboEngine::Math::Vector3 camStartRot_ = {0.0f, 0.0f, 0.0f};
+	TuboEngine::Math::Vector3 camTargetRot_ = {1.9f, 0.0f, 0.0f};
 	float camAnimTime_ = 0.0f;
 	float camAnimDuration_ = 0.8f; // イージング時間
 
@@ -63,7 +64,7 @@ private:
 	float elapsed_ = 0.0f;
 	
 	// 暗転スプライト
-	std::unique_ptr<class Sprite> blackoutSprite_;
+	std::unique_ptr<TuboEngine::Sprite> blackoutSprite_;
 
-	std::unique_ptr<Sprite> restartSprite_;
+	std::unique_ptr<TuboEngine::Sprite> restartSprite_;
 };

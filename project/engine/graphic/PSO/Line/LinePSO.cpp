@@ -6,9 +6,9 @@
 ///----------------------------------------------------
 void LinePSO::Initialize() {
     // DirectXデバイス取得
-    device = DirectXCommon::GetInstance()->GetDevice();
+	device = TuboEngine::DirectXCommon::GetInstance()->GetDevice();
     // コマンドリスト取得
-    commandList = DirectXCommon::GetInstance()->GetCommandList();
+	commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
     // グラフィックパイプライン作成
     CreateGraphicPipeline();
 }
@@ -94,9 +94,9 @@ void LinePSO::CreateGraphicPipeline() {
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
     // 頂点シェーダのコンパイル
-    vertexShaderBlob = DirectXCommon::GetInstance()->CompileShader(L"Resources/Shaders/Line.VS.hlsl", L"vs_6_0");
+	vertexShaderBlob = TuboEngine::DirectXCommon::GetInstance()->CompileShader(L"Resources/Shaders/Line.VS.hlsl", L"vs_6_0");
     // ピクセルシェーダのコンパイル
-    pixelShaderBlob = DirectXCommon::GetInstance()->CompileShader(L"Resources/Shaders/Line.PS.hlsl", L"ps_6_0");
+	pixelShaderBlob = TuboEngine::DirectXCommon::GetInstance()->CompileShader(L"Resources/Shaders/Line.PS.hlsl", L"ps_6_0");
 
     // グラフィックパイプラインステート記述設定
     graphicPipelineStateDesc.pRootSignature = rootSignature.Get();

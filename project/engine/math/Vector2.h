@@ -5,6 +5,7 @@
 #undef max
 #undef min
 
+namespace TuboEngine::Math {
 
 struct Vector2
 {
@@ -181,3 +182,5 @@ struct Vector2
 	}
 
 };
+
+} // namespace TuboEngine::Math

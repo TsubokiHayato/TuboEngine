@@ -90,7 +90,8 @@ public:
 	/// <param name="format">フォーマット</param>
 	/// <param name="clearColor">クリアカラー</param>
 	/// <returns>作成されたリソース</returns>
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTargetResource(Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, DXGI_FORMAT format, const Vector4& clearColor);
+	Microsoft::WRL::ComPtr<ID3D12Resource>
+	    CreateRenderTargetResource(Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, DXGI_FORMAT format, const TuboEngine::Math::Vector4& clearColor);
 
 public:
 	void SetCamera(Camera* camera) { this->camera_ = camera; }
@@ -124,7 +125,7 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE offscreenRtvHandle{};
 
 	// レンダーターゲットのクリアカラー
-	const Vector4 kRenderTargetClearValue = {0.0f,0.0f,0.0f, 1.0f}; // RGBの値。青っぽい色;
+	const TuboEngine::Math::Vector4 kRenderTargetClearValue = {0.0f, 0.0f, 0.0f, 1.0f}; // RGBの値。青っぽい色;
 
 	// レンダーテクスチャリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_;

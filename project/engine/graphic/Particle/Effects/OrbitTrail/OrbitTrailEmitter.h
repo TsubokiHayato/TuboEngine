@@ -11,11 +11,11 @@ public:
         prevCenter_ = preset_.center;
     }
 
-    void SetCenter(const Vector3& center) { preset_.center = center; }
+    void SetCenter(const TuboEngine::Math::Vector3& center) { preset_.center = center; }
 
     // 移動していない場合は Emit を抑制
     void Emit(uint32_t count) override {
-        Vector3 d{ preset_.center.x - prevCenter_.x, preset_.center.y - prevCenter_.y, preset_.center.z - prevCenter_.z };
+		TuboEngine::Math::Vector3 d{preset_.center.x - prevCenter_.x, preset_.center.y - prevCenter_.y, preset_.center.z - prevCenter_.z};
         float lenSq = d.x*d.x + d.y*d.y + d.z*d.z;
         if (lenSq < moveThresholdSq_) { return; }
         IParticleEmitter::Emit(count);
@@ -53,6 +53,6 @@ protected:
     }
 
 private:
-    Vector3 prevCenter_{};
+	TuboEngine::Math::Vector3 prevCenter_{};
     float moveThresholdSq_ = 0.0001f;
 };

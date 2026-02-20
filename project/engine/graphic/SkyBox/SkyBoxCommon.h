@@ -1,10 +1,10 @@
-
 #pragma once
-#include"WinApp.h"
-#include"DirectXcommon.h"
+#include "WinApp.h"
+#include "DirectXCommon.h"
 #include<memory>
-#include"SkyBox/SkyBoxPSO.h"
+#include "SkyBox/SkyBoxPSO.h"
 
+namespace TuboEngine {
 
 class SkyBoxCommon
 {
@@ -45,4 +45,6 @@ public:
 private:
 	std::unique_ptr<SkyBoxPSO> pso = nullptr; // スカイボックスのパイプラインステートオブジェクト
 };
+
+} // namespace TuboEngine
 

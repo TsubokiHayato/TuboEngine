@@ -48,13 +48,13 @@ void OverScene::Initialize() {
 	const char* text = "GAMEOVER"; // 8文字
 	letters_.clear();
 	int count = 0; while (text[count] != '\0') ++count;
-	float clientW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
+	float clientW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
 	float totalW = count * letterSize_.x + (count - 1) * lettersGap_;
 	float startX = (clientW - totalW) * 0.5f; // 中央寄せ
 	float x = startX;
 	for (int i=0; text[i] != '\0'; ++i){
 		LetterAnim la;
-		la.sprite = std::make_unique<Sprite>();
+		la.sprite = std::make_unique<TuboEngine::Sprite>();
 		// 文字に対応するテクスチャ "<prefix><Letter>.png" を使用
 		std::string texPath = letterTexturePrefix_ + std::string(1, text[i]) + ".png";
 		la.sprite->Initialize(texPath);
@@ -69,7 +69,7 @@ void OverScene::Initialize() {
 	}
 
 	
-	restartSprite_ = std::make_unique<Sprite>();
+	restartSprite_ = std::make_unique<TuboEngine::Sprite>();
 	restartSprite_->Initialize("restart.png");
 	restartSprite_->SetPosition({640.0f, 680.0f});
 	restartSprite_->SetAnchorPoint({0.5f, 0.5f});
@@ -94,12 +94,12 @@ void OverScene::Update() {
 	// Xは少し寄せる（開始X→終了X+xOffset_）
 	float ex = endPos_.x + xOffset_;
 	float x = startPos_.x + (ex - startPos_.x) * SmoothStep(t);
-	Vector3 pos = { x, y, endPos_.z };
+	TuboEngine::Math::Vector3 pos = {x, y, endPos_.z};
 	player->SetPosition(pos);
 
 	// 横倒れ（Z軸回りに倒す）: tに合わせて0→目標角
 	float tiltT = SmoothStep(t);
-	Vector3 rot = player->GetRotation();
+	TuboEngine::Math::Vector3 rot = player->GetRotation();
 	rot.z = -tiltSign_ * tiltTargetRad_ * tiltT;
 	player->SetRotation(rot);
 
@@ -117,12 +117,12 @@ void OverScene::Update() {
 		l.time += dt;
 		float tt = std::clamp((l.time - l.delay)/letterDuration_, 0.0f, 1.0f);
 		float by2 = SmoothStep(tt); // 落下はスムーズ、必要ならBounceに変更
-		Vector2 p = { l.start.x + (l.end.x - l.start.x) * by2,
+		TuboEngine::Math::Vector2 p = {l.start.x + (l.end.x - l.start.x) * by2,
 					l.start.y + (l.end.y - l.start.y) * by2 };
 		l.sprite->SetPosition(p);
 		l.sprite->Update();
 	}
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		SceneManager::GetInstance()->ChangeScene(STAGE);
 
 	}
