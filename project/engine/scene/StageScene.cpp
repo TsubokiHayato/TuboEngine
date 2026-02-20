@@ -137,8 +137,8 @@ void StageScene::Initialize() {
 
 	// HP UI (Player)
 	hpUI_ = std::make_unique<HpUI>();
-	TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
-	TextureManager::GetInstance()->LoadTexture("HP.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("HP.png");
 	int maxHp = 5; // Player 初期HPに合わせる
 	hpUI_->Initialize("HPBarFrame.png", "HP.png", maxHp);
 	hpUI_->SetPosition({20.0f, 20.0f});
@@ -148,8 +148,8 @@ void StageScene::Initialize() {
 
 	// Enemy HP UI
 	enemyHpUI_ = std::make_unique<EnemyHpUI>();
-	TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
-	TextureManager::GetInstance()->LoadTexture("HP.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("HP.png");
 	enemyHpUI_->Initialize("HPBarFrame.png", "HP.png");
 	enemyHpUI_->SetYOffset(-24.0f);
 	enemyHpUI_->SetScale(0.45f);
@@ -178,7 +178,7 @@ void StageScene::Update() {
 	CheckAllCollisions();
 
 	// 追加: プレイヤーが存在すればパーティクル更新 (Trail 用)
-	ParticleManager::GetInstance()->Update(1.0f/60.0f, followCamera->GetCamera());
+	TuboEngine::ParticleManager::GetInstance()->Update(1.0f / 60.0f, followCamera->GetCamera());
 
 	// HP UI 更新
 	if (hpUI_) { hpUI_->Update(player_.get()); }
@@ -486,7 +486,7 @@ void StageScene::ParticleDraw() {
 		stateManager_->ParticleDraw(this);
 	}
 	// 追加: 全エミッター描画 (PlayerTrail 含む)
-	ParticleManager::GetInstance()->Draw();
+	TuboEngine::ParticleManager::GetInstance()->Draw();
 }
 void StageScene::CheckAllCollisions() {
 	/// 衝突マネージャのリセット ///

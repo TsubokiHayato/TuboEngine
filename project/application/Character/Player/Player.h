@@ -100,7 +100,10 @@ public:
 	// プレイヤーの死亡状態を設定
 	void SetIsDead(bool isAlive) { this->isAlive = isAlive; }
 	// カメラを設定
-	void SetCamera(Camera* camera) { object3d->SetCamera(camera); camera_ = camera; }
+	void SetCamera(Camera* camera) {
+		object3d->SetCamera(camera);
+		camera_ = camera;
+	}
 	void SetDashRingOffset(float forward) { dashRingOffsetForward_ = forward; }
 
 	// モデルのアルファ設定
@@ -129,7 +132,7 @@ private:
 	///			メンバ変数
 	///--------------------------------------------------
 
-	std::unique_ptr<Object3d> object3d;                 // 3Dオブジェクト
+	std::unique_ptr<TuboEngine::Object3d> object3d;     // 3Dオブジェクト
 	std::vector<std::unique_ptr<PlayerBullet>> bullets; // プレイヤーの弾のリスト
 	float bulletTimer = 0.0f;                           // 発射間隔タイマー
 	float cooldownTime = 0.2f;                          // クールダウン時間（秒）
@@ -158,7 +161,7 @@ private:
 
 	//Reticle
 
-	std::unique_ptr<Sprite> reticleSprite; // スプライト
+	std::unique_ptr<TuboEngine::Sprite> reticleSprite;        // スプライト
 	TuboEngine::Math::Vector2 reticlePosition = {0.0f, 0.0f}; // レティクルの位置（画面中央）
 	TuboEngine::Math::Vector2 reticleSize = {50.0f, 50.0f};   // レティクルのサイズ
 
