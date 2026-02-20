@@ -22,9 +22,9 @@ public:
 	// 平行光源
 	struct DirectionalLight {
 		// 色
-		Vector4 color;
+		TuboEngine::Math::Vector4 color;
 		// 方向
-		Vector3 direction;
+		TuboEngine::Math::Vector3 direction;
 		// 強度
 		float intensity;
 	};
@@ -32,22 +32,22 @@ public:
 	// PointLight
 	struct PointLight {
 		// 色
-		Vector4 color;
+		TuboEngine::Math::Vector4 color;
 		// 位置
-		Vector3 position;
+		TuboEngine::Math::Vector3 position;
 		// 輝度
 		float intensity;
 	};
 
 	struct SpotLight {
 		// 色
-		Vector4 color;
+		TuboEngine::Math::Vector4 color;
 		// 位置
-		Vector3 position;
+		TuboEngine::Math::Vector3 position;
 		// 輝度
 		float intensity;
 		// 方向
-		Vector3 direction;
+		TuboEngine::Math::Vector3 direction;
 		// ライトの届く最大距離
 		float distance;
 		// 減衰率
@@ -89,30 +89,30 @@ public:
 	/// </summary>
 	void DrawImGui(const char* windowName);
 
-	Vector3 CalculateValue(const std::vector<KeyFrameVector3>& keyFrames, float time);
-	Quaternion CalculateValue(const std::vector<KeyFrameQuaternion>& keyFrames, float time);
+	TuboEngine::Math::Vector3 CalculateValue(const std::vector<KeyFrameVector3>& keyFrames, float time);
+	TuboEngine::Math::Quaternion CalculateValue(const std::vector<KeyFrameQuaternion>& keyFrames, float time);
 
 public:
 	// Setter
-	void SetScale(const Vector3& scale) { transform.scale = scale; }
-	void SetRotation(const Vector3& rotation) { transform.rotate = rotation; }
-	void SetPosition(const Vector3& position) { transform.translate = position; }
+	void SetScale(const TuboEngine::Math::Vector3& scale) { transform.scale = scale; }
+	void SetRotation(const TuboEngine::Math::Vector3& rotation) { transform.rotate = rotation; }
+	void SetPosition(const TuboEngine::Math::Vector3& position) { transform.translate = position; }
 
 	///-------------------------------------------------------------------------------------------------
 	/// Light
 	// 平行光源
-	void SetLightColor(const Vector4& color) { directionalLightData->color = color; }
-	void SetLightDirection(const Vector3& direction) { directionalLightData->direction = direction; }
+	void SetLightColor(const TuboEngine::Math::Vector4& color) { directionalLightData->color = color; }
+	void SetLightDirection(const TuboEngine::Math::Vector3& direction) { directionalLightData->direction = direction; }
 	void SetLightIntensity(float intensity) { directionalLightData->intensity = intensity; }
 	void SetLightShininess(float shininess);
 	// ポイントライト
-	void SetPointLightPosition(const Vector3& position) { pointLightData->position = position; }
-	void SetPointLightColor(const Vector4& color) { pointLightData->color = color; }
+	void SetPointLightPosition(const TuboEngine::Math::Vector3& position) { pointLightData->position = position; }
+	void SetPointLightColor(const TuboEngine::Math::Vector4& color) { pointLightData->color = color; }
 	void SetPointLightIntensity(float intensity) { pointLightData->intensity = intensity; }
 	// スポットライト
-	void SetSpotLightColor(const Vector4& color) { spotLightData->color = color; }
-	void SetSpotLightPosition(const Vector3& position) { spotLightData->position = position; }
-	void SetSpotLightDirection(const Vector3& direction) { spotLightData->direction = direction; }
+	void SetSpotLightColor(const TuboEngine::Math::Vector4& color) { spotLightData->color = color; }
+	void SetSpotLightPosition(const TuboEngine::Math::Vector3& position) { spotLightData->position = position; }
+	void SetSpotLightDirection(const TuboEngine::Math::Vector3& direction) { spotLightData->direction = direction; }
 	void SetSpotLightIntensity(float intensity) { spotLightData->intensity = intensity; }
 	void SetSpotLightDistance(float distance) { spotLightData->distance = distance; }
 	void SetSpotLightDecay(float decay) { spotLightData->decay = decay; }
@@ -125,22 +125,20 @@ public:
 		lightTypeData->type = type;
 	}
 
-	void SetModel(Model* model) {
-		assert(model);
-		this->model_ = model;
-	}
+	void SetModel(Model* model);
 	void SetModel(const std::string& filePath);
+
 	void SetCamera(Camera* camera) { this->camera = camera; }
 	Camera* GetCamera() const { return camera; }
 
-	void SetModelColor(const Vector4& color);
+	void SetModelColor(const TuboEngine::Math::Vector4& color);
 
 	// Getter
-	Vector3 GetScale() const { return transform.scale; }
-	Vector3 GetRotation() const { return transform.rotate; }
-	Vector3 GetPosition() const { return transform.translate; }
+	TuboEngine::Math::Vector3 GetScale() const { return transform.scale; }
+	TuboEngine::Math::Vector3 GetRotation() const { return transform.rotate; }
+	TuboEngine::Math::Vector3 GetPosition() const { return transform.translate; }
 	// モデルの色
-	Vector4 GetModelColor();
+	TuboEngine::Math::Vector4 GetModelColor();
 
 	//-------------------------------------------------------------------------------------------------
 	// Material
@@ -148,19 +146,19 @@ public:
 	///-------------------------------------------------------------------------------------------------
 	/// Light
 	// 平行光源
-	Vector4 GetLightColor() { return directionalLightData->color; }
-	Vector3 GetLightDirection() { return directionalLightData->direction; }
+	TuboEngine::Math::Vector4 GetLightColor() { return directionalLightData->color; }
+	TuboEngine::Math::Vector3 GetLightDirection() { return directionalLightData->direction; }
 	float GetLightIntensity() { return directionalLightData->intensity; }
 	int GetLightType() { return lightTypeData->type; }
 	float GetLightShininess();
 	// ポイントライト
-	Vector3 GetPointLightPosition() { return pointLightData->position; }
-	Vector4 GetPointLightColor() { return pointLightData->color; }
+	TuboEngine::Math::Vector3 GetPointLightPosition() { return pointLightData->position; }
+	TuboEngine::Math::Vector4 GetPointLightColor() { return pointLightData->color; }
 	float GetPointLightIntensity() { return pointLightData->intensity; }
 	// スポットライト
-	void GetSpotLightColor(Vector4& color) { color = spotLightData->color; }
-	void GetSpotLightPosition(Vector3& position) { position = spotLightData->position; }
-	void GetSpotLightDirection(Vector3& direction) { direction = spotLightData->direction; }
+	void GetSpotLightColor(TuboEngine::Math::Vector4& color) { color = spotLightData->color; }
+	void GetSpotLightPosition(TuboEngine::Math::Vector3& position) { position = spotLightData->position; }
+	void GetSpotLightDirection(TuboEngine::Math::Vector3& direction) { direction = spotLightData->direction; }
 	float GetSpotLightIntensity() { return spotLightData->intensity; }
 	float GetSpotLightDistance() { return spotLightData->distance; }
 	float GetSpotLightDecay() { return spotLightData->decay; }
@@ -177,7 +175,7 @@ private:
 	// モデルデータ
 	Model* model_ = nullptr;
 	// カメラ
-	Camera* camera;
+	Camera* camera = nullptr;
 
 	// 座標のバッファリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformMatrixResource;

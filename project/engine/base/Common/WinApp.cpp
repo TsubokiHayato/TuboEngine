@@ -24,6 +24,7 @@ LRESULT CALLBACK CallWindowProc(HWND hwnd, UINT msg,
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
+namespace TuboEngine {
 
 WinApp* WinApp::instance = nullptr; // シングルトンインスタンス
 void WinApp::Finalize()
@@ -77,7 +78,6 @@ void WinApp::Initialize()
 
 	
 
-
 }
 
 bool WinApp::ProcessMessage()
@@ -92,3 +92,5 @@ bool WinApp::ProcessMessage()
 	}
 	return false;
 }
+
+} // namespace TuboEngine

@@ -11,13 +11,13 @@
 void Model::Initialize(const std::string& directoryPath, const std::string& filename) {
 
 	
-	commandList = DirectXCommon::GetInstance()->GetCommandList();
+	commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
 
 #pragma region ModelData
 	// モデル読み込み
 	modelData = LoadModelFile(directoryPath, filename);
 	// 頂点リソースを作る
-	vertexResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
+	vertexResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
 	// 頂点バッファビューを作成する
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
@@ -31,7 +31,7 @@ void Model::Initialize(const std::string& directoryPath, const std::string& file
 
 #pragma region Material_Resource
 	// マテリアル用のリソースを作る。今回はColor1つ分のサイズを用意する
-	materialResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
+	materialResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
 	// マテリアルにデータを書き込む
 	materialData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -49,8 +49,8 @@ void Model::Initialize(const std::string& directoryPath, const std::string& file
 	textureFileName_ = std::filesystem::path(modelData.material.textureFilePath).filename().string();
 
 	// テクスチャを読み込む
-	TextureManager::GetInstance()->LoadTexture(textureFileName_);
-	modelData.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFileName_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(textureFileName_);
+	modelData.material.textureIndex = TuboEngine::TextureManager::GetInstance()->GetSrvIndex(textureFileName_);
 }
 
 void Model::Draw() {
@@ -61,8 +61,8 @@ void Model::Draw() {
 	// マテリアルバッファをセット
 	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 
-	// SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
-	commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureFileName_));
+	// SRVのDescriptorTableの先頭を設定。2はRootParameter[2]である。
+	commandList->SetGraphicsRootDescriptorTable(2, TuboEngine::TextureManager::GetInstance()->GetSrvHandleGPU(textureFileName_));
 	// 描画
 	commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 }
@@ -113,9 +113,9 @@ ModelData Model::LoadModelFile(const std::string& directoryPath, const std::stri
 	1 : OBJファイル
 	--------------*/
 	ModelData modelData;            // 構築する
-	std::vector<Vector4> positions; // 位置
-	std::vector<Vector3> normals;   // 法線
-	std::vector<Vector2> texcoords; // テクスチャ座標
+	std::vector<TuboEngine::Math::Vector4> positions; // 位置
+	std::vector<TuboEngine::Math::Vector3> normals;   // 法線
+	std::vector<TuboEngine::Math::Vector2> texcoords; // テクスチャ座標
 	std::string line;               // ファイルから読んだ1行を格納するもの
 
 	/*----------------------

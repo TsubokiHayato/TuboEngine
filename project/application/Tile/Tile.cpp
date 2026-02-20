@@ -4,11 +4,11 @@ Tile::Tile() : position_({0.0f,0.0f,-1.0f}), scale_({1.0f, 1.0f, 1.0f}), rotatio
 
 Tile::~Tile() {}
 
-void Tile::Initialize(Vector3 position, const Vector3& scale, const std::string& modelFileName) {
+void Tile::Initialize(TuboEngine::Math::Vector3 position, const TuboEngine::Math::Vector3& scale, const std::string& modelFileName) {
 	position_ = position;
 	scale_ = scale;
 	rotation_ = {0.0f, 0.0f, 0.0f};
-	object3d_ = std::make_unique<Object3d>();
+	object3d_ = std::make_unique<TuboEngine::Object3d>();
 	object3d_->Initialize(modelFileName);
 	object3d_->SetPosition(position_);
 	object3d_->SetScale(scale_);

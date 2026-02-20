@@ -1,9 +1,7 @@
 #include"Logger.h"
 #include<Windows.h>
 
-
-
-namespace Logger {
+namespace TuboEngine::Logger {
 
     // log作成
     void Log(const std::string& message) {

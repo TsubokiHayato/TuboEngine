@@ -22,7 +22,7 @@ public:
 	/// <param name="position">初期位置</param>
 	/// <param name="scale">初期スケール</param>
 	/// <param name="modelFileName">使用するモデルファイル</param>
-	void Initialize(const Vector3& position, const Vector3& scale = {1.0f, 1.0f, 1.0f},
+	void Initialize(const TuboEngine::Math::Vector3& position, const TuboEngine::Math::Vector3& scale = {1.0f, 1.0f, 1.0f},
 		const std::string& modelFileName = "block/block.obj");
 
 	/// <summary>
@@ -43,32 +43,32 @@ public:
 	/// <summary>
 	/// 位置取得。
 	/// </summary>
-	Vector3 GetPosition() const { return position_; }
+	TuboEngine::Math::Vector3 GetPosition() const { return position_; }
 
 	/// <summary>
 	/// 位置設定（内部 `Object3d` にも反映）。
 	/// </summary>
-	void SetPosition(const Vector3& pos);
+	void SetPosition(const TuboEngine::Math::Vector3& pos);
 
 	/// <summary>
 	/// スケール取得。
 	/// </summary>
-	Vector3 GetScale() const { return scale_; }
+	TuboEngine::Math::Vector3 GetScale() const { return scale_; }
 
 	/// <summary>
 	/// スケール設定（内部 `Object3d` にも反映）。
 	/// </summary>
-	void SetScale(const Vector3& scale);
+	void SetScale(const TuboEngine::Math::Vector3& scale);
 
 	/// <summary>
 	/// 回転取得。
 	/// </summary>
-	Vector3 GetRotation() const { return rotation_; }
+	TuboEngine::Math::Vector3 GetRotation() const { return rotation_; }
 
 	/// <summary>
 	/// 回転設定（内部 `Object3d` にも反映）。
 	/// </summary>
-	void SetRotation(const Vector3& rot);
+	void SetRotation(const TuboEngine::Math::Vector3& rot);
 
 	/// <summary>
 	/// 使用カメラを設定。
@@ -76,8 +76,8 @@ public:
 	void SetCamera(Camera* camera);
 
 private:
-	Vector3 position_{};
-	Vector3 scale_{1.0f, 1.0f, 1.0f};
-	Vector3 rotation_{};
-	std::unique_ptr<Object3d> object3d_;
+	TuboEngine::Math::Vector3 position_{};
+	TuboEngine::Math::Vector3 scale_{1.0f, 1.0f, 1.0f};
+	TuboEngine::Math::Vector3 rotation_{};
+	std::unique_ptr<TuboEngine::Object3d> object3d_;
 };
