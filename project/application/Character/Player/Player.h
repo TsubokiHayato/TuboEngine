@@ -162,6 +162,12 @@ public:
 	bool GetIsHit() const { return isHit_; } // 被弾フラグのゲッター
 	/** @brief 使用中の武器種別を取得します。 @return 武器種別。 */
 	WeaponType GetWeaponType() const { return weaponType_; }
+	/** @brief 回避/ダッシュのクールダウン残り(秒)。 */
+	float GetDodgeCooldownTimer() const { return dodgeCooldownTimer_; }
+	/** @brief 回避/ダッシュのクールダウン時間(秒)。 */
+	float GetDodgeCooldownDuration() const { return dodgeCooldown_; }
+	/** @brief 回避中か。 */
+	bool GetIsDodging() const { return isDodging_; }
 
 	///-----------------------------------
 	///				セッター
