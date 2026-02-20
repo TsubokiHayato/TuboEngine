@@ -11,6 +11,7 @@
 namespace {
 	constexpr int kWindowWidth = 1280;
 	constexpr int kWindowHeight = 720;
+	constexpr float kPlayerStartX = -6.0f;
 }
 
 void TitleScene::Initialize() {
@@ -43,7 +44,7 @@ void TitleScene::Initialize() {
 	// カメラをセット（描画用）
 	player_->SetCamera(camera.get());
 	// 初期は画面左外から入ってくる位置にセット（ワールド座標系前提）
-	player_->SetPosition({ -6.0f, 0.0f, 0.0f }); // 左端スタート
+	player_->SetPosition({ kPlayerStartX, 0.0f, 0.0f }); // 左端スタート
 	player_->SetScale({ 1.0f, 1.0f, 1.0f });
 	player_->Update();
 
@@ -65,7 +66,7 @@ void TitleScene::Update() {
 	if (player_) {
 		playerIntroTimer_ += (!playerIntroDone_) ? dt : 0.0f;
 
-		TuboEngine::Math::Vector3 startPos = {-6.0f, 0.0f, 0.0f};
+		TuboEngine::Math::Vector3 startPos ={kPlayerStartX, 0.0f, 0.0f};
 		TuboEngine::Math::Vector3 targetPos = {0.0f, 0.0f, 0.0f};
 
 		TuboEngine::Math::Vector3 pos = player_->GetPosition();
