@@ -24,7 +24,7 @@ void Animator::Initialize(std::string modelFileNamePath) {
 #pragma region TransformMatrixResourced
 
 	// WVP用のリソースを作る
-	transformMatrixResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
+	transformMatrixResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	// データを書き込む
 	transformMatrixData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -37,7 +37,7 @@ void Animator::Initialize(std::string modelFileNamePath) {
 
 #pragma region DirectionalLightData
 	// 平行光源用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	directionalLightResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(DirectionalLight));
+	directionalLightResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(DirectionalLight));
 	// 平行光源用にデータを書き込む
 	directionalLightData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -53,7 +53,7 @@ void Animator::Initialize(std::string modelFileNamePath) {
 #pragma region PointLight
 
 	// ポイントライト用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	pointLightResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(PointLight));
+	pointLightResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(PointLight));
 	// 平行光源用にデータを書き込む
 	pointLightData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -68,7 +68,7 @@ void Animator::Initialize(std::string modelFileNamePath) {
 #pragma region SpotLight
 
 	// スポットライト用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	spotLightResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(SpotLight));
+	spotLightResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(SpotLight));
 	// 平行光源用にデータを書き込む
 	spotLightData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -76,7 +76,7 @@ void Animator::Initialize(std::string modelFileNamePath) {
 	// デフォルト値
 	spotLightData->color = {1.0f, 1.0f, 1.0f, 1.0f};
 	spotLightData->position = {2.0f, 1.25f, 0.0f};
-	spotLightData->direction = Vector3::Normalize({-1.0f, -1.0f, 0.0f});
+	spotLightData->direction = TuboEngine::Math::Vector3::Normalize({-1.0f, -1.0f, 0.0f});
 	spotLightData->intensity = 4.0f;
 	spotLightData->distance = 7.0f;
 	spotLightData->decay = 2.0f;
@@ -86,7 +86,7 @@ void Animator::Initialize(std::string modelFileNamePath) {
 
 #pragma region cameraWorldPos
 	// 平行光源用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	cameraForGPUResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGPU));
+	cameraForGPUResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGPU));
 	// 平行光源用にデータを書き込む
 	cameraForGPUData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -97,7 +97,7 @@ void Animator::Initialize(std::string modelFileNamePath) {
 
 #pragma region LightType
 	// ライトの種類
-	lightTypeResource = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(LightType));
+	lightTypeResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(LightType));
 	// 平行光源用にデータを書き込む
 	lightTypeData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -134,11 +134,11 @@ void Animator::Update() {
     animationTime_ = std::fmod(animationTime_, animation_.duration);
 
     NodeAnimation& rootNodeAnimation = animation_.nodeAnimations[animationNodeName_];
-    Vector3 translate = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);
-    Quaternion rotate = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
-    Vector3 scale = CalculateValue(rootNodeAnimation.scale.keyframes, animationTime_);
+	TuboEngine::Math::Vector3 translate = CalculateValue(rootNodeAnimation.translate.keyframes, animationTime_);
+	TuboEngine::Math::Quaternion rotate = CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime_);
+	TuboEngine::Math::Vector3 scale = CalculateValue(rootNodeAnimation.scale.keyframes, animationTime_);
 
-    // アニメーション値をtransformに反映
+    // アニメーション値をTransformに反映
     transform.translate = translate;
     transform.rotate = rotate.ToEuler();
     transform.scale = scale;
@@ -146,14 +146,18 @@ void Animator::Update() {
     cameraForGPUData->worldPosition = camera->GetTranslate();
 
     // 行列を更新する
-    Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-    Matrix4x4 cameraMatrix = MakeAffineMatrix(camera->GetScale(), camera->GetRotation(), camera->GetTranslate());
-    Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-    Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(WinApp::GetInstance()->GetClientWidth()) / float(WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
-    Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+	TuboEngine::Math::Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	TuboEngine::Math::Matrix4x4 cameraMatrix = MakeAffineMatrix(camera->GetScale(), camera->GetRotation(), camera->GetTranslate());
+	TuboEngine::Math::Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	TuboEngine::Math::Matrix4x4 projectionMatrix =
+	    MakePerspectiveMatrix(0.45f,
+	        float(TuboEngine::WinApp::GetInstance()->GetClientWidth()) /
+	        float(TuboEngine::WinApp::GetInstance()->GetClientHeight()),
+	        0.1f, 100.0f);
+	TuboEngine::Math::Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
     if (camera) {
-        const Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
+        const TuboEngine::Math::Matrix4x4& viewProjectionMatrix = camera->GetViewProjectionMatrix();
         worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
     } else {
         worldViewProjectionMatrix = worldMatrix;
@@ -162,7 +166,17 @@ void Animator::Update() {
     transformMatrixData->WVP = model_->GetRootNodeLocalMatrix() * worldMatrix * Multiply(viewMatrix, projectionMatrix);
     transformMatrixData->World = model_->GetRootNodeLocalMatrix() * worldMatrix;
 
-    commandList = DirectXCommon::GetInstance()->GetCommandList();
+    commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
+}
+
+// モデルの設定
+void Animator::SetModel(Model* model) {
+	assert(model);
+	this->model_ = model;
+}
+
+void Animator::SetModel(const std::string& filePath) {
+	this->model_ = ModelManager::GetInstance()->FindModel(filePath);
 }
 
 // 描画処理
@@ -174,7 +188,7 @@ void Animator::Draw() {
 
 	// 例: キューブマップSRVをt1（gCubeTexture）にバインド
 	// gCubeTexture (t1, PixelShader)
-	commandList->SetGraphicsRootDescriptorTable(3, TextureManager::GetInstance()->GetSrvHandleGPU(cubeMapFilePath_));
+	commandList->SetGraphicsRootDescriptorTable(3, TuboEngine::TextureManager::GetInstance()->GetSrvHandleGPU(cubeMapFilePath_));
 	// DirectionalLight (b1, PixelShader)
 	commandList->SetGraphicsRootConstantBufferView(4, directionalLightResource->GetGPUVirtualAddress());
 	// Camera (b2, PixelShader)
@@ -200,22 +214,22 @@ void Animator::DrawImGui(const char* windowName) {
 	ImGui::Separator();
 	ImGui::Text("Object3d ImGui コントロール");
 	// 位置
-	Vector3 pos = GetPosition();
+	TuboEngine::Math::Vector3 pos = GetPosition();
 	if (ImGui::DragFloat3("Position", &pos.x, 0.1f)) {
 		SetPosition(pos);
 	}
 	// 回転
-	Vector3 rot = GetRotation();
+	TuboEngine::Math::Vector3 rot = GetRotation();
 	if (ImGui::DragFloat3("Rotation", &rot.x, 0.01f)) {
 		SetRotation(rot);
 	}
 	// スケール
-	Vector3 scale = GetScale();
+	TuboEngine::Math::Vector3 scale = GetScale();
 	if (ImGui::DragFloat3("Scale", &scale.x, 0.01f)) {
 		SetScale(scale);
 	}
 	// モデル色
-	Vector4 color = GetModelColor();
+	TuboEngine::Math::Vector4 color = GetModelColor();
 	if (ImGui::ColorEdit4("Color", &color.x)) {
 		SetModelColor(color);
 	}
@@ -294,44 +308,22 @@ void Animator::DrawImGui(const char* windowName) {
 }
 
 // モデルの色設定
-void Animator::SetModelColor(const Vector4& color) {
+void Animator::SetModelColor(const TuboEngine::Math::Vector4& color) {
 	if (model_) {
 		model_->SetModelColor(color);
 	}
 }
 
 // モデルの色取得
-Vector4 Animator::GetModelColor() {
+TuboEngine::Math::Vector4 Animator::GetModelColor() {
 	if (model_) {
 		return model_->GetModelColor();
 	}
-	return Vector4();
+	return TuboEngine::Math::Vector4{};
 }
-
-// 光沢度設定
-void Animator::SetLightShininess(float shininess) {
-	if (model_) {
-		model_->SetModelShininess(shininess);
-	}
-}
-
-// 光沢度取得
-float Animator::GetLightShininess() {
-	if (model_) {
-		return model_->GetModelShininess();
-	}
-	return 0.0f;
-}
-
-// モデルファイルパスでモデルをセット
-void Animator::SetModel(const std::string& filePath) {
-	model_ = ModelManager::GetInstance()->FindModel(filePath);
-	assert(model_);
-}
-
 
 //Vector3
-Vector3 Animator::CalculateValue(const std::vector<KeyFrame<Vector3>>& keyframes, float time) {
+TuboEngine::Math::Vector3 Animator::CalculateValue(const std::vector<KeyFrame<TuboEngine::Math::Vector3>>& keyframes, float time) {
 	assert(!keyframes.empty());
 	if (keyframes.size() == 1 || time <= keyframes[0].time) {
 		return keyframes[0].value;
@@ -340,13 +332,13 @@ Vector3 Animator::CalculateValue(const std::vector<KeyFrame<Vector3>>& keyframes
 		size_t next = i + 1;
 		if (time < keyframes[next].time) {
 			float t = (time - keyframes[i].time) / (keyframes[next].time - keyframes[i].time);
-			return Vector3::Lerp(keyframes[i].value, keyframes[next].value, t);
+			return TuboEngine::Math::Vector3::Lerp(keyframes[i].value, keyframes[next].value, t);
 		}
 	}
 	return keyframes.back().value;
 }
 // Quaternion
-Quaternion Animator::CalculateValue(const std::vector<KeyFrame<Quaternion>>& keyframes, float time) {
+TuboEngine::Math::Quaternion Animator::CalculateValue(const std::vector<KeyFrame<TuboEngine::Math::Quaternion>>& keyframes, float time) {
 	assert(!keyframes.empty());
 	if (keyframes.size() == 1 || time <= keyframes[0].time) {
 		return keyframes[0].value;
@@ -356,7 +348,7 @@ Quaternion Animator::CalculateValue(const std::vector<KeyFrame<Quaternion>>& key
 		if (time < keyframes[next].time) {
 			float t = (time - keyframes[i].time) / (keyframes[next].time - keyframes[i].time);
 			// QuaternionのSlerp（球面線形補間）
-			return Quaternion::Slerp(keyframes[i].value, keyframes[next].value, t);
+			return TuboEngine::Math::Quaternion::Slerp(keyframes[i].value, keyframes[next].value, t);
 		}
 	}
 	return keyframes.back().value;

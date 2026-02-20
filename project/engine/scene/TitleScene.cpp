@@ -60,12 +60,12 @@ void TitleScene::Update() {
 	if (player_) {
 		playerIntroTimer_ += (!playerIntroDone_) ? dt : 0.0f;
 
-		Vector3 startPos = { -6.0f, 0.0f, 0.0f };
-		Vector3 targetPos = { 0.0f, 0.0f, 0.0f };
+		TuboEngine::Math::Vector3 startPos = {-6.0f, 0.0f, 0.0f};
+		TuboEngine::Math::Vector3 targetPos = {0.0f, 0.0f, 0.0f};
 
-		Vector3 pos = player_->GetPosition();
-		Vector3 rot = {};
-		Vector3 scl = player_->GetScale();
+		TuboEngine::Math::Vector3 pos = player_->GetPosition();
+		TuboEngine::Math::Vector3 rot = {};
+		TuboEngine::Math::Vector3 scl = player_->GetScale();
 
 		// Intro: 左からゆっくり歩いてくる
 		if (!playerIntroDone_) {
@@ -199,10 +199,10 @@ void TitleScene::Object3DDraw() {
 			float x = screenW * 0.5f + (baseX * direction) * rowSpeedFactor;
 
 			// 矩形の四隅を計算
-			Vector3 p0 = {x - rectW * 0.5f, baseY - rectH * 0.5f, 0.0f};
-			Vector3 p1 = {x + rectW * 0.5f, baseY - rectH * 0.5f, 0.0f};
-			Vector3 p2 = {x + rectW * 0.5f, baseY + rectH * 0.5f, 0.0f};
-			Vector3 p3 = {x - rectW * 0.5f, baseY + rectH * 0.5f, 0.0f};
+			TuboEngine::Math::Vector3 p0 = {x - rectW * 0.5f, baseY - rectH * 0.5f, 0.0f};
+			TuboEngine::Math::Vector3 p1 = {x + rectW * 0.5f, baseY - rectH * 0.5f, 0.0f};
+			TuboEngine::Math::Vector3 p2 = {x + rectW * 0.5f, baseY + rectH * 0.5f, 0.0f};
+			TuboEngine::Math::Vector3 p3 = {x - rectW * 0.5f, baseY + rectH * 0.5f, 0.0f};
 
 			// スクリーン外の矩形は描画しても無駄なので簡易クリップ（少し余裕を持たせる）
 			if (p1.x < -rectW || p0.x > screenW + rectW)
@@ -210,10 +210,10 @@ void TitleScene::Object3DDraw() {
 
 			// 角に小さな装飾（少し回転するような印象を与えるため、行で位相ずらし）
 			float wiggle = 6.0f * std::sin(time_ * 2.0f + row * 0.6f + i * 0.3f);
-			Vector3 pp0 = {p0.x, p0.y, 0.0f};
-			Vector3 pp1 = {p1.x, p1.y, 0.0f};
-			Vector3 pp2 = {p2.x, p2.y, 0.0f};
-			Vector3 pp3 = {p3.x, p3.y, 0.0f};
+			TuboEngine::Math::Vector3 pp0 = {p0.x, p0.y, 0.0f};
+			TuboEngine::Math::Vector3 pp1 = {p1.x, p1.y, 0.0f};
+			TuboEngine::Math::Vector3 pp2 = {p2.x, p2.y, 0.0f};
+			TuboEngine::Math::Vector3 pp3 = {p3.x, p3.y, 0.0f};
 
 			// 矩形の枠線を描画
 			LineManager::GetInstance()->DrawLine(pp0, pp1, color);
@@ -222,10 +222,10 @@ void TitleScene::Object3DDraw() {
 			LineManager::GetInstance()->DrawLine(pp3, pp0, color);
 
 			// 内側に二重線で厚みを出す（ユニークな表現）
-			Vector3 in0 = {(pp0.x + pp1.x) * 0.5f - rectW * 0.25f, (pp0.y + pp3.y) * 0.5f - rectH * 0.25f, 0.0f};
-			Vector3 in1 = {(pp0.x + pp1.x) * 0.5f + rectW * 0.25f, (pp0.y + pp3.y) * 0.5f - rectH * 0.25f, 0.0f};
-			Vector3 in2 = {(pp0.x + pp1.x) * 0.5f + rectW * 0.25f, (pp0.y + pp3.y) * 0.5f + rectH * 0.25f, 0.0f};
-			Vector3 in3 = {(pp0.x + pp1.x) * 0.5f - rectW * 0.25f, (pp0.y + pp3.y) * 0.5f + rectH * 0.25f, 0.0f};
+			TuboEngine::Math::Vector3 in0 = {(pp0.x + pp1.x) * 0.5f - rectW * 0.25f, (pp0.y + pp3.y) * 0.5f - rectH * 0.25f, 0.0f};
+			TuboEngine::Math::Vector3 in1 = {(pp0.x + pp1.x) * 0.5f + rectW * 0.25f, (pp0.y + pp3.y) * 0.5f - rectH * 0.25f, 0.0f};
+			TuboEngine::Math::Vector3 in2 = {(pp0.x + pp1.x) * 0.5f + rectW * 0.25f, (pp0.y + pp3.y) * 0.5f + rectH * 0.25f, 0.0f};
+			TuboEngine::Math::Vector3 in3 = {(pp0.x + pp1.x) * 0.5f - rectW * 0.25f, (pp0.y + pp3.y) * 0.5f + rectH * 0.25f, 0.0f};
 
 			// 少し薄めの色で内側ライン
 			Vector4 innerColor = {color.x * 0.9f, color.y * 0.9f, color.z * 0.95f, 0.9f};
@@ -267,8 +267,8 @@ void TitleScene::ImGuiDraw() {
 	// プレイヤー調整（デバッグ用）
 	if (player_) {
 		ImGui::Begin("Player Title Anim");
-		Vector3 ppos = player_->GetPosition();
-		ImGui::Text("Position: %.2f, %.2f, %.2f", ppos.x, ppos.y, ppos.z);
+		TuboEngine::Math::Vector3 playerPos_ = player_->GetPosition();
+		ImGui::Text("Position: %.2f, %.2f, %.2f", playerPos_.x, playerPos_.y, playerPos_.z);
 		ImGui::Text("IntroDone: %d", playerIntroDone_ ? 1 : 0);
 		ImGui::End();
 	}
