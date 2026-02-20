@@ -47,7 +47,7 @@ void Player::Initialize() {
 	const std::string reticleFileNamePath = "2D_Reticle.png";
 
 	// 3Dオブジェクト生成・初期化
-	object3d = std::make_unique<Object3d>();
+	object3d = std::make_unique<TuboEngine::Object3d>();
 	object3d->Initialize(modelFileNamePath);
 
 	object3d->SetPosition(position);

@@ -68,9 +68,9 @@ struct LightType {
 
 };
 
+namespace TuboEngine {
 
-class Object3d
-{
+class Object3d {
 public:
 	/// <summary>
 	/// 初期化
@@ -93,27 +93,24 @@ public:
 	/// </summary>
 	void DrawImGui(const char* windowName);
 
-	
-
 public:
-
-	//Setter
+	// Setter
 	void SetScale(const TuboEngine::Math::Vector3& scale) { transform.scale = scale; }
 	void SetRotation(const TuboEngine::Math::Vector3& rotation) { transform.rotate = rotation; }
 	void SetPosition(const TuboEngine::Math::Vector3& position) { transform.translate = position; }
 
 	///-------------------------------------------------------------------------------------------------
 	/// Light
-	//平行光源
+	// 平行光源
 	void SetLightColor(const TuboEngine::Math::Vector4& color) { directionalLightData->color = color; }
 	void SetLightDirection(const TuboEngine::Math::Vector3& direction) { directionalLightData->direction = direction; }
 	void SetLightIntensity(float intensity) { directionalLightData->intensity = intensity; }
 	void SetLightShininess(float shininess);
-	//ポイントライト
+	// ポイントライト
 	void SetPointLightPosition(const TuboEngine::Math::Vector3& position) { pointLightData->position = position; }
 	void SetPointLightColor(const TuboEngine::Math::Vector4& color) { pointLightData->color = color; }
 	void SetPointLightIntensity(float intensity) { pointLightData->intensity = intensity; }
-	//スポットライト
+	// スポットライト
 	void SetSpotLightColor(const TuboEngine::Math::Vector4& color) { spotLightData->color = color; }
 	void SetSpotLightPosition(const TuboEngine::Math::Vector3& position) { spotLightData->position = position; }
 	void SetSpotLightDirection(const TuboEngine::Math::Vector3& direction) { spotLightData->direction = direction; }
@@ -121,7 +118,6 @@ public:
 	void SetSpotLightDistance(float distance) { spotLightData->distance = distance; }
 	void SetSpotLightDecay(float decay) { spotLightData->decay = decay; }
 	void SetSpotLightCosAngle(float cosAngle) { spotLightData->cosAngle = cosAngle; }
-
 
 	void SetLightType(int type) {
 		if (type < 0 || type > 5) {
@@ -140,31 +136,29 @@ public:
 
 	void SetModelColor(const TuboEngine::Math::Vector4& color);
 
-	//Getter
+	// Getter
 	TuboEngine::Math::Vector3 GetScale() const { return transform.scale; }
 	TuboEngine::Math::Vector3 GetRotation() const { return transform.rotate; }
 	TuboEngine::Math::Vector3 GetPosition() const { return transform.translate; }
-	//モデルの色
+	// モデルの色
 	Vector4 GetModelColor();
 
-
 	//-------------------------------------------------------------------------------------------------
-	//Material
-
+	// Material
 
 	///-------------------------------------------------------------------------------------------------
 	/// Light
-	//平行光源
+	// 平行光源
 	TuboEngine::Math::Vector4 GetLightColor() { return directionalLightData->color; }
 	TuboEngine::Math::Vector3 GetLightDirection() { return directionalLightData->direction; }
 	float GetLightIntensity() { return directionalLightData->intensity; }
 	int GetLightType() { return lightTypeData->type; }
 	float GetLightShininess();
-	//ポイントライト
+	// ポイントライト
 	TuboEngine::Math::Vector3 GetPointLightPosition() { return pointLightData->position; }
 	TuboEngine::Math::Vector4 GetPointLightColor() { return pointLightData->color; }
 	float GetPointLightIntensity() { return pointLightData->intensity; }
-	//スポットライト
+	// スポットライト
 	void GetSpotLightColor(TuboEngine::Math::Vector4& color) { color = spotLightData->color; }
 	void GetSpotLightPosition(TuboEngine::Math::Vector3& position) { position = spotLightData->position; }
 	void GetSpotLightDirection(TuboEngine::Math::Vector3& direction) { direction = spotLightData->direction; }
@@ -173,68 +167,60 @@ public:
 	float GetSpotLightDecay() { return spotLightData->decay; }
 	float GetSpotLightCosAngle() { return spotLightData->cosAngle; }
 
+	void SetCubeMapFilePath(const std::string& filePath) { cubeMapFilePath_ = filePath; }
 
-	void SetCubeMapFilePath(const std::string& filePath) {
-		cubeMapFilePath_ = filePath;
-	}
-	
 private:
-
 	//-------------------------------------------------------------------
 	//		メンバ変数
 
-	//モデル共通部分
+	// モデル共通部分
 	ModelCommon* modelCommon_ = nullptr;
-	//モデルデータ
+	// モデルデータ
 	Model* model_ = nullptr;
-	//カメラ
+	// カメラ
 	Camera* camera;
 
-
-
-	//座標のバッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> transformMatrixResource;
-	//座標のバッファリソース内のデータを指すポインタ
+	// 座標のバッファリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformMatrixResource;
+	// 座標のバッファリソース内のデータを指すポインタ
 	TransformationMatrix* transformMatrixData = nullptr;
 
-	//平行光源のバッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> directionalLightResource;
-	//バッファリソース内のデータを指すポインタ
+	// 平行光源のバッファリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource;
+	// バッファリソース内のデータを指すポインタ
 	DirectionalLight* directionalLightData = nullptr;
 
-	//ポイントライトのバッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> pointLightResource;
-	//バッファリソース内のデータを指すポインタ
+	// ポイントライトのバッファリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource;
+	// バッファリソース内のデータを指すポインタ
 	PointLight* pointLightData = nullptr;
 
-	//スポットライトのバッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> spotLightResource;
-	//バッファリソース内のデータを指すポインタ
+	// スポットライトのバッファリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource;
+	// バッファリソース内のデータを指すポインタ
 	SpotLight* spotLightData = nullptr;
 
+	// コマンドリスト
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 
-	//コマンドリスト
-	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
-
-	//カメラ座標のバッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> cameraForGPUResource
-		= nullptr;
-	//カメラ座標のバッファリソース内のデータを指すポインタ
+	// カメラ座標のバッファリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraForGPUResource = nullptr;
+	// カメラ座標のバッファリソース内のデータを指すポインタ
 	CameraForGPU* cameraForGPUData = nullptr;
 
-	//ライトの種類
-	Microsoft::WRL::ComPtr <ID3D12Resource> lightTypeResource= nullptr;
-	//ライトの種類のバッファリソース内のデータを指すポインタ
+	// ライトの種類
+	Microsoft::WRL::ComPtr<ID3D12Resource> lightTypeResource = nullptr;
+	// ライトの種類のバッファリソース内のデータを指すポインタ
 	LightType* lightTypeData = nullptr;
 
-	//3Dオブジェクトの座標
+	// 3Dオブジェクトの座標
 	Transform transform;
-	//カメラ座標
+	// カメラ座標
 	Transform cameraTransform;
 
 	// キューブマップのSRVハンドル
-	//デフォルト : ロストック・ラージ空港の4Kキューブマップ
+	// デフォルト : ロストック・ラージ空港の4Kキューブマップ
 	std::string cubeMapFilePath_ = "rostock_laage_airport_4k.dds";
-
 };
 
+} // namespace TuboEngine

@@ -46,7 +46,7 @@ private:
 	TuboEngine::Math::Vector3 position_ = {};
 	TuboEngine::Math::Vector3 scale_ = {};
 	TuboEngine::Math::Vector3 rotation_ = {};
-	std::unique_ptr<Object3d> object3d_ = {};
+	std::unique_ptr<TuboEngine::Object3d> object3d_ = {};
 
 	// まとめタイルのみ描画するためのフラグ（最初に生成されたTileだけ描画）
 	bool isPrimary_ = false;

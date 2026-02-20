@@ -2,7 +2,6 @@
 #include "Bullet/Player/PlayerBullet.h"
 #include "Character/Player/Player.h"
 #include "Collider/CollisionTypeId.h"
-#include "Enemy.h"
 #include "ImGuiManager.h"
 #include "LineManager.h"
 #include "Sprite.h"
@@ -33,7 +32,7 @@ void Enemy::Initialize() {
 	rotation = TuboEngine::Math::Vector3(1.56f, 0.0f, 0.0f);
     scale = {1.0f, 1.0f, 1.0f};
 
-    object3d = std::make_unique<Object3d>();
+    object3d = std::make_unique<TuboEngine::Object3d>();
     const std::string modelFileNamePath = "player/player.obj";
     object3d->Initialize(modelFileNamePath);
     object3d->SetPosition(position);

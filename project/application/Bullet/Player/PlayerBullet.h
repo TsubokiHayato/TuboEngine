@@ -72,7 +72,7 @@ public:
 	void SetCamera(Camera* camera) { object3d->SetCamera(camera); }
 
 	// プレイヤーの位置を設定
-	void SetPlayerPosition(const TuboEngine::Math::Vector3& playerPosition) { playerPostion_ = playerPosition; }
+	void SetPlayerPosition(const TuboEngine::Math::Vector3& playerPosition) { playerPosition_ = playerPosition; }
 	// プレイヤーの回転を設定
 	void SetPlayerRotation(const TuboEngine::Math::Vector3& rotation) { playerRotation = rotation; }
 
@@ -108,7 +108,7 @@ private:
 
 	/// Player関連 ///
 	// プレイヤーの位置
-	TuboEngine::Math::Vector3 playerPostion_ = {};
+	TuboEngine::Math::Vector3 playerPosition_ = {};
 	// プレイヤーの回転
 	TuboEngine::Math::Vector3 playerRotation = {};
 

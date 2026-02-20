@@ -31,5 +31,5 @@ protected:
 	TuboEngine::Math::Vector3 rotation;
 	TuboEngine::Math::Vector3 scale;
 	bool isAlive = false;
-	std::unique_ptr<Object3d> object3d;
+	std::unique_ptr<TuboEngine::Object3d> object3d;
 };
