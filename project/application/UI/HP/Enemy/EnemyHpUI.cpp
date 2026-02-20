@@ -41,8 +41,16 @@ void EnemyHpUI::Update(const std::vector<std::unique_ptr<Enemy>>& enemies, Camer
             bar.frames.clear(); bar.fills.clear();
             bar.frames.reserve(maxHp); bar.fills.reserve(maxHp);
             for (int h = 0; h < maxHp; ++h) {
-                auto fr = std::make_unique<Sprite>(); fr->Initialize(frameTex_); fr->AdjustTextureSize(); fr->SetAnchorPoint({0.0f, 0.0f}); bar.frames.push_back(std::move(fr));
-                auto fi = std::make_unique<Sprite>(); fi->Initialize(fillTex_);  fi->AdjustTextureSize(); fi->SetAnchorPoint({0.0f, 0.0f}); bar.fills.push_back(std::move(fi));
+				auto fr = std::make_unique<TuboEngine::Sprite>();
+				fr->Initialize(frameTex_);
+				fr->AdjustTextureSize();
+				fr->SetAnchorPoint({0.0f, 0.0f});
+				bar.frames.push_back(std::move(fr));
+				auto fi = std::make_unique<TuboEngine::Sprite>();
+				fi->Initialize(fillTex_);
+				fi->AdjustTextureSize();
+				fi->SetAnchorPoint({0.0f, 0.0f});
+				bar.fills.push_back(std::move(fi));
             }
             bar.animatedHp = (float)currentHp; // init animated to current
         }

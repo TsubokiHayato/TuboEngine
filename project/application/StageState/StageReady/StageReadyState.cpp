@@ -4,7 +4,6 @@
 #include "StageState/StageType.h"
 #include "TextureManager.h"
 #include "WinApp.h"
-#include "Sprite.h"
 
 #undef max
 #include <algorithm>
@@ -137,10 +136,10 @@ void StageReadyState::Enter(StageScene* scene) {
 	// テクスチャはプロジェクト側の配置に合わせて差し替えてください
 	const std::string readyTex = "ready.png";
 	const std::string startTex = "start.png";
-	TextureManager::GetInstance()->LoadTexture(readyTex);
-	TextureManager::GetInstance()->LoadTexture(startTex);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(readyTex);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(startTex);
 
-	readySprite_ = std::make_unique<Sprite>();
+	readySprite_ = std::make_unique<TuboEngine::Sprite>();
 	readySprite_->Initialize(readyTex);
 	readySprite_->SetAnchorPoint({ 0.5f, 0.5f });
 	readySprite_->SetGetIsAdjustTextureSize(true);
@@ -148,7 +147,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	readySprite_->SetColor({ 1,1,1,1 });
 	readySprite_->Update();
 
-	startSprite_ = std::make_unique<Sprite>();
+	startSprite_ = std::make_unique<TuboEngine::Sprite>();
 	startSprite_->Initialize(startTex);
 	startSprite_->SetAnchorPoint({ 0.5f, 0.5f });
 	startSprite_->SetGetIsAdjustTextureSize(true);
@@ -193,7 +192,7 @@ void StageReadyState::Update(StageScene* scene) {
 	// --- Ready/Start 演出フェーズ進行 ---
 	phaseTimer_ += kDeltaSec;
 
-	auto SetSpriteAlpha = [](Sprite* spr, float a) {
+	auto SetSpriteAlpha = [](TuboEngine::Sprite* spr, float a) {
 		if (!spr) return;
 		Vector4 c = spr->GetColor();
 		c.w = std::clamp(a, 0.0f, 1.0f);
