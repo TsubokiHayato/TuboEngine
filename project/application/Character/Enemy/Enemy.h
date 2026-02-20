@@ -63,7 +63,7 @@ protected:
 	TuboEngine::Math::Vector3 velocity;
     float turnSpeed_ = 0.1f;
     float moveSpeed_ = 0.08f;
-    float shootDistance_ = 25d.0f;
+	float shootDistance_ = 25.0f;
     float moveStartDistance_ = 50.0f;
 
     // 0 なら常に Chase しつつ射撃（遠距離射撃）。
