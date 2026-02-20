@@ -133,6 +133,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\Particle\IParticleEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\ParticleManager.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\Effects\Bloom\BloomEffect.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\Blend\BlendPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\BloomPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\Effects\DepthBasedOutline\DepthBasedOutlineEffect.cpp" />
@@ -151,6 +152,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Collider\Collider.cpp" />
     <ClCompile Include="application\Collider\CollisionManager.cpp" />
     <ClCompile Include="application\Character\Enemy\Enemy.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\ToonPSO.cpp" />
     <ClCompile Include="engine\scene\ClearScene.cpp" />
     <ClCompile Include="engine\scene\DebugScene.cpp" />
@@ -250,7 +252,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\StageState\Pause\PauseState.h" />
     <ClInclude Include="application\StageState\Tutorial\TutorialState.h" />
     <ClInclude Include="application\UI\Guide\GuideUI.h" />
+    <ClInclude Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.h" />
     <ClInclude Include="engine\graphic\PSO\Blend\BlendPSO.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.h" />
     <ClInclude Include="engine\scene\SceneType.h" />
     <ClInclude Include="application\scene\StageState\ClearState.h" />
     <ClInclude Include="application\StageState\Boss\BossState.h" />
