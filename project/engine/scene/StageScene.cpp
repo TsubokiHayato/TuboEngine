@@ -3,6 +3,12 @@
 #include "Collider/CollisionManager.h"
 #include "LineManager.h"
 #include "ParticleManager.h" // 追加: パーティクル描画/更新
+#include"SceneType.h"
+
+#include "engine/input/Input.h" // 追加
+
+// 静的メンバ定義
+bool StageScene::isDemoMode = false;
 
 namespace {
 StageScene::StageBounds ComputeBoundsWorld(const TuboEngine::Math::Vector3& origin, const MapChipField& field) {
@@ -121,6 +127,12 @@ void StageScene::Initialize() {
 		stateManager_->ChangeState(StageType::Tutorial, this);
 	}
 
+	// デモモード初期化
+	if (isDemoMode) {
+		player_->SetAutoControlEnabled(true);
+		// デモ中はUIを非表示にする設定などがあればここで行う
+	}
+
 	// Multi-stage (debug/editor): 初期ステージを2つ用意しておく
 	stageInstances_.clear();
 	{
@@ -186,6 +198,40 @@ void StageScene::Update() {
 	if (enemyHpUI_) { enemyHpUI_->Update(enemies, followCamera->GetCamera()); }
 	// Guide UI 更新
 	if (guideUI_) { guideUI_->Update(); }
+
+	// --- Demo Mode Logic ---
+	if (isDemoMode) {
+		// 敵リストをプレイヤー(AutoController)に渡す
+		if (player_ && player_->IsAutoControlEnabled()) {
+			std::vector<Enemy*> enemyPtrs;
+			enemyPtrs.reserve(enemies.size());
+			for (const auto& e : enemies) {
+				if (e && e->GetIsAlive()) {
+					enemyPtrs.push_back(e.get());
+				}
+			}
+			// StageInstance内の敵も追加する必要があるかも？
+			// 今はメインのenemiesだけ対象
+			player_->SetEnemyList(enemyPtrs);
+		}
+
+		// 入力があればタイトルへ戻る
+		// キーボードの任意のキー、あるいはマウス
+		// ※Inputクラスに AnyKey がないので代表的なキーのみチェック
+		bool pressAny = false;
+		auto* input = TuboEngine::Input::GetInstance();
+		// スペース、エンター、Z、X、クリックなど
+		if (input->TriggerKey(DIK_SPACE) || input->TriggerKey(DIK_RETURN) || 
+			input->TriggerKey(DIK_Z) || input->TriggerKey(DIK_X) ||
+			input->IsTriggerMouse(0) || input->IsTriggerMouse(1)) {
+			pressAny = true;
+		}
+
+		if (pressAny) {
+			SceneManager::GetInstance()->ChangeScene(int(SceneType::Title));
+			isDemoMode = false;
+		}
+	}
 }
 
 void StageScene::Finalize() {}
@@ -234,11 +280,11 @@ void StageScene::SpriteDraw() {
 	}
 	
 	// HP UI 描画
-	if (hpUI_) { hpUI_->Draw(); }
+	if (hpUI_ && !isDemoMode) { hpUI_->Draw(); }
 	// Enemy HP UI 描画（追従）
-	if (enemyHpUI_) { enemyHpUI_->Draw(); }
+	if (enemyHpUI_ && !isDemoMode) { enemyHpUI_->Draw(); }
 	// Guide UI 描画
-	if (guideUI_) { guideUI_->Draw(); }
+	if (guideUI_ && !isDemoMode) { guideUI_->Draw(); }
 	
 	// アニメーション描画
 	if (sceneChangeAnimation_) {
@@ -487,6 +533,17 @@ void StageScene::ParticleDraw() {
 	}
 	// 追加: 全エミッター描画 (PlayerTrail 含む)
 	TuboEngine::ParticleManager::GetInstance()->Draw();
+
+#ifdef USE_IMGUI
+	if (isDemoMode) {
+		ImGui::SetNextWindowPos(ImVec2(TuboEngine::WinApp::GetInstance()->GetClientWidth() * 0.5f, 100.0f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+		ImGui::SetNextWindowBgAlpha(0.0f); // 背景透明
+		ImGui::Begin("DemoOverlay", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoInputs);
+		ImGui::SetWindowFontScale(3.0f);
+		ImGui::TextColored(ImVec4(1, 1, 0, 1), "DEMO PLAY");
+		ImGui::End();
+	}
+#endif
 }
 void StageScene::CheckAllCollisions() {
 	/// 衝突マネージャのリセット ///

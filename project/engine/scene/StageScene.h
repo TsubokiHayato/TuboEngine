@@ -42,6 +42,9 @@
 
 class StageScene : public IScene {
 public:
+	// デモモードフラグ（タイトル画面で放置された場合にtrueになる）
+	static bool isDemoMode;
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
