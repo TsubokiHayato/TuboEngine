@@ -18,8 +18,8 @@ public:
 
 private:
     struct EnemyBar {
-        std::vector<std::unique_ptr<Sprite>> frames; // per-HP frame
-        std::vector<std::unique_ptr<Sprite>> fills;  // per-HP fill
+		std::vector<std::unique_ptr<TuboEngine::Sprite>> frames; // per-HP frame
+		std::vector<std::unique_ptr<TuboEngine::Sprite>> fills;  // per-HP fill
         bool visible = false;
         int maxHp = 0;
         int currentHp = 0;

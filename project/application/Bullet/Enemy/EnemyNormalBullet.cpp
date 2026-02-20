@@ -38,7 +38,7 @@ void EnemyNormalBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
     // 弾の当たり半径を設定（必要に応じて調整）
     Collider::SetRadius(0.5f);
 
-    object3d = std::make_unique<Object3d>();
+    object3d = std::make_unique<TuboEngine::Object3d>();
     object3d->Initialize("star.obj");
     object3d->SetPosition(position);
     object3d->SetRotation(rotation);
