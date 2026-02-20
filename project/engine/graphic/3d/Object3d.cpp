@@ -11,7 +11,7 @@
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 
-void Object3d::Initialize(std::string modelFileNamePath) {
+void TuboEngine::Object3d::Initialize(std::string modelFileNamePath) {
 	
 	this->camera = Object3dCommon::GetInstance()->GetDefaultCamera();
 
@@ -120,7 +120,7 @@ void Object3d::Initialize(std::string modelFileNamePath) {
 	};
 }
 
-void Object3d::Update() {
+void TuboEngine::Object3d::Update() {
 
 	cameraForGPUData->worldPosition = camera->GetTranslate();
 
@@ -146,7 +146,7 @@ void Object3d::Update() {
 	commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
 }
 
-void Object3d::Draw() {
+void TuboEngine::Object3d::Draw() {
 
 	// TransformMatrix (b0, VertexShader)
 	commandList->SetGraphicsRootConstantBufferView(1, transformMatrixResource->GetGPUVirtualAddress());
@@ -179,7 +179,7 @@ void Object3d::Draw() {
 	}
 }
 
-void Object3d::DrawImGui(const char* windowName) {
+void TuboEngine::Object3d::DrawImGui(const char* windowName) {
 #ifdef USE_IMGUI
     ImGui::Begin(windowName);
 
@@ -281,12 +281,12 @@ void Object3d::DrawImGui(const char* windowName) {
 #endif // USE_IMGUI
 }
 
-void Object3d::SetLightShininess(float shininess) { model_->SetModelShininess(shininess); }
+void TuboEngine::Object3d::SetLightShininess(float shininess) { model_->SetModelShininess(shininess); }
 
-void Object3d::SetModel(const std::string& filePath) { model_ = ModelManager::GetInstance()->FindModel(filePath); }
+void TuboEngine::Object3d::SetModel(const std::string& filePath) { model_ = ModelManager::GetInstance()->FindModel(filePath); }
 
-void Object3d::SetModelColor(const Vector4& color) { model_->SetModelColor(color); }
+void TuboEngine::Object3d::SetModelColor(const Vector4& color) { model_->SetModelColor(color); }
 
-Vector4 Object3d::GetModelColor() { return model_->GetModelColor(); }
+Vector4 TuboEngine::Object3d::GetModelColor() { return model_->GetModelColor(); }
 
-float Object3d::GetLightShininess() { return model_->GetModelShininess(); }
+float TuboEngine::Object3d::GetLightShininess() { return model_->GetModelShininess(); }
