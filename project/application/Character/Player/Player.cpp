@@ -230,37 +230,7 @@ void Player::Update() {
 		}
 	}
 
-	// 低HP演出: HP割合が下がるほどビネットを強くする（常時）
-	// ※最大HPが固定(=5)ならこれでOK。将来可変なら getter を追加して置き換える。
-	constexpr float kMaxHpAssumed = 5.0f;
-	float hpRatio = (kMaxHpAssumed > 0.0f) ? (static_cast<float>(HP) / kMaxHpAssumed) : 1.0f;
-	hpRatio = std::clamp(hpRatio, 0.0f, 1.0f);
 
-	// 低HP開始ライン以下で 0→1 に正規化（HPが低いほど1に近い）
-	float t = 0.0f;
-	if (hpRatio < lowHpVignetteStartRatio_) {
-		float denom = std::max(0.0001f, lowHpVignetteStartRatio_);
-		t = (lowHpVignetteStartRatio_ - hpRatio) / denom;
-	}
-	t = std::clamp(t, 0.0f, 1.0f);
-	// 強めのカーブ（HP少ない時ほど急激に濃く）
-	float eased = t * t;
-	float targetPower = 0.8f + (lowHpVignetteMaxPower_ - 0.8f) * eased;
-
-	// なめらかに追従
-	if (lowHpVignetteSmoothing_ <= 0.0f) {
-		lowHpVignetteCurrentPower_ = targetPower;
-	} else {
-		float a = std::clamp(lowHpVignetteSmoothing_, 0.0f, 1.0f);
-		lowHpVignetteCurrentPower_ = lowHpVignetteCurrentPower_ + (targetPower - lowHpVignetteCurrentPower_) * a;
-	}
-
-	if (lowHpVignetteCurrentPower_ > 0.81f) {
-		OffScreenRendering::GetInstance()->SetLowHpVignetteEnabled(true);
-		OffScreenRendering::GetInstance()->SetLowHpVignettePower(lowHpVignetteCurrentPower_);
-	} else {
-		OffScreenRendering::GetInstance()->SetLowHpVignetteEnabled(false);
-	}
 }
 
 //--------------------------------------------------
