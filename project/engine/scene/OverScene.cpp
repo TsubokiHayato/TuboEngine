@@ -54,7 +54,7 @@ void OverScene::Initialize() {
 	float x = startX;
 	for (int i=0; text[i] != '\0'; ++i){
 		LetterAnim la;
-		la.sprite = std::make_unique<Sprite>();
+		la.sprite = std::make_unique<TuboEngine::Sprite>();
 		// 文字に対応するテクスチャ "<prefix><Letter>.png" を使用
 		std::string texPath = letterTexturePrefix_ + std::string(1, text[i]) + ".png";
 		la.sprite->Initialize(texPath);
@@ -69,7 +69,7 @@ void OverScene::Initialize() {
 	}
 
 	
-	restartSprite_ = std::make_unique<Sprite>();
+	restartSprite_ = std::make_unique<TuboEngine::Sprite>();
 	restartSprite_->Initialize("restart.png");
 	restartSprite_->SetPosition({640.0f, 680.0f});
 	restartSprite_->SetAnchorPoint({0.5f, 0.5f});
@@ -122,7 +122,7 @@ void OverScene::Update() {
 		l.sprite->SetPosition(p);
 		l.sprite->Update();
 	}
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		SceneManager::GetInstance()->ChangeScene(STAGE);
 
 	}

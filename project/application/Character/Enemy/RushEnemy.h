@@ -1,6 +1,7 @@
 #pragma once
 #include "Enemy.h"
 #include <DirectXMath.h>
+#include"Sprite.h"
 
 // 前方宣言
 class Player; 

@@ -19,25 +19,25 @@ public:
 	const TuboEngine::Math::Vector2& GetPosition() const { return basePos_; }
 
 private:
-	void UpdateKeySpriteState(class Sprite* sprite, const std::string& normalTex, const std::string& outlineTex, bool pressed) const;
-	const std::string& SelectMouseIconTexture(const Input::MouseMove& move) const;
+	void UpdateKeySpriteState(TuboEngine::Sprite* sprite, const std::string& normalTex, const std::string& outlineTex, bool pressed) const;
+	const std::string& SelectMouseIconTexture(const TuboEngine::Input::MouseMove& move) const;
 
 private:
 	bool isActive_ = true;
 	TuboEngine::Math::Vector2 basePos_{20.0f, 720.0f - 20.0f}; // will be converted to left-bottom in Initialize
 
-	std::unique_ptr<Sprite> labelMove_;
-	std::unique_ptr<Sprite> labelDash_;
-	std::unique_ptr<Sprite> labelAim_;
-	std::unique_ptr<Sprite> labelShoot_;
+	std::unique_ptr<TuboEngine::Sprite> labelMove_;
+	std::unique_ptr<TuboEngine::Sprite> labelDash_;
+	std::unique_ptr<TuboEngine::Sprite> labelAim_;
+	std::unique_ptr<TuboEngine::Sprite> labelShoot_;
 
-	std::unique_ptr<Sprite> keyW_;
-	std::unique_ptr<Sprite> keyA_;
-	std::unique_ptr<Sprite> keyS_;
-	std::unique_ptr<Sprite> keyD_;
-	std::unique_ptr<Sprite> keySpace_;
-	std::unique_ptr<Sprite> mouseIcon_;
-	std::unique_ptr<Sprite> mouseShootIcon_;
+	std::unique_ptr<TuboEngine::Sprite> keyW_;
+	std::unique_ptr<TuboEngine::Sprite> keyA_;
+	std::unique_ptr<TuboEngine::Sprite> keyS_;
+	std::unique_ptr<TuboEngine::Sprite> keyD_;
+	std::unique_ptr<TuboEngine::Sprite> keySpace_;
+	std::unique_ptr<TuboEngine::Sprite> mouseIcon_;
+	std::unique_ptr<TuboEngine::Sprite> mouseShootIcon_;
 
 	// texture paths
 	std::string texW_;

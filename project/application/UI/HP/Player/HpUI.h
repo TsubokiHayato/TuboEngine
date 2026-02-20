@@ -26,8 +26,8 @@ public:
 
 private:
 	// Per-HP sprites
-	std::vector<std::unique_ptr<Sprite>> frameSprites_;
-	std::vector<std::unique_ptr<Sprite>> fillSprites_;
+	std::vector<std::unique_ptr<TuboEngine::Sprite>> frameSprites_;
+	std::vector<std::unique_ptr<TuboEngine::Sprite>> fillSprites_;
 
 	int maxHp_ = 0;
 	int currentHp_ = 0;

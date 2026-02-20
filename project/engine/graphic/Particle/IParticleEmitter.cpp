@@ -31,8 +31,8 @@ void IParticleEmitter::Initialize(const ParticlePreset& preset) {
 	BuildGeometry(vertices_);
 
 	if (!preset_.texture.empty()) {
-		TextureManager::GetInstance()->LoadTexture(preset_.texture);
-		textureSrvIndex_ = TextureManager::GetInstance()->GetSrvIndex(preset_.texture);
+		TuboEngine::TextureManager::GetInstance()->LoadTexture(preset_.texture);
+		textureSrvIndex_ = TuboEngine::TextureManager::GetInstance()->GetSrvIndex(preset_.texture);
 	}
 	EnsureBuffers();
 }
