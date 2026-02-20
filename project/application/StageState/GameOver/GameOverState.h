@@ -2,6 +2,7 @@
 #include "StageState/IStageState.h"
 #include <memory>
 #include "Animation/SceneChangeAnimation.h"
+#include"Object3d.h"
 
 class Player;
 class StageScene; 
@@ -46,8 +47,8 @@ private:
 	float orbitSpeed_ = 8.0f;     // 図形の回転速度(rad/sec)
 	float orbitRadius_ = 1.5f;    // 軌道半径
 	float orbitHeightZ_ = 0.8f;  // 見やすいように手前に
-	std::unique_ptr<class Object3d> dizzy1_;
-	std::unique_ptr<class Object3d> dizzy2_;
+	std::unique_ptr<TuboEngine::Object3d> dizzy1_;
+	std::unique_ptr<TuboEngine::Object3d> dizzy2_;
 	float dizzyAlpha_ = 1.0f;     // フェードアウト用
 
 	// GameOver時の正面カメラ設定（リクエストに合わせて狙い値へイージング）
@@ -63,7 +64,7 @@ private:
 	float elapsed_ = 0.0f;
 	
 	// 暗転スプライト
-	std::unique_ptr<class Sprite> blackoutSprite_;
+	std::unique_ptr<TuboEngine::Sprite> blackoutSprite_;
 
-	std::unique_ptr<Sprite> restartSprite_;
+	std::unique_ptr<TuboEngine::Sprite> restartSprite_;
 };

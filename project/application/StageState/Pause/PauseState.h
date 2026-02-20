@@ -3,7 +3,7 @@
 #include "StageState/IStageState.h"
 #include <memory>
 
-class Sprite;
+#include "Sprite.h"
 
 // PauseState:
 // - Overlay pause menu shown during gameplay.
@@ -24,10 +24,10 @@ private:
 
 	static constexpr int kItemCount = 3;
 	int selected_ = 0; // 0: Resume, 1: Restart, 2: Title
-	std::unique_ptr<Sprite> background_; // 追加: 背景用の半透明グレー
-	std::unique_ptr<Sprite> blackout_;
-	std::unique_ptr<Sprite> cursor_;
-	std::unique_ptr<Sprite> resumeText_;
-	std::unique_ptr<Sprite> restartText_;
-	std::unique_ptr<Sprite> titleText_;
+	std::unique_ptr<TuboEngine::Sprite> background_; 
+	std::unique_ptr<TuboEngine::Sprite> blackout_;
+	std::unique_ptr<TuboEngine::Sprite> cursor_;
+	std::unique_ptr<TuboEngine::Sprite> resumeText_;
+	std::unique_ptr<TuboEngine::Sprite> restartText_;
+	std::unique_ptr<TuboEngine::Sprite> titleText_;
 };
