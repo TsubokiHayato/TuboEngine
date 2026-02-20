@@ -50,6 +50,10 @@ public:
     float GetViewDistance() const { return kViewDistance; }
     void SetViewDistance(float dist) { kViewDistance = (dist < 0.0f) ? 0.0f : dist; }
 
+    // 攻撃範囲（射撃エネミー用）
+    float GetAttackRange() const { return attackRange_; }
+    void SetAttackRange(float range) { attackRange_ = (range < 0.0f) ? 0.0f : range; }
+
     enum class State { Idle, Alert, LookAround, Patrol, Chase, Attack };
 
 protected: 
@@ -59,8 +63,11 @@ protected:
 	TuboEngine::Math::Vector3 velocity;
     float turnSpeed_ = 0.1f;
     float moveSpeed_ = 0.08f;
-    float shootDistance_ = 7.0f;
-    float moveStartDistance_ = 15.0f;
+    float shootDistance_ = 25d.0f;
+    float moveStartDistance_ = 50.0f;
+
+    // 0 なら常に Chase しつつ射撃（遠距離射撃）。
+    float attackRange_ = 25.0f;
     int HP = 100;
     bool isAlive = true;
     bool isHit = false;
@@ -68,7 +75,7 @@ protected:
 	std::unique_ptr<TuboEngine::Object3d> object3d;
     State state_ = State::Idle;
     float kViewAngleDeg = 90.0f;
-    float kViewDistance = 15.0f;
+    float kViewDistance = 50.0f;
     int kViewLineDiv = 16;
 	TuboEngine::Math::Vector4 kViewColor = {1.0f, 1.0f, 0.0f, 0.7f};
 	TuboEngine::Math::Vector3 lastSeenPlayerPos = {0.0f, 0.0f, 0.0f};
