@@ -191,8 +191,21 @@ void StagePlayingState::SpriteDraw(StageScene* scene) {
 void StagePlayingState::ImGuiDraw(StageScene* scene) {
 
 	scene->GetFollowCamera()->DrawImGui();
-	scene->GetPlayer()->DrawImGui();
+#ifdef USE_IMGUI
+	ImGui::Begin("Stage Playing");
 
+	ImGui::Text("Playing State");
+
+	// オートプレイON/OFF
+	ImGui::Checkbox("Auto Play (Playing)", &autoPlayEnabled_);
+
+	ImGui::End();
+
+	// Player側のImGuiも出したければ
+	if (scene && scene->GetPlayer()) {
+		scene->GetPlayer()->DrawImGui();
+	}
+#endif
 	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
 	// EnemyのImgui
 	for (auto& enemy : enemies) {
