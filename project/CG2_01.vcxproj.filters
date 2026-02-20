@@ -1039,5 +1039,6 @@
       <Filter>projects\external\imgui</Filter>
     </Text>
     <Text Include="application\Resources\UI\README_PlayerRingUI.txt" />
+    <Text Include="application\Resources\UI\README_PlayerRingUI_Segments.txt" />
   </ItemGroup>
 </Project>

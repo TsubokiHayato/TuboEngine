@@ -439,6 +439,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <Text Include="application\Resources\UI\README_PlayerRingUI.txt" />
+    <Text Include="application\Resources\UI\README_PlayerRingUI_Segments.txt" />
     <Text Include="externals\imgui\LICENSE.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
