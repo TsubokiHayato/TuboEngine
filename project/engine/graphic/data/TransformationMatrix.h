@@ -4,7 +4,7 @@
 //変換行列
 struct  TransformationMatrix {
 	//ワールドビュープロジェクション行列
-	Matrix4x4 WVP;
+	TuboEngine::Math::Matrix4x4 WVP;
 	//ワールド行列
-	Matrix4x4 World;
+	TuboEngine::Math::Matrix4x4 World;
 };

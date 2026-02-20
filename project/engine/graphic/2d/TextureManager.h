@@ -5,6 +5,9 @@
 #include"SrvManager.h"
 #include<vector>
 #include<unordered_map>
+
+namespace TuboEngine {
+
 class TextureManager
 {
 private:
@@ -78,4 +81,6 @@ private:
 	std::string fullPath_;
 
 };
+
+} // namespace TuboEngine
 

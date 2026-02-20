@@ -22,8 +22,7 @@
 	/// <param name="count">発生させるパーティクルの数</param>
 	/// 	/// <param name="frequency">発生頻度</param>
 	/// 	/// <param name="repeat">繰り返し発生させるかどうかのフラグ</param>
-ParticleEmitter::ParticleEmitter(Particle* particle, const std::string& name,
-	const Transform& transform, Vector3 velocity, Vector4 color, float lifeTime, float currentTime,
+ParticleEmitter::ParticleEmitter(Particle* particle, const std::string& name, const Transform& transform, TuboEngine::Math::Vector3 velocity, Vector4 color, float lifeTime, float currentTime,
 	uint32_t count, float frequency, bool repeat)
 	//パーティクルのインスタンス
 	: particle_(particle),

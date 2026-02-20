@@ -4,7 +4,6 @@
 #include "StageState/StageType.h"
 #include "TextureManager.h"
 #include "WinApp.h"
-#include "Sprite.h"
 
 #undef max
 #include <algorithm>
@@ -54,7 +53,7 @@ void StageReadyState::Enter(StageScene* scene) {
 		playerMapX = 0;
 		playerMapY = 0;
 	}
-	Vector3 playerPos = scene->GetMapChipField()->GetMapChipPositionByIndex(playerMapX, playerMapY);
+	TuboEngine::Math::Vector3 playerPos = scene->GetMapChipField()->GetMapChipPositionByIndex(playerMapX, playerMapY);
 
 	// プレイヤー初期化（Stage0のみ）
 	scene->GetPlayer()->Initialize();
@@ -63,7 +62,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	scene->GetPlayer()->SetPosition(playerPos);
 
 	// フォローカメラ初期化（プレビュー生成にも使う）
-	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), Vector3{0.0f, 0.0f, -70.0f}, 0.08f);
+	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), TuboEngine::Math::Vector3{0.0f, 0.0f, -70.0f}, 0.08f);
 	// ズーム制限設定
 	scene->GetFollowCamera()->SetZoomLimits(0.1f, 1.0f);
 	// 開始時は近い(0.1)状態に固定してからカメラ位置を確定
@@ -84,7 +83,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	enemies.clear();
 
 	ForEachMapChip(scene, [&](uint32_t x, uint32_t y, MapChipType type) {
-		Vector3 pos = scene->GetMapChipField()->GetMapChipPositionByIndex(x, y);
+		TuboEngine::Math::Vector3 pos = scene->GetMapChipField()->GetMapChipPositionByIndex(x, y);
 
 		if (type == MapChipType::kBlock) {
 			auto block = std::make_unique<Block>();
@@ -112,7 +111,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	});
 
 	// タイル（Stage0）
-	Vector3 tilePos = scene->GetMapChipField()->GetMapChipPositionByIndex(0, 0);
+	TuboEngine::Math::Vector3 tilePos = scene->GetMapChipField()->GetMapChipPositionByIndex(0, 0);
 	tilePos.z = -1.0f;
 	scene->GetTile()->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile30x30.obj");
 	scene->GetTile()->SetCamera(cam);
@@ -130,17 +129,17 @@ void StageReadyState::Enter(StageScene* scene) {
 	phase_ = Phase::Ready;
 	phaseTimer_ = 0.0f;
 
-	const float screenW = static_cast<float>(WinApp::GetInstance()->GetClientWidth());
-	const float screenH = static_cast<float>(WinApp::GetInstance()->GetClientHeight());
-	const Vector2 center = { screenW * 0.5f, screenH * 0.5f };
+	const float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
+	const float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
+	const TuboEngine::Math::Vector2 center = {screenW * 0.5f, screenH * 0.5f};
 
 	// テクスチャはプロジェクト側の配置に合わせて差し替えてください
 	const std::string readyTex = "ready.png";
 	const std::string startTex = "start.png";
-	TextureManager::GetInstance()->LoadTexture(readyTex);
-	TextureManager::GetInstance()->LoadTexture(startTex);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(readyTex);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(startTex);
 
-	readySprite_ = std::make_unique<Sprite>();
+	readySprite_ = std::make_unique<TuboEngine::Sprite>();
 	readySprite_->Initialize(readyTex);
 	readySprite_->SetAnchorPoint({ 0.5f, 0.5f });
 	readySprite_->SetGetIsAdjustTextureSize(true);
@@ -148,7 +147,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	readySprite_->SetColor({ 1,1,1,1 });
 	readySprite_->Update();
 
-	startSprite_ = std::make_unique<Sprite>();
+	startSprite_ = std::make_unique<TuboEngine::Sprite>();
 	startSprite_->Initialize(startTex);
 	startSprite_->SetAnchorPoint({ 0.5f, 0.5f });
 	startSprite_->SetGetIsAdjustTextureSize(true);
@@ -193,7 +192,7 @@ void StageReadyState::Update(StageScene* scene) {
 	// --- Ready/Start 演出フェーズ進行 ---
 	phaseTimer_ += kDeltaSec;
 
-	auto SetSpriteAlpha = [](Sprite* spr, float a) {
+	auto SetSpriteAlpha = [](TuboEngine::Sprite* spr, float a) {
 		if (!spr) return;
 		Vector4 c = spr->GetColor();
 		c.w = std::clamp(a, 0.0f, 1.0f);
