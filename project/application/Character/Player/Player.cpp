@@ -17,6 +17,8 @@ namespace {
 	constexpr int kInitialHP = 5;
 	constexpr float kFixedDeltaTime = 1.0f / 60.0f;
 	constexpr float kMoveSpeed = 0.1f;
+	constexpr float kInitialRotationX = 1.56f;
+	constexpr float kInitialRotationZ = 3.12f;
 }
 
 //--------------------------------------------------
@@ -89,7 +91,7 @@ void Player::Initialize() {
 	// プレイヤーの初期位置
 	position_ = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
 	// プレイヤーの初期回転
-	rotation_ = TuboEngine::Math::Vector3(1.56f, 0.0f, 3.12f);
+	rotation_ = TuboEngine::Math::Vector3(kInitialRotationX, 0.0f, kInitialRotationZ);
 	// プレイヤーの初期スケール
 	scale_ = TuboEngine::Math::Vector3(1.0f, 1.0f, 1.0f);
 
@@ -440,7 +442,7 @@ void Player::Rotate() {
 	TuboEngine::Math::Vector3 aimDir = GetAimDirectionFromReticle();
 	// 反転補正を削除し、レティクル方向と一致させる
 	float angle = std::atan2(aimDir.x, -aimDir.y);
-	rotation_.z = 3.12f+angle;
+	rotation_.z = kInitialRotationZ + angle;
 }
 
 
