@@ -65,7 +65,7 @@ protected:
     bool isAlive = true;
     bool isHit = false;
     bool wasHit = false;
-    std::unique_ptr<Object3d> object3d;
+	std::unique_ptr<TuboEngine::Object3d> object3d;
     State state_ = State::Idle;
     float kViewAngleDeg = 90.0f;
     float kViewDistance = 15.0f;
