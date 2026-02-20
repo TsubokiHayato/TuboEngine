@@ -253,13 +253,13 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 	newGroup.materialFilePath = textureFilePath;
 
 	// テクスチャのSRVインデックスを取得して設定
-	TextureManager::GetInstance()->LoadTexture(textureFilePath);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(textureFilePath);
 
 	// テクスチャのSRVインデックスを取得して設定
-	newGroup.srvIndex = TextureManager::GetInstance()->GetSrvIndex(textureFilePath);
+	newGroup.srvIndex = TuboEngine::TextureManager::GetInstance()->GetSrvIndex(textureFilePath);
 
 	// テクスチャサイズを取得
-	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureFilePath);
+	const DirectX::TexMetadata& metadata = TuboEngine::TextureManager::GetInstance()->GetMetaData(textureFilePath);
 	TuboEngine::Math::Vector2 textureSize = {static_cast<float>(metadata.width), static_cast<float>(metadata.height)};
 
 	// サイズを設定（指定があればそれを使用、なければテクスチャサイズを使用）

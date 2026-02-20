@@ -49,8 +49,8 @@ void Model::Initialize(const std::string& directoryPath, const std::string& file
 	textureFileName_ = std::filesystem::path(modelData.material.textureFilePath).filename().string();
 
 	// テクスチャを読み込む
-	TextureManager::GetInstance()->LoadTexture(textureFileName_);
-	modelData.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureFileName_);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(textureFileName_);
+	modelData.material.textureIndex = TuboEngine::TextureManager::GetInstance()->GetSrvIndex(textureFileName_);
 }
 
 void Model::Draw() {
@@ -62,7 +62,7 @@ void Model::Draw() {
 	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 
 	// SRVのDescriptorTableの先頭を設定。2はRootParameter[2]である。
-	commandList->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureFileName_));
+	commandList->SetGraphicsRootDescriptorTable(2, TuboEngine::TextureManager::GetInstance()->GetSrvHandleGPU(textureFileName_));
 	// 描画
 	commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 }

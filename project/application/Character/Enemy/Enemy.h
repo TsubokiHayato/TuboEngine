@@ -5,11 +5,11 @@
 #include "MapChip/MapChipField.h"
 #include "Particle.h"
 #include "ParticleEmitter.h"
+#include"Sprite.h"
 // 演出用: 前方宣言のみで十分
 class IParticleEmitter;
 
 class Player;
-class Sprite; // スプライト前方宣言
 
 class Enemy : public BaseCharacter {
 public:
@@ -65,7 +65,7 @@ protected:
     bool isAlive = true;
     bool isHit = false;
     bool wasHit = false;
-    std::unique_ptr<Object3d> object3d;
+	std::unique_ptr<TuboEngine::Object3d> object3d;
     State state_ = State::Idle;
     float kViewAngleDeg = 90.0f;
     float kViewDistance = 15.0f;
@@ -107,7 +107,7 @@ protected:
     IParticleEmitter* hitRingEmitter_ = nullptr;   // 追加: ヒット時の小リング
     IParticleEmitter* deathEmitter_ = nullptr;
     bool deathEffectPlayed_ = false;
-    Camera* camera_ = nullptr;
+	Camera* camera_ = nullptr;
     MapChipField* mapChipField = nullptr;
     Player* player_ = nullptr;
     void ClearPath() { currentPath_.clear(); pathCursor_ = 0; lastPathGoalIndex_ = -1; }
@@ -122,8 +122,8 @@ protected:
     float surpriseDuration_ = 0.8f;       // 既定秒数
 
     // アイコンスプライト
-    std::unique_ptr<Sprite> questionIcon_;
-    std::unique_ptr<Sprite> exclamationIcon_;
+	std::unique_ptr<TuboEngine::Sprite> questionIcon_;
+	std::unique_ptr<TuboEngine::Sprite> exclamationIcon_;
     float questionTimer_ = 0.0f;          // Questionの表示残時間
     float exclamationTimer_ = 0.0f;       // Exclamationの表示残時間
     float iconDuration_ = 1.2f;           // デフォルト表示時間（秒）
