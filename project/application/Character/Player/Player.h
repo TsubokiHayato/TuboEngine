@@ -185,10 +185,5 @@ private:
 	float dashPostEffectDuration_ = 0.25f;
 	float dashRadialBlurPower_ = 0.06f; // 0.02がデフォルトなので少し強め
 
-	// Damage演出（ポストエフェクト）
-	// HP割合で常時かけるビネット（低HPほど強い）
-	float lowHpVignetteMaxPower_ = 3.0f; // HP0付近での最大（デフォルト0.8→最大3.0）
-	float lowHpVignetteStartRatio_ = 0.5f; // このHP割合以下から効き始める
-	float lowHpVignetteSmoothing_ = 0.15f; // 追従のなめらかさ（0で即時）
-	float lowHpVignetteCurrentPower_ = 0.8f; // 現在適用中（補間用）
+	
 };
