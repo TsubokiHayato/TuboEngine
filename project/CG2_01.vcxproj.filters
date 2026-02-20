@@ -363,6 +363,8 @@
     <ClCompile Include="engine\graphic\Particle\Effects\ClearFirework\ClearFireworkEmitter.cpp">
       <Filter>projects\engine\graphic\Particle\Effects\ClearFirework</Filter>
     </ClCompile>
+    <ClCompile Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -800,6 +802,8 @@
     <ClInclude Include="engine\graphic\Particle\Effects\Ring\RingEmitter.h">
       <Filter>projects\engine\graphic\Particle\Effects\Ring</Filter>
     </ClInclude>
+    <ClInclude Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli">
