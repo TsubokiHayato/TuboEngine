@@ -15,7 +15,7 @@ void Block::Initialize(const TuboEngine::Math::Vector3& position, const TuboEngi
 	rotation_ = {0.0f, 0.0f, 0.0f};
 
 	// --- 3D描画実体を生成・初期化 ---
-	object3d_ = std::make_unique<Object3d>();
+	object3d_ = std::make_unique<TuboEngine::Object3d>();
 	object3d_->Initialize(modelFileName);
 
 	// --- 初期状態を `Object3d` に反映 ---

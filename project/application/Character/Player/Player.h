@@ -129,7 +129,7 @@ private:
 	///			メンバ変数
 	///--------------------------------------------------
 
-	std::unique_ptr<Object3d> object3d;                 // 3Dオブジェクト
+	std::unique_ptr<TuboEngine::Object3d> object3d;     // 3Dオブジェクト
 	std::vector<std::unique_ptr<PlayerBullet>> bullets; // プレイヤーの弾のリスト
 	float bulletTimer = 0.0f;                           // 発射間隔タイマー
 	float cooldownTime = 0.2f;                          // クールダウン時間（秒）
