@@ -44,8 +44,8 @@ public:
 	const float& GetRotation()const { return rotation_; }
 	void SetRotation(const float& rotation) { rotation_ = rotation; }
 
-	const TuboEngine::Math::Vector4& GetColor() const { return materialData->color; }
-	void SetColor(const TuboEngine::Math::Vector4& color) { materialData->color = color; }
+	const TuboEngine::Math::Vector4& GetColor() const { return materialData_->color; }
+	void SetColor(const TuboEngine::Math::Vector4& color) { materialData_->color = color; }
 
 	const TuboEngine::Math::Vector2& GetSize() const { return size_; }
 	void SetSize(const TuboEngine::Math::Vector2& size) { size_ = size; }
@@ -81,35 +81,35 @@ public:
 
 private:
 	//バッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> vertexResource;
-	Microsoft::WRL::ComPtr <ID3D12Resource> indexResource;
+	Microsoft::WRL::ComPtr <ID3D12Resource> vertexResource_;
+	Microsoft::WRL::ComPtr <ID3D12Resource> indexResource_;
 
 	//バッファリソース内のデータを指すポインタ
-	VertexData* vertexData = nullptr;
-	uint32_t* indexData = nullptr;
+	VertexData* vertexData_ = nullptr;
+	uint32_t* indexData_ = nullptr;
 	//バッファリソースの使い道を補足するバッファビュー
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
-	D3D12_INDEX_BUFFER_VIEW indexBufferView;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
+	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
 
 	//バッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> materialResource;
+	Microsoft::WRL::ComPtr <ID3D12Resource> materialResource_;
 	//バッファリソース内のデータを指すポインタ
-	Material* materialData = nullptr;
+	Material* materialData_ = nullptr;
 
 	//バッファリソース
-	Microsoft::WRL::ComPtr <ID3D12Resource> transformationMatrixResource;
+	Microsoft::WRL::ComPtr <ID3D12Resource> transformationMatrixResource_;
 	//バッファリソース内のデータを指すポインタ
-	TransformationMatrix* transformationMatrixData = nullptr;
+	TransformationMatrix* transformationMatrixData_ = nullptr;
 
 
-	Transform uvTransFormMatrix{
+	Transform uvTransFormMatrix_{
 		{1.0f,1.0f,1.0f},
 		{0.0f,0.0f,0.0f},
 		{0.0f,0.0f,0.0f},
 	};
-	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	Transform transform_{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
-	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
+	Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList_;
 
 
 	TuboEngine::Math::Vector2 position_ = {};
@@ -117,7 +117,7 @@ private:
 	TuboEngine::Math::Vector2 size_ = {640.0f, 360.0f};
 
 	//テクスチャ番号
-	uint32_t textureIndex = 0;
+	uint32_t textureIndex_ = 0;
 
 	std::string textureFilePath_;
 
