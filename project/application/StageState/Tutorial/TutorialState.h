@@ -33,4 +33,7 @@ private:
 	std::unique_ptr<TuboEngine::Sprite> tutorialDashSprite_;
 	std::unique_ptr<TuboEngine::Sprite> howtoNextSprite_;
 	std::unique_ptr<TuboEngine::Sprite> titleBackSprite_;
+
+	// Tutorial用: PlayerAutoController の有効フラグ（ImGui から ON/OFF）
+	bool autoPlayEnabled_ = false;
 };

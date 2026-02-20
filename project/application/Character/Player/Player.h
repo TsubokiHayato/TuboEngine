@@ -7,6 +7,7 @@
 #include "engine/graphic/Particle/ParticleManager.h"
 #include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 #include "Camera.h"
+#include "PlayerAutoController.h" // 追加
 // 前方宣言（ヘッダ依存軽減）
 class IParticleEmitter;
 
@@ -121,6 +122,17 @@ public:
 
 	void SetMovementLocked(bool flag) { isMovementLocked = flag; }
 
+	// 自動操作を有効/無効
+	void SetAutoControlEnabled(bool enabled) { autoController_.SetEnabled(enabled); }
+	bool IsAutoControlEnabled() const { return autoController_.IsEnabled(); }
+
+    // 自動操作用: 敵リストをコントローラに渡す
+    void SetEnemyList(const std::vector<Enemy*>& enemies) { autoController_.SetEnemyList(enemies); }
+
+	// 自動操作用インターフェース（AutoControllerから呼ばれる）
+	void SetAutoMoveDirection(const TuboEngine::Math::Vector3& dir) { autoMoveDir_ = dir; }
+	void SetAutoShoot(bool enabled) { autoShoot_ = enabled; }
+
 private:
 	///--------------------------------------------------
 	///				引き渡し用変数
@@ -185,5 +197,9 @@ private:
 	float dashPostEffectDuration_ = 0.25f;
 	float dashRadialBlurPower_ = 0.06f; // 0.02がデフォルトなので少し強め
 
-	
+	PlayerAutoController autoController_; // 自動操作用
+
+private:
+	TuboEngine::Math::Vector3 autoMoveDir_{0.0f, 0.0f, 0.0f};
+	bool autoShoot_ = false;
 };

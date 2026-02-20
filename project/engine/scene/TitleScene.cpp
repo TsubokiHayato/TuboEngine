@@ -1,4 +1,5 @@
 #include "TitleScene.h"
+#include "StageScene.h" // 追加: isDemoModeフラグ操作のため
 #include "ImGuiManager.h"
 #include "Input.h"
 #include "LineManager.h"
@@ -48,6 +49,8 @@ void TitleScene::Initialize() {
 
 	// 背景タイマー
 	time_ = 0.0f;
+	// デモタイマーリセット
+	demoTimer_ = 0.0f;
 }
 
 void TitleScene::Update() {
@@ -156,6 +159,29 @@ void TitleScene::Update() {
 	}
 
 	// 背景アニメ（時間のみで更新、Object3DDraw で参照）
+
+	// --- Demo Timer Logic ---
+	// 何か入力があればタイマーリセット
+	auto* input = TuboEngine::Input::GetInstance();
+	if (input->TriggerKey(DIK_SPACE) || input->TriggerKey(DIK_RETURN) ||
+		input->TriggerKey(DIK_Z) || input->TriggerKey(DIK_X) ||
+		input->IsTriggerMouse(0) || input->IsTriggerMouse(1) ||
+		input->GetWheel() != 0) {
+		demoTimer_ = 0.0f;
+	} else {
+		// 入力がなければ進める
+		if (!isRequestSceneChange) { // シーン遷移中はカウントしない
+			demoTimer_ += dt;
+		}
+	}
+
+	// 時間経過でデモモードへ遷移
+	if (demoTimer_ >= kDemoStartTime) {
+		StageScene::isDemoMode = true;
+		SceneManager::GetInstance()->ChangeScene(STAGE);
+		// 遷移リクエスト済みにして多重呼び出し防止（念のため）
+		demoTimer_ = 0.0f;
+	}
 }
 
 void TitleScene::Finalize() {}

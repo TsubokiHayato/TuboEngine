@@ -78,4 +78,8 @@ private:
 	// 呼吸やHopなどのパラメータ
 	float playerIdleTime_ = 0.0f;
 	float time_ = 0.0f; // 背景アニメーション用タイマー
+
+	// 追加: デモモード遷移用タイマー
+	float demoTimer_ = 0.0f;
+	const float kDemoStartTime = 10.0f;
 };
