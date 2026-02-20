@@ -64,7 +64,7 @@ private:
 	float elapsed_ = 0.0f;
 	
 	// 暗転スプライト
-	std::unique_ptr<class Sprite> blackoutSprite_;
+	std::unique_ptr<TuboEngine::Sprite> blackoutSprite_;
 
-	std::unique_ptr<Sprite> restartSprite_;
+	std::unique_ptr<TuboEngine::Sprite> restartSprite_;
 };

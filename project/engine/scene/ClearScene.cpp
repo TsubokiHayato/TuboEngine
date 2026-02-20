@@ -1,6 +1,6 @@
 #include "ClearScene.h"
 #include "Character/Player/Player.h"
-#include "Sprite.h"
+
 #include <cmath>
 #include <format>
 #include "TextureManager.h"
@@ -123,12 +123,12 @@ void ClearScene::Initialize() {
     letterTextureNames_.clear();
 
     for (int i = 0; i < 5; ++i) {
-        auto s = std::make_unique<Sprite>();
+		auto s = std::make_unique<TuboEngine::Sprite>();
         std::string tex = std::format("{}.png", letters[i]); // 例: "C.png"
         letterTextureNames_.push_back(tex);
 
-        TextureManager::GetInstance()->LoadTexture(tex);
-        const auto& meta = TextureManager::GetInstance()->GetMetaData(tex);
+       TuboEngine::TextureManager::GetInstance()->LoadTexture(tex);
+		const auto& meta = TuboEngine::TextureManager::GetInstance()->GetMetaData(tex);
 		TuboEngine::Math::Vector2 texSize = {static_cast<float>(meta.width), static_cast<float>(meta.height)};
 
         s->Initialize(tex);
@@ -163,7 +163,7 @@ void ClearScene::Initialize() {
 
     elapsed_ = 0.0f;
 
-    restartSprite_ = std::make_unique<Sprite>();
+    restartSprite_ = std::make_unique<TuboEngine::Sprite>();
     restartSprite_->Initialize("restart.png");
     restartSprite_->SetPosition({640.0f, 680.0f});
     restartSprite_->SetAnchorPoint({0.5f, 0.5f});
@@ -202,7 +202,7 @@ void ClearScene::Update() {
     }
 
     // 入力：スペースでアニメ開始（アニメ中は無視）
-    if (!spaceAnimActive_ && Input::GetInstance()->PushKey(DIK_SPACE)) {
+	if (!spaceAnimActive_ && TuboEngine::Input::GetInstance()->PushKey(DIK_SPACE)) {
         spaceAnimActive_ = true;
         spaceAnimTimer_ = 0.0f;
         // 元の値を保存

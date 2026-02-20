@@ -3,15 +3,15 @@
 #include<iostream>
 
 
-TextureManager* TextureManager::instance = nullptr;
-uint32_t TextureManager::kSRVIndexTop = 1;
-void TextureManager::Initialize() {
+TuboEngine::TextureManager* TuboEngine::TextureManager::instance = nullptr;
+uint32_t TuboEngine::TextureManager::kSRVIndexTop = 1;
+void TuboEngine::TextureManager::Initialize() {
 	
 	
 	textureDatas.reserve(SrvManager::kMaxSRVCount);
 	directoryPath_ = "Resources/Textures/";
 }
-void TextureManager::LoadTexture(const std::string& filePath) {
+void TuboEngine::TextureManager::LoadTexture(const std::string& filePath) {
 	fullPath_ = directoryPath_ + filePath;
 
 	// 読み込み済みテクスチャを検索
@@ -90,7 +90,7 @@ void TextureManager::LoadTexture(const std::string& filePath) {
 	TuboEngine::DirectXCommon::GetInstance()->CommandExecution();
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& filePath) {
+D3D12_GPU_DESCRIPTOR_HANDLE TuboEngine::TextureManager::GetSrvHandleGPU(const std::string& filePath) {
 	fullPath_ = directoryPath_ + filePath;
 	auto it = textureDatas.find(fullPath_);
 	if (it == textureDatas.end()) {
@@ -101,7 +101,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& f
 	return textureData.srvHandleGPU;
 }
 
-const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filePath) {
+const DirectX::TexMetadata& TuboEngine::TextureManager::GetMetaData(const std::string& filePath) {
 	fullPath_ = directoryPath_ + filePath;
 	if (!textureDatas.contains(fullPath_)) {
 		std::cerr << "Texture not found: " << fullPath_ << std::endl;
@@ -112,7 +112,7 @@ const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& fileP
 	return textureData.metadata;
 }
 
-uint32_t TextureManager::GetSrvIndex(const std::string& filePath) {
+uint32_t TuboEngine::TextureManager::GetSrvIndex(const std::string& filePath) {
 	fullPath_ = directoryPath_ + filePath;
 	if (!textureDatas.contains(fullPath_)) {
 		std::cerr << "Texture not found: " << fullPath_ << std::endl;
@@ -124,14 +124,14 @@ uint32_t TextureManager::GetSrvIndex(const std::string& filePath) {
 }
 
 
-TextureManager* TextureManager::GetInstance() {
+TuboEngine::TextureManager* TuboEngine::TextureManager::GetInstance() {
 	if (instance == nullptr) {
 		instance = new TextureManager;
 	}
 	return instance;
 }
 
-void TextureManager::Finalize() {
+void TuboEngine::TextureManager::Finalize() {
 
 
 	textureDatas.clear();

@@ -80,13 +80,13 @@ namespace {
     }
 }
 
-ParticleManager::ParticleManager() {
+TuboEngine::ParticleManager::ParticleManager() {
     RegisterDefaultEmitters();
     // 初期ロード (存在すれば)
     InitialLoad("Resources/Particles/all.json");
 }
 
-void ParticleManager::RegisterDefaultEmitters() {
+void TuboEngine::ParticleManager::RegisterDefaultEmitters() {
     emitterRegistry_.clear();
     emitterRegistry_["Default"]   = [](){ return std::make_unique<DefaultEmitter>(); };
     emitterRegistry_["Primitive"] = [](){ return std::make_unique<PrimitiveEmitter>(); };
@@ -96,7 +96,7 @@ void ParticleManager::RegisterDefaultEmitters() {
     emitterRegistry_["OrbitTrail"] = [](){ return std::make_unique<OrbitTrailEmitter>(); };
 }
 
-std::string ParticleManager::DetectEmitterType(IParticleEmitter* e) const {
+std::string TuboEngine::ParticleManager::DetectEmitterType(IParticleEmitter* e) const {
     if (dynamic_cast<DefaultEmitter*>(e)) return "Default";
     if (dynamic_cast<RingEmitter*>(e)) return "Ring";
     if (dynamic_cast<CylinderEmitter*>(e)) return "Cylinder";
@@ -105,7 +105,7 @@ std::string ParticleManager::DetectEmitterType(IParticleEmitter* e) const {
     return "Primitive";
 }
 
-IParticleEmitter* ParticleManager::CreateEmitterByType(const std::string& typeName, const ParticlePreset& preset) {
+IParticleEmitter* TuboEngine::ParticleManager::CreateEmitterByType(const std::string& typeName, const ParticlePreset& preset) {
     auto it = emitterRegistry_.find(typeName);
     std::unique_ptr<IParticleEmitter> ptr;
     if (it != emitterRegistry_.end()) ptr = it->second();
@@ -121,21 +121,21 @@ IParticleEmitter* ParticleManager::CreateEmitterByType(const std::string& typeNa
     return raw;
 }
 
-void ParticleManager::SetStatus(const char* fmt, ...) {
+void TuboEngine::ParticleManager::SetStatus(const char* fmt, ...) {
     va_list args; va_start(args, fmt);
     vsnprintf(statusMsg_, sizeof(statusMsg_), fmt, args);
     va_end(args); statusTimer_ = 3.0f;
 }
 
-void ParticleManager::MarkChanged() { changedThisFrame_ = true; }
+void TuboEngine::ParticleManager::MarkChanged() { changedThisFrame_ = true; }
 
-std::string ParticleManager::GenerateUniqueName(const std::string& base) const {
+std::string TuboEngine::ParticleManager::GenerateUniqueName(const std::string& base) const {
     if (base.empty()) return GenerateUniqueName("Emitter");
     bool exists = false; for (auto& e : emitters_) if (e->GetName() == base) { exists = true; break; }
     if (!exists) return base; int counter = 2; while (true) { std::string c = base + "(" + std::to_string(counter) + ")"; bool dup=false; for (auto& e:emitters_) if (e->GetName()==c){dup=true;break;} if(!dup) return c; ++counter; }
 }
 
-void ParticleManager::Update(float dt, Camera* cam) {
+void TuboEngine::ParticleManager::Update(float dt, Camera* cam) {
     for (auto& e : emitters_) {
         auto& preset = e->GetPreset();
         if (preset.autoEmit && preset.emitRate > 0.0f) {
@@ -151,19 +151,19 @@ void ParticleManager::Update(float dt, Camera* cam) {
     if (previewPendingDestroy_) { previewEmitter_.reset(); previewType_ = -1; previewPendingDestroy_ = false; }
 }
 
-void ParticleManager::Draw() {
+void TuboEngine::ParticleManager::Draw() {
     auto* cmd = TuboEngine::DirectXCommon::GetInstance()->GetCommandList().Get();
     for (auto& e : emitters_) e->Draw(cmd);
     DrawPreview(cmd);
 }
 
-void ParticleManager::DrawStatusBar() {
+void TuboEngine::ParticleManager::DrawStatusBar() {
 #ifdef USE_IMGUI
     if (statusMsg_[0] != '\0') ImGui::TextColored(ImVec4(0.2f,0.6f,0.9f,1.0f), "%s", statusMsg_);
 #endif
 }
 
-void ParticleManager::DrawTemplatesSection() {
+void TuboEngine::ParticleManager::DrawTemplatesSection() {
 #ifdef USE_IMGUI
     ImGui::Separator(); ImGui::Text("Templates"); static int tmplIndex = 0;
     const char* items = "Default\0Smoke\0RingBurst\0Fountain\0Radial\0OrbitTrail\0";
@@ -191,7 +191,7 @@ void ParticleManager::DrawTemplatesSection() {
 #endif
 }
 
-void ParticleManager::DrawEmittersSection() {
+void TuboEngine::ParticleManager::DrawEmittersSection() {
 #ifdef USE_IMGUI
     ImGui::Separator(); ImGui::Text("Emitters"); static int newType = 0;
     ImGui::Combo("New Type", &newType, "Default\0Primitive\0Ring\0Cylinder\0Original\0OrbitTrail\0");
@@ -237,7 +237,7 @@ void ParticleManager::DrawEmittersSection() {
 #endif
 }
 
-void ParticleManager::DrawImGui() {
+void TuboEngine::ParticleManager::DrawImGui() {
 #ifdef USE_IMGUI
     if (ImGui::Begin("Particle Manager")) {
         static int themeId = 0; ImGui::RadioButton("Dark", &themeId, 0); ImGui::SameLine(); ImGui::RadioButton("Light", &themeId, 1); ImGui::SameLine(); ImGui::RadioButton("HiContrast", &themeId, 2); static int lastTheme=-1; if (lastTheme!=themeId) { ApplyParticleManagerTheme(themeId); lastTheme=themeId; }
@@ -247,15 +247,32 @@ void ParticleManager::DrawImGui() {
 #endif
 }
 
-IParticleEmitter* ParticleManager::Find(const std::string& name) { for (auto& e : emitters_) if (e->GetName()==name) return e.get(); return nullptr; }
-void ParticleManager::Remove(const std::string& name) { emitters_.erase(std::remove_if(emitters_.begin(), emitters_.end(), [&](auto& u){return u->GetName()==name;}), emitters_.end()); }
+IParticleEmitter* TuboEngine::ParticleManager::Find(const std::string& name) {
+	for (auto& e : emitters_)
+		if (e->GetName() == name)
+			return e.get();
+	return nullptr;
+}
+void TuboEngine::ParticleManager::Remove(const std::string& name) {
+	emitters_.erase(std::remove_if(emitters_.begin(), emitters_.end(), [&](auto& u) { return u->GetName() == name; }), emitters_.end());
+}
 
-std::string ParticleManager::BuildSnapshotJson() const {
+std::string TuboEngine::ParticleManager::BuildSnapshotJson() const {
     nlohmann::json root; for (auto& e : emitters_) { const auto& p = e->GetPreset(); std::string type = DetectEmitterType(e.get()); nlohmann::json j{{"type",type},{"name",p.name},{"texture",p.texture},{"maxInstances",p.maxInstances},{"billboard",p.billboard},{"emitRate",p.emitRate},{"autoEmit",p.autoEmit},{"burstCount",p.burstCount},{"lifeMin",p.lifeMin},{"lifeMax",p.lifeMax},{"posMin",{p.posMin.x,p.posMin.y,p.posMin.z}},{"posMax",{p.posMax.x,p.posMax.y,p.posMax.z}},{"velMin",{p.velMin.x,p.velMin.y,p.velMin.z}},{"velMax",{p.velMax.x,p.velMax.y,p.velMax.z}},{"scaleStart",{p.scaleStart.x,p.scaleStart.y,p.scaleStart.z}},{"scaleEnd",{p.scaleEnd.x,p.scaleEnd.y,p.scaleEnd.z}},{"colorStart",{p.colorStart.x,p.colorStart.y,p.colorStart.z,p.colorStart.w}},{"colorEnd",{p.colorEnd.x,p.colorEnd.y,p.colorEnd.z,p.colorEnd.w}},{"gravity",{p.gravity.x,p.gravity.y,p.gravity.z}},{"drag",p.drag},{"center",{p.center.x,p.center.y,p.center.z}},{"simulateInWorldSpace",p.simulateInWorldSpace},{"emitterPos",{p.emitterTransform.translate.x,p.emitterTransform.translate.y,p.emitterTransform.translate.z}}}; root["emitters"].push_back(j);} return root.dump(); }
 
-void ParticleManager::CaptureHistory() { std::string snap = BuildSnapshotJson(); if (historyIndex_+1 < (int)history_.size()) history_.erase(history_.begin()+historyIndex_+1, history_.end()); history_.push_back(snap); historyIndex_=(int)history_.size()-1; if (history_.size()>50) { history_.erase(history_.begin()); --historyIndex_; } }
+void TuboEngine::ParticleManager::CaptureHistory() {
+	std::string snap = BuildSnapshotJson();
+	if (historyIndex_ + 1 < (int)history_.size())
+		history_.erase(history_.begin() + historyIndex_ + 1, history_.end());
+	history_.push_back(snap);
+	historyIndex_ = (int)history_.size() - 1;
+	if (history_.size() > 50) {
+		history_.erase(history_.begin());
+		--historyIndex_;
+	}
+}
 
-void ParticleManager::ApplySnapshot(const std::string& jsonStr) {
+void TuboEngine::ParticleManager::ApplySnapshot(const std::string& jsonStr) {
     nlohmann::json root; try { root = nlohmann::json::parse(jsonStr); } catch (...) { SetStatus("Snapshot parse error"); return; }
     emitters_.clear(); if (!root.contains("emitters")) { SetStatus("Snapshot missing 'emitters'"); return; }
     for (auto& j : root["emitters"]) {
@@ -295,12 +312,37 @@ void ParticleManager::ApplySnapshot(const std::string& jsonStr) {
     SetStatus("Snapshot applied (%zu emitters)", emitters_.size());
 }
 
-void ParticleManager::Undo() { if (historyIndex_<=0 || history_.empty()) { SetStatus("Undo unavailable"); return; } --historyIndex_; ApplySnapshot(history_[historyIndex_]); }
-void ParticleManager::Redo() { if (historyIndex_+1 >= (int)history_.size()) { SetStatus("Redo unavailable"); return; } ++historyIndex_; ApplySnapshot(history_[historyIndex_]); }
+void TuboEngine::ParticleManager::Undo() {
+	if (historyIndex_ <= 0 || history_.empty()) {
+		SetStatus("Undo unavailable");
+		return;
+	}
+	--historyIndex_;
+	ApplySnapshot(history_[historyIndex_]);
+}
+void TuboEngine::ParticleManager::Redo() {
+	if (historyIndex_ + 1 >= (int)history_.size()) {
+		SetStatus("Redo unavailable");
+		return;
+	}
+	++historyIndex_;
+	ApplySnapshot(history_[historyIndex_]);
+}
 
-void ParticleManager::SaveAll(const std::string& path) { nlohmann::json root; root["version"]=2; root["snapshot"]=nlohmann::json::parse(BuildSnapshotJson()); std::ofstream ofs(path); if(!ofs){ SetStatus("Save failed: %s", path.c_str()); return; } ofs<<root.dump(2); SetStatus("Saved %zu emitters", emitters_.size()); }
+void TuboEngine::ParticleManager::SaveAll(const std::string& path) {
+	nlohmann::json root;
+	root["version"] = 2;
+	root["snapshot"] = nlohmann::json::parse(BuildSnapshotJson());
+	std::ofstream ofs(path);
+	if (!ofs) {
+		SetStatus("Save failed: %s", path.c_str());
+		return;
+	}
+	ofs << root.dump(2);
+	SetStatus("Saved %zu emitters", emitters_.size());
+}
 
-void ParticleManager::LoadAll(const std::string& path) {
+void TuboEngine::ParticleManager::LoadAll(const std::string& path) {
     std::ifstream ifs(path); if(!ifs){ SetStatus("Load failed: %s", path.c_str()); return; }
     nlohmann::json root; try { root=nlohmann::json::parse(ifs); } catch (...) { SetStatus("Load parse error"); return; }
     emitters_.clear(); nlohmann::json snap; if(root.contains("snapshot")) snap=root["snapshot"]; else if(root.contains("emitters")) snap=root; else { SetStatus("Load: missing snapshot"); return; }
@@ -342,10 +384,10 @@ void ParticleManager::LoadAll(const std::string& path) {
     SetStatus("Loaded %zu emitters", emitters_.size()); MarkChanged();
 }
 
-void ParticleManager::SaveSelected(const std::string& path, const std::vector<std::string>& names) {
+void TuboEngine::ParticleManager::SaveSelected(const std::string& path, const std::vector<std::string>& names) {
     nlohmann::json root; for (auto& name : names) { auto* e = Find(name); if(!e) continue; const auto& p = e->GetPreset(); std::string type = DetectEmitterType(e); nlohmann::json j{{"type",type},{"name",p.name},{"texture",p.texture},{"maxInstances",p.maxInstances},{"billboard",p.billboard},{"emitRate",p.emitRate},{"autoEmit",p.autoEmit},{"burstCount",p.burstCount},{"lifeMin",p.lifeMin},{"lifeMax",p.lifeMax},{"posMin",{p.posMin.x,p.posMin.y,p.posMin.z}},{"posMax",{p.posMax.x,p.posMax.y,p.posMax.z}},{"velMin",{p.velMin.x,p.velMin.y,p.velMin.z}},{"velMax",{p.velMax.x,p.velMax.y,p.velMax.z}},{"scaleStart",{p.scaleStart.x,p.scaleStart.y,p.scaleStart.z}},{"scaleEnd",{p.scaleEnd.x,p.scaleEnd.y,p.scaleEnd.z}},{"colorStart",{p.colorStart.x,p.colorStart.y,p.colorStart.z,p.colorStart.w}},{"colorEnd",{p.colorEnd.x,p.colorEnd.y,p.colorEnd.z,p.colorEnd.w}},{"gravity",{p.gravity.x,p.gravity.y,p.gravity.z}},{"drag",p.drag},{"simulateInWorldSpace",p.simulateInWorldSpace},{"emitterPos",{p.emitterTransform.translate.x,p.emitterTransform.translate.y,p.emitterTransform.translate.z}}}; root["emitters"].push_back(j);} std::ofstream ofs(path); if(!ofs){ SetStatus("SaveSelected failed"); return; } ofs<<root.dump(2); SetStatus("Saved %zu selected", root["emitters"].size()); }
 
-void ParticleManager::LoadMerge(const std::string& path) {
+void TuboEngine::ParticleManager::LoadMerge(const std::string& path) {
     std::ifstream ifs(path); if(!ifs){ SetStatus("Merge load failed"); return; } nlohmann::json root; try { root=nlohmann::json::parse(ifs); } catch (...) { SetStatus("Merge parse error"); return; }
     if (!root.contains("emitters")) { SetStatus("Merge: no emitters"); return; }
 	size_t added = 0;
@@ -385,11 +427,24 @@ void ParticleManager::LoadMerge(const std::string& path) {
 	MarkChanged();
 }
 
-void ParticleManager::InitialLoad(const std::string& filePath) { if (initialLoaded_) return; initialLoaded_ = true; std::ifstream ifs(filePath); if(!ifs){ SetStatus("Initial load skipped (%s not found)", filePath.c_str()); return; } LoadAll(filePath); }
+void TuboEngine::ParticleManager::InitialLoad(const std::string& filePath) {
+	if (initialLoaded_)
+		return;
+	initialLoaded_ = true;
+	std::ifstream ifs(filePath);
+	if (!ifs) {
+		SetStatus("Initial load skipped (%s not found)", filePath.c_str());
+		return;
+	}
+	LoadAll(filePath);
+}
 
 #ifdef USE_IMGUI
-void ParticleManager::OpenConfirmPopup(const char* popupName, const char* message) { confirmMessage_ = message ? message : ""; ImGui::OpenPopup(popupName); }
-void ParticleManager::ExecutePendingAction() {
+void TuboEngine::ParticleManager::OpenConfirmPopup(const char* popupName, const char* message) {
+	confirmMessage_ = message ? message : "";
+	ImGui::OpenPopup(popupName);
+}
+void TuboEngine::ParticleManager::ExecutePendingAction() {
     switch (pendingAction_) {
     case PendingActionType::DeleteEmitter: if (!pendingEmitterName_.empty()) { Remove(pendingEmitterName_); if (selectedEmitter_==pendingEmitterName_) selectedEmitter_.clear(); SetStatus("Removed '%s'", pendingEmitterName_.c_str()); MarkChanged(); } break;
     case PendingActionType::ClearEmitter: if (auto* e = Find(pendingEmitterName_)) { e->ClearAll(); SetStatus("Cleared '%s'", pendingEmitterName_.c_str()); MarkChanged(); } break;
@@ -402,7 +457,7 @@ void ParticleManager::ExecutePendingAction() {
 
 
 // プレビュー適用ヘルパー
-void ParticleManager::ApplyPreviewPreset(const ParticlePreset& src, int type) {
+void TuboEngine::ParticleManager::ApplyPreviewPreset(const ParticlePreset& src, int type) {
     if (!previewEnabled_) return;
 
     // 型変更や Texture 変更などで再生成が必要か判定
@@ -456,7 +511,7 @@ void ParticleManager::ApplyPreviewPreset(const ParticlePreset& src, int type) {
 }
 
 // プレビュー更新
-void ParticleManager::UpdatePreview(float dt, Camera* cam) {
+void TuboEngine::ParticleManager::UpdatePreview(float dt, Camera* cam) {
     if (!previewEnabled_ || !previewEmitter_) return;
     auto& p = previewEmitter_->GetPreset();
     if (p.autoEmit && p.emitRate > 0.0f) {
@@ -471,7 +526,7 @@ void ParticleManager::UpdatePreview(float dt, Camera* cam) {
 }
 
 // プレビュー描画
-void ParticleManager::DrawPreview(ID3D12GraphicsCommandList* cmd) {
+void TuboEngine::ParticleManager::DrawPreview(ID3D12GraphicsCommandList* cmd) {
     if (!previewEnabled_ || !previewEmitter_) return;
     previewEmitter_->Draw(cmd);
 }
