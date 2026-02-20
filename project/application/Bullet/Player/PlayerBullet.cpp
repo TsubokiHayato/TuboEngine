@@ -57,7 +57,7 @@ void PlayerBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
 	// モデルファイル名
 	const std::string modelFileNamePath = "star.obj";
 	// 3Dオブジェクト生成・初期化
-	object3d = std::make_unique<Object3d>();
+	object3d = std::make_unique<TuboEngine::Object3d>();
 	object3d->Initialize(modelFileNamePath);
 }
 
@@ -97,7 +97,7 @@ void PlayerBullet::Update() {
 	}
 
 	// プレイヤーから離れすぎたら消滅
-	if (isAlive && Distance(position, playerPostion_) > s_disappearRadius) {
+	if (isAlive && Distance(position, playerPosition_) > s_disappearRadius) {
 		isAlive = false;
 	}
 

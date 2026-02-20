@@ -37,7 +37,7 @@ void DebugScene::Initialize() {
 
 	// Emitters
 	if (!particleInitialized_) {
-		auto* pm = ParticleManager::GetInstance();
+		auto* pm = TuboEngine::ParticleManager::GetInstance();
 
 		{
 			ParticlePreset p{};
@@ -108,7 +108,7 @@ void DebugScene::Update() {
 	skyBox->Update();
 
 	// Scene change
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		if (sceneChangeAnimation->IsFinished()) {
 			sceneChangeAnimation->SetPhase(SceneChangeAnimation::Phase::Appearing);
 			isRequestSceneChange = true;
@@ -121,7 +121,7 @@ void DebugScene::Update() {
 	}
 
 	// エミッター存在チェック（削除・Undo後のダングリング回避）
-	auto* pm = ParticleManager::GetInstance();
+	auto* pm = TuboEngine::ParticleManager::GetInstance();
 	for (size_t i = 0; i < emitterNames_.size();) {
 		if (!pm->Find(emitterNames_[i])) {
 			emitterNames_.erase(emitterNames_.begin() + i);
@@ -160,11 +160,9 @@ void DebugScene::ImGuiDraw() {
 #endif
 
 	// 全エミッター管理 UI（保存/ロード・個別編集が可能）
-	ParticleManager::GetInstance()->DrawImGui();
+	TuboEngine::ParticleManager::GetInstance()->DrawImGui();
 
 	sceneChangeAnimation->DrawImGui();
 }
 
-void DebugScene::ParticleDraw() {
-	ParticleManager::GetInstance()->Draw();
-}
+void DebugScene::ParticleDraw() { TuboEngine::ParticleManager::GetInstance()->Draw(); }

@@ -84,7 +84,7 @@ private:
 		float alpha = 0.0f;  // 0:透明 / 1:不透明
 		float delay = 0.0f;  // ブロックごとの開始遅延（秒）
 		bool fading = false; // 予約（将来拡張用）
-		std::unique_ptr<Sprite> sprite;
+		std::unique_ptr<TuboEngine::Sprite> sprite;
 	};
 
 	int m_screenWidth = 0;

@@ -9,9 +9,11 @@
 #include <wrl.h>
 #include "engine/math/Vector2.h"
 
+namespace TuboEngine {
+
 class Input {
 public:
-	using Vector2 = TuboEngine::Math::Vector2;
+	using Vector2 = Math::Vector2;
 
 	struct MouseMove {
 		LONG lX;
@@ -103,3 +105,5 @@ private:
 	// ウィンドウハンドル
 	HWND hwnd_ = nullptr;
 };
+
+} // namespace TuboEngine

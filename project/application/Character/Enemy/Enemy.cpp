@@ -2,10 +2,8 @@
 #include "Bullet/Player/PlayerBullet.h"
 #include "Character/Player/Player.h"
 #include "Collider/CollisionTypeId.h"
-#include "Enemy.h"
 #include "ImGuiManager.h"
 #include "LineManager.h"
-#include "Sprite.h"
 #include "TextureManager.h"
 #include <algorithm>
 #include <cmath>
@@ -33,7 +31,7 @@ void Enemy::Initialize() {
 	rotation = TuboEngine::Math::Vector3(1.56f, 0.0f, 0.0f);
     scale = {1.0f, 1.0f, 1.0f};
 
-    object3d = std::make_unique<Object3d>();
+    object3d = std::make_unique<TuboEngine::Object3d>();
     const std::string modelFileNamePath = "player/player.obj";
     object3d->Initialize(modelFileNamePath);
     object3d->SetPosition(position);
@@ -49,16 +47,18 @@ void Enemy::Initialize() {
 	object3d->SetModelColor({1.0f, 0.0f, 0.0f, 1.0f});
 
     std::string particleTextureHandle = "gradationLine.png";
-    TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
+	TuboEngine::TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
 
     // Icons
-    TextureManager::GetInstance()->LoadTexture("Question.png");
-    TextureManager::GetInstance()->LoadTexture("Exclamation.png");
-    questionIcon_ = std::make_unique<Sprite>();
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("Question.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("Exclamation.png");
+
+	questionIcon_ = std::make_unique<TuboEngine::Sprite>();
     questionIcon_->Initialize("Question.png");
     questionIcon_->SetGetIsAdjustTextureSize(false);
     questionIcon_->SetAnchorPoint({0.5f, 0.5f});
-    exclamationIcon_ = std::make_unique<Sprite>();
+
+	exclamationIcon_ = std::make_unique<TuboEngine::Sprite>();
     exclamationIcon_->Initialize("Exclamation.png");
     exclamationIcon_->SetGetIsAdjustTextureSize(false);
     exclamationIcon_->SetAnchorPoint({0.5f, 0.5f});
@@ -91,7 +91,7 @@ void Enemy::Initialize() {
         p.colorStart = {1.0f, 0.6f, 0.2f, 0.9f};
         p.colorEnd = {1.0f, 1.0f, 0.4f, 0.0f};
         p.center = position;
-        hitEmitter_ = ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
+		hitEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
     }
     // 追加: ヒット時の小さなリングを別エミッタで生成（既存と併用）
     if (!hitRingEmitter_) {
@@ -108,7 +108,7 @@ void Enemy::Initialize() {
         p.colorStart = {1.0f, 0.5f, 0.2f, 0.9f};
         p.colorEnd   = {1.0f, 0.9f, 0.6f, 0.0f};
         p.center = position;
-        hitRingEmitter_ = ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
+		hitRingEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
     }
     // 死亡時: 大きなリング (一度だけ)
     if (!deathEmitter_) {
@@ -125,7 +125,7 @@ void Enemy::Initialize() {
         p.colorStart = {1.0f, 0.3f, 0.2f, 0.9f};
         p.colorEnd = {1.0f, 0.8f, 0.1f, 0.0f};
         p.center = position;
-        deathEmitter_ = ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
+		deathEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
     }
 }
 

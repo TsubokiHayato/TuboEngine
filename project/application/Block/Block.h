@@ -79,5 +79,5 @@ private:
 	TuboEngine::Math::Vector3 position_{};
 	TuboEngine::Math::Vector3 scale_{1.0f, 1.0f, 1.0f};
 	TuboEngine::Math::Vector3 rotation_{};
-	std::unique_ptr<Object3d> object3d_;
+	std::unique_ptr<TuboEngine::Object3d> object3d_;
 };

@@ -47,7 +47,7 @@ void Player::Initialize() {
 	const std::string reticleFileNamePath = "2D_Reticle.png";
 
 	// 3Dオブジェクト生成・初期化
-	object3d = std::make_unique<Object3d>();
+	object3d = std::make_unique<TuboEngine::Object3d>();
 	object3d->Initialize(modelFileNamePath);
 
 	object3d->SetPosition(position);
@@ -55,7 +55,7 @@ void Player::Initialize() {
 	object3d->SetScale(scale);
 
 	// Reticleの初期化
-	reticleSprite = std::make_unique<Sprite>();
+	reticleSprite = std::make_unique<TuboEngine::Sprite>();
 	reticleSprite->Initialize(reticleFileNamePath);
 
 	bulletTimer = 0.0f;
@@ -85,13 +85,13 @@ void Player::Initialize() {
 		p.billboard = true;
 		p.simulateInWorldSpace = true;
 		p.center = position; // 初期中心
-		trailEmitter_ = ParticleManager::GetInstance()->CreateEmitter<OrbitTrailEmitter>(p);
+		trailEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<OrbitTrailEmitter>(p);
 		prevPositionTrail_ = position;
 	}
 
 	// ダッシュリングエミッタ作成
 	if (!dashRingEmitter_) {
-		TextureManager::GetInstance()->LoadTexture("gradationLine.png");
+		TuboEngine::TextureManager::GetInstance()->LoadTexture("gradationLine.png");
 		ParticlePreset p{};
 		p.name = "PlayerDashRing";
 		p.texture = "gradationLine.png";
@@ -107,7 +107,7 @@ void Player::Initialize() {
 		p.center = GetPosition();
 		// エミッタ中心に追従させる（ワールド空間で独立しない）
 		p.simulateInWorldSpace = false;
-		dashRingEmitter_ = ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
+		dashRingEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
 	}
 }
 
@@ -151,7 +151,7 @@ void Player::Update() {
 		// 回避入力（SPACEキー）
 		// 長押し(PushKey)だと、クールダウン明けに押しっぱなしで即ダッシュしてしまうので
 		// 押した瞬間(TriggerKey)でのみ開始する。
-		if (CanDodge() && Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		if (CanDodge() && TuboEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 			StartDodge();
 		}
 		Move();
@@ -267,7 +267,7 @@ void Player::Update() {
 // 弾を撃つ処理
 //--------------------------------------------------	
 void Player::Shoot() {
-	if (Input::GetInstance()->IsPressMouse(0) && bulletTimer <= 0.0f) {
+	if (TuboEngine::Input::GetInstance()->IsPressMouse(0) && bulletTimer <= 0.0f) {
 		// プレイヤーの現在の回転(Z)から発射方向を作る（Rotateと一貫性を保つ）
 		float ang = rotation.z;
 		TuboEngine::Math::Vector3 dir{std::sin(ang), std::cos(ang), 0.0f};
@@ -311,16 +311,16 @@ void Player::Move() {
 	}
 	TuboEngine::Math::Vector3 prevPosition = position;
 	TuboEngine::Math::Vector3 moveDelta = {0.0f, 0.0f, 0.0f};
-	if (Input::GetInstance()->PushKey(DIK_W)) {
+	if (TuboEngine::Input::GetInstance()->PushKey(DIK_W)) {
 		moveDelta.y -= 0.1f;
 	}
-	if (Input::GetInstance()->PushKey(DIK_S)) {
+	if (TuboEngine::Input::GetInstance()->PushKey(DIK_S)) {
 		moveDelta.y += 0.1f;
 	}
-	if (Input::GetInstance()->PushKey(DIK_A)) {
+	if (TuboEngine::Input::GetInstance()->PushKey(DIK_A)) {
 		moveDelta.x -= 0.1f;
 	}
-	if (Input::GetInstance()->PushKey(DIK_D)) {
+	if (TuboEngine::Input::GetInstance()->PushKey(DIK_D)) {
 		moveDelta.x += 0.1f;
 	}
 	TuboEngine::Math::Vector3 tryPosition = position + moveDelta;
@@ -345,8 +345,8 @@ void Player::Rotate() {
 
 	int screenWidth = static_cast<int>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
 	int screenHeight = static_cast<int>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
-	int mouseX = static_cast<int>(Input::GetInstance()->GetMousePosition().x);
-	int mouseY = static_cast<int>(Input::GetInstance()->GetMousePosition().y);
+	int mouseX = static_cast<int>(TuboEngine::Input::GetInstance()->GetMousePosition().x);
+	int mouseY = static_cast<int>(TuboEngine::Input::GetInstance()->GetMousePosition().y);
 	reticlePosition = TuboEngine::Math::Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
 
 	// レイキャストで算出した地面上ターゲット方向で回転を更新（斜め視点対応）
@@ -505,13 +505,13 @@ bool Player::CanDodge() const { return !isDodging && dodgeCooldownTimer <= 0.0f;
 // --- 回避入力方向取得 ---
 TuboEngine::Math::Vector3 Player::GetDodgeInputDirection() const {
 	TuboEngine::Math::Vector3 inputDir(0.0f, 0.0f, 0.0f);
-	if (Input::GetInstance()->PushKey(DIK_W))
+	if (TuboEngine::Input::GetInstance()->PushKey(DIK_W))
 		inputDir.y -= 1.0f;
-	if (Input::GetInstance()->PushKey(DIK_S))
+	if (TuboEngine::Input::GetInstance()->PushKey(DIK_S))
 		inputDir.y += 1.0f;
-	if (Input::GetInstance()->PushKey(DIK_A))
+	if (TuboEngine::Input::GetInstance()->PushKey(DIK_A))
 		inputDir.x -= 1.0f;
-	if (Input::GetInstance()->PushKey(DIK_D))
+	if (TuboEngine::Input::GetInstance()->PushKey(DIK_D))
 		inputDir.x += 1.0f;
 	return inputDir;
 }
@@ -532,7 +532,7 @@ TuboEngine::Math::Vector3 Player::GetAimDirectionFromReticle() const {
 	// スクリーン座標からNDCに変換
 	float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
 	float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
-	TuboEngine::Math::Vector2 mouse = Input::GetInstance()->GetMousePosition();
+	TuboEngine::Math::Vector2 mouse = TuboEngine::Input::GetInstance()->GetMousePosition();
 	float ndcX = (mouse.x / screenW) * 2.0f - 1.0f;
 	float ndcY = 1.0f - (mouse.y / screenH) * 2.0f; // 上が+1
 

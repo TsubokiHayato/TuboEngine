@@ -69,7 +69,7 @@ private:
 
 	// GAME OVER UI（各文字のドロップ演出）
 	struct LetterAnim {
-		std::unique_ptr<Sprite> sprite;
+		std::unique_ptr<TuboEngine::Sprite> sprite;
 		TuboEngine::Math::Vector2 start;
 		TuboEngine::Math::Vector2 end;
 		float delay = 0.0f;
@@ -89,5 +89,5 @@ private:
 	std::string letterTexture_ = "barrier.png"; // 仮のテクスチャ
 
 	
-	std::unique_ptr<Sprite> restartSprite_;
+	std::unique_ptr<TuboEngine::Sprite> restartSprite_;
 };

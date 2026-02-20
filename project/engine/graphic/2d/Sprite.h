@@ -7,7 +7,7 @@
 #include"TransformationMatrix.h"
 #include"Transform.h"
 
-
+namespace TuboEngine {
 
 class SpriteCommon;
 class Sprite
@@ -150,4 +150,6 @@ private:
 	//初期サイズにするフラグ
 	bool isAdjustTextureSize;
 };
+
+} // namespace TuboEngine
 

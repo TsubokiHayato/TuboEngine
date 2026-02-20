@@ -71,16 +71,16 @@ void TitleUI::Initialize() {
 	///----------------------------
 	///texture
 	///----------------------------
-	TextureManager::GetInstance()->LoadTexture("TitleUI/Title.png");
-	TextureManager::GetInstance()->LoadTexture("TitleUI/Start.png");
-	TextureManager::GetInstance()->LoadTexture("TitleUI/Tutorial.png");
-	TextureManager::GetInstance()->LoadTexture("TitleUI/Exit.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("TitleUI/Title.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("TitleUI/Start.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("TitleUI/Tutorial.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("TitleUI/Exit.png");
 
 	//-----------------------------
 	// 各種スプライトの生成・初期化
 	//-----------------------------
 	// Startボタン用スプライト
-	StartButtonSprite_ = std::make_unique<Sprite>();
+	StartButtonSprite_ = std::make_unique<TuboEngine::Sprite>();
 	StartButtonSprite_->Initialize("TitleUI/Start.png");
 	StartButtonSprite_->SetAnchorPoint({0.5f, 0.5f}); // 中心揃え
 	StartButtonSprite_->SetPosition({centerX, buttonYPositions_[0]});
@@ -88,7 +88,7 @@ void TitleUI::Initialize() {
 	StartButtonSprite_->Update();
 
 	// Tutorialボタン用スプライト
-	TutorialButtonSprite_ = std::make_unique<Sprite>();
+	TutorialButtonSprite_ = std::make_unique<TuboEngine::Sprite>();
 	TutorialButtonSprite_->Initialize("TitleUI/Tutorial.png");
 	TutorialButtonSprite_->SetAnchorPoint({0.5f, 0.5f});
 	TutorialButtonSprite_->SetPosition({centerX, buttonYPositions_[1]});
@@ -96,7 +96,7 @@ void TitleUI::Initialize() {
 	TutorialButtonSprite_->Update();
 
 	// Exitボタン用スプライト
-	QuitButtonSprite_ = std::make_unique<Sprite>();
+	QuitButtonSprite_ = std::make_unique<TuboEngine::Sprite>();
 	QuitButtonSprite_->Initialize("TitleUI/Exit.png");
 	QuitButtonSprite_->SetAnchorPoint({0.5f, 0.5f});
 	QuitButtonSprite_->SetPosition({centerX, buttonYPositions_[2]});
@@ -106,7 +106,7 @@ void TitleUI::Initialize() {
 	//-----------------------------
 	// ロゴスプライト生成・初期化
 	//-----------------------------
-	LogoSprite_ = std::make_unique<Sprite>();
+	LogoSprite_ = std::make_unique<TuboEngine::Sprite>();
 	LogoSprite_->Initialize("TitleUI/Title.png");
 	LogoSprite_->SetAnchorPoint({0.5f, 0.0f});
 	LogoSprite_->SetPosition({centerX, 100.0f});
@@ -205,15 +205,15 @@ bool TitleUI::HandleDecisionAnimation(float deltaTime) {
 ///-------------------------------------------///
 void TitleUI::HandleInput() {
     // 上キー：選択インデックスを1つ上へ
-    if (Input::GetInstance()->TriggerKey(DIK_UP) || Input::GetInstance()->TriggerKey(DIK_W)) {
+	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_UP) || TuboEngine::Input::GetInstance()->TriggerKey(DIK_W)) {
         selectedIndex_ = (selectedIndex_ + static_cast<int>(buttons_.size()) - 1) % static_cast<int>(buttons_.size());
     }
     // 下キー：選択インデックスを1つ下へ
-	if (Input::GetInstance()->TriggerKey(DIK_DOWN) || Input::GetInstance()->TriggerKey(DIK_S)) {
+	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_DOWN) || TuboEngine::Input::GetInstance()->TriggerKey(DIK_S)) {
 		selectedIndex_ = (selectedIndex_ + 1) % static_cast<int>(buttons_.size());
 	}
 	// 決定ボタン：決定アニメーション開始
-	if (Input::GetInstance()->TriggerKey(DIK_RETURN) || Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_RETURN) || TuboEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
         selectorDecisionAnime_ = true;
         selectorDecisionAnimeTime_ = 0.0f;
         decisionIndex_ = selectedIndex_;
