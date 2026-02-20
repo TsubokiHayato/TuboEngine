@@ -12,7 +12,7 @@ static TuboEngine::Math::Vector2 WorldToScreen(const TuboEngine::Math::Vector3& 
 	TuboEngine::Math::Vector3 v = TransformCoord(world, vp);
 	int sw = (int)TuboEngine::WinApp::GetInstance()->GetClientWidth();
 	int sh = (int)TuboEngine::WinApp::GetInstance()->GetClientHeight();
-	TuboEngine::Math::Vector2 screen;
+	TuboEngine::Math::Vector2 screen = {};
     screen.x = (v.x * 0.5f + 0.5f) * sw;
     screen.y = (-v.y * 0.5f + 0.5f) * sh;
     return screen;
