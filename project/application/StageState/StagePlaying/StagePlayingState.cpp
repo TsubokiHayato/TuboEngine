@@ -110,25 +110,40 @@ void StagePlayingState::Update(StageScene* scene) {
 		}
 	}
 	if (allEnemiesDefeated && !enemies.empty()) {
-        // DEMOモード時はクリア画面に行かずタイトルへ戻す
-        if (StageScene::isDemoMode) {
-            // デモ状態を解除してタイトルへ遷移
-            StageScene::isDemoMode = false;
-            SceneManager::GetInstance()->ChangeScene(TITLE);
-            return;
-        }
-		scene->GetStageStateManager()->ChangeState(StageType::StageClear, scene);
-		return;
-	}
+	    // DEMOモード時はシーンチェンジアニメーションを挟んでタイトルへ戻す
+	    if (StageScene::isDemoMode) {
+	        if (scene) {
+	            auto* anim = scene->GetSceneChangeAnimation();
+	            if (anim) {
+	                // アニメが未リクエストなら開始
+	                if (!scene->GetIsRequestSceneChange()) {
+	                    anim->SetPhase(SceneChangeAnimation::Phase::Appearing);
+	                    scene->SetIsRequestSceneChange(true);
+	                }
+	                // アニメが完了していれば遷移
+	                if (scene->GetIsRequestSceneChange() && anim->IsFinished()) {
+	                    StageScene::isDemoMode = false;
+	                    scene->SetIsRequestSceneChange(false);
+	                    SceneManager::GetInstance()->ChangeScene(TITLE);
+	                    return;
+	                }
+	            } else {
+	                // アニメ未設定なら即遷移
+	                StageScene::isDemoMode = false;
+	                SceneManager::GetInstance()->ChangeScene(TITLE);
+	                return;
+	            }
+	        } else {
+	            StageScene::isDemoMode = false;
+	            SceneManager::GetInstance()->ChangeScene(TITLE);
+	            return;
+	        }
+	        // アニメ進行中なので遷移完了待ち
+	        return;
+	    }
 
-	///------------------------------------------------
-	/// ゲームオーバー判定
-	///------------------------------------------------
-
-	if (!player_->GetIsAlive()) {
-		// プレイヤーが死亡したらゲームオーバーステートへ
-		scene->GetStageStateManager()->ChangeState(StageType::GameOver, scene);
-		return;
+	    scene->GetStageStateManager()->ChangeState(StageType::StageClear, scene);
+	    return;
 	}
 
 	if (pauseGuideSprite_) pauseGuideSprite_->Update();
