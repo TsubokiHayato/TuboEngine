@@ -192,6 +192,13 @@ public:
 
 	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation_ = nullptr;
 	bool isRequestSceneChange = false;
+	// シーンチェンジで遷移先を一時保持する（SceneChangeAnimation 完了時に遷移する）
+	int pendingNextSceneNo_ = -1;
+
+public:
+	// シーンチェンジ遷移先設定 (SceneChangeAnimation を使う場合)
+	void SetPendingNextScene(int sceneNo) { pendingNextSceneNo_ = sceneNo; }
+	int GetPendingNextScene() const { return pendingNextSceneNo_; }
 
 	// 追加: ステート切替(リスタート等)用のトランジション状態
 	bool isStateChangeTransitionActive_ = false;
@@ -201,6 +208,10 @@ public:
 	std::unique_ptr<HpUI> hpUI_;
 	std::unique_ptr<EnemyHpUI> enemyHpUI_;
 	std::unique_ptr<GuideUI> guideUI_;
+
+	// Demo overlay sprites
+	std::unique_ptr<TuboEngine::Sprite> demoLabelSprite_ = nullptr;     // "ーDEMOー"
+	std::unique_ptr<TuboEngine::Sprite> demoPressAnySprite_ = nullptr;  // "PRESS ANY BUTTON"
 
 	// Multi-stage layout data (debug / editor)
 	bool useMultiStageLayout_ = true;

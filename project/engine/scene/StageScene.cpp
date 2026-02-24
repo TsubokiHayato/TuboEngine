@@ -170,18 +170,34 @@ void StageScene::Initialize() {
 	// Guide UI (WASD)
 	guideUI_ = std::make_unique<GuideUI>();
 	guideUI_->Initialize();
+
+	// Demo sprites (two textures expected: "DemoLabel.png" and "PressAny.png")
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("DemoLabel.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("PressAny.png");
+	demoLabelSprite_ = std::make_unique<TuboEngine::Sprite>();
+	demoPressAnySprite_ = std::make_unique<TuboEngine::Sprite>();
+	demoLabelSprite_->Initialize("DEMO/DemoLabel.png");
+	demoPressAnySprite_->Initialize("DEMO/PressAny.png");
+	// Anchor to center for both
+	demoLabelSprite_->SetAnchorPoint({0.5f, 0.5f});
+	demoPressAnySprite_->SetAnchorPoint({0.5f, 0.5f});
+	// Start invisible
+	demoLabelSprite_->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
+	demoPressAnySprite_->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
+	demoLabelSprite_->Update();
+	demoPressAnySprite_->Update();
 }
 
 void StageScene::Update() {
 
+	// Scene change animation update
 	sceneChangeAnimation_->Update(1.0f / 60.0f);
 
-	if (sceneChangeAnimation_->IsFinished()) {
-		// ステートマネージャの更新
-		if (stateManager_) {
-			stateManager_->Update(this);
-		}
+	// Always update state manager so states can respond to animation/request flags
+	if (stateManager_) {
+		stateManager_->Update(this);
 	}
+
 	// デフォルトカメラをFollowCameraに設定
 	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	// 衝突マネージャの更新
@@ -228,8 +244,31 @@ void StageScene::Update() {
 		}
 
 		if (pressAny) {
-			SceneManager::GetInstance()->ChangeScene(int(SceneType::Title));
-			isDemoMode = false;
+			// Use scene-change animation if available, otherwise fallback to immediate transition
+			if (sceneChangeAnimation_) {
+				if (!isRequestSceneChange) {
+					// request animated transition to TITLE
+					pendingNextSceneNo_ = TITLE;
+					// clear demo flag now so other scenes don't treat next scene as demo
+					StageScene::isDemoMode = false;
+					sceneChangeAnimation_->SetPhase(SceneChangeAnimation::Phase::Appearing);
+					isRequestSceneChange = true;
+				}
+			} else {
+				// fallback: immediate change
+				StageScene::isDemoMode = false;
+				SceneManager::GetInstance()->ChangeScene(TITLE);
+			}
+		}
+	}
+
+	// SceneChangeAnimation がリクエストされており完了しているなら遷移を実行
+	if (isRequestSceneChange && sceneChangeAnimation_ && sceneChangeAnimation_->IsFinished()) {
+		if (pendingNextSceneNo_ >= 0) {
+			int next = pendingNextSceneNo_;
+			pendingNextSceneNo_ = -1;
+			isRequestSceneChange = false;
+			SceneManager::GetInstance()->ChangeScene(next);
 		}
 	}
 }
@@ -285,7 +324,39 @@ void StageScene::SpriteDraw() {
 	if (enemyHpUI_ && !isDemoMode) { enemyHpUI_->Draw(); }
 	// Guide UI 描画
 	if (guideUI_ && !isDemoMode) { guideUI_->Draw(); }
-	
+
+	// Demo sprites
+	if (isDemoMode) {
+		const float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
+		const float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
+
+		// Position demo label at upper center
+		if (demoLabelSprite_) {
+			float x = screenW * 0.5f;
+			float y = screenH * 0.28f;
+			demoLabelSprite_->SetPosition({x, y});
+			// set a consistent size (scale as needed)
+			// if texture large, adjust size; here we keep texture native size
+			Vector4 c = demoLabelSprite_->GetColor();
+			c.w = 1.0f; // visible
+			demoLabelSprite_->SetColor(c);
+			demoLabelSprite_->Update();
+			demoLabelSprite_->Draw();
+		}
+
+		// Position press-any at lower center
+		if (demoPressAnySprite_) {
+			float x = screenW * 0.5f;
+			float y = screenH * 0.72f;
+			demoPressAnySprite_->SetPosition({x, y});
+			Vector4 c = demoPressAnySprite_->GetColor();
+			c.w = 1.0f; // visible
+			demoPressAnySprite_->SetColor(c);
+			demoPressAnySprite_->Update();
+			demoPressAnySprite_->Draw();
+		}
+	}
+
 	// アニメーション描画
 	if (sceneChangeAnimation_) {
 		sceneChangeAnimation_->Draw();
