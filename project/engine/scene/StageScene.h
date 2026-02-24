@@ -152,8 +152,6 @@ public:
 	bool GetDrawPreviewStages() const { return drawPreviewStages_; }
 	void SetDrawPreviewStages(bool draw) { drawPreviewStages_ = draw; }
 
-	// ...existing code...
-
 private:
 	///----------------------------------------------------------------------------------------
 	///				メンバ変数
@@ -176,7 +174,13 @@ private:
 	std::unique_ptr<SkyBox> skyBox_ = nullptr;
 
 	std::unique_ptr<MapChipField> mapChipField_ = nullptr;
-	std::string mapChipCsvFilePath_ = "Resources/MapChip.csv";
+	std::string mapChipCsvFilePath_ = "Resources/Stage/MapChip.csv";
+	// Demo専用CSVパス（デモプレイ時にこちらを読み込む）
+	std::string demoMapChipCsvFilePath_ = "Resources/Stage/Demo.csv";
+
+public:
+	// Demo用CSVパス取得
+	const std::string& GetDemoMapChipCsvFilePath() const { return demoMapChipCsvFilePath_; }
 
 	std::vector<std::unique_ptr<Block>> blocks_;
 

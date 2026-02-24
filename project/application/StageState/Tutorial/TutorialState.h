@@ -24,7 +24,7 @@ private:
 	float elapsed_ = 0.0f;
 	int step_ = 0;
 	bool built_ = false;
-	std::string tutorialCsvPath_ = "Resources/Tutorial.csv";
+	std::string tutorialCsvPath_ = "Resources/Stage/Tutorial.csv";
 
 	// Tutorial UI sprites (text baked into textures)
 	std::unique_ptr<TuboEngine::Sprite> tutorialHeaderSprite_;
