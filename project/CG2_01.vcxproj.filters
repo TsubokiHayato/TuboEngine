@@ -365,6 +365,7 @@
     </ClCompile>
     <ClCompile Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.cpp" />
+    <ClCompile Include="application\Character\Player\PlayerAutoController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -804,6 +805,7 @@
     </ClInclude>
     <ClInclude Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.h" />
+    <ClInclude Include="application\Character\Player\PlayerAutoController.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli">

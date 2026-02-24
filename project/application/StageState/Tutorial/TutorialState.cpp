@@ -3,6 +3,7 @@
 #include "StageScene.h"
 #include "TextureManager.h"
 #include "Input.h"
+#include "ImGuiManager.h"
 
 namespace {
 	template<typename Func>
@@ -226,6 +227,10 @@ void TutorialState::Update(StageScene* scene) {
 		return;
 	}
 
+	// TutorialState の ImGui フラグを Player に渡す
+	scene->GetPlayer()->SetAutoControlEnabled(autoPlayEnabled_);
+
+	// このあとにブロックやプレイヤー更新など既存処理
 	for (auto& block : scene->GetBlocks()) {
 		if (!block) continue;
 		block->SetCamera(scene->GetFollowCamera()->GetCamera());
@@ -359,6 +364,12 @@ void TutorialState::SpriteDraw(StageScene* scene) {
 }
 
 void TutorialState::ImGuiDraw(StageScene* /*scene*/) {
+#ifdef USE_IMGUI
+	ImGui::Begin("Tutorial State");
+	ImGui::Text("Tutorial Step: %d", step_);
+	ImGui::Checkbox("Auto Play (Tutorial)", &autoPlayEnabled_);
+	ImGui::End();
+#endif
 }
 
 void TutorialState::ParticleDraw(StageScene* scene) {

@@ -1,8 +1,9 @@
 #include "Player.h"
+#include "PlayerAutoController.h" // 追加
 #include "Collider/CollisionTypeId.h"
 #include "ImGuiManager.h"
 #include "Input.h"
-#include"Effects/OrbitTrail/OrbitTrailEmitter.h"
+#include "Effects/OrbitTrail/OrbitTrailEmitter.h"
 #include "TextureManager.h"
 #include "engine/graphic/Particle/ParticleManager.h"
 #include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
@@ -13,7 +14,9 @@
 //--------------------------------------------------
 Player::Player()
     : cooldownTime(0.2f), damageCooldownTimer(0.0f), damageCooldownTime(1.0f), isDodging(false), dodgeTimer(0.0f), dodgeCooldownTimer(0.0f), dodgeDuration(0.2f), dodgeCooldown(1.0f), dodgeSpeed(0.5f),
-      dodgeDirection(0.0f, 0.0f, 0.0f) {}
+      dodgeDirection(0.0f, 0.0f, 0.0f) {
+    autoController_.Initialize(this);
+}
 
 //--------------------------------------------------
 // デストラクタ
@@ -131,11 +134,26 @@ void Player::Update() {
 	const bool wantCaptureMouse = false;
 #endif
 
-	// Clear/Over等の演出シーンでは isMovementLocked=true で入力無効化される。
-	// そのときマウス位置参照の Rotate() を走らせると、意図しない方向を向いたり
-	// レティクルが更新されてしまうため、回転はシーン側が制御する。
-	if (!wantCaptureMouse && !isMovementLocked) {
-		Rotate();
+	// デモ用自動操作フラグがONのときは AI で移動・射撃を制御する
+    autoController_.Update(1.0f / 60.0f);
+
+	// 回転処理
+	if (!isMovementLocked) {
+		if (IsAutoControlEnabled()) {
+			// オート操作中: autoAimDir_ から回転を計算
+			TuboEngine::Math::Vector3 dir = autoAimDir_;
+			float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+			if (len > 0.0001f) {
+				dir.x /= len;
+				dir.y /= len;
+				// Rotate() と同じ式: atan2(aimDir.x, -aimDir.y)
+				float angle = std::atan2(dir.x, -dir.y);
+				rotation.z = 3.12f + angle;
+			}
+		} else if (!wantCaptureMouse) {
+			// 手動時は従来通りマウス方向
+			Rotate();
+		}
 	}
 
 	if (!isMovementLocked) {
@@ -237,7 +255,14 @@ void Player::Update() {
 // 弾を撃つ処理
 //--------------------------------------------------	
 void Player::Shoot() {
-	if (TuboEngine::Input::GetInstance()->IsPressMouse(0) && bulletTimer <= 0.0f) {
+	bool trigger = false;
+	if (IsAutoControlEnabled()) {
+		trigger = autoShoot_;
+	} else {
+		trigger = TuboEngine::Input::GetInstance()->IsPressMouse(0);
+	}
+
+	if (trigger && bulletTimer <= 0.0f) {
 		// プレイヤーの現在の回転(Z)から発射方向を作る（Rotateと一貫性を保つ）
 		float ang = rotation.z;
 		TuboEngine::Math::Vector3 dir{std::sin(ang), std::cos(ang), 0.0f};
@@ -281,17 +306,25 @@ void Player::Move() {
 	}
 	TuboEngine::Math::Vector3 prevPosition = position;
 	TuboEngine::Math::Vector3 moveDelta = {0.0f, 0.0f, 0.0f};
-	if (TuboEngine::Input::GetInstance()->PushKey(DIK_W)) {
-		moveDelta.y -= 0.1f;
-	}
-	if (TuboEngine::Input::GetInstance()->PushKey(DIK_S)) {
-		moveDelta.y += 0.1f;
-	}
-	if (TuboEngine::Input::GetInstance()->PushKey(DIK_A)) {
-		moveDelta.x -= 0.1f;
-	}
-	if (TuboEngine::Input::GetInstance()->PushKey(DIK_D)) {
-		moveDelta.x += 0.1f;
+	// Direct Input
+	if (IsAutoControlEnabled()) {
+		// 自動操作: コントローラーからの入力を使用
+		// 手動操作の 0.1f に相当する速度を適用 (moveDirは正規化されている前提)
+		moveDelta = autoMoveDir_ * 0.1f;
+	} else {
+		// 手動操作
+		if (TuboEngine::Input::GetInstance()->PushKey(DIK_W)) {
+			moveDelta.y -= 0.1f;
+		}
+		if (TuboEngine::Input::GetInstance()->PushKey(DIK_S)) {
+			moveDelta.y += 0.1f;
+		}
+		if (TuboEngine::Input::GetInstance()->PushKey(DIK_A)) {
+			moveDelta.x -= 0.1f;
+		}
+		if (TuboEngine::Input::GetInstance()->PushKey(DIK_D)) {
+			moveDelta.x += 0.1f;
+		}
 	}
 	TuboEngine::Math::Vector3 tryPosition = position + moveDelta;
 	if (mapChipField) {
@@ -318,6 +351,16 @@ void Player::Rotate() {
 	int mouseX = static_cast<int>(TuboEngine::Input::GetInstance()->GetMousePosition().x);
 	int mouseY = static_cast<int>(TuboEngine::Input::GetInstance()->GetMousePosition().y);
 	reticlePosition = TuboEngine::Math::Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
+
+	if (IsAutoControlEnabled()) {
+		// 自動操作中は移動方向（あるいは敵方向）を向く
+		// autoMoveDir_ が 0 でなければ更新
+		if (autoMoveDir_.x != 0.0f || autoMoveDir_.y != 0.0f) {
+			float angle = std::atan2(autoMoveDir_.x, -autoMoveDir_.y);
+			rotation.z = 3.12f + angle;
+		}
+		return;
+	}
 
 	// レイキャストで算出した地面上ターゲット方向で回転を更新（斜め視点対応）
 	TuboEngine::Math::Vector3 aimDir = GetAimDirectionFromReticle();
@@ -468,9 +511,6 @@ void Player::UpdateDodge() {
 		}
 	}
 }
-
-// --- 回避可能か ---
-bool Player::CanDodge() const { return !isDodging && dodgeCooldownTimer <= 0.0f; }
 
 // --- 回避入力方向取得 ---
 TuboEngine::Math::Vector3 Player::GetDodgeInputDirection() const {
