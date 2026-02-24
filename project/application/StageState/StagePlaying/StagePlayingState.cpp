@@ -110,18 +110,40 @@ void StagePlayingState::Update(StageScene* scene) {
 		}
 	}
 	if (allEnemiesDefeated && !enemies.empty()) {
-		scene->GetStageStateManager()->ChangeState(StageType::StageClear, scene);
-		return;
-	}
+	    // DEMOモード時はシーンチェンジアニメーションを挟んでタイトルへ戻す
+	    if (StageScene::isDemoMode) {
+	        if (scene) {
+	            auto* anim = scene->GetSceneChangeAnimation();
+	            if (anim) {
+	                // アニメが未リクエストなら開始
+	                if (!scene->GetIsRequestSceneChange()) {
+	                    anim->SetPhase(SceneChangeAnimation::Phase::Appearing);
+	                    scene->SetIsRequestSceneChange(true);
+	                }
+	                // アニメが完了していれば遷移
+	                if (scene->GetIsRequestSceneChange() && anim->IsFinished()) {
+	                    StageScene::isDemoMode = false;
+	                    scene->SetIsRequestSceneChange(false);
+	                    SceneManager::GetInstance()->ChangeScene(TITLE);
+	                    return;
+	                }
+	            } else {
+	                // アニメ未設定なら即遷移
+	                StageScene::isDemoMode = false;
+	                SceneManager::GetInstance()->ChangeScene(TITLE);
+	                return;
+	            }
+	        } else {
+	            StageScene::isDemoMode = false;
+	            SceneManager::GetInstance()->ChangeScene(TITLE);
+	            return;
+	        }
+	        // アニメ進行中なので遷移完了待ち
+	        return;
+	    }
 
-	///------------------------------------------------
-	/// ゲームオーバー判定
-	///------------------------------------------------
-
-	if (!player_->GetIsAlive()) {
-		// プレイヤーが死亡したらゲームオーバーステートへ
-		scene->GetStageStateManager()->ChangeState(StageType::GameOver, scene);
-		return;
+	    scene->GetStageStateManager()->ChangeState(StageType::StageClear, scene);
+	    return;
 	}
 
 	if (pauseGuideSprite_) pauseGuideSprite_->Update();
@@ -191,8 +213,21 @@ void StagePlayingState::SpriteDraw(StageScene* scene) {
 void StagePlayingState::ImGuiDraw(StageScene* scene) {
 
 	scene->GetFollowCamera()->DrawImGui();
-	scene->GetPlayer()->DrawImGui();
+#ifdef USE_IMGUI
+	ImGui::Begin("Stage Playing");
 
+	ImGui::Text("Playing State");
+
+	// オートプレイON/OFF
+	ImGui::Checkbox("Auto Play (Playing)", &autoPlayEnabled_);
+
+	ImGui::End();
+
+	// Player側のImGuiも出したければ
+	if (scene && scene->GetPlayer()) {
+		scene->GetPlayer()->DrawImGui();
+	}
+#endif
 	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
 	// EnemyのImgui
 	for (auto& enemy : enemies) {
