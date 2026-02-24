@@ -133,6 +133,8 @@ public:
 	void SetAutoMoveDirection(const TuboEngine::Math::Vector3& dir) { autoMoveDir_ = dir; }
 	void SetAutoShoot(bool enabled) { autoShoot_ = enabled; }
 
+	// ★ 追加: 近くの敵への向き（XY平面の正規化ベクトル）を設定
+	void SetAutoAimDirection(const TuboEngine::Math::Vector3& dir) { autoAimDir_ = dir; }
 private:
 	///--------------------------------------------------
 	///				引き渡し用変数
@@ -202,4 +204,7 @@ private:
 private:
 	TuboEngine::Math::Vector3 autoMoveDir_{0.0f, 0.0f, 0.0f};
 	bool autoShoot_ = false;
+
+	//オートエイム用の方向（XY平面の正規化ベクトル）
+	TuboEngine::Math::Vector3 autoAimDir_{0.0f, -1.0f, 0.0f};
 };
