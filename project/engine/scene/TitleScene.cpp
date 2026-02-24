@@ -132,6 +132,8 @@ void TitleScene::Update() {
 	// UIからのシーン遷移要求を受け取って、演出開始
 	if (!isRequestSceneChange && titleUI && titleUI->GetrRequestSceneChange_()) {
 		if (sceneChangeAnimation->IsFinished()) {
+			// pending に UI の希望を保存してアニメ開始
+			pendingNextSceneType_ = titleUI->GetNextSceneType();
 			sceneChangeAnimation->SetPhase(SceneChangeAnimation::Phase::Appearing);
 			isRequestSceneChange = true;
 		}
@@ -140,20 +142,25 @@ void TitleScene::Update() {
 	// シーン遷移完了判定（UIの要求に応じて遷移）
 	if (isRequestSceneChange && sceneChangeAnimation->IsFinished()) {
 		int next = TITLE;
-		if (titleUI) {
+		// UI 主導の遷移があれば優先
+		if (titleUI && titleUI->GetrRequestSceneChange_()) {
 			switch (titleUI->GetNextSceneType()) {
-			case SceneType::Select:
-				next = STAGE;
-				break;
-			case SceneType::Tutorial:
-				next = TUTORIAL;
-				break;
-			default:
-				next = TITLE;
-				break;
+			case SceneType::Select: next = STAGE; break;
+			case SceneType::Tutorial: next = TUTORIAL; break;
+			default: next = TITLE; break;
 			}
 			titleUI->ClearSceneChangeRequest();
+		} else {
+			// pendingNextSceneType_ を使う（デモなど）
+			switch (pendingNextSceneType_) {
+			case SceneType::Select: next = STAGE; break;
+			case SceneType::Tutorial: next = TUTORIAL; break;
+			default: next = TITLE; break;
+			}
+			// reset pending
+			pendingNextSceneType_ = SceneType::Title;
 		}
+		// ChangeScene 実行
 		SceneManager::GetInstance()->ChangeScene(next);
 		isRequestSceneChange = false;
 	}
@@ -177,9 +184,19 @@ void TitleScene::Update() {
 
 	// 時間経過でデモモードへ遷移
 	if (demoTimer_ >= kDemoStartTime) {
-		StageScene::isDemoMode = true;
-		SceneManager::GetInstance()->ChangeScene(STAGE);
-		// 遷移リクエスト済みにして多重呼び出し防止（念のため）
+		// アニメーション経由でデモに遷移する
+		if (!isRequestSceneChange && sceneChangeAnimation && sceneChangeAnimation->IsFinished()) {
+			pendingNextSceneType_ = SceneType::Select; // 実行時に STAGE へ
+			// Set demo flag now so StageScene initializes in demo mode
+			StageScene::isDemoMode = true;
+			sceneChangeAnimation->SetPhase(SceneChangeAnimation::Phase::Appearing);
+			isRequestSceneChange = true;
+		} else if (!sceneChangeAnimation) {
+			// フォールバック
+			StageScene::isDemoMode = true;
+			SceneManager::GetInstance()->ChangeScene(STAGE);
+		}
+		// reset timer
 		demoTimer_ = 0.0f;
 	}
 }
