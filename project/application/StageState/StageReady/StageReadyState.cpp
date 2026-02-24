@@ -39,7 +39,9 @@ template<typename Func> static void ForEachMapChipField(MapChipField* field, Fun
 
 void StageReadyState::Enter(StageScene* scene) {
 	// Stage0（実プレイ）のCSVをロード
-	scene->GetMapChipField()->LoadMapChipCsv(scene->GetMapChipCsvFilePath());
+	// デモモード時は専用のCSVを読み込む
+	const std::string csvToLoad = (StageScene::isDemoMode) ? scene->GetDemoMapChipCsvFilePath() : scene->GetMapChipCsvFilePath();
+	scene->GetMapChipField()->LoadMapChipCsv(csvToLoad);
 
 	// プレイヤー座標（Stage0）
 	int playerMapX = -1, playerMapY = -1;
