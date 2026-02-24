@@ -1,5 +1,4 @@
 #include "TitleScene.h"
-#include "StageScene.h" // 追加: isDemoModeフラグ操作のため
 #include "ImGuiManager.h"
 #include "Input.h"
 #include "LineManager.h"
@@ -49,8 +48,6 @@ void TitleScene::Initialize() {
 
 	// 背景タイマー
 	time_ = 0.0f;
-	// デモタイマーリセット
-	demoTimer_ = 0.0f;
 }
 
 void TitleScene::Update() {
@@ -132,8 +129,6 @@ void TitleScene::Update() {
 	// UIからのシーン遷移要求を受け取って、演出開始
 	if (!isRequestSceneChange && titleUI && titleUI->GetrRequestSceneChange_()) {
 		if (sceneChangeAnimation->IsFinished()) {
-			// pending に UI の希望を保存してアニメ開始
-			pendingNextSceneType_ = titleUI->GetNextSceneType();
 			sceneChangeAnimation->SetPhase(SceneChangeAnimation::Phase::Appearing);
 			isRequestSceneChange = true;
 		}
@@ -142,63 +137,25 @@ void TitleScene::Update() {
 	// シーン遷移完了判定（UIの要求に応じて遷移）
 	if (isRequestSceneChange && sceneChangeAnimation->IsFinished()) {
 		int next = TITLE;
-		// UI 主導の遷移があれば優先
-		if (titleUI && titleUI->GetrRequestSceneChange_()) {
+		if (titleUI) {
 			switch (titleUI->GetNextSceneType()) {
-			case SceneType::Select: next = STAGE; break;
-			case SceneType::Tutorial: next = TUTORIAL; break;
-			default: next = TITLE; break;
+			case SceneType::Select:
+				next = STAGE;
+				break;
+			case SceneType::Tutorial:
+				next = TUTORIAL;
+				break;
+			default:
+				next = TITLE;
+				break;
 			}
 			titleUI->ClearSceneChangeRequest();
-		} else {
-			// pendingNextSceneType_ を使う（デモなど）
-			switch (pendingNextSceneType_) {
-			case SceneType::Select: next = STAGE; break;
-			case SceneType::Tutorial: next = TUTORIAL; break;
-			default: next = TITLE; break;
-			}
-			// reset pending
-			pendingNextSceneType_ = SceneType::Title;
 		}
-		// ChangeScene 実行
 		SceneManager::GetInstance()->ChangeScene(next);
 		isRequestSceneChange = false;
 	}
 
 	// 背景アニメ（時間のみで更新、Object3DDraw で参照）
-
-	// --- Demo Timer Logic ---
-	// 何か入力があればタイマーリセット
-	auto* input = TuboEngine::Input::GetInstance();
-	if (input->TriggerKey(DIK_SPACE) || input->TriggerKey(DIK_RETURN) ||
-		input->TriggerKey(DIK_Z) || input->TriggerKey(DIK_X) ||
-		input->IsTriggerMouse(0) || input->IsTriggerMouse(1) ||
-		input->GetWheel() != 0) {
-		demoTimer_ = 0.0f;
-	} else {
-		// 入力がなければ進める
-		if (!isRequestSceneChange) { // シーン遷移中はカウントしない
-			demoTimer_ += dt;
-		}
-	}
-
-	// 時間経過でデモモードへ遷移
-	if (demoTimer_ >= kDemoStartTime) {
-		// アニメーション経由でデモに遷移する
-		if (!isRequestSceneChange && sceneChangeAnimation && sceneChangeAnimation->IsFinished()) {
-			pendingNextSceneType_ = SceneType::Select; // 実行時に STAGE へ
-			// Set demo flag now so StageScene initializes in demo mode
-			StageScene::isDemoMode = true;
-			sceneChangeAnimation->SetPhase(SceneChangeAnimation::Phase::Appearing);
-			isRequestSceneChange = true;
-		} else if (!sceneChangeAnimation) {
-			// フォールバック
-			StageScene::isDemoMode = true;
-			SceneManager::GetInstance()->ChangeScene(STAGE);
-		}
-		// reset timer
-		demoTimer_ = 0.0f;
-	}
 }
 
 void TitleScene::Finalize() {}

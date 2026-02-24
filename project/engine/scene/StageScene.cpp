@@ -3,12 +3,6 @@
 #include "Collider/CollisionManager.h"
 #include "LineManager.h"
 #include "ParticleManager.h" // 追加: パーティクル描画/更新
-#include"SceneType.h"
-
-#include "engine/input/Input.h" // 追加
-
-// 静的メンバ定義
-bool StageScene::isDemoMode = false;
 
 namespace {
 StageScene::StageBounds ComputeBoundsWorld(const TuboEngine::Math::Vector3& origin, const MapChipField& field) {
@@ -127,12 +121,6 @@ void StageScene::Initialize() {
 		stateManager_->ChangeState(StageType::Tutorial, this);
 	}
 
-	// デモモード初期化
-	if (isDemoMode) {
-		player_->SetAutoControlEnabled(true);
-		// デモ中はUIを非表示にする設定などがあればここで行う
-	}
-
 	// Multi-stage (debug/editor): 初期ステージを2つ用意しておく
 	stageInstances_.clear();
 	{
@@ -170,34 +158,18 @@ void StageScene::Initialize() {
 	// Guide UI (WASD)
 	guideUI_ = std::make_unique<GuideUI>();
 	guideUI_->Initialize();
-
-	// Demo sprites (two textures expected: "DemoLabel.png" and "PressAny.png")
-	TuboEngine::TextureManager::GetInstance()->LoadTexture("DemoLabel.png");
-	TuboEngine::TextureManager::GetInstance()->LoadTexture("PressAny.png");
-	demoLabelSprite_ = std::make_unique<TuboEngine::Sprite>();
-	demoPressAnySprite_ = std::make_unique<TuboEngine::Sprite>();
-	demoLabelSprite_->Initialize("DEMO/DemoLabel.png");
-	demoPressAnySprite_->Initialize("DEMO/PressAny.png");
-	// Anchor to center for both
-	demoLabelSprite_->SetAnchorPoint({0.5f, 0.5f});
-	demoPressAnySprite_->SetAnchorPoint({0.5f, 0.5f});
-	// Start invisible
-	demoLabelSprite_->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
-	demoPressAnySprite_->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
-	demoLabelSprite_->Update();
-	demoPressAnySprite_->Update();
 }
 
 void StageScene::Update() {
 
-	// Scene change animation update
 	sceneChangeAnimation_->Update(1.0f / 60.0f);
 
-	// Always update state manager so states can respond to animation/request flags
-	if (stateManager_) {
-		stateManager_->Update(this);
+	if (sceneChangeAnimation_->IsFinished()) {
+		// ステートマネージャの更新
+		if (stateManager_) {
+			stateManager_->Update(this);
+		}
 	}
-
 	// デフォルトカメラをFollowCameraに設定
 	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	// 衝突マネージャの更新
@@ -214,63 +186,6 @@ void StageScene::Update() {
 	if (enemyHpUI_) { enemyHpUI_->Update(enemies, followCamera->GetCamera()); }
 	// Guide UI 更新
 	if (guideUI_) { guideUI_->Update(); }
-
-	// --- Demo Mode Logic ---
-	if (isDemoMode) {
-		// 敵リストをプレイヤー(AutoController)に渡す
-		if (player_ && player_->IsAutoControlEnabled()) {
-			std::vector<Enemy*> enemyPtrs;
-			enemyPtrs.reserve(enemies.size());
-			for (const auto& e : enemies) {
-				if (e && e->GetIsAlive()) {
-					enemyPtrs.push_back(e.get());
-				}
-			}
-			// StageInstance内の敵も追加する必要があるかも？
-			// 今はメインのenemiesだけ対象
-			player_->SetEnemyList(enemyPtrs);
-		}
-
-		// 入力があればタイトルへ戻る
-		// キーボードの任意のキー、あるいはマウス
-		// ※Inputクラスに AnyKey がないので代表的なキーのみチェック
-		bool pressAny = false;
-		auto* input = TuboEngine::Input::GetInstance();
-		// スペース、エンター、Z、X、クリックなど
-		if (input->TriggerKey(DIK_SPACE) || input->TriggerKey(DIK_RETURN) || 
-			input->TriggerKey(DIK_Z) || input->TriggerKey(DIK_X) ||
-			input->IsTriggerMouse(0) || input->IsTriggerMouse(1)) {
-			pressAny = true;
-		}
-
-		if (pressAny) {
-			// Use scene-change animation if available, otherwise fallback to immediate transition
-			if (sceneChangeAnimation_) {
-				if (!isRequestSceneChange) {
-					// request animated transition to TITLE
-					pendingNextSceneNo_ = TITLE;
-					// clear demo flag now so other scenes don't treat next scene as demo
-					StageScene::isDemoMode = false;
-					sceneChangeAnimation_->SetPhase(SceneChangeAnimation::Phase::Appearing);
-					isRequestSceneChange = true;
-				}
-			} else {
-				// fallback: immediate change
-				StageScene::isDemoMode = false;
-				SceneManager::GetInstance()->ChangeScene(TITLE);
-			}
-		}
-	}
-
-	// SceneChangeAnimation がリクエストされており完了しているなら遷移を実行
-	if (isRequestSceneChange && sceneChangeAnimation_ && sceneChangeAnimation_->IsFinished()) {
-		if (pendingNextSceneNo_ >= 0) {
-			int next = pendingNextSceneNo_;
-			pendingNextSceneNo_ = -1;
-			isRequestSceneChange = false;
-			SceneManager::GetInstance()->ChangeScene(next);
-		}
-	}
 }
 
 void StageScene::Finalize() {}
@@ -319,44 +234,12 @@ void StageScene::SpriteDraw() {
 	}
 	
 	// HP UI 描画
-	if (hpUI_ && !isDemoMode) { hpUI_->Draw(); }
+	if (hpUI_) { hpUI_->Draw(); }
 	// Enemy HP UI 描画（追従）
-	if (enemyHpUI_ && !isDemoMode) { enemyHpUI_->Draw(); }
+	if (enemyHpUI_) { enemyHpUI_->Draw(); }
 	// Guide UI 描画
-	if (guideUI_ && !isDemoMode) { guideUI_->Draw(); }
-
-	// Demo sprites
-	if (isDemoMode) {
-		const float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
-		const float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
-
-		// Position demo label at upper center
-		if (demoLabelSprite_) {
-			float x = screenW * 0.5f;
-			float y = screenH * 0.28f;
-			demoLabelSprite_->SetPosition({x, y});
-			// set a consistent size (scale as needed)
-			// if texture large, adjust size; here we keep texture native size
-			Vector4 c = demoLabelSprite_->GetColor();
-			c.w = 1.0f; // visible
-			demoLabelSprite_->SetColor(c);
-			demoLabelSprite_->Update();
-			demoLabelSprite_->Draw();
-		}
-
-		// Position press-any at lower center
-		if (demoPressAnySprite_) {
-			float x = screenW * 0.5f;
-			float y = screenH * 0.72f;
-			demoPressAnySprite_->SetPosition({x, y});
-			Vector4 c = demoPressAnySprite_->GetColor();
-			c.w = 1.0f; // visible
-			demoPressAnySprite_->SetColor(c);
-			demoPressAnySprite_->Update();
-			demoPressAnySprite_->Draw();
-		}
-	}
-
+	if (guideUI_) { guideUI_->Draw(); }
+	
 	// アニメーション描画
 	if (sceneChangeAnimation_) {
 		sceneChangeAnimation_->Draw();
@@ -604,18 +487,6 @@ void StageScene::ParticleDraw() {
 	}
 	// 追加: 全エミッター描画 (PlayerTrail 含む)
 	TuboEngine::ParticleManager::GetInstance()->Draw();
-
-#ifdef USE_IMGUI
-	if (isDemoMode) {
-		ImGui::SetNextWindowPos(ImVec2(TuboEngine::WinApp::GetInstance()->GetClientWidth() * 0.5f, 100.0f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-		ImGui::SetNextWindowBgAlpha(0.0f); // 背景透明
-		//ImGui::Begin("DemoOverlay", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoInputs);
-		/*ImGui::Begin("DEMO");
-		ImGui::SetWindowFontScale(3.0f);
-		ImGui::TextColored(ImVec4(1, 1, 0, 1), "DEMO PLAY");
-		ImGui::End();*/
-	}
-#endif
 }
 void StageScene::CheckAllCollisions() {
 	/// 衝突マネージャのリセット ///
