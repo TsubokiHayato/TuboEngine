@@ -29,6 +29,7 @@ void PlayerAutoController::Update(float dt) {
     }
 
     TuboEngine::Math::Vector3 moveDir{0.0f, 0.0f, 0.0f};
+    TuboEngine::Math::Vector3 aimDir{0.0f, -1.0f, 0.0f}; // デフォルト
     bool wantShoot = false;
 
     if (nearest) {
@@ -50,6 +51,9 @@ void PlayerAutoController::Update(float dt) {
             moveDir = {-toEnemy.x, -toEnemy.y, 0.0f};
         }
 
+        // ★ 常に最近敵の方向をエイム方向にする
+        aimDir = toEnemy;
+
         if (dist <= kDesiredDist + kStopBand) {
             shootTimer_ += dt;
             if (shootTimer_ >= 0.5f) {
@@ -66,4 +70,5 @@ void PlayerAutoController::Update(float dt) {
 
     owner_->SetAutoMoveDirection(moveDir);
     owner_->SetAutoShoot(wantShoot);
+    owner_->SetAutoAimDirection(aimDir); // ★ 追加
 }

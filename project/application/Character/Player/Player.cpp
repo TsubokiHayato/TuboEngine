@@ -135,12 +135,25 @@ void Player::Update() {
 #endif
 
 	// デモ用自動操作フラグがONのときは AI で移動・射撃を制御する
-
-
     autoController_.Update(1.0f / 60.0f);
 
-	if (!wantCaptureMouse && !isMovementLocked) {
-		Rotate();
+	// 回転処理
+	if (!isMovementLocked) {
+		if (IsAutoControlEnabled()) {
+			// オート操作中: autoAimDir_ から回転を計算
+			TuboEngine::Math::Vector3 dir = autoAimDir_;
+			float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+			if (len > 0.0001f) {
+				dir.x /= len;
+				dir.y /= len;
+				// Rotate() と同じ式: atan2(aimDir.x, -aimDir.y)
+				float angle = std::atan2(dir.x, -dir.y);
+				rotation.z = 3.12f + angle;
+			}
+		} else if (!wantCaptureMouse) {
+			// 手動時は従来通りマウス方向
+			Rotate();
+		}
 	}
 
 	if (!isMovementLocked) {

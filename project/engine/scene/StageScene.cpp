@@ -538,10 +538,11 @@ void StageScene::ParticleDraw() {
 	if (isDemoMode) {
 		ImGui::SetNextWindowPos(ImVec2(TuboEngine::WinApp::GetInstance()->GetClientWidth() * 0.5f, 100.0f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
 		ImGui::SetNextWindowBgAlpha(0.0f); // 背景透明
-		ImGui::Begin("DemoOverlay", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoInputs);
+		//ImGui::Begin("DemoOverlay", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoInputs);
+		/*ImGui::Begin("DEMO");
 		ImGui::SetWindowFontScale(3.0f);
 		ImGui::TextColored(ImVec4(1, 1, 0, 1), "DEMO PLAY");
-		ImGui::End();
+		ImGui::End();*/
 	}
 #endif
 }
