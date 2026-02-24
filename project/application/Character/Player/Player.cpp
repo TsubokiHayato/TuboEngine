@@ -512,9 +512,6 @@ void Player::UpdateDodge() {
 	}
 }
 
-// --- 回避可能か ---
-bool Player::CanDodge() const { return !isDodging && dodgeCooldownTimer <= 0.0f; }
-
 // --- 回避入力方向取得 ---
 TuboEngine::Math::Vector3 Player::GetDodgeInputDirection() const {
 	TuboEngine::Math::Vector3 inputDir(0.0f, 0.0f, 0.0f);
