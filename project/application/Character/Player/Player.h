@@ -59,7 +59,6 @@ private:
 	// --- 回避関連 ---
 	void StartDodge();
 	void UpdateDodge();
-	bool CanDodge() const;
 	TuboEngine::Math::Vector3 GetDodgeInputDirection() const;
 
 public:
@@ -133,8 +132,14 @@ public:
 	void SetAutoMoveDirection(const TuboEngine::Math::Vector3& dir) { autoMoveDir_ = dir; }
 	void SetAutoShoot(bool enabled) { autoShoot_ = enabled; }
 
-	// ★ 追加: 近くの敵への向き（XY平面の正規化ベクトル）を設定
+	// 近くの敵への向き（XY平面の正規化ベクトル）を設定
 	void SetAutoAimDirection(const TuboEngine::Math::Vector3& dir) { autoAimDir_ = dir; }
+	// 自動操作で回避開始
+	void AutoStartDodge() { StartDodge(); }
+
+	// --- 回避可能か ---
+	bool CanDodge() const { return !isDodging && dodgeCooldownTimer <= 0.0f; }
+
 private:
 	///--------------------------------------------------
 	///				引き渡し用変数
