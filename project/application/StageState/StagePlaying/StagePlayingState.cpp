@@ -110,6 +110,13 @@ void StagePlayingState::Update(StageScene* scene) {
 		}
 	}
 	if (allEnemiesDefeated && !enemies.empty()) {
+        // DEMOモード時はクリア画面に行かずタイトルへ戻す
+        if (StageScene::isDemoMode) {
+            // デモ状態を解除してタイトルへ遷移
+            StageScene::isDemoMode = false;
+            SceneManager::GetInstance()->ChangeScene(TITLE);
+            return;
+        }
 		scene->GetStageStateManager()->ChangeState(StageType::StageClear, scene);
 		return;
 	}
