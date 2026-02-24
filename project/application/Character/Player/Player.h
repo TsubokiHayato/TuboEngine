@@ -7,6 +7,7 @@
 #include "engine/graphic/Particle/ParticleManager.h"
 #include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 #include "Camera.h"
+#include "PlayerAutoController.h" // 追加
 // 前方宣言（ヘッダ依存軽減）
 class IParticleEmitter;
 
@@ -58,7 +59,6 @@ private:
 	// --- 回避関連 ---
 	void StartDodge();
 	void UpdateDodge();
-	bool CanDodge() const;
 	TuboEngine::Math::Vector3 GetDodgeInputDirection() const;
 
 public:
@@ -120,6 +120,25 @@ public:
 	void SetMapChipField(MapChipField* mapChipField) { this->mapChipField = mapChipField; }
 
 	void SetMovementLocked(bool flag) { isMovementLocked = flag; }
+
+	// 自動操作を有効/無効
+	void SetAutoControlEnabled(bool enabled) { autoController_.SetEnabled(enabled); }
+	bool IsAutoControlEnabled() const { return autoController_.IsEnabled(); }
+
+    // 自動操作用: 敵リストをコントローラに渡す
+    void SetEnemyList(const std::vector<Enemy*>& enemies) { autoController_.SetEnemyList(enemies); }
+
+	// 自動操作用インターフェース（AutoControllerから呼ばれる）
+	void SetAutoMoveDirection(const TuboEngine::Math::Vector3& dir) { autoMoveDir_ = dir; }
+	void SetAutoShoot(bool enabled) { autoShoot_ = enabled; }
+
+	// 近くの敵への向き（XY平面の正規化ベクトル）を設定
+	void SetAutoAimDirection(const TuboEngine::Math::Vector3& dir) { autoAimDir_ = dir; }
+	// 自動操作で回避開始
+	void AutoStartDodge() { StartDodge(); }
+
+	// --- 回避可能か ---
+	bool CanDodge() const { return !isDodging && dodgeCooldownTimer <= 0.0f; }
 
 private:
 	///--------------------------------------------------
@@ -185,10 +204,12 @@ private:
 	float dashPostEffectDuration_ = 0.25f;
 	float dashRadialBlurPower_ = 0.06f; // 0.02がデフォルトなので少し強め
 
-	// Damage演出（ポストエフェクト）
-	// HP割合で常時かけるビネット（低HPほど強い）
-	float lowHpVignetteMaxPower_ = 3.0f; // HP0付近での最大（デフォルト0.8→最大3.0）
-	float lowHpVignetteStartRatio_ = 0.5f; // このHP割合以下から効き始める
-	float lowHpVignetteSmoothing_ = 0.15f; // 追従のなめらかさ（0で即時）
-	float lowHpVignetteCurrentPower_ = 0.8f; // 現在適用中（補間用）
+	PlayerAutoController autoController_; // 自動操作用
+
+private:
+	TuboEngine::Math::Vector3 autoMoveDir_{0.0f, 0.0f, 0.0f};
+	bool autoShoot_ = false;
+
+	//オートエイム用の方向（XY平面の正規化ベクトル）
+	TuboEngine::Math::Vector3 autoAimDir_{0.0f, -1.0f, 0.0f};
 };
