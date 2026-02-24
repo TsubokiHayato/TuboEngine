@@ -28,4 +28,10 @@ private:
 	float shootTimer_ = 0.0f;
 
 	std::vector<Enemy*> enemies_;
+
+	// ★ ブリンク用パラメータ
+	float blinkCooldown_ = 2.0f;     // ブリンクのクールダウン(秒)
+	float blinkCooldownTimer_ = 0.0f;
+	float blinkDistance_ = 8.0f;     // 一回のブリンク距離
+	float blinkDangerDist_ = 5.0f;   // この距離より近いと「危険」とみなす
 };
