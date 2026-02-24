@@ -781,6 +781,7 @@ bool Enemy::CanSeePlayer() {
 }
 
 void Enemy::DrawViewCone() {
+#if defined(_DEBUG)
     float halfRad = (kViewAngleDeg / 2.0f) * kPI / 180.0f;
     float baseAngle = rotation.z;
 	TuboEngine::Math::Vector3 center = position;
@@ -826,9 +827,11 @@ void Enemy::DrawViewCone() {
             }
         }
     }
+#endif
 }
 
 void Enemy::DrawLastSeenMark() {
+#if defined(_DEBUG)
     if (lastSeenTimer <= 0.0f)
         return;
     constexpr Vector4 kLastSeenColor = {1.0f, 0.2f, 0.2f, 1.0f};
@@ -846,6 +849,7 @@ void Enemy::DrawLastSeenMark() {
 		TuboEngine::Math::Vector3 p1 = center + TuboEngine::Math::Vector3{std::cos(a1) * kLastSeenMarkSize, std::sin(a1) * kLastSeenMarkSize, 0.0f};
         LineManager::GetInstance()->DrawLine(p0, p1, kLastSeenColor);
     }
+#endif
 }
 
 // 末尾に欠けていた関数を追加
