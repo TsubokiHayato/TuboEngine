@@ -12,6 +12,7 @@
 #include <memory>
 #include "Sprite.h"
 #include "Character/Player/Player.h"
+#include"application/SkyDome/SkyDome.h"
 
 class TitleScene : public IScene {
 public:
@@ -84,4 +85,9 @@ private:
 	const float kDemoStartTime = 10.0f;
 	// アニメ経由での遷移先を保持する（UI以外からの要求、例: デモ）
 	SceneType pendingNextSceneType_ = SceneType::Title;
+
+	// タイトル画面用スカイドーム
+	std::unique_ptr<SkyDome> skyDome_;
+	float skyboxRotateY_ = 0.0f;
+	float skyboxRotateX_ = 0.0f;
 };
