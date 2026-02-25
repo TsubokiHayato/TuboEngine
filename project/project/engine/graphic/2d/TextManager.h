@@ -19,6 +19,7 @@ public:
     void Finalize();
     void UpdateAll();
     void DrawAll();
+    void DrawImGui();
 
     // フォント管理
     Font* LoadFont(const std::string& name, const std::wstring& filePath, float size);

@@ -158,7 +158,8 @@ bool Font::AddGlyphToAtlas(char32_t codePoint) {
     Glyph glyph;
     glyph.advanceX = glyphMetrics.advanceWidth * scale;
     glyph.offsetX = glyphMetrics.leftSideBearing * scale;
-    glyph.offsetY = glyphMetrics.topSideBearing * scale;
+    // topSideBearing ではなく、ascent と topSideBearing を使ってベースラインからのオフセットを計算
+    glyph.offsetY = (fontMetrics.ascent - glyphMetrics.topSideBearing) * scale;
     
     // グリフのビットマップを生成
     Microsoft::WRL::ComPtr<IDWriteGlyphRunAnalysis> glyphAnalysis;

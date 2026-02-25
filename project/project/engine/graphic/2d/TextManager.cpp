@@ -1,5 +1,6 @@
 #include "TextManager.h"
 #include <iostream>
+#include "externals/imgui/imgui.h"
 
 namespace TuboEngine {
 
@@ -48,6 +49,116 @@ void TextManager::DrawAll() {
     for (auto& text : texts_) {
         text->Draw();
     }
+}
+
+void TextManager::DrawImGui() {
+#ifdef USE_IMGUI
+    ImGui::Begin("TextManager");
+
+    // フォントの追加UI
+    if (ImGui::CollapsingHeader("Add Font")) {
+        static char fontNameBuf[64] = "";
+        static char fontPathBuf[256] = "C:\\Windows\\Fonts\\msgothic.ttc";
+        static float fontSize = 32.0f;
+
+        ImGui::InputText("Font Name", fontNameBuf, sizeof(fontNameBuf));
+        ImGui::InputText("Font Path", fontPathBuf, sizeof(fontPathBuf));
+        ImGui::DragFloat("Font Size", &fontSize, 1.0f, 8.0f, 128.0f);
+
+        if (ImGui::Button("Load Font")) {
+            if (fontNameBuf[0] != '\0' && fontPathBuf[0] != '\0') {
+                // char* から std::wstring への変換
+                int size_needed = MultiByteToWideChar(CP_UTF8, 0, fontPathBuf, (int)strlen(fontPathBuf), NULL, 0);
+                std::wstring wstrPath(size_needed, 0);
+                MultiByteToWideChar(CP_UTF8, 0, fontPathBuf, (int)strlen(fontPathBuf), &wstrPath[0], size_needed);
+
+                LoadFont(fontNameBuf, wstrPath, fontSize);
+            }
+        }
+    }
+
+    // 登録済みフォント一覧
+    if (ImGui::CollapsingHeader("Loaded Fonts")) {
+        for (const auto& pair : fonts_) {
+            ImGui::Text("%s", pair.first.c_str());
+        }
+    }
+
+    // テキストオブジェクトの管理UI
+    if (ImGui::CollapsingHeader("Text Objects")) {
+        if (ImGui::Button("Create New Text")) {
+            if (!fonts_.empty()) {
+                CreateText(fonts_.begin()->first, "New Text", { 100.0f, 100.0f });
+            }
+        }
+
+        ImGui::Separator();
+
+        int index = 0;
+        for (auto it = texts_.begin(); it != texts_.end(); ) {
+            ImGui::PushID(index);
+            
+            bool isOpen = ImGui::TreeNode((std::string("Text ") + std::to_string(index)).c_str());
+            
+            ImGui::SameLine();
+            if (ImGui::Button("Delete")) {
+                it = texts_.erase(it);
+                ImGui::PopID();
+                if (isOpen) ImGui::TreePop();
+                continue;
+            }
+
+            if (isOpen) {
+                TextObject* textObj = it->get();
+
+                // テキスト内容の編集
+                // std::u32string から UTF-8 への変換は少し手間なので、
+                // ここでは簡易的に TextObject 側に GetText() を追加するか、
+                // 別の方法で管理する必要があります。
+                // 今回は TextObject に GetText() がないと仮定し、
+                // 編集用のバッファを別途用意するなどの工夫が必要ですが、
+                // ひとまず位置、色、スケールの編集のみ実装します。
+
+                Math::Vector2 pos = textObj->GetPosition();
+                if (ImGui::DragFloat2("Position", &pos.x, 1.0f)) {
+                    textObj->SetPosition(pos);
+                }
+
+                Math::Vector4 color = textObj->GetColor();
+                if (ImGui::ColorEdit4("Color", &color.x)) {
+                    textObj->SetColor(color);
+                }
+
+                float scale = textObj->GetScale();
+                if (ImGui::DragFloat("Scale", &scale, 0.01f, 0.1f, 10.0f)) {
+                    textObj->SetScale(scale);
+                }
+
+                // フォントの変更
+                if (!fonts_.empty()) {
+                    std::vector<const char*> fontNames;
+                    for (const auto& pair : fonts_) {
+                        fontNames.push_back(pair.first.c_str());
+                    }
+                    
+                    // 現在のフォントのインデックスを見つける処理は省略（簡易化のため）
+                    static int currentFontIdx = 0;
+                    if (ImGui::Combo("Font", &currentFontIdx, fontNames.data(), static_cast<int>(fontNames.size()))) {
+                        textObj->SetFont(GetFont(fontNames[currentFontIdx]));
+                    }
+                }
+
+                ImGui::TreePop();
+            }
+            
+            ImGui::PopID();
+            ++it;
+            ++index;
+        }
+    }
+
+    ImGui::End();
+#endif
 }
 
 Font* TextManager::LoadFont(const std::string& name, const std::wstring& filePath, float size) {
