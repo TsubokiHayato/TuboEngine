@@ -26,6 +26,12 @@ public:
     void SetScale(float scale);
     void SetFont(Font* font);
 
+    // Getter
+    const Math::Vector2& GetPosition() const { return position_; }
+    const Math::Vector4& GetColor() const { return color_; }
+    float GetScale() const { return scale_; }
+    Font* GetFont() const { return font_; }
+
     void Update();  // 文字列やパラメータ変更時に頂点を更新
     void Draw();    // Sprite と同じパイプラインで描画
 
