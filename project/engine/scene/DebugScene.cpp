@@ -39,12 +39,10 @@ void DebugScene::Initialize() {
 	// TextManager Test
 
 	// フォントの読み込み (Windows標準のメイリオを使用)
-	TuboEngine::TextManager::GetInstance()->LoadFont("Meiryo", L"C:\\Windows\\Fonts\\meiryo.ttc", 32.0f);
-	TuboEngine::TextManager::GetInstance()->LoadFont("Arial", L"C:\\Windows\\Fonts\\arial.ttf", 32.0f);
 	TuboEngine::TextManager::GetInstance()->LoadFont("MS Gothic", L"C:\\Windows\\Fonts\\msgothic.ttc", 32.0f);
 	// テキストオブジェクトの作成
 	testText_ = TuboEngine::TextManager::GetInstance()->CreateText(
-		"Meiryo", 
+		"MS Gothic", 
 		"Debug Scene\nTextManager Test\n日本語も表示できます", 
 		{ 50.0f, 50.0f }, 
 		{ 1.0f, 1.0f, 1.0f, 1.0f }, 
@@ -183,40 +181,8 @@ void DebugScene::ImGuiDraw() {
 	ImGui::DragFloat3("Scale",    &cameraScale.x,    0.1f);
 	ImGui::End();
 
-	if (testText_) {
-		ImGui::Begin("TextManager Test");
-		
-		static char textBuf[256] = "Debug Scene\nTextManager Test\n日本語も表示できます";
-		if (ImGui::InputTextMultiline("Text", textBuf, sizeof(textBuf))) {
-			testText_->SetText(textBuf);
-		}
-
-		static float pos[2] = { 50.0f, 50.0f };
-		if (ImGui::DragFloat2("Position", pos, 1.0f)) {
-			testText_->SetPosition({ pos[0], pos[1] });
-		}
-
-		static float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		if (ImGui::ColorEdit4("Color", color)) {
-			testText_->SetColor({ color[0], color[1], color[2], color[3] });
-		}
-
-		static float scale = 1.0f;
-		if (ImGui::DragFloat("Scale", &scale, 0.01f, 0.1f, 10.0f)) {
-			testText_->SetScale(scale);
-		}
-
-		const char* fontNames[] = { "Meiryo", "Arial", "MS Gothic" };
-		static int currentFontIdx = 0;
-		if (ImGui::Combo("Font", &currentFontIdx, fontNames, IM_ARRAYSIZE(fontNames))) {
-			auto* font = TuboEngine::TextManager::GetInstance()->GetFont(fontNames[currentFontIdx]);
-			if (font) {
-				testText_->SetFont(font);
-			}
-		}
-
-		ImGui::End();
-	}
+		TuboEngine::TextManager::GetInstance()->DrawImGui();
+	
 #endif
 
 	// 全エミッター管理 UI（保存/ロード・個別編集が可能）
