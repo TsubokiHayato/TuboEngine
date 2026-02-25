@@ -23,6 +23,8 @@
 #include"SkyBox.h"
 #include"Animation/SceneChangeAnimation.h"
 
+#include "project/engine/graphic/2d/TextManager.h"
+
 // パーティクル
 #include "engine/graphic/Particle/ParticleManager.h"
 #include "engine/graphic/Particle/Effects/Primitive/PrimitiveEmitter.h"
@@ -69,6 +71,9 @@ private:
 
 	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation = nullptr;
 	bool isRequestSceneChange = false;
+
+	// テキストテスト用
+	TuboEngine::TextObject* testText_ = nullptr;
 
 	// 変更: 生ポインタ配列 → 名前配列
 	std::vector<std::string> emitterNames_;
