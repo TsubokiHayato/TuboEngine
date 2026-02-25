@@ -171,7 +171,8 @@ void TitleScene::Update() {
 		if (titleUI && titleUI->GetrRequestSceneChange_()) {
 			switch (titleUI->GetNextSceneType()) {
 			case SceneType::Select: next = STAGE; break;
-			case SceneType::Tutorial: next = TUTORIAL; break;
+			// Tutorialには行けないようにする
+			case SceneType::Tutorial: next = TITLE; break;
 			default: next = TITLE; break;
 			}
 			titleUI->ClearSceneChangeRequest();
@@ -179,7 +180,8 @@ void TitleScene::Update() {
 			// pendingNextSceneType_ を使う（デモなど）
 			switch (pendingNextSceneType_) {
 			case SceneType::Select: next = STAGE; break;
-			case SceneType::Tutorial: next = TUTORIAL; break;
+			// Tutorialには行けないようにする
+			case SceneType::Tutorial: next = TITLE; break;
 			default: next = TITLE; break;
 			}
 			// reset pending
@@ -215,7 +217,7 @@ void TitleScene::Update() {
 			// Set demo flag now so StageScene initializes in demo mode
 			StageScene::isDemoMode = true;
 			sceneChangeAnimation->SetPhase(SceneChangeAnimation::Phase::Appearing);
-			isRequestSceneChange = true;
+		 isRequestSceneChange = true;
 		} else if (!sceneChangeAnimation) {
 			// フォールバック
 			StageScene::isDemoMode = true;
