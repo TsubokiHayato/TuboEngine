@@ -192,12 +192,17 @@ void TextManager::DrawImGui() {
 					def.name = nameBuf;
 				}
 
-				// text
-				static char textBuf[512];
-				std::snprintf(textBuf, sizeof(textBuf), "%s", def.text.c_str());
-				if (ImGui::InputTextMultiline("Text", textBuf, sizeof(textBuf))) {
-					def.text = textBuf;
-					textObj->SetText(def.text);
+				// text (persistent buffer)
+				{
+					static std::unordered_map<size_t, std::string> editBuffers;
+					std::string& edit = editBuffers[index];
+					if (edit.empty() && !def.text.empty()) {
+						edit = def.text;
+					}
+					if (ImGui::InputTextMultiline("Text", edit.data(), static_cast<int>(edit.capacity()), ImVec2(0, 0), ImGuiInputTextFlags_AllowTabInput)) {
+						def.text = edit;
+						textObj->SetText(def.text);
+					}
 				}
 
 				// position
