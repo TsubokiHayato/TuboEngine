@@ -15,7 +15,6 @@
 #include "Effects/Toon/ToonEffect.h"
 #include "Effects/Vignette/VignetteEffect.h"
 #include "Effects/randam/randomEffect.h"
-#include "Effects/FlickerGlow/FlickerGlowEffect.h"
 
 OffScreenRendering* OffScreenRendering::instance = nullptr;
 
@@ -69,7 +68,6 @@ void OffScreenRendering::Initialize() {
 	postEffectManager.AddEffect(std::make_unique<randomEffect>());            // ランダムエフェクト
 	postEffectManager.AddEffect(std::make_unique<ToonEffect>());              // トゥーンエフェクト
 	postEffectManager.AddEffect(std::make_unique<BloomEffect>());             // ブルームエフェクト
-	postEffectManager.AddEffect(std::make_unique<FlickerGlowEffect>());       // フリッカー＋グローエフェクト
 	// PostEffectManagerの初期化
 	postEffectManager.InitializeAll();
 
@@ -270,7 +268,7 @@ void OffScreenRendering::DrawImGui() {
 	    "Random",            // ランダムエフェクト
 	    "Toon",              // トゥーンエフェクト
 	    "Bloom",             // ブルームエフェクト
-	    "FlickerGlow",       // 徐々に点灯＋ノイズ＋軽いグロー
+	                         //  他のエフェクトを追加する場合はここに追加
 	};
 
 	int effectIndex = static_cast<int>(postEffectManager.GetCurrentIndex());
