@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <externals/nlohmann/json.hpp>
+#include <filesystem> // 追加: ディレクトリ作成用
 
 namespace TuboEngine {
 
@@ -172,7 +173,10 @@ void TextManager::DrawImGui() {
 			TextObject* textObj = texts_[index].get();
 
 			ImGui::PushID(static_cast<int>(index));
-			bool isOpen = ImGui::TreeNode(def.name.c_str());
+			// ツリーラベル: 表示名 + 固定ID + index（ImGui の ID は ## 以降）
+			char treeLabel[128];
+			std::snprintf(treeLabel, sizeof(treeLabel), "TextObject [%s]##TextDef%zu", def.name.c_str(), index);
+			bool isOpen = ImGui::TreeNode(treeLabel);
 			ImGui::SameLine();
 			if (ImGui::Button("Delete")) {
 				textDefs_.erase(textDefs_.begin() + static_cast<std::ptrdiff_t>(index));
@@ -192,15 +196,15 @@ void TextManager::DrawImGui() {
 					def.name = nameBuf;
 				}
 
-				// text (persistent buffer)
+				// text: use a local fixed buffer each frame, seeded from def.text
 				{
-					static std::unordered_map<size_t, std::string> editBuffers;
-					std::string& edit = editBuffers[index];
-					if (edit.empty() && !def.text.empty()) {
-						edit = def.text;
-					}
-					if (ImGui::InputTextMultiline("Text", edit.data(), static_cast<int>(edit.capacity()), ImVec2(0, 0), ImGuiInputTextFlags_AllowTabInput)) {
-						def.text = edit;
+					char textBuf[1024];
+					std::size_t len = def.text.size();
+					if (len >= sizeof(textBuf)) { len = sizeof(textBuf) - 1; }
+					std::memcpy(textBuf, def.text.data(), len);
+					textBuf[len] = '\0';
+					if (ImGui::InputTextMultiline("Text", textBuf, sizeof(textBuf))) {
+						def.text = textBuf;
 						textObj->SetText(def.text);
 					}
 				}
@@ -435,7 +439,7 @@ bool TextManager::LoadTextLayout(const std::string& filePath) {
 		if (font) {
 			TextObject* obj = CreateText(def.fontName + "_" + std::to_string(static_cast<int>(def.fontSize)), def.text, def.position, def.color, def.scale);
 			if (obj) {
-				obj->SetFont(font);
+			 obj->SetFont(font);
 			}
 		}
 	}
@@ -459,8 +463,20 @@ bool TextManager::SaveTextLayout(const std::string& filePath) const {
 		root["texts"].push_back(jt);
 	}
 
+	// 親ディレクトリが無ければ作成
+	try {
+		std::filesystem::path path(filePath);
+		if (path.has_parent_path()) {
+			std::filesystem::create_directories(path.parent_path());
+		}
+	} catch (const std::exception& e) {
+		std::cerr << "Failed to create directories for layout: " << e.what() << std::endl;
+		return false;
+	}
+
 	std::ofstream ofs(filePath);
 	if (!ofs) {
+		std::cerr << "Failed to open layout file for writing: " << filePath << std::endl;
 		return false;
 	}
 	ofs << root.dump(2);
