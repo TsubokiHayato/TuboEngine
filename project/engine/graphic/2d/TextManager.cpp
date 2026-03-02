@@ -53,15 +53,26 @@ void TextManager::Finalize() {
 }
 
 void TextManager::UpdateAll() {
-	for (std::unique_ptr<TextObject>& text : texts_) {
-		text->Update();
-	}
+    for (size_t i = 0; i < texts_.size(); ++i) {
+        if (i < textAlive_.size() && !textAlive_[i]) continue;
+        texts_[i]->Update();
+    }
+
+    // ここでフラグが false のものを後ろから erase
+    for (size_t i = texts_.size(); i-- > 0; ) {
+        if (i < textAlive_.size() && !textAlive_[i]) {
+            texts_.erase(texts_.begin() + static_cast<std::ptrdiff_t>(i));
+            textDefs_.erase(textDefs_.begin() + static_cast<std::ptrdiff_t>(i));
+            textAlive_.erase(textAlive_.begin() + static_cast<std::ptrdiff_t>(i));
+        }
+    }
 }
 
 void TextManager::DrawAll() {
-	for (std::unique_ptr<TextObject>& text : texts_) {
-		text->Draw();
-	}
+    for (size_t i = 0; i < texts_.size(); ++i) {
+        if (i < textAlive_.size() && !textAlive_[i]) continue;
+        texts_[i]->Draw();
+    }
 }
 
 void TextManager::DrawImGui() {
@@ -179,14 +190,17 @@ void TextManager::DrawImGui() {
 			bool isOpen = ImGui::TreeNode(treeLabel);
 			ImGui::SameLine();
 			if (ImGui::Button("Delete")) {
-				textDefs_.erase(textDefs_.begin() + static_cast<std::ptrdiff_t>(index));
-				texts_.erase(texts_.begin() + static_cast<std::ptrdiff_t>(index));
-				ImGui::PopID();
-				if (isOpen) {
-					ImGui::TreePop();
-				}
-				continue;
-			}
+    // 論理削除: フラグを false にする
+    if (index < textAlive_.size()) {
+        textAlive_[index] = false;
+    }
+    ImGui::PopID();
+    if (isOpen) {
+        ImGui::TreePop();
+    }
+    ++index;
+    continue;
+}
 
 			if (isOpen) {
 				// name
@@ -380,16 +394,19 @@ TextObject* TextManager::CreateText(const std::string& fontName, const std::stri
 
 	TextObject* ptr = textObj.get();
 	texts_.push_back(std::move(textObj));
+	textAlive_.push_back(true);   // 追加
 	return ptr;
 }
 
 void TextManager::RemoveText(TextObject* text) {
-	std::vector<std::unique_ptr<TextObject>>::iterator it = std::find_if(
-		texts_.begin(), texts_.end(),
-		[text](const std::unique_ptr<TextObject>& ptr) { return ptr.get() == text; });
-	if (it != texts_.end()) {
-		texts_.erase(it);
-	}
+    auto it = std::find_if(texts_.begin(), texts_.end(),
+        [text](const std::unique_ptr<TextObject>& ptr) { return ptr.get() == text; });
+    if (it != texts_.end()) {
+        size_t idx = static_cast<size_t>(std::distance(texts_.begin(), it));
+        if (idx < textAlive_.size()) {
+            textAlive_[idx] = false; // 削除予約
+        }
+    }
 }
 
 bool TextManager::LoadTextLayout(const std::string& filePath) {
@@ -412,6 +429,7 @@ bool TextManager::LoadTextLayout(const std::string& filePath) {
 
 	textDefs_.clear();
 	texts_.clear();
+	textAlive_.clear();   // 追加
 
 	for (json& jt : root["texts"]) {
 		TextDefinition def{};

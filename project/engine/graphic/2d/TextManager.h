@@ -88,6 +88,9 @@ private:
     // 保存用のテキスト定義と TextObject の対応
     std::vector<TextDefinition> textDefs_;
 
+    // TextManager.h（texts_ と同じサイズを保つフラグ）
+    std::vector<bool> textAlive_;
+
     // フォント検索用ディレクトリ
     std::string projectFontDir_ = "Resources/Font/";
     std::string externalFontDir_ = "Resources/Font/external/";
