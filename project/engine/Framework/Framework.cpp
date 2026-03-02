@@ -1,8 +1,7 @@
 #include "Framework.h"
 #include"WinApp.h"
 #include <dxcapi.h>
-
-
+#include "project/engine/graphic/2d/TextManager.h"
 
 void Framework::Initialize() {
 
@@ -62,6 +61,9 @@ void Framework::Initialize() {
 	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
 	TuboEngine::TextureManager::GetInstance()->LoadTexture(testDDSTextureHandle);
 
+	// TextManagerの初期化
+	TuboEngine::TextManager::GetInstance()->Initialize();
+
 	//シーンマネージャーの初期化
 	SceneManager::GetInstance()->Initialize(STAGE); // タイトルシーンから開始
 
@@ -96,6 +98,9 @@ void Framework::Finalize() {
 #endif // USE_IMGUI
 
 	TuboEngine::Input::GetInstance()->Finalize();
+
+	// TextManagerの解放
+	TuboEngine::TextManager::DestroyInstance();
 
 	// パーティクルマネージャの明示解放（エミッター内のGPUリソースを先に解放する）
 	TuboEngine::ParticleManager::GetInstance()->Finalize();
