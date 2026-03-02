@@ -1,4 +1,5 @@
 #include "TitleScene.h"
+#include"StageScene.h"//isDemo用
 #include "ImGuiManager.h"
 #include "Input.h"
 #include "LineManager.h"
