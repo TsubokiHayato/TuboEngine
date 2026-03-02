@@ -298,6 +298,7 @@ void RushEnemy::ApplyChargeAndVisuals(float dt) {
 }
 
 void RushEnemy::DrawDebugGizmos() {
+#if defined(_DEBUG)
     const int div = 24; Vector4 triggerCol{0.3f,0.9f,0.3f,0.35f};
 	for (int i = 0; i < div; ++i) {
 		float a0 = (2.0f * DirectX::XM_PI) * (float(i) / div);
@@ -321,10 +322,13 @@ void RushEnemy::DrawDebugGizmos() {
 			LineManager::GetInstance()->DrawLine(p0, p1, previewCol);
 		}
 		float cross = previewR;
+
 		LineManager::GetInstance()->DrawLine(predicted + TuboEngine::Math::Vector3{-cross, 0, 0}, predicted + TuboEngine::Math::Vector3{cross, 0, 0}, previewCol);
 		LineManager::GetInstance()->DrawLine(predicted + TuboEngine::Math::Vector3{0, -cross, 0}, predicted + TuboEngine::Math::Vector3{0, cross, 0}, previewCol);
 		LineManager::GetInstance()->DrawLine(position, predicted, Vector4{1, 0.3f, 0.3f, 0.3f});
+
     }
+#endif
 }
 
 // -------------------------------------------------
