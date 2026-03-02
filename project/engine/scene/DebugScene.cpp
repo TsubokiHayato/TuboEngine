@@ -11,7 +11,7 @@
 #include "TextureManager.h"
 #include "Input.h"
 #include "LineManager.h"
-#include "project/engine/graphic/2d/TextManager.h"
+#include "TextManager.h"
 
 void DebugScene::Initialize() {
 

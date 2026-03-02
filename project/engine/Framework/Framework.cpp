@@ -1,7 +1,7 @@
 #include "Framework.h"
 #include"WinApp.h"
 #include <dxcapi.h>
-#include "project/engine/graphic/2d/TextManager.h"
+#include "TextManager.h"
 
 void Framework::Initialize() {
 
