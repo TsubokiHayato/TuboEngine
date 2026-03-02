@@ -65,9 +65,6 @@ void Enemy::Initialize() {
 
     HP = 10; // 調整: 少し耐える
 
-    // 射撃エネミーの攻撃範囲(停止して撃つ距離)は従来値を初期値として保持
-    attackRange_ = shootDistance_;
-
     idleLookAroundTimer = idleLookAroundIntervalSec;
     idleBackPhase_ = IdleBackPhase::None;
     idleBackHoldTimer = 0.0f;
@@ -409,20 +406,12 @@ void Enemy::Update() {
 
     if (player_) {
         if (canSeePlayer) {
-            // 射撃エネミーは「見えている限り遠距離でも射撃」
-            // 追跡/停止の切替は attackRange_ で決める
-            if (attackRange_ <= 0.0f) {
-                // attackRange_==0: 常に追跡しつつ射撃
-                state_ = (distanceToPlayer > moveStartDistance_) ? State::Idle : State::Chase;
-            } else {
-                if (distanceToPlayer > moveStartDistance_) {
-                    state_ = State::Idle;
-                } else if (distanceToPlayer > attackRange_) {
-                    state_ = State::Chase;
-                } else {
-                    state_ = State::Attack;
-                }
-            }
+            if (distanceToPlayer > moveStartDistance_)
+                state_ = State::Idle;
+            else if (distanceToPlayer > shootDistance_)
+                state_ = State::Chase;
+            else
+                state_ = State::Attack;
         } else if (lastSeenTimer > 0.0f)
             state_ = State::Alert;
         else if (state_ == State::Alert)
@@ -447,7 +436,6 @@ void Enemy::Update() {
     }
 
     // --- 射撃条件評価 ---
-    // 見えている限り、距離に関係なく射撃を試行する（射撃エネミーの遠距離攻撃）
     wantShoot_ = (canSeePlayer && (state_ == State::Chase || state_ == State::Attack));
 
     // クールダウンタイマー更新
@@ -713,12 +701,6 @@ void Enemy::DrawImGui() {
     ImGui::DragFloat("KnockbackStrength", &knockbackStrength_, 0.01f, 0.1f, 10.0f);
     ImGui::DragFloat("KnockbackDamping", &knockbackDamping_, 0.01f, 0.5f, 0.99f);
     ImGui::Separator();
-	// Enemy::DrawImGui 内
-	float atkRange = GetAttackRange();
-	if (ImGui::DragFloat("Attack Range", &atkRange, 0.1f, 0.0f, 50.0f)) {
-		SetAttackRange(atkRange);
-	}
-	ImGui::DragFloat("Move Start Distance", &moveStartDistance_, 0.1f, 0.0f, 100.0f);
     // 視野角・視認距離を調整
     float angle = GetViewAngleDeg();
     if (ImGui::DragFloat("View Angle (deg)", &angle, 0.5f, 1.0f, 360.0f)) {
