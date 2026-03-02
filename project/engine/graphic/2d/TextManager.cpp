@@ -410,59 +410,67 @@ void TextManager::RemoveText(TextObject* text) {
 }
 
 bool TextManager::LoadTextLayout(const std::string& filePath) {
-	std::ifstream ifs(filePath);
-	if (!ifs) {
-		return false;
-	}
+    // レイアウト差し替え前に一度 GPU 完了を待つ
+    {
+        auto* dx = TuboEngine::DirectXCommon::GetInstance();
+        dx->CommandExecution();  // 何もコマンドを積んでいなければ fence 待ちになるだけ
+    }
 
-	json root;
-	try {
-		ifs >> root;
-	} catch (...) {
-		std::cerr << "Failed to parse text layout JSON: " << filePath << std::endl;
-		return false;
-	}
+    std::ifstream ifs(filePath);
+    if (!ifs) {
+        return false;
+    }
 
-	if (!root.contains("texts") || !root["texts"].is_array()) {
-		return false;
-	}
+    json root;
+    try {
+        ifs >> root;
+    } catch (...) {
+        std::cerr << "Failed to parse text layout JSON: " << filePath << std::endl;
+        return false;
+    }
 
-	textDefs_.clear();
-	texts_.clear();
-	textAlive_.clear();   // 追加
+    if (!root.contains("texts") || !root["texts"].is_array()) {
+        return false;
+    }
 
-	for (json& jt : root["texts"]) {
-		TextDefinition def{};
-		def.name     = jt.value("name", "");
-		def.text     = jt.value("text", "");
-		def.fontName = jt.value("font", PresetFontNames::Best10);
-		def.fontSize = jt.value("fontSize", 32.0f);
-		std::vector<float> posArr  = jt.value("position", std::vector<float>{0.0f, 0.0f});
-		std::vector<float> colArr  = jt.value("color",    std::vector<float>{1.0f, 1.0f, 1.0f, 1.0f});
-		def.scale    = jt.value("scale", 1.0f);
+    textDefs_.clear();
+    texts_.clear();
+    textAlive_.clear();
 
-		if (posArr.size() >= 2) {
-			def.position = Math::Vector2{posArr[0], posArr[1]};
-		}
-		if (colArr.size() >= 4) {
-			def.color = Math::Vector4{colArr[0], colArr[1], colArr[2], colArr[3]};
-		}
+    // 以下は今の実装のまま
+    for (json& jt : root["texts"]) {
+        TextDefinition def{};
+        def.name     = jt.value("name", "");
+        def.text     = jt.value("text", "");
+        def.fontName = jt.value("font", PresetFontNames::Best10);
+        def.fontSize = jt.value("fontSize", 32.0f);
+        std::vector<float> posArr  = jt.value("position", std::vector<float>{0.0f, 0.0f});
+        std::vector<float> colArr  = jt.value("color",    std::vector<float>{1.0f, 1.0f, 1.0f, 1.0f});
+        def.scale    = jt.value("scale", 1.0f);
 
-		textDefs_.push_back(def);
-	}
+        if (posArr.size() >= 2) {
+            def.position = Math::Vector2{posArr[0], posArr[1]};
+        }
+        if (colArr.size() >= 4) {
+            def.color = Math::Vector4{colArr[0], colArr[1], colArr[2], colArr[3]};
+        }
 
-	// TextObject を生成
-	for (TextDefinition& def : textDefs_) {
-		Font* font = GetOrCreateFontSized(def.fontName, def.fontSize);
-		if (font) {
-			TextObject* obj = CreateText(def.fontName + "_" + std::to_string(static_cast<int>(def.fontSize)), def.text, def.position, def.color, def.scale);
-			if (obj) {
-			 obj->SetFont(font);
-			}
-		}
-	}
+        textDefs_.push_back(def);
+    }
 
-	return true;
+    for (TextDefinition& def : textDefs_) {
+        Font* font = GetOrCreateFontSized(def.fontName, def.fontSize);
+        if (font) {
+            TextObject* obj =
+                CreateText(def.fontName + "_" + std::to_string(static_cast<int>(def.fontSize)),
+                           def.text, def.position, def.color, def.scale);
+            if (obj) {
+                obj->SetFont(font);
+            }
+        }
+    }
+
+    return true;
 }
 
 bool TextManager::SaveTextLayout(const std::string& filePath) const {
