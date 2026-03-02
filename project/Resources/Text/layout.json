@@ -1,3 +1,21 @@
 {
-  "texts": []
+  "texts": [
+    {
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "font": "Best10",
+      "fontSize": 32.0,
+      "name": "Text",
+      "position": [
+        100.0,
+        100.0
+      ],
+      "scale": 1.0,
+      "text": "茄子はおいしいよ"
+    }
+  ]
 }
