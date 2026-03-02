@@ -366,6 +366,9 @@
     <ClCompile Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.cpp" />
     <ClCompile Include="application\Character\Player\PlayerAutoController.cpp" />
+    <ClCompile Include="engine\graphic\2d\Font.cpp" />
+    <ClCompile Include="engine\graphic\2d\TextManager.cpp" />
+    <ClCompile Include="engine\graphic\2d\TextObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -806,6 +809,9 @@
     <ClInclude Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.h" />
     <ClInclude Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.h" />
     <ClInclude Include="application\Character\Player\PlayerAutoController.h" />
+    <ClInclude Include="engine\graphic\2d\Font.h" />
+    <ClInclude Include="engine\graphic\2d\TextManager.h" />
+    <ClInclude Include="engine\graphic\2d\TextObject.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli">

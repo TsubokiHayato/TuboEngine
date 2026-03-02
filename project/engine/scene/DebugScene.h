@@ -23,7 +23,7 @@
 #include"SkyBox.h"
 #include"Animation/SceneChangeAnimation.h"
 
-#include "project/engine/graphic/2d/TextManager.h"
+#include "TextManager.h"
 
 // パーティクル
 #include "engine/graphic/Particle/ParticleManager.h"
