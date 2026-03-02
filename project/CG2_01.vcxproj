@@ -245,6 +245,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Tile\Tile.cpp" />
     <ClCompile Include="engine\scene\OverScene.cpp" />
     <ClCompile Include="application\SkyDome\SkyDome.cpp" />
+    <ClCompile Include="project\engine\graphic\2d\Font.cpp" />
+    <ClCompile Include="project\engine\graphic\2d\TextManager.cpp" />
+    <ClCompile Include="project\engine\graphic\2d\TextObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\Character\Enemy\RushEnemy.h" />
@@ -397,6 +400,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Tile\Tile.h" />
     <ClInclude Include="engine\scene\OverScene.h" />
     <ClInclude Include="application\SkyDome\SkyDome.h" />
+    <ClInclude Include="project\engine\graphic\2d\Font.h" />
+    <ClInclude Include="project\engine\graphic\2d\TextManager.h" />
+    <ClInclude Include="project\engine\graphic\2d\TextObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
