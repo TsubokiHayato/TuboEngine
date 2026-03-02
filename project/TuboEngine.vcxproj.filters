@@ -1034,7 +1034,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="CG2.rc">
+    <ResourceCompile Include="TuboEngine.rc">
       <Filter>projects</Filter>
     </ResourceCompile>
   </ItemGroup>

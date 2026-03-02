@@ -410,7 +410,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="CG2.rc" />
+    <ResourceCompile Include="TuboEngine.rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="tools\README_Filters.md" />
