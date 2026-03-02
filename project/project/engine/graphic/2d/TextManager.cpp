@@ -30,30 +30,35 @@ void TextManager::Initialize() {
 	windowsFontDir_ = "C:/Windows/Fonts/";
 #endif
 
-	// プリセットフォント登録
+	// プリセット BaseFont 登録
 	LoadFontFromExternal(PresetFontNames::Best10, "BestTen-CRT.otf", 32.0f);
 	LoadFontFromExternal(PresetFontNames::SoukouMincho, "SoukouMincho.ttf", 32.0f);
 	LoadFontFromExternal(PresetFontNames::UtsukushiFONT, "UtsukushiFONT.otf", 24.0f);
 	LoadFontFromExternal(PresetFontNames::YasashisaGothicBold, "YasashisaGothicBold-V2.otf", 48.0f);
 
-	// 必要ならここでデフォルトレイアウト JSON を読み込む
-	// LoadTextLayout("Resources/Text/layout.json");
+	baseFontNames_.push_back(PresetFontNames::Best10);
+	baseFontNames_.push_back(PresetFontNames::SoukouMincho);
+	baseFontNames_.push_back(PresetFontNames::UtsukushiFONT);
+	baseFontNames_.push_back(PresetFontNames::YasashisaGothicBold);
 }
 
 void TextManager::Finalize() {
 	fonts_.clear();
 	texts_.clear();
 	textDefs_.clear();
+	baseFontNames_.clear();
+	addedFontNames_.clear();
+	sizedFontNames_.clear();
 }
 
 void TextManager::UpdateAll() {
-	for (auto& text : texts_) {
+	for (std::unique_ptr<TextObject>& text : texts_) {
 		text->Update();
 	}
 }
 
 void TextManager::DrawAll() {
-	for (auto& text : texts_) {
+	for (std::unique_ptr<TextObject>& text : texts_) {
 		text->Draw();
 	}
 }
@@ -79,7 +84,7 @@ void TextManager::DrawImGui() {
 		}
 	}
 
-	// フォントの追加UI
+	// フォントの追加UI（AddFont）
 	if (ImGui::CollapsingHeader("Add Font")) {
 		static char fontNameBuf[64] = "";
 		static char fontFileBuf[128] = "msgothic.ttc";
@@ -96,36 +101,44 @@ void TextManager::DrawImGui() {
 		if (ImGui::Button("Load Font")) {
 			if (fontNameBuf[0] != '\0' && fontFileBuf[0] != '\0') {
 				Font* font = nullptr;
+				std::string fontName(fontNameBuf);
 				std::string fileName(fontFileBuf);
 
 				switch (sourceType) {
-				case 0: font = LoadFontFromProject(fontNameBuf, fileName, fontSize); break;
-				case 1: font = LoadFontFromExternal(fontNameBuf, fileName, fontSize); break;
-				case 2: font = LoadFontFromWindows(fontNameBuf, fileName, fontSize); break;
+				case 0: font = LoadFontFromProject(fontName, fileName, fontSize); break;
+				case 1: font = LoadFontFromExternal(fontName, fileName, fontSize); break;
+				case 2: font = LoadFontFromWindows(fontName, fileName, fontSize); break;
 				default: break;
 				}
 
 				if (!font) {
 					std::cerr << "Failed to load font via ImGui UI." << std::endl;
+				} else {
+					// AddFont グループに登録（BaseFont とは別）
+					addedFontNames_.push_back(fontName);
 				}
 			}
 		}
 	}
 
-	// 登録済みフォント一覧
+	// 登録済みフォント一覧（BaseFont / AddFont / SizeFont を区別して表示）
 	if (ImGui::CollapsingHeader("Loaded Fonts")) {
-		for (const auto& pair : fonts_) {
-			const std::string& name = pair.first;
-			bool isPreset =
-				name == PresetFontNames::Best10 ||
-				name == PresetFontNames::SoukouMincho ||
-				name == PresetFontNames::UtsukushiFONT ||
-				name == PresetFontNames::YasashisaGothicBold;
-
-			if (isPreset) {
-				ImGui::Text("[Preset] %s", name.c_str());
-			} else {
-				ImGui::Text("%s", name.c_str());
+		ImGui::Text("BaseFont:");
+		for (const std::string& name : baseFontNames_) {
+			ImGui::BulletText("%s", name.c_str());
+		}
+		if (!addedFontNames_.empty()) {
+			ImGui::Separator();
+			ImGui::Text("AddFont:");
+			for (const std::string& name : addedFontNames_) {
+				ImGui::BulletText("%s", name.c_str());
+			}
+		}
+		if (!sizedFontNames_.empty()) {
+			ImGui::Separator();
+			ImGui::Text("SizeFont (generated, not selectable):");
+			for (const std::string& name : sizedFontNames_) {
+				ImGui::BulletText("%s", name.c_str());
 			}
 		}
 	}
@@ -136,19 +149,24 @@ void TextManager::DrawImGui() {
 			TextDefinition def{};
 			def.name = "Text" + std::to_string(textDefs_.size());
 			def.text = "New Text";
-			def.fontName = fonts_.empty() ? "" : fonts_.begin()->first;
-			def.position = {100.0f, 100.0f};
-			def.color = {1.0f, 1.0f, 1.0f, 1.0f};
+			def.fontName = PresetFontNames::Best10;
+			def.fontSize = 32.0f;
+			def.position = Math::Vector2{100.0f, 100.0f};
+			def.color = Math::Vector4{1.0f, 1.0f, 1.0f, 1.0f};
 			def.scale = 1.0f;
 			textDefs_.push_back(def);
 
-			// 実体 TextObject も生成
-			CreateText(def.fontName, def.text, def.position, def.color, def.scale);
+			Font* font = GetOrCreateFontSized(def.fontName, def.fontSize);
+			if (font) {
+				TextObject* obj = CreateText(def.fontName + "_" + std::to_string(static_cast<int>(def.fontSize)), def.text, def.position, def.color, def.scale);
+				if (obj) {
+					obj->SetFont(font);
+				}
+			}
 		}
 
 		ImGui::Separator();
 
-		// textDefs_ と texts_ はインデックス対応させる前提
 		for (size_t index = 0; index < textDefs_.size() && index < texts_.size();) {
 			TextDefinition& def = textDefs_[index];
 			TextObject* textObj = texts_[index].get();
@@ -157,11 +175,13 @@ void TextManager::DrawImGui() {
 			bool isOpen = ImGui::TreeNode(def.name.c_str());
 			ImGui::SameLine();
 			if (ImGui::Button("Delete")) {
-				textDefs_.erase(textDefs_.begin() + index);
-				texts_.erase(texts_.begin() + index);
+				textDefs_.erase(textDefs_.begin() + static_cast<std::ptrdiff_t>(index));
+				texts_.erase(texts_.begin() + static_cast<std::ptrdiff_t>(index));
 				ImGui::PopID();
-				if (isOpen) ImGui::TreePop();
-				continue; // index はインクリメントしない
+				if (isOpen) {
+					ImGui::TreePop();
+				}
+				continue;
 			}
 
 			if (isOpen) {
@@ -191,36 +211,58 @@ void TextManager::DrawImGui() {
 				// color
 				float col[4] = {def.color.x, def.color.y, def.color.z, def.color.w};
 				if (ImGui::ColorEdit4("Color", col)) {
-					def.color = {col[0], col[1], col[2], col[3]};
+					def.color = Math::Vector4{col[0], col[1], col[2], col[3]};
 					textObj->SetColor(def.color);
 				}
 
-				// scale
+				// scale（見た目のスケール調整）
 				float scale = def.scale;
 				if (ImGui::DragFloat("Scale", &scale, 0.01f, 0.1f, 10.0f)) {
 					def.scale = scale;
 					textObj->SetScale(def.scale);
 				}
 
-				// font
-				if (!fonts_.empty()) {
-					std::vector<const char*> fontNames;
-					int currentFontIdx = 0;
-					int i = 0;
-					for (const auto& pair : fonts_) {
-						fontNames.push_back(pair.first.c_str());
-						if (def.fontName == pair.first) {
-							currentFontIdx = i;
-						}
-						i++;
-					}
+				// BaseFont + AddFont から選択（SizeFont は対象外）
+				std::vector<const char*> selectableFontNames;
+				std::vector<std::string> selectableNamesStorage;
+				// BaseFont
+				for (const std::string& n : baseFontNames_) {
+					selectableNamesStorage.push_back(n);
+				}
+				// AddFont
+				for (const std::string& n : addedFontNames_) {
+					selectableNamesStorage.push_back(n);
+				}
+				for (std::string& s : selectableNamesStorage) {
+					selectableFontNames.push_back(s.c_str());
+				}
 
-					if (ImGui::Combo("Font", &currentFontIdx, fontNames.data(), static_cast<int>(fontNames.size()))) {
-						def.fontName = fontNames[currentFontIdx];
-						Font* font = GetFont(def.fontName);
-						if (font) {
-							textObj->SetFont(font);
+				int baseIndex = 0;
+				for (int i = 0; i < static_cast<int>(selectableNamesStorage.size()); ++i) {
+					if (def.fontName == selectableNamesStorage[i]) {
+						baseIndex = i;
+						break;
+					}
+				}
+				if (!selectableFontNames.empty()) {
+					if (ImGui::Combo("Base/Add Font", &baseIndex,
+						selectableFontNames.data(),
+						static_cast<int>(selectableFontNames.size()))) {
+						def.fontName = selectableNamesStorage[baseIndex];
+						Font* sizedFont = GetOrCreateFontSized(def.fontName, def.fontSize);
+						if (sizedFont) {
+							textObj->SetFont(sizedFont);
 						}
+					}
+				}
+
+				// フォントサイズ（実サイズ）
+				float fontSize = def.fontSize;
+				if (ImGui::DragFloat("Font Size", &fontSize, 1.0f, 8.0f, 128.0f)) {
+					def.fontSize = fontSize;
+					Font* sizedFont = GetOrCreateFontSized(def.fontName, def.fontSize);
+					if (sizedFont) {
+						textObj->SetFont(sizedFont);
 					}
 				}
 
@@ -237,12 +279,12 @@ void TextManager::DrawImGui() {
 }
 
 Font* TextManager::LoadFont(const std::string& name, const std::string& filePath, float size) {
-	auto it = fonts_.find(name);
+	std::unordered_map<std::string, std::unique_ptr<Font>>::iterator it = fonts_.find(name);
 	if (it != fonts_.end()) {
 		return it->second.get();
 	}
 
-	auto font = std::make_unique<Font>();
+	std::unique_ptr<Font> font = std::make_unique<Font>();
 	std::wstring filePathW(filePath.begin(), filePath.end());
 	if (font->Initialize(filePathW, size)) {
 		Font* ptr = font.get();
@@ -276,11 +318,40 @@ Font* TextManager::LoadFontFromWindows(const std::string& name, const std::strin
 }
 
 Font* TextManager::GetFont(const std::string& name) {
-	auto it = fonts_.find(name);
+	std::unordered_map<std::string, std::unique_ptr<Font>>::iterator it = fonts_.find(name);
 	if (it != fonts_.end()) {
 		return it->second.get();
 	}
 	return nullptr;
+}
+
+Font* TextManager::GetOrCreateFontSized(const std::string& baseName, float fontSize) {
+	std::string sizedName = baseName + "_" + std::to_string(static_cast<int>(fontSize));
+
+	Font* existing = GetFont(sizedName);
+	if (existing) {
+		return existing;
+	}
+
+	std::string fileName;
+	if (baseName == PresetFontNames::Best10) {
+		fileName = "BestTen-CRT.otf";
+	} else if (baseName == PresetFontNames::SoukouMincho) {
+		fileName = "SoukouMincho.ttf";
+	} else if (baseName == PresetFontNames::UtsukushiFONT) {
+		fileName = "UtsukushiFONT.otf";
+	} else if (baseName == PresetFontNames::YasashisaGothicBold) {
+		fileName = "YasashisaGothicBold-V2.otf";
+	} else {
+		// AddFont からの baseName は、そのまま external ファイル名とみなす
+		fileName = baseName;
+	}
+
+	Font* sized = LoadFontFromExternal(sizedName, fileName, fontSize);
+	if (sized) {
+		sizedFontNames_.push_back(sizedName);
+	}
+	return sized;
 }
 
 TextObject* TextManager::CreateText(const std::string& fontName, const std::string& text, const Math::Vector2& pos, const Math::Vector4& color, float scale) {
@@ -290,7 +361,7 @@ TextObject* TextManager::CreateText(const std::string& fontName, const std::stri
 		return nullptr;
 	}
 
-	auto textObj = std::make_unique<TextObject>();
+	std::unique_ptr<TextObject> textObj = std::make_unique<TextObject>();
 	textObj->Initialize();
 	textObj->SetFont(font);
 	textObj->SetText(text);
@@ -304,7 +375,9 @@ TextObject* TextManager::CreateText(const std::string& fontName, const std::stri
 }
 
 void TextManager::RemoveText(TextObject* text) {
-	auto it = std::find_if(texts_.begin(), texts_.end(), [text](const std::unique_ptr<TextObject>& ptr) { return ptr.get() == text; });
+	std::vector<std::unique_ptr<TextObject>>::iterator it = std::find_if(
+		texts_.begin(), texts_.end(),
+		[text](const std::unique_ptr<TextObject>& ptr) { return ptr.get() == text; });
 	if (it != texts_.end()) {
 		texts_.erase(it);
 	}
@@ -331,28 +404,35 @@ bool TextManager::LoadTextLayout(const std::string& filePath) {
 	textDefs_.clear();
 	texts_.clear();
 
-	for (auto& jt : root["texts"]) {
+	for (json& jt : root["texts"]) {
 		TextDefinition def{};
 		def.name     = jt.value("name", "");
 		def.text     = jt.value("text", "");
 		def.fontName = jt.value("font", PresetFontNames::Best10);
-		auto posArr  = jt.value("position", std::vector<float>{0.0f, 0.0f});
-		auto colArr  = jt.value("color",    std::vector<float>{1.0f, 1.0f, 1.0f, 1.0f});
+		def.fontSize = jt.value("fontSize", 32.0f);
+		std::vector<float> posArr  = jt.value("position", std::vector<float>{0.0f, 0.0f});
+		std::vector<float> colArr  = jt.value("color",    std::vector<float>{1.0f, 1.0f, 1.0f, 1.0f});
 		def.scale    = jt.value("scale", 1.0f);
 
 		if (posArr.size() >= 2) {
-			def.position = {posArr[0], posArr[1]};
+			def.position = Math::Vector2{posArr[0], posArr[1]};
 		}
 		if (colArr.size() >= 4) {
-			def.color = {colArr[0], colArr[1], colArr[2], colArr[3]};
+			def.color = Math::Vector4{colArr[0], colArr[1], colArr[2], colArr[3]};
 		}
 
 		textDefs_.push_back(def);
 	}
 
 	// TextObject を生成
-	for (auto& def : textDefs_) {
-		CreateText(def.fontName, def.text, def.position, def.color, def.scale);
+	for (TextDefinition& def : textDefs_) {
+		Font* font = GetOrCreateFontSized(def.fontName, def.fontSize);
+		if (font) {
+			TextObject* obj = CreateText(def.fontName + "_" + std::to_string(static_cast<int>(def.fontSize)), def.text, def.position, def.color, def.scale);
+			if (obj) {
+				obj->SetFont(font);
+			}
+		}
 	}
 
 	return true;
@@ -362,11 +442,12 @@ bool TextManager::SaveTextLayout(const std::string& filePath) const {
 	json root;
 	root["texts"] = json::array();
 
-	for (const auto& def : textDefs_) {
+	for (const TextDefinition& def : textDefs_) {
 		json jt;
 		jt["name"]     = def.name;
 		jt["text"]     = def.text;
 		jt["font"]     = def.fontName;
+		jt["fontSize"] = def.fontSize;
 		jt["position"] = { def.position.x, def.position.y };
 		jt["color"]    = { def.color.x, def.color.y, def.color.z, def.color.w };
 		jt["scale"]    = def.scale;

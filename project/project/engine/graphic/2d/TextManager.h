@@ -25,36 +25,31 @@ public:
     struct PresetFontNames {
         static inline const std::string Best10             = "Best10";
         static inline const std::string SoukouMincho       = "SoukouMincho";
-        static inline const std::string UtsukushiFONT      = "UtsukushiFONT";     // UI用小サイズ
-        static inline const std::string YasashisaGothicBold = "YasashisaGothicBold-V2"; // UI用大サイズ
+        static inline const std::string UtsukushiFONT      = "UtsukushiFONT";
+        static inline const std::string YasashisaGothicBold = "YasashisaGothicBold-V2";
     };
-
-    // プリセットフォントへのショートカット
-    Font* GetBest10Font()           { return GetFont(PresetFontNames::Best10); }
-    Font* GetSoukouMinchoFont()     { return GetFont(PresetFontNames::SoukouMincho); }
-    Font* GetUtsukushiFONT()        { return GetFont(PresetFontNames::UtsukushiFONT); }
-    Font* GetYasashisaGothicBoldV2(){ return GetFont(PresetFontNames::YasashisaGothicBold); }
 
     // テキスト定義（保存用）
     struct TextDefinition {
         std::string name;        // 識別名
         std::string text;        // 表示文字列 (UTF-8)
-        std::string fontName;    // 使用フォント名
+        std::string fontName;    // 使用フォント名（BaseFont または AddFont の論理名）
+        float       fontSize = 32.0f; // 実フォントサイズ
         Math::Vector2 position{0.0f, 0.0f};
         Math::Vector4 color{1.0f, 1.0f, 1.0f, 1.0f};
-        float scale = 1.0f;
+        float       scale = 1.0f;     // 見た目のスケール
     };
 
     // フォント管理
     Font* LoadFont(const std::string& name, const std::string& filePath, float size = 32.0f);
     Font* GetFont(const std::string& name);
 
-    // プロジェクト標準フォント (Resources/Font/)
     Font* LoadFontFromProject(const std::string& name, const std::string& fileName, float size = 32.0f);
-    // 外部フォント (Resources/Font/external/)
     Font* LoadFontFromExternal(const std::string& name, const std::string& fileName, float size = 32.0f);
-    // Windows フォントディレクトリから読み込み (Windows のみ)
     Font* LoadFontFromWindows(const std::string& name, const std::string& fileName, float size = 32.0f);
+
+    // ベース名とサイズからフォントを取得/生成（BaseFont/AddFont 用の SizeFont を生成）
+    Font* GetOrCreateFontSized(const std::string& baseName, float fontSize);
 
     // テキスト作成/削除
     TextObject* CreateText(
@@ -78,7 +73,16 @@ private:
 
     static TextManager* instance_;
 
+    // すべての Font インスタンス
     std::unordered_map<std::string, std::unique_ptr<Font>> fonts_;
+
+    // BaseFont: プリセットなどベースにする論理フォント名
+    std::vector<std::string> baseFontNames_;
+    // AddFont: ImGui の Add Font で追加された論理フォント名
+    std::vector<std::string> addedFontNames_;
+    // SizeFont: BaseFont/AddFont から生成されたサイズ付きフォント名（"Name_32" など）
+    std::vector<std::string> sizedFontNames_;
+
     std::vector<std::unique_ptr<TextObject>> texts_;
 
     // 保存用のテキスト定義と TextObject の対応
@@ -87,7 +91,7 @@ private:
     // フォント検索用ディレクトリ
     std::string projectFontDir_ = "Resources/Font/";
     std::string externalFontDir_ = "Resources/Font/external/";
-    std::string windowsFontDir_{}; // Initialize で設定 (Windows のみ)
+    std::string windowsFontDir_{};
 };
 
 } // namespace TuboEngine
