@@ -4,6 +4,11 @@
 #include "LineManager.h"
 #include "ParticleManager.h" // 追加: パーティクル描画/更新
 
+
+// 静的メンバ定義
+bool StageScene::isDemoMode = false;
+
+
 namespace {
 StageScene::StageBounds ComputeBoundsWorld(const TuboEngine::Math::Vector3& origin, const MapChipField& field) {
 		const float w = static_cast<float>(field.GetNumBlockHorizontal()) * MapChipField::GetBlockWidth();
