@@ -38,6 +38,11 @@ public:
         Math::Vector2 position{0.0f, 0.0f};
         Math::Vector4 color{1.0f, 1.0f, 1.0f, 1.0f};
         float       scale = 1.0f;     // 見た目のスケール
+        // 揃え/アンカー情報
+        // 0: Left   1: Center   2: Right
+        int         horizontalAlign = 0;
+        // 0: Top    1: Middle   2: Bottom
+        int         verticalAlign   = 0;
     };
 
     // フォント管理

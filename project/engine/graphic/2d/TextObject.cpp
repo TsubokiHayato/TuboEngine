@@ -119,6 +119,64 @@ void TextObject::Update() {
     float cursorX = 0.0f;
     float cursorY = 0.0f;
 
+    // まずはテキスト全体のサイズを計算
+    float totalWidth = 0.0f;
+    float totalHeight = 0.0f;
+    {
+        float lineWidth = 0.0f;
+        float maxLineWidth = 0.0f;
+        float height = font_->GetLineHeight();
+        for (char32_t c : text_) {
+            if (c == U'\n') {
+                if (lineWidth > maxLineWidth) { maxLineWidth = lineWidth; }
+                lineWidth = 0.0f;
+                height += font_->GetLineHeight();
+                continue;
+            }
+            const Font::Glyph* glyph = font_->GetGlyph(c);
+            if (!glyph) { continue; }
+            lineWidth += glyph->advanceX;
+        }
+        if (lineWidth > maxLineWidth) { maxLineWidth = lineWidth; }
+        totalWidth = maxLineWidth * scale_;
+        totalHeight = height * scale_;
+    }
+
+    // 揃えに応じた原点オフセット
+    float offsetX = 0.0f;
+    float offsetY = 0.0f;
+
+    // 横方向
+    switch (horizontalAlign_) {
+    case 1: // Center
+        offsetX = -totalWidth * 0.5f;
+        break;
+    case 2: // Right
+        offsetX = -totalWidth;
+        break;
+    case 0: // Left
+    default:
+        offsetX = 0.0f;
+        break;
+    }
+
+    // 縦方向
+    switch (verticalAlign_) {
+    case 1: // Middle
+        offsetY = -totalHeight * 0.5f;
+        break;
+    case 2: // Bottom
+        offsetY = -totalHeight;
+        break;
+    case 0: // Top
+    default:
+        offsetY = 0.0f;
+        break;
+    }
+
+    cursorX = 0.0f;
+    cursorY = 0.0f;
+
     for (char32_t c : text_) {
         if (currentCharacterCount_ >= maxCharacters_) break;
 
@@ -134,10 +192,10 @@ void TextObject::Update() {
         // 頂点データの生成
         uint32_t vIndex = currentCharacterCount_ * 4;
         
-        float left = cursorX + glyph->offsetX;
-        float right = left + glyph->width;
-        float top = cursorY + font_->GetBaseline() - glyph->offsetY;
-        float bottom = top + glyph->height;
+        float left = (cursorX + glyph->offsetX) * scale_ + offsetX;
+        float right = left + glyph->width * scale_;
+        float top = (cursorY + font_->GetBaseline() - glyph->offsetY) * scale_ + offsetY;
+        float bottom = top + glyph->height * scale_;
 
         // A (左下)
         vertexData_[vIndex + 0].position = { left, bottom, 0.0f, 1.0f };
@@ -165,7 +223,7 @@ void TextObject::Update() {
 
     // 行列の更新
     transform_.translate = { position_.x, position_.y, 0.0f };
-    transform_.scale = { scale_, scale_, 1.0f };
+    transform_.scale = { 1.0f, 1.0f, 1.0f }; // スケールは頂点に反映済み
 
     Matrix4x4 uvTransformMatrix = MakeAffineMatrix(uvTransform_.scale, uvTransform_.rotate, uvTransform_.translate);
     materialData_->uvTransform = uvTransformMatrix;
