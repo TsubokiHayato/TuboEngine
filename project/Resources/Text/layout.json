@@ -9,13 +9,15 @@
       ],
       "font": "Best10",
       "fontSize": 32.0,
+      "horizontalAlign": 0,
       "name": "Text",
       "position": [
         100.0,
         100.0
       ],
       "scale": 1.0,
-      "text": "茄子はおいしいよ"
+      "text": "茄子はおいしいよ",
+      "verticalAlign": 0
     }
   ]
 }
