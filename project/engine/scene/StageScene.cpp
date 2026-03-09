@@ -114,19 +114,12 @@ void StageScene::Initialize() {
 	tile_ = std::make_unique<Tile>();
 	sceneChangeAnimation_ = std::make_unique<SceneChangeAnimation>(1280, 720, 80, 1.5f, "barrier.png");
 
-	// 追加: StageManager の生成と基本設定
+	// StageManager の生成と基本設定のみ行う（実ロードは ReadyState でカメラ初期化後に行う）
 	stageManager_ = std::make_unique<StageManager>();
-	// チャンクサイズ(マップチップの幅/高さ単位)とタイルスケールは既存のステージ仕様に合わせておく
-	// 必要なら ImGui から変更できるようにしてもよい
-	stageManager_->Configure(100, 100, 30.0f);
-
-	// Multi-stage 用メタレイアウト読み込み
-	// CSV: Resources/Stage/Stage.csv (0/1 グリッド)
-	// ・Player の開始位置は StageManager 内で検出される
-	// ・FollowCamera は各チャンク生成時に設定される
-	if (useMultiStageLayout_) {
-		stageManager_->LoadMetaLayout("Resources/Stage/Stage.csv", player_.get(), followCamera.get());
-	}
+	stageManager_->Configure(10, 10, 15.0f);
+	// ★ ここでチャンクIDごとのCSVを登録
+	stageManager_->RegisterChunkCsv(1, "Resources/Stage/Stage1.csv");
+	stageManager_->RegisterChunkCsv(2, "Resources/Stage/Stage2.csv");
 
 	// 衝突マネージャの生成
 	collisionManager_->Initialize();
@@ -196,8 +189,6 @@ void StageScene::Update() {
 	// StageManager によるステージ構成の更新
 	if (stageManager_) {
 		stageManager_->Update(player_.get(), followCamera.get());
-		// 衝突登録は StageScene 側で一括して行う
-		stageManager_->RegisterCollisions(collisionManager_.get(), player_.get());
 	}
 
 	// Always update state manager so states can respond to animation/request flags
@@ -218,7 +209,19 @@ void StageScene::Update() {
 	// HP UI 更新
 	if (hpUI_) { hpUI_->Update(player_.get()); }
 	// Enemy HP UI 更新（エネミーに追従）"
-	if (enemyHpUI_) { enemyHpUI_->Update(enemies, followCamera->GetCamera()); }
+	if (enemyHpUI_ && stageManager_ && followCamera) {
+		std::vector<Enemy*> enemyPtrs;
+		const auto& insts = stageManager_->GetStageInstances();
+		for (const auto& inst : insts) {
+			if (!inst.visible) continue;
+			for (const auto& e : inst.enemies) {
+				if (e && e->GetIsAlive()) {
+					enemyPtrs.push_back(e.get());
+				}
+			}
+		}
+		enemyHpUI_->Update(enemyPtrs, followCamera->GetCamera());
+	}
 	// Guide UI 更新
 	if (guideUI_) { guideUI_->Update(); }
 
@@ -356,6 +359,10 @@ void StageScene::ImGuiDraw() {
 
 	LineManager::GetInstance()->DrawImGui();
 	stateManager_->DrawImGui(this);
+	// StageManager の各チャンク情報を表示
+	if (stageManager_) {
+		stageManager_->DrawImGui();
+	}
 
 	#endif // USE_IMGUI
 
@@ -378,33 +385,12 @@ void StageScene::ParticleDraw() {
 #endif
 }
 void StageScene::CheckAllCollisions() {
-	/// 衝突マネージャのリセット ///
 	collisionManager_->Reset();
 
-	/// コライダーをリストに登録 ///
-	// プレイヤー
-	collisionManager_->AddCollider(player_.get());
-
-	// 敵（生存中のみ登録）
-	for (const auto& enemy : enemies) {
-		if (!enemy) {
-			continue;
-		}
-		if (enemy->GetIsAlive() && enemy->GetHP() > 0) {
-			collisionManager_->AddCollider(enemy.get());
-		}
+	// ここで StageManager に一括登録させる
+	if (stageManager_) {
+		stageManager_->RegisterCollisions(collisionManager_.get(), player_.get());
 	}
 
-	// プレイヤーの弾（生存中のみ登録）
-	for (const auto& bullet : player_->GetBullets()) {
-		if (!bullet) {
-			continue;
-		}
-		if (bullet->GetIsAlive()) {
-			collisionManager_->AddCollider(bullet.get());
-		}
-	}
-
-	// 衝突判定と応答
 	collisionManager_->CheckAllCollisions();
 }
