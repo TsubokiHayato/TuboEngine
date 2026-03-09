@@ -369,6 +369,7 @@
     <ClCompile Include="engine\graphic\2d\Font.cpp" />
     <ClCompile Include="engine\graphic\2d\TextManager.cpp" />
     <ClCompile Include="engine\graphic\2d\TextObject.cpp" />
+    <ClCompile Include="application\Stage\StageManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -812,6 +813,7 @@
     <ClInclude Include="engine\graphic\2d\Font.h" />
     <ClInclude Include="engine\graphic\2d\TextManager.h" />
     <ClInclude Include="engine\graphic\2d\TextObject.h" />
+    <ClInclude Include="application\Stage\StageManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli">

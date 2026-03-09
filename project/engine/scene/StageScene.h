@@ -36,9 +36,10 @@
 #include "application/UI/HP/Enemy/EnemyHpUI.h"
 #include "application/UI/Guide/GuideUI.h"
 
+#include "application/Stage/StageManager.h" // 追加: StageManager の完全型定義
+
 #include <string>
 #include <vector>
-
 
 class StageScene : public IScene {
 public:
@@ -95,7 +96,7 @@ public:
 
 public:
 	///----------------------------------------------------------------------------------------
-	///				引き渡し用変数
+	///			引き渡し用変数
 	///-----------------------------------------------------------------------------------------
 
 	Player* GetPlayer() const { return player_.get(); }
@@ -128,33 +129,14 @@ public:
 		float top{};
 	};
 
-	struct StageInstance {
-		std::string csvPath;
-		TuboEngine::Math::Vector3 origin{0.0f, 0.0f, 0.0f};
-		bool visible = true;
+	StageManager* GetStageManager() const { return stageManager_.get(); }
 
-		std::unique_ptr<MapChipField> field;
-		std::vector<std::unique_ptr<Block>> blocks;
-		std::vector<std::unique_ptr<Enemy>> enemies;
-		std::unique_ptr<Tile> tile;
-
-		// Stage[0]用（Playerチップ探索結果）
-		int playerMapX = -1;
-		int playerMapY = -1;
-
-		StageBounds boundsWorld{};
-	};
-
-	std::vector<StageInstance>& GetStageInstances() { return stageInstances_; }
-	const std::vector<StageInstance>& GetStageInstances() const { return stageInstances_; }
-
-	// デバッグ表示用：Stage[1..] のプレビューを描画するか
 	bool GetDrawPreviewStages() const { return drawPreviewStages_; }
 	void SetDrawPreviewStages(bool draw) { drawPreviewStages_ = draw; }
 
 private:
 	///----------------------------------------------------------------------------------------
-	///				メンバ変数
+	///			メンバ変数
 	///----------------------------------------------------------------------------------------
 
 	std::unique_ptr<Audio> audio = nullptr;
@@ -216,6 +198,6 @@ public:
 	// Multi-stage layout data (debug / editor)
 	bool useMultiStageLayout_ = true;
 	bool drawPreviewStages_ = true;
-	std::vector<StageInstance> stageInstances_;
 
+	std::unique_ptr<StageManager> stageManager_;
 };

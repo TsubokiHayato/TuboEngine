@@ -35,8 +35,11 @@ std::map<std::string, MapChipType> mapChipTable = {
 //--------------------------------------------------
 MapChipField::IndexSet MapChipField::GetMapChipIndexSetByPosition(const TuboEngine::Math::Vector3& position) const {
     IndexSet indexSet = {};
-    indexSet.xIndex = static_cast<uint32_t>((position.x + kBlockWidth_ / 2) / kBlockWidth_);
-    indexSet.yIndex = static_cast<uint32_t>((position.y + kBlockHeight_ / 2) / kBlockHeight_);
+    // 原点を考慮したローカル座標でインデックス計算
+    float localX = position.x - origin_.x;
+    float localY = position.y - origin_.y;
+    indexSet.xIndex = static_cast<uint32_t>((localX + kBlockWidth_ / 2) / kBlockWidth_);
+    indexSet.yIndex = static_cast<uint32_t>((localY + kBlockHeight_ / 2) / kBlockHeight_);
     return indexSet;
 }
 
@@ -133,9 +136,9 @@ MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex
 //--------------------------------------------------
 TuboEngine::Math::Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex) {
 	return TuboEngine::Math::Vector3(
-        kBlockWidth_ * xIndex,      // X: 右へ+
-        kBlockHeight_ * yIndex,     // Y: 上へ+
-        0.0f                        // Z: 高さ（固定）
+        origin_.x + kBlockWidth_ * xIndex,      // X: 右へ+
+        origin_.y + kBlockHeight_ * yIndex,     // Y: 上へ+
+        origin_.z                        // Z: 原点に合わせる
     );
 }
 
@@ -170,13 +173,13 @@ bool MapChipField::IsWalkable(const TuboEngine::Math::Vector3& position) const {
 bool MapChipField::IsBlocked(const TuboEngine::Math::Vector3& position) const {
     IndexSet index = GetMapChipIndexSetByPosition(position);
 
-    // 実データで境界チェック（範囲外はブロック扱い）
+    // 実データで境界チェック（範囲外は通行可能扱いに変更）
     if (index.yIndex >= mapChipData_.data.size()) {
-        return true;
+        return false;
     }
     const auto& row = mapChipData_.data[index.yIndex];
     if (index.xIndex >= row.size()) {
-        return true;
+        return false;
     }
 
     MapChipType type = row[index.xIndex];
