@@ -115,6 +115,7 @@ void StagePlayingState::Update(StageScene* scene) {
 			break;
 		}
 	}
+
 	if (allEnemiesDefeated && !enemies.empty()) {
 	    // DEMOモード時はシーンチェンジアニメーションを挟んでタイトルへ戻す
 	    if (StageScene::isDemoMode) {
@@ -151,6 +152,46 @@ void StagePlayingState::Update(StageScene* scene) {
 	    scene->GetStageStateManager()->ChangeState(StageType::StageClear, scene);
 	    return;
 	}
+
+		///------------------------------------------------
+	/// ゲームオーバー判定（プレイヤー死亡）
+	///------------------------------------------------
+	if (!player_->GetIsAlive()) {
+		// DEMOモード時はそのままタイトルに戻す（挙動は好みで調整）
+		if (StageScene::isDemoMode) {
+			if (scene) {
+				auto* anim = scene->GetSceneChangeAnimation();
+				if (anim) {
+					if (!scene->GetIsRequestSceneChange()) {
+						anim->SetPhase(SceneChangeAnimation::Phase::Appearing);
+						scene->SetIsRequestSceneChange(true);
+					}
+					if (scene->GetIsRequestSceneChange() && anim->IsFinished()) {
+						StageScene::isDemoMode = false;
+						scene->SetIsRequestSceneChange(false);
+						SceneManager::GetInstance()->ChangeScene(TITLE);
+						return;
+					}
+				} else {
+					StageScene::isDemoMode = false;
+					SceneManager::GetInstance()->ChangeScene(TITLE);
+					return;
+				}
+			} else {
+				StageScene::isDemoMode = false;
+				SceneManager::GetInstance()->ChangeScene(TITLE);
+				return;
+			}
+			return;
+		}
+
+		// 通常時はゲームオーバーステートへ
+		if (scene && scene->GetStageStateManager()) {
+			scene->GetStageStateManager()->ChangeState(StageType::GameOver, scene);
+		}
+		return;
+	}
+
 
 	if (pauseGuideSprite_) pauseGuideSprite_->Update();
 	if (scene->GetSkyDome()) scene->GetSkyDome()->Update();
