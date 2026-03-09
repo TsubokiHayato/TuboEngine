@@ -263,21 +263,7 @@ void PauseState::Object3DDraw(StageScene* scene) {
 			enemy->Draw();
 	}
 
-	// preview stages (if any)
-	auto& stages = scene->GetStageInstances();
-	for (size_t i = 1; i < stages.size(); ++i) {
-		auto& st = stages[i];
-		if (!st.visible)
-			continue;
-		if (st.tile)
-			st.tile->Draw();
-		for (auto& b : st.blocks)
-			if (b)
-				b->Draw();
-		for (auto& e : st.enemies)
-			if (e)
-				e->Draw();
-	}
+	
 }
 
 void PauseState::SpriteDraw(StageScene* scene) {

@@ -124,6 +124,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\StageState\StageReady\StageReadyState.cpp" />
     <ClCompile Include="application\StageState\StageStateManager.cpp" />
     <ClCompile Include="application\StageState\Tutorial\TutorialState.cpp" />
+    <ClCompile Include="application\Stage\StageManager.cpp" />
     <ClCompile Include="application\UI\Guide\GuideUI.cpp" />
     <ClCompile Include="application\UI\Title\TitleUI.cpp" />
     <ClCompile Include="application\UI\HP\Enemy\EnemyHpUI.cpp" />
@@ -256,6 +257,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Character\Player\PlayerAutoController.h" />
     <ClInclude Include="application\StageState\Pause\PauseState.h" />
     <ClInclude Include="application\StageState\Tutorial\TutorialState.h" />
+    <ClInclude Include="application\Stage\StageManager.h" />
     <ClInclude Include="application\UI\Guide\GuideUI.h" />
     <ClInclude Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.h" />
     <ClInclude Include="engine\graphic\PSO\Blend\BlendPSO.h" />

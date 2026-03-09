@@ -94,6 +94,10 @@ public:
 	static void SetBlockHeight(float h) { kBlockHeight_ = h; }
 	static void SetBlockSize(float s) { kBlockSize_ = s; }
 
+	// --- 追加: フィールド原点 ---
+	void SetOrigin(const TuboEngine::Math::Vector3& origin) { origin_ = origin; }
+	const TuboEngine::Math::Vector3& GetOrigin() const { return origin_; }
+
 
 private:
 	///--------------------------------------------------
@@ -112,4 +116,7 @@ private:
 
 	// マップチップデータ
 	MapChipData mapChipData_;
+
+	// フィールド原点
+	TuboEngine::Math::Vector3 origin_{0.0f, 0.0f, 0.0f};
 };

@@ -107,7 +107,6 @@ void TutorialState::BuildTutorialStage(StageScene* scene) {
 
 	scene->GetBlocks().clear();
 	scene->GetEnemies().clear();
-	scene->GetStageInstances().clear();
 
 	scene->GetMapChipField()->ResetMapChipData();
 	scene->GetMapChipField()->LoadMapChipCsv(tutorialCsvPath_);
