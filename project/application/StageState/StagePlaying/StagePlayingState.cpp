@@ -4,27 +4,21 @@
 #include "Input.h"
 #include "TextureManager.h"
 #include "WinApp.h"
-#include <cmath> // 追加: sqrtf など
+#include <cmath>
 
 namespace {
 	constexpr const char* kPauseGuideTex = "Pose.png";
 }
 
-// StagePlayingState
 void StagePlayingState::Enter(StageScene* scene) {
-
-	// Do not show pause guide in demo mode
+	if (!scene) return;
 	if (StageScene::isDemoMode) {
 		pauseGuideSprite_.reset();
 		return;
 	}
-
-	// Pause guide UI (show how to open pause)
 	TuboEngine::TextureManager::GetInstance()->LoadTexture(kPauseGuideTex);
 	pauseGuideSprite_ = std::make_unique<TuboEngine::Sprite>();
 	pauseGuideSprite_->Initialize(kPauseGuideTex);
-
-	// 右上に収まるように画面サイズから計算（anchor=右上）
 	const float margin = 20.0f;
 	TuboEngine::Math::Vector2 spriteSize = pauseGuideSprite_->GetSize() / 3;
 	const float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
@@ -35,167 +29,90 @@ void StagePlayingState::Enter(StageScene* scene) {
 }
 
 void StagePlayingState::Update(StageScene* scene) {
+	if (!scene) return;
 
 	// ESCでポーズへ（デモモード時は無効）
 	if (!StageScene::isDemoMode && TuboEngine::Input::GetInstance()->TriggerKey(DIK_ESCAPE)) {
-		if (scene && scene->GetStageStateManager()) {
-			scene->GetStageStateManager()->ChangeState(StageType::Pause, scene);
+		if (auto* mgr = scene->GetStageStateManager()) {
+			mgr->ChangeState(StageType::Pause, scene);
 		}
 		return;
 	}
 
-	///------------------------------------------------
-	/// 各オブジェクトの取得
-	///------------------------------------------------
-
-	Player* player_ = scene->GetPlayer();
-	MapChipField* mapChipField_ = scene->GetMapChipField();
-	std::vector<std::unique_ptr<Block>>& blocks_ = scene->GetBlocks();
-	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
+	Player* player = scene->GetPlayer();
 	FollowTopDownCamera* followCamera = scene->GetFollowCamera();
+	StageManager* stageMgr = scene->GetStageManager();
 
-	///------------------------------------------------
-	/// 各オブジェクトの更新
-	///------------------------------------------------
+	// プレイヤー設定
+	if (player && followCamera) {
+		player->SetCamera(followCamera->GetCamera());
+		player->SetMovementLocked(false);
 
-	/// ブロック ///
-	for (auto& block : blocks_) {
-		// カメラ設定
-		block->SetCamera(followCamera->GetCamera());
-		// 更新
-		block->Update();
+		// プレイヤー被弾時のカメラシェイク
+		if (player->GetIsHit()) {
+			followCamera->Shake(0.35f, 0.25f);
+		}
+		player->Update();
 	}
 
-	/// プレイヤー ///
-	// カメラ設定
-	player_->SetCamera(followCamera->GetCamera());
-	player_->SetMovementLocked(false);
-	player_->SetMapChipField(mapChipField_);
-
-	// プレイヤー被弾時にカメラシェイク
-	if (player_->GetIsHit() == true) {
-		// 適度な強度と時間。必要に応じて調整可能
-		followCamera->Shake(0.35f, 0.25f);
-	}
-	// 更新
-	player_->Update();
-
-	/// 敵 ///
-	for (auto& enemy : enemies) {
-		// カメラ設定
-		enemy->SetCamera(followCamera->GetCamera());
-		// プレイヤー設定
-		enemy->SetPlayer(player_);
-		// マップチップフィールド設定
-		enemy->SetMapChipField(mapChipField_);
-		// 更新
-		enemy->Update();
+	// ステージオブジェクト更新
+	if (stageMgr && player && followCamera) {
+		stageMgr->Update(player, followCamera);
 	}
 
-	/// Tile///
-	std::unique_ptr<Tile>& tile_ = scene->GetTile();
-	// カメラ設定
-	tile_->SetCamera(followCamera->GetCamera());
-	// 更新
-	tile_->Update();
+	// カメラ更新
+	if (followCamera) {
+		followCamera->Update();
+		LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
+	}
 
-	/// カメラ ///
-	// 更新
-	followCamera->Update();
-
-	///------------------------------------------------
-	/// ゲームクリア判定
-	///------------------------------------------------
-
-	// 全ての敵が倒されたかチェック
+	// --- ゲームクリア判定 / ゲームオーバー判定は StageManager 管理の敵リストから行う ---
 	bool allEnemiesDefeated = true;
-	for (const auto& enemy : enemies) {
-		if (enemy->GetIsAlive()) {
-			allEnemiesDefeated = false;
-			break;
+	bool hasAnyEnemy = false;
+	if (stageMgr) {
+		const auto& insts = stageMgr->GetStageInstances();
+		for (const auto& inst : insts) {
+			if (!inst.visible) continue;
+			for (const auto& e : inst.enemies) {
+				if (!e) continue;
+				hasAnyEnemy = true;
+				if (e->GetIsAlive()) {
+					allEnemiesDefeated = false;
+					break;
+				}
+			}
+			if (!allEnemiesDefeated) break;
 		}
 	}
 
-	if (allEnemiesDefeated && !enemies.empty()) {
-	    // DEMOモード時はシーンチェンジアニメーションを挟んでタイトルへ戻す
-	    if (StageScene::isDemoMode) {
-	        if (scene) {
-	            auto* anim = scene->GetSceneChangeAnimation();
-	            if (anim) {
-	                // アニメが未リクエストなら開始
-	                if (!scene->GetIsRequestSceneChange()) {
-	                    anim->SetPhase(SceneChangeAnimation::Phase::Appearing);
-	                    scene->SetIsRequestSceneChange(true);
-	                }
-	                // アニメが完了していれば遷移
-	                if (scene->GetIsRequestSceneChange() && anim->IsFinished()) {
-	                    StageScene::isDemoMode = false;
-	                    scene->SetIsRequestSceneChange(false);
-	                    SceneManager::GetInstance()->ChangeScene(TITLE);
-	                    return;
-	                }
-	            } else {
-	                // アニメ未設定なら即遷移
-	                StageScene::isDemoMode = false;
-	                SceneManager::GetInstance()->ChangeScene(TITLE);
-	                return;
-	            }
-	        } else {
-	            StageScene::isDemoMode = false;
-	            SceneManager::GetInstance()->ChangeScene(TITLE);
-	            return;
-	        }
-	        // アニメ進行中なので遷移完了待ち
-	        return;
-	    }
-
-	    scene->GetStageStateManager()->ChangeState(StageType::StageClear, scene);
-	    return;
-	}
-
-		///------------------------------------------------
-	/// ゲームオーバー判定（プレイヤー死亡）
-	///------------------------------------------------
-	if (!player_->GetIsAlive()) {
-		// DEMOモード時はそのままタイトルに戻す（挙動は好みで調整）
+	if (allEnemiesDefeated && hasAnyEnemy) {
+		// DEMOモード時はタイトルへ戻る (既存ロジックを簡略)
 		if (StageScene::isDemoMode) {
-			if (scene) {
-				auto* anim = scene->GetSceneChangeAnimation();
-				if (anim) {
-					if (!scene->GetIsRequestSceneChange()) {
-						anim->SetPhase(SceneChangeAnimation::Phase::Appearing);
-						scene->SetIsRequestSceneChange(true);
-					}
-					if (scene->GetIsRequestSceneChange() && anim->IsFinished()) {
-						StageScene::isDemoMode = false;
-						scene->SetIsRequestSceneChange(false);
-						SceneManager::GetInstance()->ChangeScene(TITLE);
-						return;
-					}
-				} else {
-					StageScene::isDemoMode = false;
-					SceneManager::GetInstance()->ChangeScene(TITLE);
-					return;
-				}
-			} else {
-				StageScene::isDemoMode = false;
-				SceneManager::GetInstance()->ChangeScene(TITLE);
-				return;
-			}
+			StageScene::isDemoMode = false;
+			SceneManager::GetInstance()->ChangeScene(TITLE);
 			return;
 		}
-
-		// 通常時はゲームオーバーステートへ
-		if (scene && scene->GetStageStateManager()) {
-			scene->GetStageStateManager()->ChangeState(StageType::GameOver, scene);
+		if (auto* mgr = scene->GetStageStateManager()) {
+			mgr->ChangeState(StageType::StageClear, scene);
 		}
 		return;
 	}
 
+	// ゲームオーバー判定（プレイヤー死亡）
+	if (player && !player->GetIsAlive()) {
+		if (StageScene::isDemoMode) {
+			StageScene::isDemoMode = false;
+			SceneManager::GetInstance()->ChangeScene(TITLE);
+			return;
+		}
+		if (auto* mgr = scene->GetStageStateManager()) {
+			mgr->ChangeState(StageType::GameOver, scene);
+		}
+		return;
+	}
 
 	if (pauseGuideSprite_) pauseGuideSprite_->Update();
 	if (scene->GetSkyDome()) scene->GetSkyDome()->Update();
-
 }
 
 void StagePlayingState::Exit(StageScene* scene) {
@@ -204,84 +121,83 @@ void StagePlayingState::Exit(StageScene* scene) {
 }
 
 void StagePlayingState::Object3DDraw(StageScene* scene) {
-	// 3Dオブジェクトの描画
-	// スカイドーム描画
-	scene->GetSkyDome()->Draw();
-
-	// タイル描画
-	std::unique_ptr<Tile>& tile_ = scene->GetTile();
-	tile_->Draw();
-
-	// ブロック描画
-	std::vector<std::unique_ptr<Block>>& blocks_ = scene->GetBlocks();
-	for (auto& block : blocks_) {
-		block->Draw();
+	if (!scene) return;
+	// 3Dオブジェクトの描画は StageManager と SkyDome に委譲
+	if (auto* stageMgr = scene->GetStageManager()) {
+		stageMgr->Draw3D();
 	}
-
-	// プレイヤーの3Dオブジェクトを描画
-	scene->GetPlayer()->Draw();
-
-	// 敵の3Dオブジェクトを描画
-	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
-	for (auto& enemy : enemies) {
-		enemy->Draw();
+	if (auto* sky = scene->GetSkyDome().get()) {
+		sky->Draw();
 	}
-
-	
+	Player* player = scene->GetPlayer();
+	player->Draw();
 }
 
 void StagePlayingState::SpriteDraw(StageScene* scene) {
-	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
-	scene->GetPlayer()->ReticleDraw();
-	for (auto& enemy : enemies) {
-		if (auto* rush = dynamic_cast<RushEnemy*>(enemy.get())) {
-			rush->DrawSprite();
+	if (!scene) return;
+	StageManager* stageMgr = scene->GetStageManager();
+	Player* player = scene->GetPlayer();
+
+	// プレイヤーの照準
+	if (player) {
+		player->ReticleDraw();
+	}
+
+	// ラッシュエネミーのスプライト (Stage Manager 管理分)
+	if (stageMgr) {
+		const auto& insts = stageMgr->GetStageInstances();
+		for (const auto& inst : insts) {
+			for (const auto& e : inst.enemies) {
+				if (auto* rush = dynamic_cast<RushEnemy*>(e.get())) {
+					rush->DrawSprite();
+				}
+			}
 		}
 	}
-	// Do not draw pause guide during demo mode
+
+	// ポーズガイド
 	if (!StageScene::isDemoMode && pauseGuideSprite_) pauseGuideSprite_->Draw();
 }
 
 void StagePlayingState::ImGuiDraw(StageScene* scene) {
-
-	// Hide ImGui during demo mode
 	if (StageScene::isDemoMode) return;
+	if (!scene) return;
 
-	scene->GetFollowCamera()->DrawImGui();
+	if (scene->GetFollowCamera()) scene->GetFollowCamera()->DrawImGui();
+
 #ifdef USE_IMGUI
 	ImGui::Begin("Stage Playing");
-
 	ImGui::Text("Playing State");
-
-	// オートプレイON/OFF
 	ImGui::Checkbox("Auto Play (Playing)", &autoPlayEnabled_);
-
 	ImGui::End();
 
-	// Player側のImGuiも出したければ
-	if (scene && scene->GetPlayer()) {
+	if (scene->GetPlayer()) {
 		scene->GetPlayer()->DrawImGui();
 	}
 #endif
-	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
-	// EnemyのImgui
-	for (auto& enemy : enemies) {
-		enemy->DrawImGui();
-	}
 
-	std::vector<std::unique_ptr<Block>>& blocks_ = scene->GetBlocks();
-	// ブロックのImGui
-	for (auto& block : blocks_) {
-		block->DrawImGui();
+	// Enemy/Block ImGui は StageManager 側のインスタンスを対象にする
+	if (auto* stageMgr = scene->GetStageManager()) {
+		const auto& insts = stageMgr->GetStageInstances();
+		for (const auto& inst : insts) {
+			for (const auto& e : inst.enemies) {
+				if (e) e->DrawImGui();
+			}
+			for (const auto& b : inst.blocks) {
+				if (b) b->DrawImGui();
+			}
+		}
 	}
 }
 
 void StagePlayingState::ParticleDraw(StageScene* scene) {
-
-	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
-
-	for (auto& enemy : enemies) {
-		enemy->ParticleDraw();
+	if (!scene) return;
+	if (auto* stageMgr = scene->GetStageManager()) {
+		const auto& insts = stageMgr->GetStageInstances();
+		for (const auto& inst : insts) {
+			for (const auto& e : inst.enemies) {
+				if (e) e->ParticleDraw();
+			}
+		}
 	}
-
 }

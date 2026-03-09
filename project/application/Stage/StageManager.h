@@ -2,6 +2,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "Vector3.h"
 #include "Collider/CollisionManager.h"
 
@@ -43,6 +44,13 @@ public:
 
     void Configure(uint32_t chunkWidth, uint32_t chunkHeight, float tileScale);
 
+    // プレイヤーポインタを借りる（所有はしない）
+    void SetPlayer(Player* player) { player_ = player; }
+    Player* GetPlayer() const { return player_; }
+
+    // チャンクIDと使用するCSVパスを登録
+    void RegisterChunkCsv(int id, const std::string& path) { idToCsvPath_[id] = path; }
+
     void LoadMetaLayout(const std::string& metaCsvPath,
                         Player* player,
                         FollowTopDownCamera* followCamera);
@@ -52,11 +60,15 @@ public:
     void Draw3D();
 
     TuboEngine::Math::Vector3 GetPlayerStartPosition() const;
+    MapChipField* GetPlayerStartField() const; // プレイヤー開始マスの属する Field
 
     void RegisterCollisions(CollisionManager* collisionManager,
                             Player* player);
 
     const std::vector<StageInstance>& GetStageInstances() const { return stageInstances_; }
+
+    // ImGui で各チャンクの情報を表示
+    void DrawImGui();
 
 private:
     void CreateChunkFromId(int id, int row, int col,
@@ -76,5 +88,14 @@ private:
     uint32_t chunkHeight_ = 100;
     float    tileScale_   = 30.0f;
 
+    // チャンク間隔調整係数（1.0 でぴったり、0.5 で半分など）
+    float gapScale_ = 0.5f;
+
     int mainChunkIndex_ = 0;
+
+    // ID -> CSV パスの対応表
+    std::unordered_map<int, std::string> idToCsvPath_;
+
+    // StageScene から借りるだけのプレイヤー参照（所有しない）
+    Player* player_ = nullptr;
 };

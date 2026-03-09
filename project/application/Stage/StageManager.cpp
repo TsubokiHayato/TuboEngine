@@ -11,6 +11,7 @@
 #include "Tile/Tile.h"
 #include "Camera/FollowTopDownCamera.h"
 #include "Collider/CollisionManager.h"
+#include "ImGuiManager.h" // ImGui 用
 
 void StageManager::Configure(uint32_t chunkWidth, uint32_t chunkHeight, float tileScale) {
     chunkWidth_  = chunkWidth;
@@ -18,7 +19,7 @@ void StageManager::Configure(uint32_t chunkWidth, uint32_t chunkHeight, float ti
     tileScale_   = tileScale;
 }
 
-// メタレイアウト用: intグリッドCSV読み込み (0/1 など)
+// メタレイアウト用: intグリッドCSV読み込み (0/1/2/...)
 static std::vector<std::vector<int>> LoadIntGridCsv(const std::string& path) {
     std::vector<std::vector<int>> grid;
     std::ifstream file(path);
@@ -44,21 +45,51 @@ static std::vector<std::vector<int>> LoadIntGridCsv(const std::string& path) {
     return grid;
 }
 
-// Stage.csv から 0/1 のメタレイアウトを読み込み、1 のセルだけ現在のステージ構成として生成
+// Stage.csv から 0/1/2/... のメタレイアウトを読み込み、0 以外のセルだけチャンク生成
 void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
                                   Player* player,
                                   FollowTopDownCamera* followCamera) {
+    // 保持プレイヤーを更新（null でなければ優先）
+    if (player) {
+        player_ = player;
+    }
     stageInstances_.clear();
 
     auto grid = LoadIntGridCsv(metaCsvPath);
     const int rows = static_cast<int>(grid.size());
+    if (rows <= 0) {
+        return;
+    }
+
+    // 各行の最大列数を取得（行ごとに列数が違っても対応）
+    int maxCols = 0;
+    for (const auto& row : grid) {
+        maxCols = std::max<int>(maxCols, static_cast<int>(row.size()));
+    }
+    if (maxCols <= 0) {
+        return;
+    }
+
+    // 可変サイズ Stage.csv 全体の中心セルが (0,0) 付近になるように、
+    // 行・列の中心オフセットを計算する。
+    // 例) 3x3 -> centerRow=1, centerCol=1 (5 が中心)
+    //     3x5 -> centerRow=1, centerCol=2 (8 が中心)
+    const float centerRow = (rows   - 1) * 0.5f;
+    const float centerCol = (maxCols - 1) * 0.5f;
+
     for (int r = 0; r < rows; ++r) {
         const int cols = static_cast<int>(grid[r].size());
         for (int c = 0; c < cols; ++c) {
             int id = grid[r][c];
-            // 0: 何も置かない, 1: MapChip.csv を使ったチャンクを生成
-            if (id == 1) {
-                CreateChunkFromId(1, r, c, player, followCamera);
+            // 0: 何も置かない, 1/2/...: 登録済みCSVを使ったチャンクを生成
+            if (id != 0) {
+                // 元のグリッド座標(r,c)を、ステージ全体中心が (0,0) になるように平行移動
+                const float relRowF = static_cast<float>(r) - centerRow;
+                const float relColF = static_cast<float>(c) - centerCol;
+                const int   relRow  = static_cast<int>(std::round(relRowF));
+                const int   relCol  = static_cast<int>(std::round(relColF));
+
+                CreateChunkFromId(id, relRow, relCol, player, followCamera);
             }
         }
     }
@@ -70,19 +101,25 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
 
 TuboEngine::Math::Vector3 StageManager::ComputeOriginForChunk(int row, int col) const {
     TuboEngine::Math::Vector3 origin;
-    origin.x = static_cast<float>(col) * static_cast<float>(chunkWidth_) * tileScale_;
-    origin.y = -static_cast<float>(row) * static_cast<float>(chunkHeight_) * tileScale_;
+    // gapScale_ でステージ同士の間隔を調整できるようにする
+    origin.x = static_cast<float>(col) * static_cast<float>(chunkWidth_) * tileScale_ * gapScale_;
+    origin.y = -static_cast<float>(row) * static_cast<float>(chunkHeight_) * tileScale_ * gapScale_;
     origin.z = 0.0f;
     return origin;
 }
 
-void StageManager::CreateChunkFromId(int /*id*/, int row, int col,
+void StageManager::CreateChunkFromId(int id, int row, int col,
                                      Player* player,
                                      FollowTopDownCamera* followCamera) {
     StageInstance inst;
 
-    // 現在のステージ構成: すべて MapChip.csv を使用
-    inst.csvPath = "Resources/Stage/MapChip.csv";
+    // ID -> CSV パスの対応からパスを決定（見つからなければデフォルト）
+    auto it = idToCsvPath_.find(id);
+    if (it != idToCsvPath_.end()) {
+        inst.csvPath = it->second;
+    } else {
+        inst.csvPath = "Resources/Stage/MapChip.csv"; // デフォルト
+    }
 
     inst.origin  = ComputeOriginForChunk(row, col);
     inst.visible = true;
@@ -130,7 +167,9 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
     TuboEngine::Math::Vector3 tilePos = field->GetMapChipPositionByIndex(0, 0);
     tilePos.z = -1.0f;
     inst.tile->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile30x30.obj");
-    inst.tile->SetCamera(cam);
+    if (cam) {
+        inst.tile->SetCamera(cam);
+    }
     inst.tile->Update();
 
     for (uint32_t y = 0; y < field->GetNumBlockVirtical(); ++y) {
@@ -141,13 +180,17 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
             if (type == MapChipType::kBlock) {
                 auto block = std::make_unique<Block>();
                 block->Initialize(pos);
-                block->SetCamera(cam);
+                if (cam) {
+                    block->SetCamera(cam);
+                }
                 block->Update();
                 inst.blocks.push_back(std::move(block));
             } else if (type == MapChipType::Enemy || type == MapChipType::EnemyRush) {
                 auto enemy = std::make_unique<RushEnemy>();
                 enemy->Initialize();
-                enemy->SetCamera(cam);
+                if (cam) {
+                    enemy->SetCamera(cam);
+                }
                 enemy->SetPlayer(player);
                 enemy->SetMapChipField(field);
                 enemy->SetPosition(pos);
@@ -156,7 +199,9 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
             } else if (type == MapChipType::EnemyShoot) {
                 auto enemy = std::make_unique<Enemy>();
                 enemy->Initialize();
-                enemy->SetCamera(cam);
+                if (cam) {
+                    enemy->SetCamera(cam);
+                }
                 enemy->SetPlayer(player);
                 enemy->SetMapChipField(field);
                 enemy->SetPosition(pos);
@@ -168,20 +213,25 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
 }
 
 void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
+    // プレイヤーもここで更新（State側はロックやカメラ設定だけ）
     Camera* cam = followCamera ? followCamera->GetCamera() : nullptr;
+    if (player && cam) {
+        player->SetCamera(cam);
+        player->Update();
+    }
 
     for (auto& inst : stageInstances_) {
         if (!inst.visible) continue;
         if (inst.tile) {
-            inst.tile->SetCamera(cam);
+            if (cam) inst.tile->SetCamera(cam);
             inst.tile->Update();
         }
         for (auto& b : inst.blocks) {
-            b->SetCamera(cam);
+            if (cam) b->SetCamera(cam);
             b->Update();
         }
         for (auto& e : inst.enemies) {
-            e->SetCamera(cam);
+            if (cam) e->SetCamera(cam);
             e->SetPlayer(player);
             e->Update();
         }
@@ -215,6 +265,16 @@ TuboEngine::Math::Vector3 StageManager::GetPlayerStartPosition() const {
     return TuboEngine::Math::Vector3{0.0f, 0.0f, 0.0f};
 }
 
+MapChipField* StageManager::GetPlayerStartField() const {
+    for (const auto& inst : stageInstances_) {
+        if (!inst.field) continue;
+        if (inst.playerMapX >= 0 && inst.playerMapY >= 0) {
+            return inst.field.get();
+        }
+    }
+    return nullptr;
+}
+
 void StageManager::RegisterCollisions(CollisionManager* collisionManager,
                                       Player* player) {
     if (!collisionManager) return;
@@ -235,4 +295,47 @@ void StageManager::RegisterCollisions(CollisionManager* collisionManager,
             }
         }
     }
+}
+
+void StageManager::DrawImGui() {
+#ifdef USE_IMGUI
+    ImGui::Begin("StageManager");
+
+    // チャンク間隔調整スライダー
+    ImGui::SliderFloat("Gap Scale", &gapScale_, 0.1f, 2.0f, "%.2f");
+    ImGui::Separator();
+
+    if (stageInstances_.empty()) {
+        ImGui::Text("No stage instances.");
+        ImGui::End();
+        return;
+    }
+
+    ImGui::Text("Chunk Count: %d", static_cast<int>(stageInstances_.size()));
+    ImGui::Separator();
+
+    int index = 0;
+    for (auto& inst : stageInstances_) {
+        const float centerX = (inst.boundsWorld.left + inst.boundsWorld.right) * 0.5f;
+        const float centerY = (inst.boundsWorld.bottom + inst.boundsWorld.top) * 0.5f;
+        ImGui::PushID(index);
+        if (ImGui::TreeNode("Chunk", "Chunk %d", index)) {
+            ImGui::Text("CSV: %s", inst.csvPath.c_str());
+            ImGui::Checkbox("Visible", &inst.visible);
+            ImGui::Text("Origin: (%.1f, %.1f)", inst.origin.x, inst.origin.y);
+            ImGui::Text("Bounds: L=%.1f R=%.1f B=%.1f T=%.1f",
+                        inst.boundsWorld.left, inst.boundsWorld.right,
+                        inst.boundsWorld.bottom, inst.boundsWorld.top);
+            ImGui::Text("Center: (%.1f, %.1f)", centerX, centerY);
+            ImGui::Text("Blocks: %d  Enemies: %d",
+                        static_cast<int>(inst.blocks.size()),
+                        static_cast<int>(inst.enemies.size()));
+            ImGui::TreePop();
+        }
+        ImGui::PopID();
+        ++index;
+    }
+
+    ImGui::End();
+#endif // USE_IMGUI
 }
