@@ -227,27 +227,32 @@ void StageScene::Update() {
 
 	// --- Demo Mode Logic ---
 	if (isDemoMode) {
+		// Demo中は常に自動操作ONを維持する
+		if (player_ && !player_->IsAutoControlEnabled()) {
+			player_->SetAutoControlEnabled(true);
+		}
+
 		// 敵リストをプレイヤー(AutoController)に渡す
 		if (player_ && player_->IsAutoControlEnabled()) {
 			std::vector<Enemy*> enemyPtrs;
-			enemyPtrs.reserve(enemies.size());
-			for (const auto& e : enemies) {
-				if (e && e->GetIsAlive()) {
-					enemyPtrs.push_back(e.get());
+			if (stageManager_) {
+				const auto& insts = stageManager_->GetStageInstances();
+				for (const auto& inst : insts) {
+					if (!inst.visible) continue;
+					for (const auto& e : inst.enemies) {
+						if (e && e->GetIsAlive()) {
+							enemyPtrs.push_back(e.get());
+						}
+					}
 				}
 			}
-			// StageInstance内の敵も追加する必要があるかも？"
-			// 今はメインのenemiesだけ対象
 			player_->SetEnemyList(enemyPtrs);
 		}
 
 		// 入力があればタイトルへ戻る
-		// キーボードの任意のキー、あるいはマウス
-		// ※Inputクラスに AnyKey がないので代表的なキーのみチェック
 		bool pressAny = false;
 		auto* input = TuboEngine::Input::GetInstance();
-		// スペース、エンター、Z、X、クリックなど
-		if (input->TriggerKey(DIK_SPACE) || input->TriggerKey(DIK_RETURN) || 
+		if (input->TriggerKey(DIK_SPACE) || input->TriggerKey(DIK_RETURN) ||
 			input->TriggerKey(DIK_Z) || input->TriggerKey(DIK_X) ||
 			input->IsTriggerMouse(0) || input->IsTriggerMouse(1)) {
 			pressAny = true;

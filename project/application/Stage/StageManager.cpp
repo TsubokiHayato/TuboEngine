@@ -12,6 +12,7 @@
 #include "Camera/FollowTopDownCamera.h"
 #include "Collider/CollisionManager.h"
 #include "ImGuiManager.h" // ImGui 用
+#include "engine/scene/StageScene.h" // 追加: Demo判定用
 
 void StageManager::Configure(uint32_t chunkWidth, uint32_t chunkHeight, float tileScale) {
     chunkWidth_  = chunkWidth;
@@ -55,6 +56,16 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
     }
     stageInstances_.clear();
 
+    // Demoモード時は Stage.csv を使わず、中央に 1 チャンクだけ Demo.csv を配置する
+    if (StageScene::isDemoMode) {
+        // 中心(0,0) に ID=1 チャンクとして Demo.csv を生成
+        CreateChunkFromId(1, 0, 0, player, followCamera);
+        if (player) {
+            player->SetPosition(GetPlayerStartPosition());
+        }
+        return;
+    }
+
     auto grid = LoadIntGridCsv(metaCsvPath);
     const int rows = static_cast<int>(grid.size());
     if (rows <= 0) {
@@ -83,6 +94,8 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
             int id = grid[r][c];
             // 0: 何も置かない, 1/2/...: 登録済みCSVを使ったチャンクを生成
             if (id != 0) {
+                // Demoモードでない通常ステージのみここを通る
+
                 // 元のグリッド座標(r,c)を、ステージ全体中心が (0,0) になるように平行移動
                 const float relRowF = static_cast<float>(r) - centerRow;
                 const float relColF = static_cast<float>(c) - centerCol;
@@ -119,6 +132,11 @@ void StageManager::CreateChunkFromId(int id, int row, int col,
         inst.csvPath = it->second;
     } else {
         inst.csvPath = "Resources/Stage/MapChip.csv"; // デフォルト
+    }
+
+    // Demoモード時は強制的に Demo.csv を使用
+    if (StageScene::isDemoMode) {
+        inst.csvPath = "Resources/Stage/Demo.csv";
     }
 
     inst.origin  = ComputeOriginForChunk(row, col);
@@ -213,12 +231,8 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
 }
 
 void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
-    // プレイヤーもここで更新（State側はロックやカメラ設定だけ）
+    // プレイヤーの Update はシーン/ステート側で行うため、ここでは行わない
     Camera* cam = followCamera ? followCamera->GetCamera() : nullptr;
-    if (player && cam) {
-        player->SetCamera(cam);
-        player->Update();
-    }
 
     for (auto& inst : stageInstances_) {
         if (!inst.visible) continue;
