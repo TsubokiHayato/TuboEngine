@@ -81,6 +81,18 @@ void StageTransitionState::Update(StageScene* scene) {
 
 	Player* player = scene->GetPlayer();
 	if (!player) return;
+	StageManager* stageMgr = scene->GetStageManager();
+	FollowTopDownCamera* follow = scene->GetFollowCamera();
+	// --- ステージオブジェクトやカメラは通常どおり更新してアニメーションとして見せる ---
+	if (stageMgr && follow) {
+		// Enemy 側で攻撃・移動しないようにするため、Update 前に簡易フラグを立てる等の制御を入れたい場合は、
+		// 今後 StageManager/Enemy 側に専用APIを追加して対応する。
+		// 現時点では Update 自体は行い、敵AI側で「Transition 中は攻撃・移動しない」分岐を入れておく想定。
+		stageMgr->Update(player, follow);
+	}
+	if (follow) {
+		follow->Update();
+	}
 
 	auto now = std::chrono::steady_clock::now();
 	float elapsed = std::chrono::duration<float>(now - startTime_).count();
@@ -120,6 +132,21 @@ void StageTransitionState::Update(StageScene* scene) {
 		followCamera->Update();
 		LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	}
+
+#ifdef USE_IMGUI
+	// --- デバッグ: 遷移の出発点(赤)と目的地(マゼンタ)を表示 ---
+	const float mh = 4.0f;
+	Vector3 startTop = { startPos_.x, startPos_.y, startPos_.z + mh };
+	Vector3 targetTop = { targetPos_.x, targetPos_.y, targetPos_.z + mh };
+	// 出発点（現在チャンクの Exit）: 赤
+	LineManager::GetInstance()->DrawLine(startPos_, startTop, { 1.0f, 0.3f, 0.3f, 1.0f });
+	LineManager::GetInstance()->DrawSphere(startTop, 0.6f, { 1.0f, 0.3f, 0.3f, 1.0f });
+	// 目的地（次のチャンクの Entrance）: マゼンタ
+	LineManager::GetInstance()->DrawLine(targetPos_, targetTop, { 1.0f, 0.3f, 1.0f, 1.0f });
+	LineManager::GetInstance()->DrawSphere(targetTop, 0.6f, { 1.0f, 0.3f, 1.0f, 1.0f });
+	// 出発→目的地のライン（白）
+	LineManager::GetInstance()->DrawLine(startTop, targetTop, { 1.0f, 1.0f, 1.0f, 0.8f });
+#endif // USE_IMGUI
 
 	if (t >= 1.0f) {
 		// 目的地（次のチャンクの Entrance）に到達：操作ロック解除して Playing に戻る
