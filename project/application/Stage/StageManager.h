@@ -57,6 +57,14 @@ public:
 
     void Update(Player* player, FollowTopDownCamera* followCamera);
 
+    // 現在メインとなっているチャンクのインデックスを取得
+    int GetMainChunkIndex() const { return mainChunkIndex_; }
+    // 次のチャンクに進める（単純に mainChunkIndex_ を +1 する）
+    bool AdvanceToNextChunk();
+
+    // 全チャンクの敵が全滅しているかを判定
+    bool AreAllEnemiesDefeated() const;
+
     void Draw3D();
 
     TuboEngine::Math::Vector3 GetPlayerStartPosition() const;
@@ -69,6 +77,13 @@ public:
 
     // ImGui で各チャンクの情報を表示
     void DrawImGui();
+
+    // デバッグ用: 各チャンク内の敵数・生存数を取得
+    struct ChunkEnemyInfo {
+        int total = 0;
+        int alive = 0;
+    };
+    std::vector<ChunkEnemyInfo> GetChunkEnemyInfos() const;
 
 private:
     void CreateChunkFromId(int id, int row, int col,

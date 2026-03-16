@@ -252,6 +252,16 @@ void Player::Update() {
 }
 
 //--------------------------------------------------
+// 見た目だけ更新（ゲームロジックなし。Transition用）
+//--------------------------------------------------
+void Player::UpdateVisualOnly() {
+	object3d->SetPosition(position);
+	object3d->SetRotation(rotation);
+	object3d->SetScale(scale);
+	object3d->Update();
+}
+
+//--------------------------------------------------
 // 弾を撃つ処理
 //--------------------------------------------------	
 void Player::Shoot() {

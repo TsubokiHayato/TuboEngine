@@ -29,6 +29,8 @@ public:
 	void Initialize() override;
 	// 更新処理のオーバーライド
 	void Update() override;
+	// 見た目だけ更新（ゲームロジックを一切実行しない。Transition等の外部制御用）
+	void UpdateVisualOnly();
 	// 描画処理のオーバーライド
 	void Draw() override;
 	// 衝突時の処理のオーバーライド
@@ -118,6 +120,8 @@ public:
 
 	// マップチップフィールドを設定
 	void SetMapChipField(MapChipField* mapChipField) { this->mapChipField = mapChipField; }
+	// 現在紐づいているマップチップフィールドを取得
+	MapChipField* GetMapChipField() const { return mapChipField; }
 
 	void SetMovementLocked(bool flag) { isMovementLocked = flag; }
 

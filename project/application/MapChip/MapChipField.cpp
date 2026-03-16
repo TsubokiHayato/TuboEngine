@@ -27,6 +27,8 @@ std::map<std::string, MapChipType> mapChipTable = {
     {"3", MapChipType::Enemy },
     {"4", MapChipType::EnemyRush },
     {"5", MapChipType::EnemyShoot },
+    {"6", MapChipType::kEntrance },
+    {"7", MapChipType::kExit },
 };
 }
 
@@ -86,29 +88,12 @@ void MapChipField::LoadMapChipCsv(const std::string& filePath) {
 		std::stringstream ss(line);
 		std::string cell;
 		while (std::getline(ss, cell, ',')) {
-			int value = std::stoi(cell);
-			switch (value) {
-			case 0:
+			// マップチップ種別テーブルを利用して変換
+			auto it = mapChipTable.find(cell);
+			if (it != mapChipTable.end()) {
+				row.push_back(it->second);
+			} else {
 				row.push_back(MapChipType::kBlank);
-				break;
-			case 1:
-				row.push_back(MapChipType::kBlock);
-				break;
-			case 2:
-				row.push_back(MapChipType::Player);
-				break;
-			case 3:
-				row.push_back(MapChipType::Enemy);
-				break;
-			case 4:
-				row.push_back(MapChipType::EnemyRush);
-				break;
-			case 5:
-				row.push_back(MapChipType::EnemyShoot);
-				break;
-			default:
-				row.push_back(MapChipType::kBlank);
-				break;
 			}
 		}
 		mapChipData_.data.push_back(row);
@@ -205,6 +190,27 @@ bool MapChipField::IsRectBlocked(const TuboEngine::Math::Vector3& center, float 
     return false;
 }
 
+//--------------------------------------------------
+// 指定タイプのチップのワールド座標リストを取得
+//--------------------------------------------------
+std::vector<TuboEngine::Math::Vector3> MapChipField::GetChipPositions(MapChipType type) const {
+	std::vector<TuboEngine::Math::Vector3> result;
+	for (uint32_t y = 0; y < mapChipData_.data.size(); ++y) {
+		const auto& row = mapChipData_.data[y];
+		for (uint32_t x = 0; x < row.size(); ++x) {
+			if (row[x] == type) {
+				// 座標計算では origin_ とブロックサイズを利用
+				TuboEngine::Math::Vector3 pos(
+					origin_.x + kBlockWidth_ * x,
+					origin_.y + kBlockHeight_ * y,
+					origin_.z);
+				result.push_back(pos);
+			}
+		}
+	}
+	return result;
+}
+
 
 //--------------------------------------------------
 // ImGuiの描画処理
@@ -231,13 +237,15 @@ void MapChipField::DrawImGui(const char* windowName) {
                 const char* label = nullptr;
                 ImVec4 color;
                 switch (mapChipType) {
-                    case MapChipType::kBlank:     label = "";  color = ImVec4(0.8f, 0.8f, 0.8f, 1.0f); break;
-                    case MapChipType::kBlock:     label = "B"; color = ImVec4(0.3f, 0.3f, 0.8f, 1.0f); break;
-                    case MapChipType::Player:     label = "P"; color = ImVec4(0.2f, 0.8f, 0.2f, 1.0f); break;
-                    case MapChipType::Enemy:      label = "E"; color = ImVec4(0.8f, 0.2f, 0.2f, 1.0f); break;
+                    case MapChipType::kBlank:     label = "";   color = ImVec4(0.8f, 0.8f, 0.8f, 1.0f); break;
+                    case MapChipType::kBlock:     label = "B";  color = ImVec4(0.3f, 0.3f, 0.8f, 1.0f); break;
+                    case MapChipType::Player:     label = "P";  color = ImVec4(0.2f, 0.8f, 0.2f, 1.0f); break;
+                    case MapChipType::Enemy:      label = "E";  color = ImVec4(0.8f, 0.2f, 0.2f, 1.0f); break;
                     case MapChipType::EnemyRush:  label = "ER"; color = ImVec4(1.0f, 0.4f, 0.2f, 1.0f); break;
                     case MapChipType::EnemyShoot: label = "ES"; color = ImVec4(0.9f, 0.6f, 0.2f, 1.0f); break;
-                    default:                      label = "?"; color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); break;
+					case MapChipType::kEntrance:  label = "IN"; color = ImVec4(0.2f, 0.6f, 1.0f, 1.0f); break;
+					case MapChipType::kExit:      label = "OUT"; color = ImVec4(1.0f, 0.9f, 0.2f, 1.0f); break;
+                    default:                      label = "?";  color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); break;
                 }
                 ImGui::PushStyleColor(ImGuiCol_Button, color);
                 ImGui::PushID(yIndex * kNumBlockHorizontal + xIndex);
@@ -250,7 +258,9 @@ void MapChipField::DrawImGui(const char* windowName) {
                         case MapChipType::Player:     nextType = MapChipType::Enemy;       break;
                         case MapChipType::Enemy:      nextType = MapChipType::EnemyRush;   break;
                         case MapChipType::EnemyRush:  nextType = MapChipType::EnemyShoot;  break;
-                        case MapChipType::EnemyShoot: nextType = MapChipType::kBlank;      break;
+                        case MapChipType::EnemyShoot: nextType = MapChipType::kEntrance;   break;
+					case MapChipType::kEntrance:  nextType = MapChipType::kExit;       break;
+					case MapChipType::kExit:      nextType = MapChipType::kBlank;      break;
                         default:                      nextType = MapChipType::kBlank;      break;
                     }
                     SetMapChipTypeByIndex(xIndex, yIndex, nextType);
