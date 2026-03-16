@@ -4,7 +4,6 @@
 #include <sstream>
 #include <algorithm>
 #include <format>
-#include "MapChip/MapChipField.h"
 #include "Block/Block.h"
 #include "Character/Enemy/Enemy.h"
 #include "Character/Enemy/RushEnemy.h"
@@ -252,6 +251,33 @@ void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
     }
 }
 
+// 全チャンクの敵が全滅しているか
+bool StageManager::AreAllEnemiesDefeated() const {
+	bool hasAnyEnemy = false;
+	for (const auto& inst : stageInstances_) {
+		if (!inst.visible) continue;
+		for (const auto& e : inst.enemies) {
+			if (!e) continue;
+			hasAnyEnemy = true;
+			if (e->GetIsAlive()) {
+				return false;
+			}
+		}
+	}
+	// 敵が一体もいない場合は false とする（任意仕様）
+	return hasAnyEnemy;
+}
+
+// mainChunkIndex_ を一つ進める（次のチャンクが存在すれば true を返す）
+bool StageManager::AdvanceToNextChunk() {
+	int next = mainChunkIndex_ + 1;
+	if (next < 0 || next >= static_cast<int>(stageInstances_.size())) {
+		return false;
+	}
+	mainChunkIndex_ = next;
+	return true;
+}
+
 void StageManager::Draw3D() {
     for (auto& inst : stageInstances_) {
         if (!inst.visible) continue;
@@ -350,6 +376,37 @@ void StageManager::DrawImGui() {
         ++index;
     }
 
+    ImGui::Text("Main Chunk Index: %d", mainChunkIndex_);
+
+    // チャンクごとの敵数/生存数を表示
+    const auto enemyInfos = GetChunkEnemyInfos();
+    for (size_t i = 0; i < stageInstances_.size(); ++i) {
+        const auto& inst = stageInstances_[i];
+        ImGui::Separator();
+        ImGui::Text("Chunk %zu (id=%s) visible=%s", i, inst.csvPath.c_str(), inst.visible ? "true" : "false");
+        if (i < enemyInfos.size()) {
+            ImGui::Text("  Enemies: total=%d, alive=%d", enemyInfos[i].total, enemyInfos[i].alive);
+        }
+    }
+
     ImGui::End();
 #endif // USE_IMGUI
+}
+
+// デバッグ用: 各チャンクの敵数・生存数を取得
+std::vector<StageManager::ChunkEnemyInfo> StageManager::GetChunkEnemyInfos() const {
+	std::vector<ChunkEnemyInfo> result;
+	result.reserve(stageInstances_.size());
+	for (const auto& inst : stageInstances_) {
+		ChunkEnemyInfo info{};
+		for (const auto& e : inst.enemies) {
+			if (!e) continue;
+			++info.total;
+			if (e->GetIsAlive()) {
+				++info.alive;
+			}
+		}
+		result.push_back(info);
+	}
+	return result;
 }

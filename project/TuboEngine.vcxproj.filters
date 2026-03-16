@@ -370,6 +370,7 @@
     <ClCompile Include="engine\graphic\2d\TextManager.cpp" />
     <ClCompile Include="engine\graphic\2d\TextObject.cpp" />
     <ClCompile Include="application\Stage\StageManager.cpp" />
+    <ClCompile Include="application\StageState\StageTransition\StageTransitionState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">

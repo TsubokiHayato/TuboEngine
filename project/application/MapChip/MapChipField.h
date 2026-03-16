@@ -15,6 +15,9 @@ enum class MapChipType {
 	Enemy,       // 旧: 敵（互換用。今後は下の個別タイプを推奨）
 	EnemyRush,   // 追加: 突進敵
 	EnemyShoot,  // 追加: 射撃敵
+	// --- ステージ遷移用マーカー ---
+	kEntrance,   // 追加: ステージ入口
+	kExit,       // 追加: ステージ出口（イージング遷移の目的地）
 };
 
 ///--------------------------------------------------
@@ -79,6 +82,9 @@ public:
 
 	// 指定矩形領域（プレイヤーの四隅など）が衝突しているか判定
 	bool IsRectBlocked(const TuboEngine::Math::Vector3& center, float width, float height) const;
+
+	// 指定タイプのチップのワールド座標リストを取得（出口探索などに使用）
+	std::vector<TuboEngine::Math::Vector3> GetChipPositions(MapChipType type) const;
 
 	// ImGuiの描画処理
 	void DrawImGui(const char* windowName = "MapChipField");

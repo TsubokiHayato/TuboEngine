@@ -123,6 +123,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\StageState\StagePlaying\StagePlayingState.cpp" />
     <ClCompile Include="application\StageState\StageReady\StageReadyState.cpp" />
     <ClCompile Include="application\StageState\StageStateManager.cpp" />
+    <ClCompile Include="application\StageState\StageTransition\StageTransitionState.cpp" />
     <ClCompile Include="application\StageState\Tutorial\TutorialState.cpp" />
     <ClCompile Include="application\Stage\StageManager.cpp" />
     <ClCompile Include="application\UI\Guide\GuideUI.cpp" />

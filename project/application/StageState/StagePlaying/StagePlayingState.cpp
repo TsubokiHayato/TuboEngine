@@ -66,34 +66,61 @@ void StagePlayingState::Update(StageScene* scene) {
 		LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	}
 
-	// --- ゲームクリア判定 / ゲームオーバー判定は StageManager 管理の敵リストから行う ---
-	bool allEnemiesDefeated = true;
-	bool hasAnyEnemy = false;
+	// --- ゲームクリア判定 / チャンククリア判定 ---
+	bool allEnemiesInCurrentChunkDefeated = true;
+	bool hasAnyEnemyInCurrentChunk = false;
+	bool allChunksCleared = false;
 	if (stageMgr) {
+		int mainIndex = stageMgr->GetMainChunkIndex();
 		const auto& insts = stageMgr->GetStageInstances();
-		for (const auto& inst : insts) {
-			if (!inst.visible) continue;
-			for (const auto& e : inst.enemies) {
-				if (!e) continue;
-				hasAnyEnemy = true;
-				if (e->GetIsAlive()) {
-					allEnemiesDefeated = false;
-					break;
+		if (mainIndex >= 0 && mainIndex < static_cast<int>(insts.size())) {
+			const auto& cur = insts[mainIndex];
+			if (cur.visible) {
+				for (const auto& e : cur.enemies) {
+					if (!e) continue;
+					hasAnyEnemyInCurrentChunk = true;
+					if (e->GetIsAlive()) {
+						allEnemiesInCurrentChunkDefeated = false;
+						break;
+					}
 				}
 			}
-			if (!allEnemiesDefeated) break;
 		}
+		// 全チャンクの敵が全滅しているか（GameClear 用）
+		allChunksCleared = stageMgr->AreAllEnemiesDefeated();
 	}
 
-	if (allEnemiesDefeated && hasAnyEnemy) {
+	if (allEnemiesInCurrentChunkDefeated && hasAnyEnemyInCurrentChunk) {
 		// DEMOモード時はタイトルへ戻る (既存ロジックを簡略)
 		if (StageScene::isDemoMode) {
 			StageScene::isDemoMode = false;
 			SceneManager::GetInstance()->ChangeScene(TITLE);
 			return;
 		}
+
+		// 敵全滅後、プレイヤーが kExit チップの上に乗ったら Transition へ
+		// （プレイヤーが自分で出口まで歩く設計）
+		if (player) {
+			MapChipField* field = player->GetMapChipField();
+			if (field) {
+				auto playerPos = player->GetPosition();
+				auto idx = field->GetMapChipIndexSetByPosition(playerPos);
+				MapChipType chipAtPlayer = field->GetMapChipTypeByIndex(idx.xIndex, idx.yIndex);
+				if (chipAtPlayer == MapChipType::kExit) {
+					if (auto* mgr = scene->GetStageStateManager()) {
+						mgr->ChangeState(StageType::Transition, scene);
+					}
+					return;
+				}
+			}
+		}
+		// kExit に到達していなければ Playing を続行（プレイヤーが自分で歩いて行く）
+	}
+
+	// 全チャンクの敵が全滅している場合は GameClear へ
+	if (allChunksCleared) {
 		if (auto* mgr = scene->GetStageStateManager()) {
-			mgr->ChangeState(StageType::StageClear, scene);
+			mgr->ChangeState(StageType::GameClear, scene);
 		}
 		return;
 	}
