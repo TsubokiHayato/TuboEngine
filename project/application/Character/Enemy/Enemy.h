@@ -76,7 +76,7 @@ protected:
     State state_ = State::Idle;
     float kViewAngleDeg = 90.0f;
     float kViewDistance = 50.0f;
-    int kViewLineDiv = 16;
+    int kViewLineDiv = 8;
 	TuboEngine::Math::Vector4 kViewColor = {1.0f, 1.0f, 0.0f, 0.7f};
 	TuboEngine::Math::Vector3 lastSeenPlayerPos = {0.0f, 0.0f, 0.0f};
     float lastSeenTimer = 0.0f;
