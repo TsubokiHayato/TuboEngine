@@ -186,10 +186,10 @@ void StageScene::Update() {
 	// Scene change animation update
 	sceneChangeAnimation_->Update(1.0f / 60.0f);
 
-	// StageManager によるステージ構成の更新
-	if (stageManager_) {
-		stageManager_->Update(player_.get(), followCamera.get());
-	}
+	// ★ StageManager の更新は各ステート（Playing/Ready/Tutorial など）に委譲する
+	// if (stageManager_) {
+	// 	stageManager_->Update(player_.get(), followCamera.get());
+	// }
 
 	// Always update state manager so states can respond to animation/request flags
 	if (stateManager_) {
@@ -292,10 +292,10 @@ void StageScene::Finalize() {}
 
 void StageScene::Object3DDraw() {
 
-	// ステージ(タイル/ブロック/敵)は StageManager からまとめて描画
-	if (stageManager_) {
-		stageManager_->Draw3D();
-	}
+	// ★ ステージ(タイル/ブロック/敵)の描画も各ステート側に委譲する
+	// if (stageManager_) {
+	// 	stageManager_->Draw3D();
+	// }
 
 	// ステートマネージャの3Dオブジェクト描画
 	if (stateManager_) {
