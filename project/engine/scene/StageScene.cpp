@@ -111,7 +111,7 @@ void StageScene::Initialize() {
 	collisionManager_ = std::make_unique<CollisionManager>();
 	stateManager_ = std::make_unique<StageStateManager>();
 	skyDome_ = std::make_unique<SkyDome>();
-	tile_ = std::make_unique<Tile>();
+	// tile_ = std::make_unique<Tile>(); // StageManager に統合済みのため未使用
 	sceneChangeAnimation_ = std::make_unique<SceneChangeAnimation>(1280, 720, 80, 1.5f, "barrier.png");
 
 	// StageManager の生成と基本設定のみ行う（実ロードは ReadyState でカメラ初期化後に行う）

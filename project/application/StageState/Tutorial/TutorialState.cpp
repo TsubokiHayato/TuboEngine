@@ -105,9 +105,6 @@ void TutorialState::BuildTutorialStage(StageScene* scene) {
 		return;
 	}
 
-	scene->GetBlocks().clear();
-	scene->GetEnemies().clear();
-
 	scene->GetMapChipField()->ResetMapChipData();
 	scene->GetMapChipField()->LoadMapChipCsv(tutorialCsvPath_);
 
@@ -137,46 +134,9 @@ void TutorialState::BuildTutorialStage(StageScene* scene) {
 	scene->GetPlayer()->SetCamera(scene->GetFollowCamera()->GetCamera());
 	scene->GetPlayer()->Update();
 
-	// タイル初期化（ステージ左上基準）
-	if (!scene->GetTile()) {
-		scene->GetTile() = std::make_unique<Tile>();
-	}
-	{
-		TuboEngine::Math::Vector3 tilePos = scene->GetMapChipField()->GetMapChipPositionByIndex(0, 0);
-		tilePos.z = -1.0f;
-		scene->GetTile()->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile30x30.obj");
-		scene->GetTile()->SetCamera(scene->GetFollowCamera()->GetCamera());
-		scene->GetTile()->Update();
-	}
-
-	ForEachMapChip(scene->GetMapChipField(), [&](uint32_t x, uint32_t y, MapChipType type) {
-		TuboEngine::Math::Vector3 pos = scene->GetMapChipField()->GetMapChipPositionByIndex(x, y);
-		if (type == MapChipType::kBlock) {
-			auto block = std::make_unique<Block>();
-			block->Initialize(pos);
-			block->SetCamera(scene->GetFollowCamera()->GetCamera());
-			block->Update();
-			scene->GetBlocks().push_back(std::move(block));
-		} else if (type == MapChipType::Enemy || type == MapChipType::EnemyRush) {
-			auto enemy = std::make_unique<RushEnemy>();
-			enemy->Initialize();
-			enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
-			enemy->SetPlayer(scene->GetPlayer());
-			enemy->SetPosition(pos);
-			enemy->SetMapChipField(scene->GetMapChipField());
-			enemy->Update();
-			scene->GetEnemies().push_back(std::move(enemy));
-		} else if (type == MapChipType::EnemyShoot) {
-			auto enemy = std::make_unique<Enemy>();
-			enemy->Initialize();
-			enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
-			enemy->SetPlayer(scene->GetPlayer());
-			enemy->SetPosition(pos);
-			enemy->SetMapChipField(scene->GetMapChipField());
-			enemy->Update();
-			scene->GetEnemies().push_back(std::move(enemy));
-		}
-	});
+	// タイル/ブロック/敵の生成は Tutorial 用に StageManager 側で行うのが理想だが、
+	// 現状は MapChipField を使ったチュートリアル専用レイアウトのみ扱うため、
+	// 必要であれば今後 StageManager に統合する。
 
 	if (scene->GetSkyDome()) {
 		scene->GetSkyDome()->Initialize();
@@ -229,30 +189,11 @@ void TutorialState::Update(StageScene* scene) {
 	// TutorialState の ImGui フラグを Player に渡す
 	scene->GetPlayer()->SetAutoControlEnabled(autoPlayEnabled_);
 
-	// このあとにブロックやプレイヤー更新など既存処理
-	for (auto& block : scene->GetBlocks()) {
-		if (!block) continue;
-		block->SetCamera(scene->GetFollowCamera()->GetCamera());
-		block->Update();
-	}
-
+	// プレイヤーとカメラのみ更新（ブロック/敵/タイルは StageManager 側に統合予定）
 	scene->GetPlayer()->SetCamera(scene->GetFollowCamera()->GetCamera());
 	scene->GetPlayer()->SetMovementLocked(false);
 	scene->GetPlayer()->SetMapChipField(scene->GetMapChipField());
 	scene->GetPlayer()->Update();
-
-	for (auto& enemy : scene->GetEnemies()) {
-		if (!enemy) continue;
-		enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
-		enemy->SetPlayer(scene->GetPlayer());
-		enemy->SetMapChipField(scene->GetMapChipField());
-		enemy->Update();
-	}
-
-	if (auto& tile = scene->GetTile()) {
-		tile->SetCamera(scene->GetFollowCamera()->GetCamera());
-		tile->Update();
-	}
 
 	scene->GetFollowCamera()->Update();
 
@@ -308,23 +249,18 @@ void TutorialState::Object3DDraw(StageScene* scene) {
 		scene->GetSkyDome()->Draw();
 	}
 
-	if (auto& tile = scene->GetTile()) {
-		tile->Draw();
-	}
-
-	for (auto& block : scene->GetBlocks()) {
-		if (!block) continue;
-		block->Draw();
-	}
-
+	// チュートリアル用のステージ描画は StageManager に統合可能だが、
+	// 現状はプレイヤーのみ描画
 	if (scene->GetPlayer()) {
 		scene->GetPlayer()->Draw();
 	}
+}
 
-	for (auto& enemy : scene->GetEnemies()) {
-		if (!enemy) continue;
-		enemy->Draw();
+void TutorialState::ParticleDraw(StageScene* scene) {
+	if (!scene) {
+		return;
 	}
+	// チュートリアルでは現在、敵パーティクルは未使用
 }
 
 void TutorialState::SpriteDraw(StageScene* scene) {
@@ -369,14 +305,4 @@ void TutorialState::ImGuiDraw(StageScene* /*scene*/) {
 	ImGui::Checkbox("Auto Play (Tutorial)", &autoPlayEnabled_);
 	ImGui::End();
 #endif
-}
-
-void TutorialState::ParticleDraw(StageScene* scene) {
-	if (!scene) {
-		return;
-	}
-	for (auto& enemy : scene->GetEnemies()) {
-		if (!enemy) continue;
-		enemy->ParticleDraw();
-	}
 }

@@ -101,9 +101,8 @@ public:
 
 	Player* GetPlayer() const { return player_.get(); }
 	MapChipField* GetMapChipField() const { return mapChipField_.get(); }
-	std::vector<std::unique_ptr<Block>>& GetBlocks() { return blocks_; }
-	std::unique_ptr<Tile>& GetTile() { return tile_; }
-	std::vector<std::unique_ptr<Enemy>>& GetEnemies() { return enemies; }
+	// Stage オブジェクトはすべて StageManager 管理に移行したため、
+	// 旧 blocks_/tile_/enemies の Getter は削除済み。
 
 	FollowTopDownCamera* GetFollowCamera() const { return followCamera.get(); }
 	std::string& GetMapChipCsvFilePath() { return mapChipCsvFilePath_; }
@@ -150,8 +149,7 @@ private:
 	TuboEngine::Math::Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
 
 	std::unique_ptr<Player> player_ = nullptr;
-	std::unique_ptr<Enemy> enemy_ = nullptr;
-	std::vector<std::unique_ptr<Enemy>> enemies;
+	std::unique_ptr<Enemy> enemy_ = nullptr; // TODO: 旧世代の単体 Enemy。必要なければ将来削除。
 
 	std::unique_ptr<SkyBox> skyBox_ = nullptr;
 
@@ -164,9 +162,7 @@ public:
 	// Demo用CSVパス取得
 	const std::string& GetDemoMapChipCsvFilePath() const { return demoMapChipCsvFilePath_; }
 
-	std::vector<std::unique_ptr<Block>> blocks_;
-
-	std::unique_ptr<Tile> tile_;
+	// 旧: blocks_/tile_/enemies は StageManager 統合により削除
 
 	std::unique_ptr<StageStateManager> stateManager_;
 

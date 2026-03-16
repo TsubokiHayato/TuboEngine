@@ -248,22 +248,13 @@ void PauseState::Object3DDraw(StageScene* scene) {
 	if (!scene)
 		return;
 
+	if (auto* stageMgr = scene->GetStageManager()) {
+		stageMgr->Draw3D();
+	}
 	if (scene->GetSkyDome())
 		scene->GetSkyDome()->Draw();
-	if (auto& tile = scene->GetTile())
-		tile->Draw();
-	for (auto& block : scene->GetBlocks()) {
-		if (block)
-			block->Draw();
-	}
 	if (scene->GetPlayer())
 		scene->GetPlayer()->Draw();
-	for (auto& enemy : scene->GetEnemies()) {
-		if (enemy)
-			enemy->Draw();
-	}
-
-	
 }
 
 void PauseState::SpriteDraw(StageScene* scene) {
