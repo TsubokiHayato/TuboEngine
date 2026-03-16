@@ -140,6 +140,42 @@ void StagePlayingState::Update(StageScene* scene) {
 
 	if (pauseGuideSprite_) pauseGuideSprite_->Update();
 	if (scene->GetSkyDome()) scene->GetSkyDome()->Update();
+
+#ifdef USE_IMGUI
+	// --- デバッグ: 入口(青)・出口(黄)にマーカーを表示 ---
+	if (player) {
+		MapChipField* field = player->GetMapChipField();
+		if (field) {
+			auto entrances = field->GetChipPositions(MapChipType::kEntrance);
+			auto exits = field->GetChipPositions(MapChipType::kExit);
+			const float markerHeight = 3.0f;  // マーカーの高さ（縦線の長さ）
+			const float sphereR = 0.8f;
+
+			// 入口: 青い縦線 + 球
+			for (const auto& pos : entrances) {
+				TuboEngine::Math::Vector3 top = { pos.x, pos.y, pos.z + markerHeight };
+				LineManager::GetInstance()->DrawLine(pos, top, { 0.2f, 0.5f, 1.0f, 1.0f }); // 青
+				LineManager::GetInstance()->DrawSphere(top, sphereR, { 0.2f, 0.5f, 1.0f, 1.0f });
+			}
+
+			// 出口: 黄色い縦線 + 球
+			for (const auto& pos : exits) {
+				TuboEngine::Math::Vector3 top = { pos.x, pos.y, pos.z + markerHeight };
+				LineManager::GetInstance()->DrawLine(pos, top, { 1.0f, 0.9f, 0.2f, 1.0f }); // 黄
+				LineManager::GetInstance()->DrawSphere(top, sphereR, { 1.0f, 0.9f, 0.2f, 1.0f });
+			}
+
+			// 入口→出口への案内ライン（緑の点線風）
+			for (const auto& ent : entrances) {
+				for (const auto& ext : exits) {
+					TuboEngine::Math::Vector3 entTop = { ent.x, ent.y, ent.z + markerHeight };
+					TuboEngine::Math::Vector3 extTop = { ext.x, ext.y, ext.z + markerHeight };
+					LineManager::GetInstance()->DrawLine(entTop, extTop, { 0.2f, 1.0f, 0.3f, 0.6f }); // 緑
+				}
+			}
+		}
+	}
+#endif // USE_IMGUI
 }
 
 void StagePlayingState::Exit(StageScene* scene) {
