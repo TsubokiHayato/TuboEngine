@@ -194,6 +194,29 @@ void StagePlayingState::Object3DDraw(StageScene* scene) {
 	}
 	Player* player = scene->GetPlayer();
 	player->Draw();
+
+	// --- 入口・出口の目印を球体のみで描画 ---
+	if (player) {
+		MapChipField* field = player->GetMapChipField();
+		if (field) {
+			auto entrances = field->GetChipPositions(MapChipType::kEntrance);
+			auto exits = field->GetChipPositions(MapChipType::kExit);
+			const float markerHeight = 3.0f;  // 球体の高さ（地面から浮かせる）
+			const float sphereR = 0.8f;
+
+			// 入口: 青い球
+			for (const auto& pos : entrances) {
+				TuboEngine::Math::Vector3 top = { pos.x, pos.y, pos.z + markerHeight };
+				LineManager::GetInstance()->DrawSphere(top, sphereR, { 0.2f, 0.5f, 1.0f, 1.0f });
+			}
+
+			// 出口: 黄色い球
+			for (const auto& pos : exits) {
+				TuboEngine::Math::Vector3 top = { pos.x, pos.y, pos.z + markerHeight };
+				LineManager::GetInstance()->DrawSphere(top, sphereR, { 1.0f, 0.9f, 0.2f, 1.0f });
+			}
+		}
+	}
 }
 
 void StagePlayingState::SpriteDraw(StageScene* scene) {
