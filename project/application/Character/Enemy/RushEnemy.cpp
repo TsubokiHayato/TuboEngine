@@ -356,7 +356,10 @@ bool RushEnemy::HandlePlayerCollision(Collider* other) {
         isReacting_ = true;
         reactionTimer_ = reactionDuration_;
         rushCooldownTimer_ = rushCooldownDuration_;
-        requireExitBeforeNextRush_ = true;
+        // Do not force "require exit before next rush" on player collision.
+        // Forcing exit was causing the enemy to never attack again if knocked back
+        // but still within rush range. Only wall collisions should require exit.
+        requireExitBeforeNextRush_ = false;
         endedRushWithoutWall_ = false;
         lastReactionSource_ = ReactionSource::Player; // プレイヤー接触リアクション
 		TuboEngine::Math::Vector3 knock = reactionDir_ * reactionBackoffSpeed_;
