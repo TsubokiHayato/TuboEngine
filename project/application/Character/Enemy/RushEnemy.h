@@ -39,12 +39,12 @@ public:
 
 private:
     // --- Parameters ---
-    float baseMoveSpeed_ = 0.08f;      // 通常追跡速度 (少し遅く)
-    float rushSpeed_ = 0.30f;          // 突進速度 (やや抑制)
-    float rushTriggerDistance_ = 7.0f; // 突進開始距離
-    float rushDuration_ = 0.8f;        // 突進持続秒 (少し延長)
+    float baseMoveSpeed_ = 0.1f;      // 通常追跡速度 (少し遅く)
+    float rushSpeed_ = 0.40f;          // 突進速度 (やや抑制)
+    float rushTriggerDistance_ = 15.0f; // 突進開始距離 (少し広げる)
+    float rushDuration_ = 0.8f;        // 突進持続秒
     bool  isPreparing_ = false;        // 突進前ため状態
-    float prepareDuration_ = 0.9f;     // ため秒数 (延長)
+    float prepareDuration_ = 0.45f;     // ため秒数 (延長)
     float prepareTimer_ = 0.0f;        // 残りため時間
     float prepareMoveSpeed_ = 0.03f;   // ため中の前進速度 (遅く)
     bool  isRushing_ = false;          // 突進中フラグ

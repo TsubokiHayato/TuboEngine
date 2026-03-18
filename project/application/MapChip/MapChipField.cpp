@@ -48,7 +48,7 @@ MapChipField::IndexSet MapChipField::GetMapChipIndexSetByPosition(const TuboEngi
 //--------------------------------------------------
 // インデックスから矩形領域を取得
 //--------------------------------------------------
-MapChipField::Rect MapChipField::GetRectByIndex(uint32_t xIndex, uint32_t yIndex) {
+MapChipField::Rect MapChipField::GetRectByIndex(uint32_t xIndex, uint32_t yIndex) const {
 	TuboEngine::Math::Vector3 center = GetMapChipPositionByIndex(xIndex, yIndex);
 
 	Rect rect;
@@ -119,7 +119,7 @@ MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex
 //--------------------------------------------------
 // インデックスからマップチップの座標を取得
 //--------------------------------------------------
-TuboEngine::Math::Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex) {
+TuboEngine::Math::Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex)const {
 	return TuboEngine::Math::Vector3(
         origin_.x + kBlockWidth_ * xIndex,      // X: 右へ+
         origin_.y + kBlockHeight_ * yIndex,     // Y: 上へ+
@@ -175,16 +175,24 @@ bool MapChipField::IsBlocked(const TuboEngine::Math::Vector3& position) const {
 // 指定矩形領域（プレイヤーの四隅など）が衝突しているか判定
 //--------------------------------------------------
 bool MapChipField::IsRectBlocked(const TuboEngine::Math::Vector3& center, float width, float height) const {
-    // 四隅の座標を計算
-	std::array<TuboEngine::Math::Vector3, 4> corners = {
-	    TuboEngine::Math::Vector3(center.x + width / 2.0f, center.y - height / 2.0f, center.z), // 右下
-	    TuboEngine::Math::Vector3(center.x - width / 2.0f, center.y - height / 2.0f, center.z), // 左下
-	    TuboEngine::Math::Vector3(center.x + width / 2.0f, center.y + height / 2.0f, center.z), // 右上
-	    TuboEngine::Math::Vector3(center.x - width / 2.0f, center.y + height / 2.0f, center.z)  // 左上
-    };
-    for (const auto& pos : corners) {
-        if (IsBlocked(pos)) {
-            return true;
+    // 矩形範囲をインデックス範囲に変換
+    float halfW = width / 2.0f;
+    float halfH = height / 2.0f;
+    
+    // 少し内側を判定対象にする（境界ギリギリでの誤検知防止）
+    float margin = 0.01f;
+    IndexSet minIdx = GetMapChipIndexSetByPosition({center.x - halfW + margin, center.y - halfH + margin, center.z});
+    IndexSet maxIdx = GetMapChipIndexSetByPosition({center.x + halfW - margin, center.y + halfH - margin, center.z});
+
+    // 範囲内の全チップをチェック
+    for (uint32_t y = minIdx.yIndex; y <= maxIdx.yIndex; ++y) {
+        if (y >= mapChipData_.data.size()) continue;
+        const auto& row = mapChipData_.data[y];
+        for (uint32_t x = minIdx.xIndex; x <= maxIdx.xIndex; ++x) {
+            if (x >= row.size()) continue;
+            if (row[x] == MapChipType::kBlock) {
+                return true;
+            }
         }
     }
     return false;
@@ -211,6 +219,21 @@ std::vector<TuboEngine::Math::Vector3> MapChipField::GetChipPositions(MapChipTyp
 	return result;
 }
 
+//--------------------------------------------------
+// 指定座標の衝突法線を取得 (反射用)
+//--------------------------------------------------
+TuboEngine::Math::Vector3 MapChipField::GetCollisionNormal(const TuboEngine::Math::Vector3& pos, const TuboEngine::Math::Vector3& velocity) const {
+	IndexSet index = GetMapChipIndexSetByPosition(pos);
+	TuboEngine::Math::Vector3 center = GetMapChipPositionByIndex(index.xIndex, index.yIndex);
+	TuboEngine::Math::Vector3 diff = pos - center;
+
+	// X, Y のどちらの面に近いかで法線を決定
+	if (std::abs(diff.x * kBlockHeight_) > std::abs(diff.y * kBlockWidth_)) {
+		return { (diff.x > 0) ? 1.0f : -1.0f, 0.0f, 0.0f };
+	} else {
+		return { 0.0f, (diff.y > 0) ? 1.0f : -1.0f, 0.0f };
+	}
+}
 
 //--------------------------------------------------
 // ImGuiの描画処理
