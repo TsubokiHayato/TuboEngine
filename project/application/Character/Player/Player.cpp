@@ -273,17 +273,15 @@ void Player::Shoot() {
 	}
 
 	if (trigger && bulletTimer <= 0.0f) {
-		// プレイヤーの現在の回転(Z)から発射方向を作る（Rotateと一貫性を保つ）
-		float ang = rotation.z;
-		TuboEngine::Math::Vector3 dir{std::sin(ang), std::cos(ang), 0.0f};
 		// 発射
 		auto bullet = std::make_unique<PlayerBullet>();
-		bullet->Initialize(position);
 		bullet->SetPlayerRotation(rotation);
 		bullet->SetPlayerPosition(position);
 		bullet->SetMapChipField(mapChipField);
-		// 弾の速度をプレイヤー向きに設定
-		bullet->SetVelocity({dir.x * PlayerBullet::s_bulletSpeed, dir.y * PlayerBullet::s_bulletSpeed, dir.z * PlayerBullet::s_bulletSpeed});
+		
+		// フィールドや回転を設定した後に初期化（Initialize内で速度が決まる）
+		bullet->Initialize(position);
+		
 		bullets.push_back(std::move(bullet));
 		bulletTimer = cooldownTime;
 	}

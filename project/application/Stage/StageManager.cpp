@@ -224,7 +224,7 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                 enemy->SetPosition(pos);
                 enemy->Update();
                 inst.enemies.push_back(std::move(enemy));
-            }
+            } 
         }
     }
 }

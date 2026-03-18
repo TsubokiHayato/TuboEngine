@@ -42,17 +42,23 @@ void PlayerBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
 	Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon));
 	// 弾の初期位置を設定
 	position = startPos;
-	// 速度初期化
-	velocity = {};
+
+	// 速度初期化 (発射時のプレイヤーの向きを基準にする)
+	bulletSpeed = s_bulletSpeed;
+	// プレイヤーの回転に基づいた発射方向 (Wii Tank 基準の座標系に合わせる)
+	velocity.x = std::sinf(playerRotation.z) * -bulletSpeed;
+	velocity.y = -std::cosf(playerRotation.z) * -bulletSpeed;
+	velocity.z = 0.0f;
+
 	// 生存フラグON
 	isAlive = true;
+	reflectCount = 0;
+	maxReflectCount = 2; // 2回反射を許可
 
 	// パラメータを静的変数から取得
-	bulletSpeed = s_bulletSpeed;
 	disappearZ = s_disappearZ;
 	scale = s_scale;
 	rotation = s_rotation;
-	// damage = s_damage; // ダメージ設定（未使用）
 
 	// モデルファイル名
 	const std::string modelFileNamePath = "star.obj";
@@ -65,38 +71,74 @@ void PlayerBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
 // 更新処理
 //--------------------------------------------------
 void PlayerBullet::Update() {
+	if (!isAlive) return;
+
 	// 衝突判定の初期化
 	isHit = false;
-	// パラメータを静的変数から取得
-	bulletSpeed = -s_bulletSpeed;
+	
+	// 更新時のスケール・回転適用
 	scale = s_scale;
 	rotation = s_rotation;
 
-	// プレイヤー向きから進行方向決定
-	velocity.x = std::sinf(playerRotation.z) * bulletSpeed;
-	velocity.y = -std::cosf(playerRotation.z) * bulletSpeed;
-	velocity.z = 0.0f;
+	// 1フレームの合計移動ベクトル
+	TuboEngine::Math::Vector3 moveAmount = velocity; 
 
-	// 今フレームの移動量
-	TuboEngine::Math::Vector3 desiredMove = velocity; // dt(=1) 前提
-	float moveLen2D = std::sqrt(desiredMove.x * desiredMove.x + desiredMove.y * desiredMove.y);
+	// 衝突判定用のサイズ (見た目に対して適切か確認。2x2のブロックに対して0.5f程度が妥当)
+	float bulletWidth = 0.5f;
+	float bulletHeight = 0.5f;
 
-	// ブロック貫通防止用サブステップ
-	float tileSize = (mapChipField_) ? MapChipField::GetBlockSize() : 1.0f;
-	int subSteps = std::max(1, int(std::ceil(moveLen2D / (tileSize * 0.5f))));
-	TuboEngine::Math::Vector3 stepMove = desiredMove / float(subSteps);
+	// 高速移動時の突き抜け防止のためサブステップ化
+	float moveDist = std::sqrt(moveAmount.x * moveAmount.x + moveAmount.y * moveAmount.y);
+	// 0.1f単位でチェックするようにサブステップ数を決定
+	int subSteps = std::max(1, int(std::ceil(moveDist / 0.1f))); 
+	TuboEngine::Math::Vector3 stepDelta = moveAmount / (float)subSteps;
 
 	for (int i = 0; i < subSteps; ++i) {
-		TuboEngine::Math::Vector3 nextPos = position + stepMove;
-		if (mapChipField_ && mapChipField_->IsBlocked(nextPos)) {
-			isAlive = false;
-			break;
+		// X軸移動の判定
+		TuboEngine::Math::Vector3 nextPosX = position;
+		nextPosX.x += stepDelta.x;
+		if (mapChipField_ && mapChipField_->IsRectBlocked(nextPosX, bulletWidth, bulletHeight)) {
+			if (reflectCount < maxReflectCount) {
+				// X反転
+				velocity.x *= -1.0f;
+				// 今フレームの残りの移動分も反転させる
+				stepDelta.x *= -1.0f;
+				reflectCount++;
+				// 埋まり防止を兼ねて旧位置に留める（反転後の座標を次ステップで使用）
+			} else {
+				isAlive = false;
+				break;
+			}
+		} else {
+			position.x = nextPosX.x;
 		}
-		position = nextPos;
+
+		// Y軸移動の判定 (更新されたX位置から判定)
+		TuboEngine::Math::Vector3 nextPosY = position;
+		nextPosY.y += stepDelta.y;
+		if (mapChipField_ && mapChipField_->IsRectBlocked(nextPosY, bulletWidth, bulletHeight)) {
+			if (reflectCount < maxReflectCount) {
+				// Y反転
+				velocity.y *= -1.0f;
+				stepDelta.y *= -1.0f;
+				reflectCount++;
+			} else {
+				isAlive = false;
+				break;
+			}
+		} else {
+			position.y = nextPosY.y;
+		}
+
 		if (!isAlive) break;
 	}
 
-	// プレイヤーから離れすぎたら消滅
+	// 画面外（Z座標）チェック
+	if (position.z > disappearZ) {
+		isAlive = false;
+	}
+
+	// プレイヤーから離れすぎたら消滅 (反射を考慮して初期位置からの距離で判定するのもありだが、今はプレイヤーからの距離を維持)
 	if (isAlive && Distance(position, playerPosition_) > s_disappearRadius) {
 		isAlive = false;
 	}
