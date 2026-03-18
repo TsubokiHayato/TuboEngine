@@ -814,18 +814,21 @@ void Enemy::DrawViewCone() {
 	Vector4 colNone = {1.0f, 1.0f, 0.0f, 0.7f};
 	Vector4 colAware = {1.0f, 0.6f, 0.0f, 0.8f};
 	Vector4 colFound = {1.0f, 0.2f, 0.2f, 0.9f};
-	bool canSee = CanSeePlayer();
+	bool canSee = sawPlayerPrev_;
 	Vector4 coneColor = canSee ? colFound : (lastSeenTimer > 0.0f ? colAware : colNone);
 
-	for (int i = 0; i < kViewLineDiv; ++i) {
-		float a0 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i) / kViewLineDiv);
-		TuboEngine::Math::Vector3 p0 = center + TuboEngine::Math::Vector3{std::cos(a0) * kViewDistance, std::sin(a0) * kViewDistance, 0.0f};
-		p0.z = center.z;
-		LineManager::GetInstance()->DrawLine(center, p0, coneColor);
-	}
-	for (int i = 0; i < kViewLineDiv - 1; ++i) {
-		float a0 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i) / kViewLineDiv);
-		float a1 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i + 1) / kViewLineDiv);
+	// 輪郭部分のみ描画し、内部の扇線は描かないことで負荷を軽減
+	TuboEngine::Math::Vector3 pLeft = center + TuboEngine::Math::Vector3{std::cos(baseAngle - halfRad) * kViewDistance, std::sin(baseAngle - halfRad) * kViewDistance, 0.0f};
+	TuboEngine::Math::Vector3 pRight = center + TuboEngine::Math::Vector3{std::cos(baseAngle + halfRad) * kViewDistance, std::sin(baseAngle + halfRad) * kViewDistance, 0.0f};
+	pLeft.z = center.z; pRight.z = center.z;
+	LineManager::GetInstance()->DrawLine(center, pLeft, coneColor);
+	LineManager::GetInstance()->DrawLine(center, pRight, coneColor);
+
+	// 扇状の弧を描く（分割数を下げて軽くする）
+	const int arcDiv = 4;
+	for (int i = 0; i < arcDiv; ++i) {
+		float a0 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i) / arcDiv);
+		float a1 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i + 1) / arcDiv);
 		TuboEngine::Math::Vector3 p0 = center + TuboEngine::Math::Vector3{std::cos(a0) * kViewDistance, std::sin(a0) * kViewDistance, 0.0f};
 		TuboEngine::Math::Vector3 p1 = center + TuboEngine::Math::Vector3{std::cos(a1) * kViewDistance, std::sin(a1) * kViewDistance, 0.0f};
 		p0.z = p1.z = center.z;
@@ -867,7 +870,7 @@ void Enemy::DrawLastSeenMark() {
 	LineManager::GetInstance()->DrawLine(center + TuboEngine::Math::Vector3{-kLastSeenMarkSize, 0.0f, 0.0f}, center + TuboEngine::Math::Vector3{kLastSeenMarkSize, 0.0f, 0.0f}, kLastSeenColor);
 	LineManager::GetInstance()->DrawLine(center + TuboEngine::Math::Vector3{0.0f, -kLastSeenMarkSize, 0.0f}, center + TuboEngine::Math::Vector3{0.0f, kLastSeenMarkSize, 0.0f}, kLastSeenColor);
 	// 外周円
-	constexpr int circleDiv = 16;
+	constexpr int circleDiv = 8;
 	for (int i = 0; i < circleDiv; ++i) {
 		float a0 = (2.0f * kPI) * (float(i) / circleDiv);
 		float a1 = (2.0f * kPI) * (float(i + 1) / circleDiv);

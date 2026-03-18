@@ -312,37 +312,76 @@ void Player::Move() {
 				position = tryPosition;
 			}
 		}
+		// 回避中は速度を更新しておく（回避終了後の慣性のために）
+		velocity = dodgeDirection * dodgeSpeed;
 		return;
 	}
-	TuboEngine::Math::Vector3 prevPosition = position;
-	TuboEngine::Math::Vector3 moveDelta = {0.0f, 0.0f, 0.0f};
-	// Direct Input
+
+	TuboEngine::Math::Vector3 moveInput = {0.0f, 0.0f, 0.0f};
+	// 入力取得
 	if (IsAutoControlEnabled()) {
-		// 自動操作: コントローラーからの入力を使用
-		// 手動操作の 0.1f に相当する速度を適用 (moveDirは正規化されている前提)
-		moveDelta = autoMoveDir_ * 0.1f;
+		moveInput = autoMoveDir_;
 	} else {
-		// 手動操作
-		if (TuboEngine::Input::GetInstance()->PushKey(DIK_W)) {
-			moveDelta.y -= 0.1f;
-		}
-		if (TuboEngine::Input::GetInstance()->PushKey(DIK_S)) {
-			moveDelta.y += 0.1f;
-		}
-		if (TuboEngine::Input::GetInstance()->PushKey(DIK_A)) {
-			moveDelta.x -= 0.1f;
-		}
-		if (TuboEngine::Input::GetInstance()->PushKey(DIK_D)) {
-			moveDelta.x += 0.1f;
-		}
+		if (TuboEngine::Input::GetInstance()->PushKey(DIK_W)) moveInput.y -= 1.0f;
+		if (TuboEngine::Input::GetInstance()->PushKey(DIK_S)) moveInput.y += 1.0f;
+		if (TuboEngine::Input::GetInstance()->PushKey(DIK_A)) moveInput.x -= 1.0f;
+		if (TuboEngine::Input::GetInstance()->PushKey(DIK_D)) moveInput.x += 1.0f;
 	}
-	TuboEngine::Math::Vector3 tryPosition = position + moveDelta;
+
+	// 入力の正規化
+	float inputLen = std::sqrt(moveInput.x * moveInput.x + moveInput.y * moveInput.y);
+	if (inputLen > 0.0f) {
+		moveInput.x /= inputLen;
+		moveInput.y /= inputLen;
+	}
+
+	// 戦車物理パラメータ
+	float acceleration = 0.015f; // 加速度
+	float friction = 0.92f;      // 摩擦（減衰率）
+	float maxSpeed = 0.15f;      // 最大速度
+
+	// 加速
+	velocity.x += moveInput.x * acceleration;
+	velocity.y += moveInput.y * acceleration;
+
+	// 摩擦（入力がない時にゆっくり止まる）
+	if (inputLen == 0.0f) {
+		velocity.x *= friction;
+		velocity.y *= friction;
+	}
+
+	// 速度制限
+	float speed = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+	if (speed > maxSpeed) {
+		velocity.x = (velocity.x / speed) * maxSpeed;
+		velocity.y = (velocity.y / speed) * maxSpeed;
+	}
+
+	// 衝突判定付きの位置更新
+	TuboEngine::Math::Vector3 tryPosition = position + velocity;
 	if (mapChipField) {
 		float playerWidth = scale.x * MapChipField::GetBlockWidth() - 0.1f;
 		float playerHeight = scale.y * MapChipField::GetBlockHeight() - 0.1f;
-		if (!mapChipField->IsRectBlocked(tryPosition, playerWidth, playerHeight)) {
-			position = tryPosition;
+		
+		// X方向の移動チェック
+		TuboEngine::Math::Vector3 tryX = position;
+		tryX.x += velocity.x;
+		if (!mapChipField->IsRectBlocked(tryX, playerWidth, playerHeight)) {
+			position.x = tryX.x;
+		} else {
+			velocity.x = 0.0f; // 壁に当たったら速度を殺す
 		}
+
+		// Y方向の移動チェック
+		TuboEngine::Math::Vector3 tryY = position;
+		tryY.y += velocity.y;
+		if (!mapChipField->IsRectBlocked(tryY, playerWidth, playerHeight)) {
+			position.y = tryY.y;
+		} else {
+			velocity.y = 0.0f; // 壁に当たったら速度を殺す
+		}
+	} else {
+		position = tryPosition;
 	}
 }
 

@@ -299,7 +299,7 @@ void RushEnemy::ApplyChargeAndVisuals(float dt) {
 
 void RushEnemy::DrawDebugGizmos() {
 #if defined(_DEBUG)
-    const int div = 24; Vector4 triggerCol{0.3f,0.9f,0.3f,0.35f};
+	const int div = 8; Vector4 triggerCol{0.3f,0.9f,0.3f,0.35f};
 	for (int i = 0; i < div; ++i) {
 		float a0 = (2.0f * DirectX::XM_PI) * (float(i) / div);
 		float a1 = (2.0f * DirectX::XM_PI) * (float(i + 1) / div);

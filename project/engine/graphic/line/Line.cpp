@@ -18,6 +18,10 @@ void Line::Initialize(LineCommon* lineCommon) {
     CreateVertexBuffer();
     // 座標変換行列バッファ生成
     CreateTransformationMatrixBuffer();
+
+    // Debug時のpush_back再確保による高負荷を防ぐため事前予約
+    vertices_.reserve(100000);
+
     // Transformの初期化
     transform_ = {
         {1.0f, 1.0f, 1.0f},
