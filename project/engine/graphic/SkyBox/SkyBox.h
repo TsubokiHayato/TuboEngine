@@ -9,13 +9,12 @@
 #include"TransformationMatrix.h"
 #include"Material.h"
 
-class SkyBox
-{
+namespace TuboEngine {
+class SkyBox {
 public:
-    void Initialize(const std::string& textureFilePath);
-    void Update();
-    void Draw();
-
+	void Initialize(const std::string& textureFilePath);
+	void Update();
+	void Draw();
 
 public:
 	void SetCamera(TuboEngine::Camera* camera) { camera_ = camera; }
@@ -27,35 +26,37 @@ public:
 	void SetRotation(const TuboEngine::Math::Vector3& rotation) { transform.rotate = rotation; }
 	void SetScale(const TuboEngine::Math::Vector3& scale) { transform.scale = scale; }
 
-    void SetTextureFilePath(const std::string& textureFilePath) { textureFilePath_ = textureFilePath; }
-    const std::string& GetTextureFilePath() const { return textureFilePath_; }
-  
+	void SetTextureFilePath(const std::string& textureFilePath) { textureFilePath_ = textureFilePath; }
+	const std::string& GetTextureFilePath() const { return textureFilePath_; }
+
 private:
-   
-   
-    TuboEngine::Camera* camera_ = nullptr;
-    Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
+	TuboEngine::Camera* camera_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 
-    VertexData* vertexData = nullptr;
-    uint32_t* indexData = nullptr;
-    //バッファリソース
-    Microsoft::WRL::ComPtr <ID3D12Resource> vertexResource;
-    Microsoft::WRL::ComPtr <ID3D12Resource> indexResource;
-    //バッファリソースの使い道を補足するバッファビュー
-    D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
-    D3D12_INDEX_BUFFER_VIEW indexBufferView;
+	VertexData* vertexData = nullptr;
+	uint32_t* indexData = nullptr;
+	// バッファリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
+	// バッファリソースの使い道を補足するバッファビュー
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
+	D3D12_INDEX_BUFFER_VIEW indexBufferView;
 
-	//バッファリソース内のデータを指すポインタ
+	// バッファリソース内のデータを指すポインタ
 	TransformationMatrix* transformationMatrixData = nullptr;
-    Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
-    std::string textureFilePath_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
+	std::string textureFilePath_;
 
+	// バッファリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource;
+	// バッファリソース内のデータを指すポインタ
+	Material* materialData = nullptr;
 
-    //バッファリソース
-    Microsoft::WRL::ComPtr <ID3D12Resource> materialResource;
-    //バッファリソース内のデータを指すポインタ
-    Material* materialData = nullptr;
-
-	//大きさ、回転、位置
-    Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	// 大きさ、回転、位置
+	Transform transform{
+	    {1.0f, 1.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f}
+    };
 };
+} // namespace TuboEngine

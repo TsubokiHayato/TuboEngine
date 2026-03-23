@@ -67,7 +67,7 @@ private:
 	TuboEngine::Math::Vector4 pointLightColor = {1.0f, 1.0f, 1.0f, 1.0f};
 	float pointLightIntensity = 1.0f;
 
-	std::unique_ptr<SkyBox> skyBox = nullptr;
+	std::unique_ptr<TuboEngine::SkyBox> skyBox = nullptr;
 
 	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation = nullptr;
 	bool isRequestSceneChange = false;
