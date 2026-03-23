@@ -23,7 +23,7 @@ void DebugScene::Initialize() {
     audio->Initialize(audioFileName);
 
     // SkyBox
-    skyBox = std::make_unique<SkyBox>();
+	skyBox = std::make_unique<TuboEngine::SkyBox>();
     skyBox->Initialize(testDDSTextureHandle);
 
     // Camera

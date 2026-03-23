@@ -151,7 +151,7 @@ private:
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<Enemy> enemy_ = nullptr; // TODO: 旧世代の単体 Enemy。必要なければ将来削除。
 
-	std::unique_ptr<SkyBox> skyBox_ = nullptr;
+	std::unique_ptr<TuboEngine::SkyBox> skyBox_ = nullptr;
 
 	std::unique_ptr<MapChipField> mapChipField_ = nullptr;
 	std::string mapChipCsvFilePath_ = "Resources/Stage/MapChip.csv";
