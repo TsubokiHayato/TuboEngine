@@ -39,7 +39,7 @@ void Line::Update() {
     // デフォルトカメラ取得
     camera_ = lineCommon_->GetDefaultCamera();
     // ワールド行列作成
-	TuboEngine::Math::Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	TuboEngine::Math::Matrix4x4 worldMatrix = TuboEngine::Math::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	TuboEngine::Math::Matrix4x4 worldViewProjectionMatrix;
     if (camera_) {
         // ビュー・プロジェクション行列取得
@@ -135,6 +135,6 @@ void Line::CreateTransformationMatrixBuffer() {
     // 書き込むためのアドレスを取得
     transfomationMatrixBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
     // 単位行列を書き込む
-    transformationMatrix.WVP = MakeIdentity4x4();
+	transformationMatrix.WVP = TuboEngine::Math::MakeIdentity4x4();
     *transformationMatrixData_ = transformationMatrix;
 }

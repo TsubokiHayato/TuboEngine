@@ -39,7 +39,7 @@ void Model::Initialize(const std::string& directoryPath, const std::string& file
 	// 今回は赤を書き込んでみる
 	materialData->color = {1.0f, 1.0f, 1.0f, 1.0f};
 	materialData->enableLighting = true;
-	materialData->uvTransform = MakeIdentity4x4();
+	materialData->uvTransform = TuboEngine::Math::MakeIdentity4x4();
 	materialData->shininess = 70.0f;
 	materialData->environmentCoefficient = 1.0f;
 

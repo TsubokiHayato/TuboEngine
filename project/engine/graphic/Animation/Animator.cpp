@@ -30,8 +30,8 @@ void Animator::Initialize(std::string modelFileNamePath) {
 	// 書き込むためのアドレスを取得
 	transformMatrixResource->Map(0, nullptr, reinterpret_cast<void**>(&transformMatrixData));
 	// 単位行列を書き込んでいく
-	transformMatrixData->WVP = MakeIdentity4x4();
-	transformMatrixData->World = MakeIdentity4x4();
+	transformMatrixData->WVP = TuboEngine::Math::MakeIdentity4x4();
+	transformMatrixData->World = TuboEngine::Math::MakeIdentity4x4();
 
 #pragma endregion TransformMatrixResource
 
@@ -146,11 +146,11 @@ void Animator::Update() {
     cameraForGPUData->worldPosition = camera->GetTranslate();
 
     // 行列を更新する
-	TuboEngine::Math::Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	TuboEngine::Math::Matrix4x4 cameraMatrix = MakeAffineMatrix(camera->GetScale(), camera->GetRotation(), camera->GetTranslate());
-	TuboEngine::Math::Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	TuboEngine::Math::Matrix4x4 worldMatrix = TuboEngine::Math::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	TuboEngine::Math::Matrix4x4 cameraMatrix = TuboEngine::Math::MakeAffineMatrix(camera->GetScale(), camera->GetRotation(), camera->GetTranslate());
+	TuboEngine::Math::Matrix4x4 viewMatrix = TuboEngine::Math::Inverse(cameraMatrix);
 	TuboEngine::Math::Matrix4x4 projectionMatrix =
-	    MakePerspectiveMatrix(0.45f,
+	    TuboEngine::Math::MakePerspectiveMatrix(0.45f,
 	        float(TuboEngine::WinApp::GetInstance()->GetClientWidth()) /
 	        float(TuboEngine::WinApp::GetInstance()->GetClientHeight()),
 	        0.1f, 100.0f);

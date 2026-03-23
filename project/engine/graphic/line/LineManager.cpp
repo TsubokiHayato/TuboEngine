@@ -101,7 +101,7 @@ void LineManager::DrawGrid(float size, int split, const TuboEngine::Math::Vector
 	TuboEngine::Math::Vector3 center = {0.0f, 0.0f, 0.0f};
 
 	// 回転行列を生成
-	TuboEngine::Math::Matrix4x4 rotMat = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotation, {0.0f, 0.0f, 0.0f});
+	TuboEngine::Math::Matrix4x4 rotMat = TuboEngine::Math::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotation, {0.0f, 0.0f, 0.0f});
 
 	float half = size / 2.0f;
 	float step = size / split;
@@ -112,15 +112,15 @@ void LineManager::DrawGrid(float size, int split, const TuboEngine::Math::Vector
 		// X軸方向の線
 		TuboEngine::Math::Vector3 startX = {pos, 0.0f, -half};
 		TuboEngine::Math::Vector3 endX = {pos, 0.0f, half};
-		startX = TransformCoord(startX, rotMat);
-		endX = TransformCoord(endX, rotMat);
+		startX = TuboEngine::Math::TransformCoord(startX, rotMat);
+		endX = TuboEngine::Math::TransformCoord(endX, rotMat);
 		DrawLine(startX, endX, color);
 
 		// Z軸方向の線
 		TuboEngine::Math::Vector3 startZ = {-half, 0.0f, pos};
 		TuboEngine::Math::Vector3 endZ = {half, 0.0f, pos};
-		startZ = TransformCoord(startZ, rotMat);
-		endZ = TransformCoord(endZ, rotMat);
+		startZ = TuboEngine::Math::TransformCoord(startZ, rotMat);
+		endZ = TuboEngine::Math::TransformCoord(endZ, rotMat);
 		DrawLine(startZ, endZ, color);
 	}
 }
