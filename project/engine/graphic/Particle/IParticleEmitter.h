@@ -16,7 +16,7 @@
 #include <string>
 
 struct ParticleInfo {
-	Transform transform;
+	TuboEngine::Transform transform;
 	TuboEngine::Math::Vector3 velocity;
 	TuboEngine::Math::Vector4 color;
 	float lifeTime;
@@ -57,7 +57,7 @@ struct ParticlePreset {
 	TuboEngine::Math::Vector4 colorStart{1,1,1,1}, colorEnd{1,1,1,0};
 	int blendModeOverride = -1;                // -1 なら共通設定を使う
 	bool simulateInWorldSpace = true;
-	Transform emitterTransform{};              // エミッター自身の座標
+	TuboEngine::Transform emitterTransform{}; // エミッター自身の座標
 };
 
 class IParticleEmitter {
@@ -86,7 +86,7 @@ protected:
 	// 派生で粒子1個生成
 	virtual ParticleInfo GenerateParticle() = 0;
 	// 派生で頂点形状生成
-	virtual void BuildGeometry(std::vector<VertexData>& outVertices) = 0;
+	virtual void BuildGeometry(std::vector<TuboEngine::VertexData>& outVertices) = 0;
 	void EnsureBuffers();
 	void PushParticle(const ParticleInfo& p);
 	void UpdateParticles(float dt, const TuboEngine::Math::Matrix4x4& viewProj, const TuboEngine::Math::Matrix4x4& billboard);
@@ -98,12 +98,12 @@ protected:
 	std::mt19937 rng_{ std::random_device{}() };
 	Microsoft::WRL::ComPtr<ID3D12Resource> vb_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> material_;
-	Material* materialPtr_ = nullptr;
+	TuboEngine::Material* materialPtr_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancing_;
 	ParticleForGPU* instancingPtr_ = nullptr;
 	uint32_t instanceCount_ = 0;
 	uint32_t allocatedInstances_ = 0; // 現インスタンスバッファ確保数
 	int textureSrvIndex_ = -1;
 	int instancingSrvIndex_ = -1;
-	std::vector<VertexData> vertices_;
+	std::vector<TuboEngine::VertexData> vertices_;
 };

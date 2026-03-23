@@ -51,7 +51,7 @@ public:
 
 private:
 	std::unique_ptr<TuboEngine::Camera> camera; // カメラ
-	Transform cameraTransform;      // 変形情報
+	TuboEngine::Transform cameraTransform;      // 変形情報
 
 	std::unique_ptr<Player> player; // プレイヤー
 

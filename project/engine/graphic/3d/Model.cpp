@@ -8,7 +8,7 @@
 #include <fstream>
 #include <sstream>
 
-void Model::Initialize(const std::string& directoryPath, const std::string& filename) {
+void TuboEngine::Model::Initialize(const std::string& directoryPath, const std::string& filename) {
 
 	
 	commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
@@ -53,7 +53,7 @@ void Model::Initialize(const std::string& directoryPath, const std::string& file
 	modelData.material.textureIndex = TuboEngine::TextureManager::GetInstance()->GetSrvIndex(textureFileName_);
 }
 
-void Model::Draw() {
+void TuboEngine::Model::Draw() {
 
 	// 頂点バッファをセット
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
@@ -67,7 +67,7 @@ void Model::Draw() {
 	commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 }
 
-MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filePath) {
+TuboEngine::MaterialData TuboEngine::Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filePath) {
 
 	/*------------------------
 	1 : 中で必要になる変数の宣言
@@ -107,7 +107,7 @@ MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, c
 	return materialData;
 }
 
-ModelData Model::LoadModelFile(const std::string& directoryPath, const std::string& filename) {
+TuboEngine::ModelData TuboEngine::Model::LoadModelFile(const std::string& directoryPath, const std::string& filename) {
 
 	/*-------------
 	1 : OBJファイル
@@ -191,7 +191,7 @@ ModelData Model::LoadModelFile(const std::string& directoryPath, const std::stri
 	return modelData;
 }
 
-Node Model::ReadNode(aiNode* node) {
+TuboEngine::Node TuboEngine::Model::ReadNode(aiNode* node) {
 
 	Node result;
 	aiMatrix4x4 aiLocalMatrix = node->mTransformation; // ノードのローカル行列を取得

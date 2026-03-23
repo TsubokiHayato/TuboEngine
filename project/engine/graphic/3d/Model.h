@@ -13,7 +13,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-
+namespace TuboEngine {
 class Model {
 public:
 	//------------------------------------
@@ -23,7 +23,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="modelCommon">モデル共通部分</param>
-	void Initialize( const std::string& directoryPath, const std::string& filename);
+	void Initialize(const std::string& directoryPath, const std::string& filename);
 
 	/// <summary>
 	/// 描画処理
@@ -57,8 +57,7 @@ public:
 	//-----------------------------------------------------------
 	// Setter&Getter
 
-	
-	//モデルのカラー
+	// モデルのカラー
 	Vector4 GetModelColor() { return materialData->color; }
 	void SetModelColor(const Vector4& color) { materialData->color = color; }
 
@@ -66,7 +65,7 @@ public:
 	float GetModelShininess() { return materialData->shininess; }
 	void SetModelShininess(float shininess) { materialData->shininess = shininess; }
 
-	//環境マップ寄与度
+	// 環境マップ寄与度
 	float GetModelEnvironmentCoefficient() { return materialData->environmentCoefficient; }
 	void SetModelEnvironmentCoefficient(float coefficient) { materialData->environmentCoefficient = coefficient; }
 
@@ -74,10 +73,7 @@ public:
 	Matrix4x4 GetRootNodeLocalMatrix() { return modelData.rootNode.localMatrix; }
 	void SetRootNodeLocalMatrix(const Matrix4x4& matrix) { modelData.rootNode.localMatrix = matrix; }
 
-
 private:
-
-
 	// モデルデータ
 	ModelData modelData;
 
@@ -98,3 +94,4 @@ private:
 
 	std::string textureFileName_;
 };
+} // namespace TuboEngine

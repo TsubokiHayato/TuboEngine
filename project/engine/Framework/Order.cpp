@@ -1,39 +1,38 @@
 #include "Order.h"
 
-namespace TuboEngine {
-void Order::Initialize() {
+void TuboEngine::Order::Initialize() {
 	// 初期化
-	Framework::Initialize();
+	TuboEngine::Framework::Initialize();
 }
 
-void Order::Update() {
+void TuboEngine::Order::Update() {
 	// 更新
-	Framework::Update();
+	TuboEngine::Framework::Update();
 }
 
-void Order::Finalize() {
+void TuboEngine::Order::Finalize() {
 	// 終了処理
-	Framework::Finalize();
+	TuboEngine::Framework::Finalize();
 }
 
-void Order::Draw() {
+void TuboEngine::Order::Draw() {
 
 	// RenderTargetの描画
 
 	// Renderの設定
-	Framework::FrameWorkRenderTargetPreDraw();
+	TuboEngine::Framework::FrameWorkRenderTargetPreDraw();
 	// 3Dオブジェクト描画
-	Framework::Object3dCommonDraw();
+	TuboEngine::Framework::Object3dCommonDraw();
 	// 2Dスプライト描画
-	Framework::SpriteCommonDraw();
+	TuboEngine::Framework::SpriteCommonDraw();
 	// ライン描画
 	LineManager::GetInstance()->Draw();
 	// パーティクル描画
-	Framework::ParticleCommonDraw();
+	TuboEngine::Framework::ParticleCommonDraw();
 	// swapChainのバリアを設定
-	Framework::FrameworkSwapChainPreDraw();
+	TuboEngine::Framework::FrameworkSwapChainPreDraw();
 	// OffScreenの描画
-	Framework::OffScreenRenderingDraw();
+	TuboEngine::Framework::OffScreenRenderingDraw();
 
 	// SwapChainの描画
 
@@ -48,4 +47,3 @@ void Order::Draw() {
 	// ループ後処理
 	Framework::FrameworkSwapChainPostDraw();
 }
-} // namespace TuboEngine

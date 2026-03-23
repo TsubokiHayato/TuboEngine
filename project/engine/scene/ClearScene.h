@@ -62,7 +62,7 @@ public:
 private:
     // カメラ
 	std::unique_ptr<TuboEngine::Camera> camera;
-    Transform cameraTransform{};
+	TuboEngine::Transform cameraTransform{};
 
     // プレイヤー
     std::unique_ptr<Player> player_;
