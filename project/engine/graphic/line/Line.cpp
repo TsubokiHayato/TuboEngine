@@ -11,7 +11,7 @@
 ///----------------------------------------------------
 /// Lineクラスの初期化処理
 ///----------------------------------------------------
-void Line::Initialize(LineCommon* lineCommon) {
+void TuboEngine::Line::Initialize(TuboEngine::LineCommon* lineCommon) {
     // Line描画の共通処理管理クラスをセット
     lineCommon_ = lineCommon;
     // 頂点バッファ生成
@@ -35,7 +35,7 @@ void Line::Initialize(LineCommon* lineCommon) {
 ///----------------------------------------------------
 /// Lineクラスの更新処理
 ///----------------------------------------------------
-void Line::Update() {
+void TuboEngine::Line::Update() {
     // デフォルトカメラ取得
     camera_ = lineCommon_->GetDefaultCamera();
     // ワールド行列作成
@@ -61,7 +61,7 @@ void Line::Update() {
 ///----------------------------------------------------
 /// ライン描画用頂点追加
 ///----------------------------------------------------
-void Line::DrawLine(const TuboEngine::Math::Vector3& start, const TuboEngine::Math::Vector3& end, const TuboEngine::Math::Vector4& color) {
+void TuboEngine::Line::DrawLine(const TuboEngine::Math::Vector3& start, const TuboEngine::Math::Vector3& end, const TuboEngine::Math::Vector4& color) {
     vertices_.push_back({start, color});
     vertices_.push_back({end, color});
 }
@@ -69,7 +69,7 @@ void Line::DrawLine(const TuboEngine::Math::Vector3& start, const TuboEngine::Ma
 ///----------------------------------------------------
 /// ライン描画処理
 ///----------------------------------------------------
-void Line::Draw() {
+void TuboEngine::Line::Draw() {
     if (vertices_.empty()) {
         return;
     }
@@ -90,14 +90,14 @@ void Line::Draw() {
 ///----------------------------------------------------
 /// ライン頂点情報のクリア
 ///----------------------------------------------------
-void Line::ClearLines() {
+void TuboEngine::Line::ClearLines() {
     vertices_.clear();
 }
 
 ///----------------------------------------------------
 /// 頂点バッファ生成
 ///----------------------------------------------------
-void Line::CreateVertexBuffer() {
+void TuboEngine::Line::CreateVertexBuffer() {
     // デバイスの取得
 	auto device = TuboEngine::DirectXCommon::GetInstance()->GetDevice();
     // バッファサイズ（最大100000頂点分）
@@ -126,7 +126,7 @@ void Line::CreateVertexBuffer() {
 ///----------------------------------------------------
 /// 座標変換行列バッファ生成
 ///----------------------------------------------------
-void Line::CreateTransformationMatrixBuffer() {
+void TuboEngine::Line::CreateTransformationMatrixBuffer() {
     // 定数バッファのサイズを 256 バイトの倍数に設定
 	size_t bufferSize = (sizeof(TuboEngine::TransformationMatrix) + 255) & ~255;
 	transfomationMatrixBuffer_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(bufferSize);

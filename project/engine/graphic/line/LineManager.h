@@ -6,6 +6,8 @@
 #include <memory>
 #include <vector>
 
+namespace TuboEngine {
+
 ///----------------------------------------------------
 // LineManagerクラス
 ///----------------------------------------------------
@@ -93,8 +95,8 @@ public:
 	/// メンバ変数
 	///-----------------------------------------------------
 private:
-	std::unique_ptr<Line> line_;
-	std::unique_ptr<LineCommon> lineCommon_;
+	std::unique_ptr<TuboEngine::Line> line_;
+	std::unique_ptr<TuboEngine::LineCommon> lineCommon_;
 	bool isDrawLine_ = true;
 	bool isDrawGrid_ = true;
 	float gridSize_ = 16.0f;
@@ -102,3 +104,4 @@ private:
 	TuboEngine::Math::Vector4 gridColor_ = {0.0f, 0.0f, 0.0f, 1.0f};
 	bool isDrawSphere_ = true;
 };
+} // namespace TuboEngine

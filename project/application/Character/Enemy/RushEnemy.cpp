@@ -305,11 +305,11 @@ void RushEnemy::DrawDebugGizmos() {
 		float a1 = (2.0f * DirectX::XM_PI) * (float(i + 1) / div);
 		TuboEngine::Math::Vector3 p0 = position + TuboEngine::Math::Vector3{std::cos(a0) * rushTriggerDistance_, std::sin(a0) * rushTriggerDistance_, 0};
 		TuboEngine::Math::Vector3 p1 = position + TuboEngine::Math::Vector3{std::cos(a1) * rushTriggerDistance_, std::sin(a1) * rushTriggerDistance_, 0};
-		LineManager::GetInstance()->DrawLine(p0, p1, triggerCol);
+		TuboEngine::LineManager::GetInstance()->DrawLine(p0, p1, triggerCol);
 	}    
    TuboEngine::Math:: Vector4 dirCol = isPreparing_? Vector4{1,0.6f,0.2f,1} : (isRushing_? Vector4{1,0.2f,0.2f,1} : (isStopping_? Vector4{0.8f,0.8f,0.8f,1} : (isScanning_? Vector4{0.2f,0.7f,1.0f,1} : (rushCooldownTimer_>0.0f? Vector4{0.4f,0.4f,0.4f,1}:Vector4{0.4f,0.4f,0.9f,1}))));
 	TuboEngine::Math::Vector3 head = position + TuboEngine::Math::Vector3{rushDir_.x * 2.2f, rushDir_.y * 2.2f, 0};
-	LineManager::GetInstance()->DrawLine(position, head, dirCol);
+   TuboEngine::LineManager::GetInstance()->DrawLine(position, head, dirCol);
     if (isPreparing_ && showDashPreview_) {
 		TuboEngine::Math::Vector3 predicted = position + TuboEngine::Math::Vector3{rushDir_.x * rushSpeed_ * rushDuration_, rushDir_.y * rushSpeed_ * rushDuration_, 0};
 		float previewR = 0.9f;
@@ -319,13 +319,13 @@ void RushEnemy::DrawDebugGizmos() {
 			float a1 = (2.0f * DirectX::XM_PI) * (float(i + 1) / div);
 			TuboEngine::Math::Vector3 p0 = predicted + TuboEngine::Math::Vector3{std::cos(a0) * previewR, std::sin(a0) * previewR, 0};
 			TuboEngine::Math::Vector3 p1 = predicted + TuboEngine::Math::Vector3{std::cos(a1) * previewR, std::sin(a1) * previewR, 0};
-			LineManager::GetInstance()->DrawLine(p0, p1, previewCol);
+			TuboEngine::LineManager::GetInstance()->DrawLine(p0, p1, previewCol);
 		}
 		float cross = previewR;
 
-		LineManager::GetInstance()->DrawLine(predicted + TuboEngine::Math::Vector3{-cross, 0, 0}, predicted + TuboEngine::Math::Vector3{cross, 0, 0}, previewCol);
-		LineManager::GetInstance()->DrawLine(predicted + TuboEngine::Math::Vector3{0, -cross, 0}, predicted + TuboEngine::Math::Vector3{0, cross, 0}, previewCol);
-		LineManager::GetInstance()->DrawLine(position, predicted, Vector4{1, 0.3f, 0.3f, 0.3f});
+		TuboEngine::LineManager::GetInstance()->DrawLine(predicted + TuboEngine::Math::Vector3{-cross, 0, 0}, predicted + TuboEngine::Math::Vector3{cross, 0, 0}, previewCol);
+		TuboEngine::LineManager::GetInstance()->DrawLine(predicted + TuboEngine::Math::Vector3{0, -cross, 0}, predicted + TuboEngine::Math::Vector3{0, cross, 0}, previewCol);
+		TuboEngine::LineManager::GetInstance()->DrawLine(position, predicted, Vector4{1, 0.3f, 0.3f, 0.3f});
 
     }
 #endif

@@ -77,7 +77,7 @@ StageScene::StageBounds ComputeBoundsWorld(const TuboEngine::Math::Vector3& orig
 	    TuboEngine::Math::Vector3 p1{b.right, b.bottom, z};
 	    TuboEngine::Math::Vector3 p2{b.right, b.top, z};
 	    TuboEngine::Math::Vector3 p3{b.left, b.top, z};
-		auto* lm = LineManager::GetInstance();
+	    auto* lm = TuboEngine::LineManager::GetInstance();
 		lm->DrawLine(p0, p1, color);
 		lm->DrawLine(p1, p2, color);
 		lm->DrawLine(p2, p3, color);
@@ -197,7 +197,7 @@ void StageScene::Update() {
 	}
 
 	// デフォルトカメラをFollowCameraに設定
-	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
+	TuboEngine::LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	// 衝突マネージャの更新
 	collisionManager_->Update();
 	// 全ての衝突をチェック
@@ -362,7 +362,7 @@ void StageScene::ImGuiDraw() {
 	
 	#ifdef USE_IMGUI
 
-	LineManager::GetInstance()->DrawImGui();
+	TuboEngine::LineManager::GetInstance()->DrawImGui();
 	stateManager_->DrawImGui(this);
 	// StageManager の各チャンク情報を表示
 	if (stageManager_) {

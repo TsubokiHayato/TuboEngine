@@ -22,7 +22,8 @@
 	/// <param name="count">発生させるパーティクルの数</param>
 	/// 	/// <param name="frequency">発生頻度</param>
 	/// 	/// <param name="repeat">繰り返し発生させるかどうかのフラグ</param>
-ParticleEmitter::ParticleEmitter(Particle* particle, const std::string& name, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, Vector4 color, float lifeTime, float currentTime,
+TuboEngine::ParticleEmitter::ParticleEmitter(
+    Particle* particle, const std::string& name, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, Vector4 color, float lifeTime, float currentTime,
 	uint32_t count, float frequency, bool repeat)
 	//パーティクルのインスタンス
 	: particle_(particle),
@@ -49,7 +50,7 @@ ParticleEmitter::ParticleEmitter(Particle* particle, const std::string& name, co
 	Emit(); // 初期化時に即時発生
 }
 
-void ParticleEmitter::Update() {
+void TuboEngine::ParticleEmitter::Update() {
 	if (!repeat_) return; // 繰り返し発生させない場合は何もしない
 
 	elapsedTime_ += 1.0f / 60.0f; // フレーム単位の経過時間を加算
@@ -63,16 +64,16 @@ void ParticleEmitter::Update() {
 	}
 }
 
-void ParticleEmitter::Draw() {
+void TuboEngine::ParticleEmitter::Draw() {
 
 }
 
-void ParticleEmitter::Emit() {
+void TuboEngine::ParticleEmitter::Emit() {
 	// パーティクルの発生
 	particle_->Emit(name_, transform_, velocity_, color_, lifeTime_, currentTime_, count_);
 }
 
-void ParticleEmitter::SetRepeat(bool repeat) {
+void TuboEngine::ParticleEmitter::SetRepeat(bool repeat) {
 	// 繰り返し発生させるかどうかのフラグを設定
 	repeat_ = repeat;
 }

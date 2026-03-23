@@ -130,7 +130,7 @@ void StageTransitionState::Update(StageScene* scene) {
 	FollowTopDownCamera* followCamera = scene->GetFollowCamera();
 	if (followCamera) {
 		followCamera->Update();
-		LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
+		TuboEngine::LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	}
 
 #ifdef USE_IMGUI
@@ -139,13 +139,13 @@ void StageTransitionState::Update(StageScene* scene) {
 	Vector3 startTop = { startPos_.x, startPos_.y, startPos_.z + mh };
 	Vector3 targetTop = { targetPos_.x, targetPos_.y, targetPos_.z + mh };
 	// 出発点（現在チャンクの Exit）: 赤
-	LineManager::GetInstance()->DrawLine(startPos_, startTop, { 1.0f, 0.3f, 0.3f, 1.0f });
-	LineManager::GetInstance()->DrawSphere(startTop, 0.6f, { 1.0f, 0.3f, 0.3f, 1.0f });
+	TuboEngine::LineManager::GetInstance()->DrawLine(startPos_, startTop, {1.0f, 0.3f, 0.3f, 1.0f});
+	TuboEngine::LineManager::GetInstance()->DrawSphere(startTop, 0.6f, {1.0f, 0.3f, 0.3f, 1.0f});
 	// 目的地（次のチャンクの Entrance）: マゼンタ
-	LineManager::GetInstance()->DrawLine(targetPos_, targetTop, { 1.0f, 0.3f, 1.0f, 1.0f });
-	LineManager::GetInstance()->DrawSphere(targetTop, 0.6f, { 1.0f, 0.3f, 1.0f, 1.0f });
+	TuboEngine::LineManager::GetInstance()->DrawLine(targetPos_, targetTop, {1.0f, 0.3f, 1.0f, 1.0f});
+	TuboEngine::LineManager::GetInstance()->DrawSphere(targetTop, 0.6f, {1.0f, 0.3f, 1.0f, 1.0f});
 	// 出発→目的地のライン（白）
-	LineManager::GetInstance()->DrawLine(startTop, targetTop, { 1.0f, 1.0f, 1.0f, 0.8f });
+	TuboEngine::LineManager::GetInstance()->DrawLine(startTop, targetTop, {1.0f, 1.0f, 1.0f, 0.8f});
 #endif // USE_IMGUI
 
 	if (t >= 1.0f) {
