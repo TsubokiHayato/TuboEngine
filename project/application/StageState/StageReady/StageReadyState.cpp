@@ -33,7 +33,7 @@ void StageReadyState::Enter(StageScene* scene) {
 		followCam->SnapToTarget();
 		followCam->StartIntroZoom(0.1f, 1.0f, 0.8f);
 		TuboEngine::Camera* cam = followCam->GetCamera();
-		LineManager::GetInstance()->SetDefaultCamera(cam);
+		TuboEngine::LineManager::GetInstance()->SetDefaultCamera(cam);
 		player->SetCamera(cam);
 
 		// SkyDome 初期化
@@ -113,7 +113,7 @@ void StageReadyState::Update(StageScene* scene) {
 		player->Update();
 
 		followCam->Update();
-		LineManager::GetInstance()->SetDefaultCamera(followCam->GetCamera());
+		TuboEngine::LineManager::GetInstance()->SetDefaultCamera(followCam->GetCamera());
 	}
 
 	// StageManager 管理下のステージオブジェクトを更新

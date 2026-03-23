@@ -143,7 +143,7 @@ void DebugScene::Update() {
 
     // Particles
     pm->Update(1.0f / 60.0f, camera.get());
-    LineManager::GetInstance()->SetDefaultCamera(camera.get());
+	TuboEngine::LineManager::GetInstance()->SetDefaultCamera(camera.get());
 
     // TextManager Update
     TuboEngine::TextManager::GetInstance()->UpdateAll();
@@ -159,7 +159,7 @@ void DebugScene::Finalize() {
 void DebugScene::Object3DDraw() {
     // 必要に応じて
     // skyBox->Draw();
-    LineManager::GetInstance()->DrawGrid(16.0f, 8, TuboEngine::Math::Vector3{}, TuboEngine::Math::Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+	TuboEngine::LineManager::GetInstance()->DrawGrid(16.0f, 8, TuboEngine::Math::Vector3{}, TuboEngine::Math::Vector4{1.0f, 1.0f, 1.0f, 1.0f});
 }
 
 void DebugScene::SpriteDraw() {

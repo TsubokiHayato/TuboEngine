@@ -63,7 +63,7 @@ void StagePlayingState::Update(StageScene* scene) {
 	// カメラ更新
 	if (followCamera) {
 		followCamera->Update();
-		LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
+		TuboEngine::LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	}
 
 	// --- ゲームクリア判定 / チャンククリア判定 ---
@@ -154,15 +154,15 @@ void StagePlayingState::Update(StageScene* scene) {
 			// 入口: 青い縦線 + 球
 			for (const auto& pos : entrances) {
 				TuboEngine::Math::Vector3 top = { pos.x, pos.y, pos.z + markerHeight };
-				LineManager::GetInstance()->DrawLine(pos, top, { 0.2f, 0.5f, 1.0f, 1.0f }); // 青
-				LineManager::GetInstance()->DrawSphere(top, sphereR, { 0.2f, 0.5f, 1.0f, 1.0f });
+				TuboEngine::LineManager::GetInstance()->DrawLine(pos, top, {0.2f, 0.5f, 1.0f, 1.0f}); // 青
+				TuboEngine::LineManager::GetInstance()->DrawSphere(top, sphereR, {0.2f, 0.5f, 1.0f, 1.0f});
 			}
 
 			// 出口: 黄色い縦線 + 球
 			for (const auto& pos : exits) {
 				TuboEngine::Math::Vector3 top = { pos.x, pos.y, pos.z + markerHeight };
-				LineManager::GetInstance()->DrawLine(pos, top, { 1.0f, 0.9f, 0.2f, 1.0f }); // 黄
-				LineManager::GetInstance()->DrawSphere(top, sphereR, { 1.0f, 0.9f, 0.2f, 1.0f });
+				TuboEngine::LineManager::GetInstance()->DrawLine(pos, top, {1.0f, 0.9f, 0.2f, 1.0f}); // 黄
+				TuboEngine::LineManager::GetInstance()->DrawSphere(top, sphereR, {1.0f, 0.9f, 0.2f, 1.0f});
 			}
 
 			// 入口→出口への案内ライン（緑の点線風）
@@ -170,7 +170,7 @@ void StagePlayingState::Update(StageScene* scene) {
 				for (const auto& ext : exits) {
 					TuboEngine::Math::Vector3 entTop = { ent.x, ent.y, ent.z + markerHeight };
 					TuboEngine::Math::Vector3 extTop = { ext.x, ext.y, ext.z + markerHeight };
-					LineManager::GetInstance()->DrawLine(entTop, extTop, { 0.2f, 1.0f, 0.3f, 0.6f }); // 緑
+					TuboEngine::LineManager::GetInstance()->DrawLine(entTop, extTop, {0.2f, 1.0f, 0.3f, 0.6f}); // 緑
 				}
 			}
 		}
@@ -207,13 +207,13 @@ void StagePlayingState::Object3DDraw(StageScene* scene) {
 			// 入口: 青い球
 			for (const auto& pos : entrances) {
 				TuboEngine::Math::Vector3 top = { pos.x, pos.y, pos.z + markerHeight };
-				LineManager::GetInstance()->DrawSphere(top, sphereR, { 0.2f, 0.5f, 1.0f, 1.0f });
+				TuboEngine::LineManager::GetInstance()->DrawSphere(top, sphereR, {0.2f, 0.5f, 1.0f, 1.0f});
 			}
 
 			// 出口: 黄色い球
 			for (const auto& pos : exits) {
 				TuboEngine::Math::Vector3 top = { pos.x, pos.y, pos.z + markerHeight };
-				LineManager::GetInstance()->DrawSphere(top, sphereR, { 1.0f, 0.9f, 0.2f, 1.0f });
+				TuboEngine::LineManager::GetInstance()->DrawSphere(top, sphereR, {1.0f, 0.9f, 0.2f, 1.0f});
 			}
 		}
 	}

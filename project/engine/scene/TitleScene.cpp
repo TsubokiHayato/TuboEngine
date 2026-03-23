@@ -20,7 +20,7 @@ void TitleScene::Initialize() {
 	camera->setScale(cameraScale);
 
 	// Line 描画用にデフォルトカメラをセット（ここで一度登録しておく）
-	LineManager::GetInstance()->SetDefaultCamera(camera.get());
+	TuboEngine::LineManager::GetInstance()->SetDefaultCamera(camera.get());
 
 	// タイトル用スカイドーム
 	skyDome_ = std::make_unique<SkyDome>();
@@ -145,8 +145,8 @@ void TitleScene::Update() {
 	camera->Update();
 
 	// LineManager にカメラを渡し、Line の内部更新を行う（カメラが未設定だとスクリーン変換されない）
-	LineManager::GetInstance()->SetDefaultCamera(camera.get());
-	LineManager::GetInstance()->Update();
+	TuboEngine::LineManager::GetInstance()->SetDefaultCamera(camera.get());
+	TuboEngine::LineManager::GetInstance()->Update();
 
 	// シーンチェンジアニメーション更新
 	sceneChangeAnimation->Update(dt);

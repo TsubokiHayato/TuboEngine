@@ -821,8 +821,8 @@ void Enemy::DrawViewCone() {
 	TuboEngine::Math::Vector3 pLeft = center + TuboEngine::Math::Vector3{std::cos(baseAngle - halfRad) * kViewDistance, std::sin(baseAngle - halfRad) * kViewDistance, 0.0f};
 	TuboEngine::Math::Vector3 pRight = center + TuboEngine::Math::Vector3{std::cos(baseAngle + halfRad) * kViewDistance, std::sin(baseAngle + halfRad) * kViewDistance, 0.0f};
 	pLeft.z = center.z; pRight.z = center.z;
-	LineManager::GetInstance()->DrawLine(center, pLeft, coneColor);
-	LineManager::GetInstance()->DrawLine(center, pRight, coneColor);
+	TuboEngine::LineManager::GetInstance()->DrawLine(center, pLeft, coneColor);
+	TuboEngine::LineManager::GetInstance()->DrawLine(center, pRight, coneColor);
 
 	// 扇状の弧を描く（分割数を下げて軽くする）
 	const int arcDiv = 4;
@@ -832,7 +832,7 @@ void Enemy::DrawViewCone() {
 		TuboEngine::Math::Vector3 p0 = center + TuboEngine::Math::Vector3{std::cos(a0) * kViewDistance, std::sin(a0) * kViewDistance, 0.0f};
 		TuboEngine::Math::Vector3 p1 = center + TuboEngine::Math::Vector3{std::cos(a1) * kViewDistance, std::sin(a1) * kViewDistance, 0.0f};
 		p0.z = p1.z = center.z;
-		LineManager::GetInstance()->DrawLine(p0, p1, coneColor);
+		TuboEngine::LineManager::GetInstance()->DrawLine(p0, p1, coneColor);
 	}
 
 	// レイサンプルはデバッグフラグがONかつプレイヤーが存在する時のみ描画
@@ -852,7 +852,7 @@ void Enemy::DrawViewCone() {
 				Vector4 dotCol = blocked ? Vector4{1.0f, 0.1f, 0.1f, 1.0f} : Vector4{0.2f, 1.0f, 0.2f, 1.0f};
 				TuboEngine::Math::Vector3 pA = {checkPos.x - 0.05f, checkPos.y - 0.05f, checkPos.z};
 				TuboEngine::Math::Vector3 pB = {checkPos.x + 0.05f, checkPos.y + 0.05f, checkPos.z};
-				LineManager::GetInstance()->DrawLine(pA, pB, dotCol);
+				TuboEngine::LineManager::GetInstance()->DrawLine(pA, pB, dotCol);
 			}
 		}
 	}
@@ -867,8 +867,10 @@ void Enemy::DrawLastSeenMark() {
 	constexpr float kLastSeenMarkSize = 0.5f;
 	const TuboEngine::Math::Vector3& center = lastSeenPlayerPos;
 	// 十字
-	LineManager::GetInstance()->DrawLine(center + TuboEngine::Math::Vector3{-kLastSeenMarkSize, 0.0f, 0.0f}, center + TuboEngine::Math::Vector3{kLastSeenMarkSize, 0.0f, 0.0f}, kLastSeenColor);
-	LineManager::GetInstance()->DrawLine(center + TuboEngine::Math::Vector3{0.0f, -kLastSeenMarkSize, 0.0f}, center + TuboEngine::Math::Vector3{0.0f, kLastSeenMarkSize, 0.0f}, kLastSeenColor);
+	TuboEngine::LineManager::GetInstance()->DrawLine(
+	    center + TuboEngine::Math::Vector3{-kLastSeenMarkSize, 0.0f, 0.0f}, center + TuboEngine::Math::Vector3{kLastSeenMarkSize, 0.0f, 0.0f}, kLastSeenColor);
+	TuboEngine::LineManager::GetInstance()->DrawLine(
+	    center + TuboEngine::Math::Vector3{0.0f, -kLastSeenMarkSize, 0.0f}, center + TuboEngine::Math::Vector3{0.0f, kLastSeenMarkSize, 0.0f}, kLastSeenColor);
 	// 外周円
 	constexpr int circleDiv = 8;
 	for (int i = 0; i < circleDiv; ++i) {
@@ -876,7 +878,7 @@ void Enemy::DrawLastSeenMark() {
 		float a1 = (2.0f * kPI) * (float(i + 1) / circleDiv);
 		TuboEngine::Math::Vector3 p0 = center + TuboEngine::Math::Vector3{std::cos(a0) * kLastSeenMarkSize, std::sin(a0) * kLastSeenMarkSize, 0.0f};
 		TuboEngine::Math::Vector3 p1 = center + TuboEngine::Math::Vector3{std::cos(a1) * kLastSeenMarkSize, std::sin(a1) * kLastSeenMarkSize, 0.0f};
-		LineManager::GetInstance()->DrawLine(p0, p1, kLastSeenColor);
+		TuboEngine::LineManager::GetInstance()->DrawLine(p0, p1, kLastSeenColor);
 	}
 #endif
 }
@@ -922,8 +924,8 @@ void Enemy::DrawStateIcon() {
 	TuboEngine::Math::Vector3 p1 = base + TuboEngine::Math::Vector3{s, 0, 0};
 	TuboEngine::Math::Vector3 p2 = base + TuboEngine::Math::Vector3{0, s, 0};
 	TuboEngine::Math::Vector3 p3 = base + TuboEngine::Math::Vector3{-s, 0, 0};
-	LineManager::GetInstance()->DrawLine(p0, p1, col);
-	LineManager::GetInstance()->DrawLine(p1, p2, col);
-	LineManager::GetInstance()->DrawLine(p2, p3, col);
-	LineManager::GetInstance()->DrawLine(p3, p0, col);
+	TuboEngine::LineManager::GetInstance()->DrawLine(p0, p1, col);
+	TuboEngine::LineManager::GetInstance()->DrawLine(p1, p2, col);
+	TuboEngine::LineManager::GetInstance()->DrawLine(p2, p3, col);
+	TuboEngine::LineManager::GetInstance()->DrawLine(p3, p0, col);
 }

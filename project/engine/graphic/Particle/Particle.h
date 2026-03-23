@@ -14,6 +14,8 @@
 #include <string>
 #include <unordered_map>
 
+
+
 // 古いレガシー方式パーティクル用クラス（Emitterシステムとは別）
 class Particle {
 public:
@@ -25,7 +27,7 @@ public:
 	void Emit(const std::string name, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime, uint32_t count);
 	void CreateParticleGroup(const std::string& name, const std::string& textureFilePath);
 
-	// 追加: 明示解放用デストラクタ（カメラ delete と各種 Unmap を実行）
+	//明示解放用デストラクタ（カメラ delete と各種 Unmap を実行）
 	~Particle();
 
 private:
