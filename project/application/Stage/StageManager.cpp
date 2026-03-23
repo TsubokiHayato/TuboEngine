@@ -162,7 +162,7 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                                         FollowTopDownCamera* followCamera) {
     if (!inst.field) return;
     MapChipField* field = inst.field.get();
-    Camera* cam = followCamera ? followCamera->GetCamera() : nullptr;
+	TuboEngine::Camera* cam = followCamera ? followCamera->GetCamera() : nullptr;
 
     inst.playerMapX = -1;
     inst.playerMapY = -1;
@@ -231,7 +231,7 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
 
 void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
     // プレイヤーの Update はシーン/ステート側で行うため、ここでは行わない
-    Camera* cam = followCamera ? followCamera->GetCamera() : nullptr;
+	TuboEngine::Camera* cam = followCamera ? followCamera->GetCamera() : nullptr;
 
     for (auto& inst : stageInstances_) {
         if (!inst.visible) continue;

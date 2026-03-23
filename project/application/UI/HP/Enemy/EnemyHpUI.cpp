@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cmath>
 
-static TuboEngine::Math::Vector2 WorldToScreen(const TuboEngine::Math::Vector3& world, const Camera* cam) {
+static TuboEngine::Math::Vector2 WorldToScreen(const TuboEngine::Math::Vector3& world, const TuboEngine::Camera* cam) {
     if (!cam) return {0,0};
 	const TuboEngine::Math::Matrix4x4& vp = cam->GetViewProjectionMatrix();
 	TuboEngine::Math::Vector3 v = TransformCoord(world, vp);
@@ -28,7 +28,7 @@ void EnemyHpUI::Initialize(const std::string& frameTexturePath, const std::strin
     frameTex_ = frameTexturePath; fillTex_ = fillTexturePath;
 }
 
-void EnemyHpUI::Update(const std::vector<Enemy*>& enemies, Camera* cam) {
+void EnemyHpUI::Update(const std::vector<Enemy*>& enemies, TuboEngine::Camera* cam) {
     bars_.resize(enemies.size());
     for (size_t i = 0; i < enemies.size(); ++i) {
         Enemy* e = enemies[i];

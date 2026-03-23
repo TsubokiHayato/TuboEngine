@@ -32,7 +32,7 @@ void StageReadyState::Enter(StageScene* scene) {
 		followCam->SetZoom(0.1f);
 		followCam->SnapToTarget();
 		followCam->StartIntroZoom(0.1f, 1.0f, 0.8f);
-		Camera* cam = followCam->GetCamera();
+		TuboEngine::Camera* cam = followCam->GetCamera();
 		LineManager::GetInstance()->SetDefaultCamera(cam);
 		player->SetCamera(cam);
 

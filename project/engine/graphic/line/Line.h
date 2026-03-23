@@ -1,6 +1,7 @@
 #pragma once
 #include "Transform.h"
 #include "TransformationMatrix.h"
+#include"Camera.h"
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <vector>

@@ -14,7 +14,7 @@ void TitleScene::Initialize() {
 
 	
     // カメラ（3D向けに調整）
-	camera = std::make_unique<Camera>();
+	camera = std::make_unique<TuboEngine::Camera>();
 	camera->SetTranslate(cameraPosition);
 	camera->setRotation(cameraRotation);
 	camera->setScale(cameraScale);

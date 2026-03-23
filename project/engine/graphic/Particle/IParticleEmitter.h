@@ -10,6 +10,7 @@
 #include "Vector4.h"
 #include "VertexData.h"
 #include <list>
+#include"Camera.h"
 #include <memory>
 #include <random>
 #include <string>

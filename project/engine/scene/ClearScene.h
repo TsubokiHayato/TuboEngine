@@ -54,14 +54,14 @@ public:
 	/// <summary>
 	/// カメラの取得
 	/// </summary>
-	Camera* GetMainCamera() const { return camera.get(); }
+	TuboEngine::Camera* GetMainCamera() const { return camera.get(); }
 
 	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
 
 
 private:
     // カメラ
-	std::unique_ptr<Camera> camera;
+	std::unique_ptr<TuboEngine::Camera> camera;
     Transform cameraTransform{};
 
     // プレイヤー

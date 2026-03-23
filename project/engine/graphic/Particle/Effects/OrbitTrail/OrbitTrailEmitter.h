@@ -47,7 +47,7 @@ protected:
         return p;
     }
 
-    void Update(float dt, const Camera* camera) override {
+    void Update(float dt, const TuboEngine::Camera* camera) override {
         IParticleEmitter::Update(dt, camera);
         prevCenter_ = preset_.center;
     }

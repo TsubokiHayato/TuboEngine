@@ -41,7 +41,7 @@ void PostEffectManager::DrawImGui() {
     }
 }
 
-void PostEffectManager::SetMainCamera(Camera* camera) {
+void PostEffectManager::SetMainCamera(TuboEngine::Camera* camera) {
     for (auto& e : effects_) {
         e->SetMainCamera(camera);
     }
