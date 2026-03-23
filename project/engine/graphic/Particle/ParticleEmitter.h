@@ -20,7 +20,7 @@ public:
 	/// @param frequency 発生頻度
 	/// @param repeat 繰り返し発生させるかどうかのフラグ
 	ParticleEmitter(Particle* particle, const std::string& name, 
-		const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime,
+		const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime,
 		uint32_t count, float frequency, bool repeat = false);
 
 
@@ -61,7 +61,7 @@ public:
 private:
 	std::unique_ptr<Particle> particle_; // Particleのインスタンスを保持
     std::string name_;   // パーティクルグループ名
-    Transform transform_;// エミッターの位置・回転・スケール
+	TuboEngine::Transform transform_;    // エミッターの位置・回転・スケール
 	TuboEngine::Math::Vector3 velocity_; // 速度
 	TuboEngine::Math::Vector4 color_;    // カラー
 	float lifeTime_;   // 寿命

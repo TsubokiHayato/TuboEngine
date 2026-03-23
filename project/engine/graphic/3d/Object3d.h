@@ -1,19 +1,15 @@
 #pragma once
 #include"DirectXcommon.h"
-#include"WinApp.h"
 
 #include"VertexData.h"
-#include"Material.h"
 #include"TransformationMatrix.h"
 #include"Transform.h"
-#include"ModelData.h"
-#include"BlendMode.h"
 #include"CameraForGPU.h"
 #include"SkyBox.h"
+#include"Model.h"
 //前方宣言
 class Object3dCommon;
 class ModelCommon;
-class Model;
 class Camera;
 
 //平行光源
@@ -126,7 +122,7 @@ public:
 		lightTypeData->type = type;
 	}
 
-	void SetModel(Model* model) {
+	void SetModel(TuboEngine::Model* model) {
 		assert(model);
 		this->model_ = model;
 	}
@@ -176,7 +172,7 @@ private:
 	// モデル共通部分
 	ModelCommon* modelCommon_ = nullptr;
 	// モデルデータ
-	Model* model_ = nullptr;
+	TuboEngine::Model* model_ = nullptr;
 	// カメラ
 	TuboEngine::Camera* camera;
 

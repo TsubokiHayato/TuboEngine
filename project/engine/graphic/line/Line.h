@@ -46,9 +46,9 @@ private:
 
 public:
     ///<summary>Transformの設定</summary>
-    void SetTransform(const Transform& transform) { transform_ = transform; }
+	void SetTransform(const TuboEngine::Transform& transform) { transform_ = transform; }
     ///<summary>Transformの取得</summary>
-    Transform GetTransform() const { return transform_; }
+	TuboEngine::Transform GetTransform() const { return transform_; }
     ///<summary>スケールの設定</summary>
 	void SetScale(const TuboEngine::Math::Vector3& scale) { transform_.scale = scale; }
     ///<summary>スケールの取得</summary>
@@ -93,12 +93,12 @@ private:
     ///----------------------------------------------------
     /// 座標変換行列データポインタ
     ///----------------------------------------------------
-    TransformationMatrix* transformationMatrixData_ = nullptr;
+	TuboEngine::TransformationMatrix* transformationMatrixData_ = nullptr;
 
     ///----------------------------------------------------
     /// 座標変換情報
     ///----------------------------------------------------
-    Transform transform_ = {};
+	TuboEngine::Transform transform_ = {};
 
     ///----------------------------------------------------
     /// カメラ

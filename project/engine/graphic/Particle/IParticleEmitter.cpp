@@ -82,8 +82,8 @@ void IParticleEmitter::Draw(ID3D12GraphicsCommandList* cmd) {
 
 	D3D12_VERTEX_BUFFER_VIEW vbv{};
 	vbv.BufferLocation = vb_->GetGPUVirtualAddress();
-	vbv.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * vertices_.size());
-	vbv.StrideInBytes = sizeof(VertexData);
+	vbv.SizeInBytes = static_cast<UINT>(sizeof(TuboEngine::VertexData) * vertices_.size());
+	vbv.StrideInBytes = sizeof(TuboEngine::VertexData);
 	cmd->IASetVertexBuffers(0, 1, &vbv);
 
 	cmd->SetGraphicsRootConstantBufferView(0, material_->GetGPUVirtualAddress());
@@ -111,10 +111,10 @@ void IParticleEmitter::EnsureBuffers() {
 	auto* dx = TuboEngine::DirectXCommon::GetInstance();
 
 	if (!vb_ && !vertices_.empty()) {
-		vb_ = dx->CreateBufferResource(sizeof(VertexData) * vertices_.size());
+		vb_ = dx->CreateBufferResource(sizeof(TuboEngine::VertexData) * vertices_.size());
 		void* mapped = nullptr;
 		vb_->Map(0, nullptr, &mapped);
-		std::memcpy(mapped, vertices_.data(), sizeof(VertexData) * vertices_.size());
+		std::memcpy(mapped, vertices_.data(), sizeof(TuboEngine::VertexData) * vertices_.size());
 		vb_->Unmap(0, nullptr);
 	}
 
@@ -134,7 +134,7 @@ void IParticleEmitter::EnsureBuffers() {
 	}
 
 	if (!material_) {
-		material_ = dx->CreateBufferResource(sizeof(Material));
+		material_ = dx->CreateBufferResource(sizeof(TuboEngine::Material));
 		material_->Map(0, nullptr, reinterpret_cast<void**>(&materialPtr_));
 		materialPtr_->color = {1,1,1,1};
 		materialPtr_->enableLighting = false;

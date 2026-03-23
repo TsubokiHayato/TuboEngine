@@ -128,10 +128,10 @@ void Line::CreateVertexBuffer() {
 ///----------------------------------------------------
 void Line::CreateTransformationMatrixBuffer() {
     // 定数バッファのサイズを 256 バイトの倍数に設定
-    size_t bufferSize = (sizeof(TransformationMatrix) + 255) & ~255;
+	size_t bufferSize = (sizeof(TuboEngine::TransformationMatrix) + 255) & ~255;
 	transfomationMatrixBuffer_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(bufferSize);
     // TransformationMatrixの初期化
-    TransformationMatrix transformationMatrix = {};
+	TuboEngine::TransformationMatrix transformationMatrix = {};
     // 書き込むためのアドレスを取得
     transfomationMatrixBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
     // 単位行列を書き込む
