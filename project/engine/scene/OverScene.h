@@ -47,10 +47,10 @@ public:
 	/// <summary>
 	/// カメラの取得
 	/// </summary>
-	Camera* GetMainCamera() const { return camera.get(); }
+	TuboEngine::Camera* GetMainCamera() const { return camera.get(); }
 
 private:
-	std::unique_ptr<Camera> camera; // カメラ
+	std::unique_ptr<TuboEngine::Camera> camera; // カメラ
 	Transform cameraTransform;      // 変形情報
 
 	std::unique_ptr<Player> player; // プレイヤー

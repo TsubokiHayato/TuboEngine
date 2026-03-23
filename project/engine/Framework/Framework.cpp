@@ -27,7 +27,7 @@ void Framework::Initialize() {
 #endif // USE_IMGUI
 
 	//SRVマネージャーの初期化
-	SrvManager::GetInstance()->Initialize();
+	TuboEngine::SrvManager::GetInstance()->Initialize();
 	//スプライト共通部分
 	SpriteCommon::GetInstance()->Initialize();
 
@@ -110,7 +110,7 @@ void Framework::Finalize() {
 	CloseHandle(TuboEngine::DirectXCommon::GetInstance()->GetFenceEvent());
 
 	OffScreenRendering::GetInstance()->Finalize();
-	SrvManager::GetInstance()->Finalize();
+	TuboEngine::SrvManager::GetInstance()->Finalize();
 	SceneManager::GetInstance()->Finalize();
 
 	ParticleCommon::GetInstance()->Finalize();
@@ -205,7 +205,7 @@ void Framework::FrameWorkRenderTargetPreDraw() {
 	//ImGuiの受付開始
 	OffScreenRendering::GetInstance()->PreDraw();
 
-	SrvManager::GetInstance()->PreDraw();
+	TuboEngine::SrvManager::GetInstance()->PreDraw();
 
 	
 	

@@ -27,7 +27,7 @@ void DebugScene::Initialize() {
     skyBox->Initialize(testDDSTextureHandle);
 
     // Camera
-    camera = std::make_unique<Camera>();
+	camera = std::make_unique<TuboEngine::Camera>();
     camera->SetTranslate(cameraPosition);
     camera->setRotation(cameraRotation);
     camera->setScale(cameraScale);

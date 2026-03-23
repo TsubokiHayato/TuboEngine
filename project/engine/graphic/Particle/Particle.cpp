@@ -174,10 +174,10 @@ void Particle::Draw() {
 		commandList->SetGraphicsRootConstantBufferView(0, materialBuffer_->GetGPUVirtualAddress());
 
 		// テクスチャのSRVのDescriptorTableを設定
-		commandList->SetGraphicsRootDescriptorTable(2, SrvManager::GetInstance()->GetGPUDescriptorHandle(group.second.srvIndex));
+		commandList->SetGraphicsRootDescriptorTable(2, TuboEngine::SrvManager::GetInstance()->GetGPUDescriptorHandle(group.second.srvIndex));
 
 		// インスタンシングデータのSRVのDescriptorTableを設定
-		commandList->SetGraphicsRootDescriptorTable(1, SrvManager::GetInstance()->GetGPUDescriptorHandle(group.second.instancingSrvIndex));
+		commandList->SetGraphicsRootDescriptorTable(1, TuboEngine::SrvManager::GetInstance()->GetGPUDescriptorHandle(group.second.instancingSrvIndex));
 
 		// Draw Call (インスタンシング描画)
 		commandList->DrawInstanced((UINT)modelData_.vertices.size(), group.second.instanceCount, 0, 0);
@@ -279,9 +279,9 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 	}
 
 	// インスタンシング用SRVを確保してSRVインデックスを記録
-	newGroup.instancingSrvIndex = SrvManager::GetInstance()->Allocate() + 1;
+	newGroup.instancingSrvIndex = TuboEngine::SrvManager::GetInstance()->Allocate() + 1;
 	// 作成したSRVをインスタンシング用リソースに設定
-	SrvManager::GetInstance()->CreateSRVForStructuredBuffer(newGroup.instancingSrvIndex, newGroup.instancingResource.Get(), kNumMaxInstance, sizeof(ParticleForGPU));
+	TuboEngine::SrvManager::GetInstance()->CreateSRVForStructuredBuffer(newGroup.instancingSrvIndex, newGroup.instancingResource.Get(), kNumMaxInstance, sizeof(ParticleForGPU));
 
 	// パーティクルグループをリストに追加
 	particleGroups.emplace(name, newGroup);

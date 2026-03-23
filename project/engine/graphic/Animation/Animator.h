@@ -128,8 +128,8 @@ public:
 	void SetModel(Model* model);
 	void SetModel(const std::string& filePath);
 
-	void SetCamera(Camera* camera) { this->camera = camera; }
-	Camera* GetCamera() const { return camera; }
+	void SetCamera(TuboEngine::Camera* camera) { this->camera = camera; }
+	TuboEngine::Camera* GetCamera() const { return camera; }
 
 	void SetModelColor(const TuboEngine::Math::Vector4& color);
 
@@ -175,7 +175,7 @@ private:
 	// モデルデータ
 	Model* model_ = nullptr;
 	// カメラ
-	Camera* camera = nullptr;
+	TuboEngine::Camera* camera = nullptr;
 
 	// 座標のバッファリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformMatrixResource;

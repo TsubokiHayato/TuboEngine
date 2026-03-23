@@ -86,8 +86,8 @@ public:
 	/// ゲッター・セッター
 	///----------------------------------------------------
 public:
-	Camera* GetDefaultCamera() { return lineCommon_->GetDefaultCamera(); }
-	void SetDefaultCamera(Camera* camera) { lineCommon_->SetDefaultCamera(camera); }
+	TuboEngine::Camera* GetDefaultCamera() { return lineCommon_->GetDefaultCamera(); }
+	void SetDefaultCamera(TuboEngine::Camera* camera) { lineCommon_->SetDefaultCamera(camera); }
 
 	///-----------------------------------------------------
 	/// メンバ変数

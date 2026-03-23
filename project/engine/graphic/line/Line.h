@@ -61,7 +61,7 @@ public:
     ///<summary>位置の取得</summary>
 	const TuboEngine::Math::Vector3& GetPosition() const { return transform_.translate; }
     ///<summary>カメラの設定</summary>
-    void SetCamera(Camera* camera) { this->camera_ = camera; }
+	void SetCamera(TuboEngine::Camera* camera) { this->camera_ = camera; }
 
 private:
     ///----------------------------------------------------
@@ -102,5 +102,5 @@ private:
     ///----------------------------------------------------
     /// カメラ
     ///----------------------------------------------------
-    Camera* camera_ = nullptr;
+	TuboEngine::Camera* camera_ = nullptr;
 };

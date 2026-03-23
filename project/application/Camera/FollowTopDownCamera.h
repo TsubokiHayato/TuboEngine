@@ -38,7 +38,7 @@ public:
 	float GetIntroZoomCurve() const { return introZoomCurve_; }
 	bool IsIntroZoomPlaying() const { return introZoomPlaying_; }
 
-	Camera* GetCamera() const { return camera_.get(); }
+	TuboEngine::Camera* GetCamera() const { return camera_.get(); }
 	TuboEngine::Math::Vector3 GetOffset() const { return offset_; }
 	TuboEngine::Math::Vector3 GetRotation() const { return rotation_; }
 	float GetZoom() const { return zoom_; }
@@ -62,7 +62,7 @@ private:
 	float followSpeed_ = 0.07f;
 	float zoom_ = 1.0f;
 	TuboEngine::Math::Vector3 rotation_ = {DirectX::XM_PIDIV2 * 1.5f, 0.0f, 0.0f};
-	std::unique_ptr<Camera> camera_;
+	std::unique_ptr<TuboEngine::Camera> camera_;
 
 	// カメラシェイク
 	float shakeTime_ = 0.0f;

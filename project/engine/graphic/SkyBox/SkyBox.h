@@ -18,7 +18,7 @@ public:
 
 
 public:
-	void SetCamera(Camera* camera) { camera_ = camera; }
+	void SetCamera(TuboEngine::Camera* camera) { camera_ = camera; }
 
 	void SetTransform(const Transform& transform) { this->transform = transform; }
 	const Transform& GetTransform() const { return transform; }
@@ -33,7 +33,7 @@ public:
 private:
    
    
-    Camera* camera_ = nullptr;
+    TuboEngine::Camera* camera_ = nullptr;
     Microsoft::WRL::ComPtr <ID3D12GraphicsCommandList> commandList;
 
     VertexData* vertexData = nullptr;

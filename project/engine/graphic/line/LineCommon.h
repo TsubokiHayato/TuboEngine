@@ -15,9 +15,9 @@ public:
     void DrawSettingsCommon();
 
     ///<summary>デフォルトカメラの設定</summary>
-    void SetDefaultCamera(Camera* camera) { defaultCamera = camera; }
+	void SetDefaultCamera(TuboEngine::Camera* camera) { defaultCamera = camera; }
     ///<summary>デフォルトカメラの取得</summary>
-    Camera* GetDefaultCamera() const { return defaultCamera; }
+	TuboEngine::Camera* GetDefaultCamera() const { return defaultCamera; }
 
 private:
     ///----------------------------------------------------
@@ -28,5 +28,5 @@ private:
     ///----------------------------------------------------
     /// デフォルトカメラ
     ///----------------------------------------------------
-    Camera* defaultCamera = nullptr;
+    TuboEngine::Camera* defaultCamera = nullptr;
 };
