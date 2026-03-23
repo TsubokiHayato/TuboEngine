@@ -52,8 +52,8 @@ public:
 			GETTER & SETTER
 	---------------------------------------------------*/
 
-	void SetDefaultCamera(Camera* camera) { defaultCamera = camera; }
-	Camera* GetDefaultCamera()const { return defaultCamera; }
+	void SetDefaultCamera(TuboEngine::Camera* camera) { defaultCamera = camera; }
+	TuboEngine::Camera* GetDefaultCamera() const { return defaultCamera; }
 
 
 
@@ -64,7 +64,7 @@ private:
 	std::unique_ptr <PSO> pso = nullptr;//PSOのユニークポインタ
 	std::unique_ptr <BlendPSO> blendPso_;//ブレンドPSOのユニークポインタ
 
-	Camera* defaultCamera = nullptr;//デフォルトカメラ
+	TuboEngine::Camera* defaultCamera = nullptr; // デフォルトカメラ
 	int blenderMode_=0;//ブレンダーモード
 
 };

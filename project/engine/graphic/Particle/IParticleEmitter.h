@@ -64,7 +64,7 @@ public:
 	// デストラクタを明示的にし、マップ解除とリソース解放を安全に行う
 	virtual ~IParticleEmitter();
 	virtual void Initialize(const ParticlePreset& preset);
-	virtual void Update(float dt, const Camera* camera);
+	virtual void Update(float dt, const TuboEngine::Camera* camera);
 	virtual void Draw(ID3D12GraphicsCommandList* cmd);
 	virtual void Emit(uint32_t count);
 	virtual ParticlePreset& GetPreset() { return preset_; }

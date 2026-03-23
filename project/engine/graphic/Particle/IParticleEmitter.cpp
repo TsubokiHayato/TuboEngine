@@ -57,7 +57,7 @@ void IParticleEmitter::Emit(uint32_t count) {
 	}
 }
 
-void IParticleEmitter::Update(float dt, const Camera* camera) {
+void IParticleEmitter::Update(float dt, const TuboEngine::Camera* camera) {
 	if (dt <= 0.0f) return;
 
 	Matrix4x4 viewProj = MakeIdentity4x4();
@@ -87,8 +87,8 @@ void IParticleEmitter::Draw(ID3D12GraphicsCommandList* cmd) {
 	cmd->IASetVertexBuffers(0, 1, &vbv);
 
 	cmd->SetGraphicsRootConstantBufferView(0, material_->GetGPUVirtualAddress());
-	cmd->SetGraphicsRootDescriptorTable(1, SrvManager::GetInstance()->GetGPUDescriptorHandle(instancingSrvIndex_));
-	cmd->SetGraphicsRootDescriptorTable(2, SrvManager::GetInstance()->GetGPUDescriptorHandle(textureSrvIndex_));
+	cmd->SetGraphicsRootDescriptorTable(1, TuboEngine::SrvManager::GetInstance()->GetGPUDescriptorHandle(instancingSrvIndex_));
+	cmd->SetGraphicsRootDescriptorTable(2, TuboEngine::SrvManager::GetInstance()->GetGPUDescriptorHandle(textureSrvIndex_));
 
 	cmd->DrawInstanced(static_cast<UINT>(vertices_.size()), instanceCount_, 0, 0);
 }
@@ -128,8 +128,8 @@ void IParticleEmitter::EnsureBuffers() {
 			instancingPtr_[i].color = {1,1,1,1};
 		}
 		// Allocate() の戻り値を直接使用（+1しない）
-		instancingSrvIndex_ = SrvManager::GetInstance()->Allocate();
-		SrvManager::GetInstance()->CreateSRVForStructuredBuffer(
+		instancingSrvIndex_ = TuboEngine::SrvManager::GetInstance()->Allocate();
+		TuboEngine::SrvManager::GetInstance()->CreateSRVForStructuredBuffer(
 			instancingSrvIndex_, instancing_.Get(), preset_.maxInstances, sizeof(ParticleForGPU));
 	}
 
@@ -155,8 +155,8 @@ void IParticleEmitter::ReallocateInstanceBufferIfNeeded() {
 		instancingPtr_[i].color = {1,1,1,1};
 	}
 	// 新しい SRV を再確保（古いインデックスを再利用せず新規取得）
-	instancingSrvIndex_ = SrvManager::GetInstance()->Allocate();
-	SrvManager::GetInstance()->CreateSRVForStructuredBuffer(
+	instancingSrvIndex_ = TuboEngine::SrvManager::GetInstance()->Allocate();
+	TuboEngine::SrvManager::GetInstance()->CreateSRVForStructuredBuffer(
 		instancingSrvIndex_, instancing_.Get(), preset_.maxInstances, sizeof(ParticleForGPU));
 
 	// 粒子数が上限を超えていたら切り詰め

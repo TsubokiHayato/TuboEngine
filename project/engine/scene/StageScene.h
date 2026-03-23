@@ -85,7 +85,7 @@ public:
 	/// <summary>
 	/// メインカメラ取得
 	/// </summary>
-	Camera* GetMainCamera() const { return followCamera->GetCamera(); }
+	TuboEngine::Camera* GetMainCamera() const { return followCamera->GetCamera(); }
 
 	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
 
@@ -143,7 +143,7 @@ private:
 	std::unique_ptr<CollisionManager> collisionManager_;
 
 	std::unique_ptr<FollowTopDownCamera> followCamera;
-	std::unique_ptr<Camera> camera = nullptr;
+	std::unique_ptr<TuboEngine::Camera> camera = nullptr;
 	TuboEngine::Math::Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
 	TuboEngine::Math::Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	TuboEngine::Math::Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
