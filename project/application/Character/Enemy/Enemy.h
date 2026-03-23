@@ -30,7 +30,7 @@ public:
     void OnCollision(Collider* other) override;
 	TuboEngine::Math::Vector3 GetCenterPosition() const override;
 
-    void SetCamera(Camera* camera) { camera_ = camera; }
+    void SetCamera(TuboEngine::Camera* camera) { camera_ = camera; }
 	TuboEngine::Math::Vector3 GetPosition() const { return position; }
 	void SetPosition(const TuboEngine::Math::Vector3& pos) { position = pos; }
 	TuboEngine::Math::Vector3 GetRotation() const { return rotation; }
@@ -114,7 +114,7 @@ protected:
     IParticleEmitter* hitRingEmitter_ = nullptr;   // 追加: ヒット時の小リング
     IParticleEmitter* deathEmitter_ = nullptr;
     bool deathEffectPlayed_ = false;
-	Camera* camera_ = nullptr;
+	TuboEngine::Camera* camera_ = nullptr;
     MapChipField* mapChipField = nullptr;
     Player* player_ = nullptr;
     void ClearPath() { currentPath_.clear(); pathCursor_ = 0; lastPathGoalIndex_ = -1; }

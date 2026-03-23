@@ -70,7 +70,7 @@ void Particle::Initialize( ParticleType particleType) {
 	// 頂点データをリソースにコピー
 	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
 
-	camera_ = new Camera;
+	camera_ = new TuboEngine::Camera;
 	camera_->SetTranslate({ 0.0f,0.0f,-5.0f });
 	camera_->setRotation({ 0.0f,0.0f,0.0f });
 	camera_->setScale({ 1.0f,1.0f,1.0f });

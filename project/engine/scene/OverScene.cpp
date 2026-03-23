@@ -25,7 +25,7 @@ namespace {
 
 void OverScene::Initialize() {
 	// カメラの初期化
-	camera = std::make_unique<Camera>();
+	camera = std::make_unique<TuboEngine::Camera>();
 	cameraTransform.rotate = {0.0f, 0.0f, 0.0f};      // カメラの回転を初期化
 	cameraTransform.scale = {1.0f, 1.0f, 1.0f};       // カメラのスケールを初期化
 	cameraTransform.translate = {0.0f, 0.0f, -15.0f}; // カメラの位置を初期化

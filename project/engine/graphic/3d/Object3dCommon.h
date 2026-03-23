@@ -1,6 +1,7 @@
 #pragma once
 #include"Object/PSO.h"
 #include"BlendPSO.h"
+#include"Camera.h"
 
 
 class Camera;

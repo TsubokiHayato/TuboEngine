@@ -47,7 +47,7 @@ void DepthBasedOutlineEffect::DrawImGui() {
 #endif // USE_IMGUI
 }
 
-void DepthBasedOutlineEffect::SetMainCamera(Camera* camera) {
+void DepthBasedOutlineEffect::SetMainCamera(TuboEngine::Camera* camera) {
 	// カメラの設定を行う
 	camera_ = camera;
 	if (camera) {

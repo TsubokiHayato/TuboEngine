@@ -19,7 +19,7 @@ public:
 
     void DrawImGui();
 
-    void SetMainCamera(Camera* camera);
+    void SetMainCamera(TuboEngine::Camera* camera);
 
     size_t GetEffectCount() const { return effects_.size(); }
     size_t GetCurrentIndex() const { return currentIndex_; }

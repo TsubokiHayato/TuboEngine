@@ -3,6 +3,7 @@
 #include <wrl.h>
 #include <string>
 #include <cassert>
+#include"Camera.h"
 
 class PostEffectBase
 {
@@ -21,5 +22,5 @@ public:
     // 描画
     virtual void Draw(ID3D12GraphicsCommandList* commandList) = 0;
 
-    virtual void SetMainCamera(class Camera* camera) {};
+    virtual void SetMainCamera(TuboEngine::Camera* camera) {};
 };

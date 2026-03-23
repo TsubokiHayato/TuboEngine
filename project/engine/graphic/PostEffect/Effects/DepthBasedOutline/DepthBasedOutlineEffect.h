@@ -21,12 +21,12 @@ public:
 	void DrawImGui() override;
 
 public:
-	void SetMainCamera(Camera* camera) override;
+	void SetMainCamera(TuboEngine::Camera* camera) override;
 	// 定数バッファの取得
 	ID3D12Resource* GetMaterialCB() const { return materialCB_.Get(); }
 
 private:
-	Camera* camera_ = nullptr; // メインカメラへのポインタ
+	TuboEngine::Camera* camera_ = nullptr; // メインカメラへのポインタ
 	std::unique_ptr<DepthBasedOutlinePSO> pso_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialCB_; // 定数バッファ
 	ToonDepthOutlineParams* materialCBData_ = nullptr;

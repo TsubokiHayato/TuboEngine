@@ -94,7 +94,7 @@ public:
 	    CreateRenderTargetResource(Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, DXGI_FORMAT format, const TuboEngine::Math::Vector4& clearColor);
 
 public:
-	void SetCamera(Camera* camera) { this->camera_ = camera; }
+	void SetCamera(TuboEngine::Camera* camera) { this->camera_ = camera; }
 
 	// Dash演出用: 一時的にRadialBlurへ切り替えて強度をブーストする
 	// enable=false にすると元のポストエフェクトへ戻す
@@ -110,7 +110,7 @@ private:
 	///-----------------------------------------------------------------------
 	///                             メンバ変数
 	///-----------------------------------------------------------------------
-	Camera* camera_ = nullptr; // カメラオブジェクトへのポインタ
+	TuboEngine::Camera* camera_ = nullptr; // カメラオブジェクトへのポインタ
 
 	// D3D12デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device;

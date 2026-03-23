@@ -83,7 +83,7 @@ private:
 
 	std::unordered_map<std::string, ParticleGroup> particleGroups;
 
-	Camera* camera_ = nullptr;
+	TuboEngine::Camera* camera_ = nullptr;
 
 	// カスタムサイズ指定（>0 のときテクスチャサイズを上書き）
 	TuboEngine::Math::Vector2 customTextureSize{0, 0};

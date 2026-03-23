@@ -102,7 +102,7 @@ public:
 	// プレイヤーの死亡状態を設定
 	void SetIsDead(bool isAlive) { this->isAlive = isAlive; }
 	// カメラを設定
-	void SetCamera(Camera* camera) {
+	void SetCamera(TuboEngine::Camera* camera) {
 		object3d->SetCamera(camera);
 		camera_ = camera;
 	}
@@ -196,7 +196,7 @@ private:
 	IParticleEmitter* dashRingEmitter_ = nullptr;
 	bool wasDashingPrev_ = false;
 	bool isDashing_ = false; // 既存のダッシュ状態に置き換え可
-	Camera* camera_ = nullptr; // 位置/方向参照用
+	TuboEngine::Camera* camera_ = nullptr; // 位置/方向参照用
 	float dashRingOffsetForward_ = 0.0f; // カメラ前方方向へのオフセット量
 
 	// 連続リング発生のためのタイマーと間隔

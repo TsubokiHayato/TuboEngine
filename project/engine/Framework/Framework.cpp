@@ -79,7 +79,7 @@ void Framework::Update() {
 	//シーンマネージャーの更新
 	SceneManager::GetInstance()->Update();
 
-	Camera* mainCamera = SceneManager::GetInstance()->GetMainCamera();
+	TuboEngine::Camera* mainCamera = SceneManager::GetInstance()->GetMainCamera();
 
 	if (mainCamera) {
 		// ラインマネージャーのカメラ設定

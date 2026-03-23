@@ -73,7 +73,7 @@ public:
 	/// <summary>
 	/// 使用カメラを設定。
 	/// </summary>
-	void SetCamera(Camera* camera);
+	void SetCamera(TuboEngine::Camera* camera);
 
 private:
 	TuboEngine::Math::Vector3 position_{};

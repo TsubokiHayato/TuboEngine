@@ -78,7 +78,7 @@ void ClearScene::SetupLettersClearAnim() {
 
 void ClearScene::Initialize() {
     // カメラの初期化
-    camera = std::make_unique<Camera>();
+	camera = std::make_unique<TuboEngine::Camera>();
     cameraTransform.rotate = {0.0f, 0.0f, 0.0f};
     cameraTransform.scale = {1.0f, 1.0f, 1.0f};
     cameraTransform.translate = {0.0f, 0.0f, -15.0f};

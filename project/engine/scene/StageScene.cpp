@@ -107,7 +107,7 @@ void StageScene::Initialize() {
 	mapChipField_ = std::make_unique<MapChipField>();
 	player_ = std::make_unique<Player>();
 	followCamera = std::make_unique<FollowTopDownCamera>();
-	camera = std::make_unique<Camera>();
+	camera = std::make_unique<TuboEngine::Camera>();
 	collisionManager_ = std::make_unique<CollisionManager>();
 	stateManager_ = std::make_unique<StageStateManager>();
 	skyDome_ = std::make_unique<SkyDome>();
