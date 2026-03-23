@@ -60,13 +60,13 @@ void IParticleEmitter::Emit(uint32_t count) {
 void IParticleEmitter::Update(float dt, const TuboEngine::Camera* camera) {
 	if (dt <= 0.0f) return;
 
-	Matrix4x4 viewProj = MakeIdentity4x4();
-	Matrix4x4 billboard = MakeIdentity4x4();
+	Matrix4x4 viewProj = TuboEngine::Math::MakeIdentity4x4();
+	Matrix4x4 billboard = TuboEngine::Math::MakeIdentity4x4();
 
 	if (camera) {
 		viewProj = camera->GetViewProjectionMatrix();
 		Matrix4x4 camWorld = camera->GetWorldMatrix();
-		Matrix4x4 backToFront = MakeRotateYMatrix(std::numbers::pi_v<float>);
+		Matrix4x4 backToFront = TuboEngine::Math::MakeRotateYMatrix(std::numbers::pi_v<float>);
 		billboard = Multiply(backToFront, camWorld);
 		billboard.m[3][0] = 0.0f;
 		billboard.m[3][1] = 0.0f;
@@ -123,8 +123,8 @@ void IParticleEmitter::EnsureBuffers() {
 		allocatedInstances_ = preset_.maxInstances;
 		instancing_->Map(0, nullptr, reinterpret_cast<void**>(&instancingPtr_));
 		for (uint32_t i = 0; i < preset_.maxInstances; ++i) {
-			instancingPtr_[i].WVP = MakeIdentity4x4();
-			instancingPtr_[i].World = MakeIdentity4x4();
+			instancingPtr_[i].WVP = TuboEngine::Math::MakeIdentity4x4();
+			instancingPtr_[i].World = TuboEngine::Math::MakeIdentity4x4();
 			instancingPtr_[i].color = {1,1,1,1};
 		}
 		// Allocate() の戻り値を直接使用（+1しない）
@@ -138,7 +138,7 @@ void IParticleEmitter::EnsureBuffers() {
 		material_->Map(0, nullptr, reinterpret_cast<void**>(&materialPtr_));
 		materialPtr_->color = {1,1,1,1};
 		materialPtr_->enableLighting = false;
-		materialPtr_->uvTransform = MakeIdentity4x4();
+		materialPtr_->uvTransform = TuboEngine::Math::MakeIdentity4x4();
 	}
 }
 
@@ -150,8 +150,8 @@ void IParticleEmitter::ReallocateInstanceBufferIfNeeded() {
 	allocatedInstances_ = preset_.maxInstances;
 	instancing_->Map(0, nullptr, reinterpret_cast<void**>(&instancingPtr_));
 	for (uint32_t i = 0; i < preset_.maxInstances; ++i) {
-		instancingPtr_[i].WVP = MakeIdentity4x4();
-		instancingPtr_[i].World = MakeIdentity4x4();
+		instancingPtr_[i].WVP = TuboEngine::Math::MakeIdentity4x4();
+		instancingPtr_[i].World = TuboEngine::Math::MakeIdentity4x4();
 		instancingPtr_[i].color = {1,1,1,1};
 	}
 	// 新しい SRV を再確保（古いインデックスを再利用せず新規取得）
@@ -222,7 +222,7 @@ void IParticleEmitter::UpdateParticles(float dt, const Matrix4x4& viewProj, cons
 		uint32_t i = 0;
 		for (auto& p : particles_) {
 			if (i >= preset_.maxInstances) break;
-			Matrix4x4 local = MakeAffineMatrix(p.transform.scale, p.transform.rotate, p.transform.translate);
+			Matrix4x4 local = TuboEngine::Math::MakeAffineMatrix(p.transform.scale, p.transform.rotate, p.transform.translate);
 			Matrix4x4 world = preset_.billboard ? Multiply(billboard, local) : local;
 			instancingPtr_[i].World = world;
 			instancingPtr_[i].WVP = Multiply(world, viewProj);

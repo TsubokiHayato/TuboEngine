@@ -37,13 +37,13 @@ void TextObject::Initialize() {
     materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
     materialData_->color = color_;
     materialData_->enableLighting = false;
-    materialData_->uvTransform = MakeIdentity4x4();
+	materialData_->uvTransform = TuboEngine::Math::MakeIdentity4x4();
 
     // 変換行列バッファの作成
     transformationMatrixResource_ = DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
     transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
-    transformationMatrixData_->WVP = MakeIdentity4x4();
-    transformationMatrixData_->World = MakeIdentity4x4();
+	transformationMatrixData_->WVP = TuboEngine::Math::MakeIdentity4x4();
+	transformationMatrixData_->World = TuboEngine::Math::MakeIdentity4x4();
 }
 
 void TextObject::SetText(const std::string& text) {
@@ -230,8 +230,8 @@ void TextObject::Update() {
     materialData_->color = color_;
 
     Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-    Matrix4x4 viewMatrix = MakeIdentity4x4();
-    Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::GetInstance()->GetClientWidth()), float(WinApp::GetInstance()->GetClientHeight()), 0.0f, 100.0f);
+	Matrix4x4 viewMatrix = TuboEngine::Math::MakeIdentity4x4();
+	Matrix4x4 projectionMatrix = TuboEngine::Math::MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::GetInstance()->GetClientWidth()), float(WinApp::GetInstance()->GetClientHeight()), 0.0f, 100.0f);
     Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
     
     transformationMatrixData_->WVP = worldViewProjectionMatrix;

@@ -92,8 +92,8 @@ void SkyBox::Initialize(const std::string& textureFilePath) {
 	// transformationMatrixResource_ の生成
 	transformationMatrixResource_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TransformationMatrix));
 	transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
-	transformationMatrixData->WVP = MakeIdentity4x4();
-	transformationMatrixData->World = MakeIdentity4x4();
+	transformationMatrixData->WVP = TuboEngine::Math::MakeIdentity4x4();
+	transformationMatrixData->World = TuboEngine::Math::MakeIdentity4x4();
 
 
 #pragma region Material_Resource_Sprite
@@ -105,7 +105,7 @@ void SkyBox::Initialize(const std::string& textureFilePath) {
 	//今回は白を書き込んでみる
 	materialData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	materialData->enableLighting = false;
-	materialData->uvTransform = MakeIdentity4x4();
+	materialData->uvTransform = TuboEngine::Math::MakeIdentity4x4();
 
 
 #pragma endregion
@@ -122,9 +122,9 @@ void SkyBox::Update() {
 	// 行列を更新する
 	TuboEngine::Math::Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	TuboEngine::Math::Matrix4x4 cameraMatrix = MakeAffineMatrix(camera_->GetScale(), camera_->GetRotation(), camera_->GetTranslate());
-	TuboEngine::Math::Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	TuboEngine::Math::Matrix4x4 viewMatrix = TuboEngine::Math::Inverse(cameraMatrix);
 	TuboEngine::Math::Matrix4x4 projectionMatrix =
-	    MakePerspectiveMatrix(0.45f, float(TuboEngine::WinApp::GetInstance()->GetClientWidth()) / float(TuboEngine::WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
+	    TuboEngine::Math::MakePerspectiveMatrix(0.45f, float(TuboEngine::WinApp::GetInstance()->GetClientWidth()) / float(TuboEngine::WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
 	TuboEngine::Math::Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
 	if (camera_) {

@@ -9,7 +9,7 @@
 static TuboEngine::Math::Vector2 WorldToScreen(const TuboEngine::Math::Vector3& world, const TuboEngine::Camera* cam) {
     if (!cam) return {0,0};
 	const TuboEngine::Math::Matrix4x4& vp = cam->GetViewProjectionMatrix();
-	TuboEngine::Math::Vector3 v = TransformCoord(world, vp);
+	TuboEngine::Math::Vector3 v = TuboEngine::Math::TransformCoord(world, vp);
 	int sw = (int)TuboEngine::WinApp::GetInstance()->GetClientWidth();
 	int sh = (int)TuboEngine::WinApp::GetInstance()->GetClientHeight();
 	TuboEngine::Math::Vector2 screen = {};

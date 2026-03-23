@@ -86,15 +86,15 @@ void Particle::Update() {
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera_->GetScale(),
 		camera_->GetRotation(), camera_->GetTranslate());
 	// ビュー行列の取得
-	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	Matrix4x4 viewMatrix = TuboEngine::Math::Inverse(cameraMatrix);
 	// プロジェクション行列の取得
 	Matrix4x4 projectionMatrix =
-	    MakePerspectiveMatrix(0.45f, float(TuboEngine::WinApp::GetInstance()->GetClientWidth()) / float(TuboEngine::WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
+	    TuboEngine::Math::MakePerspectiveMatrix(0.45f, float(TuboEngine::WinApp::GetInstance()->GetClientWidth()) / float(TuboEngine::WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
 	// ビュープロジェクション行列の取得
 	Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 
 	// ビルボード行列の取得
-	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
+	Matrix4x4 backToFrontMatrix = TuboEngine::Math::MakeRotateYMatrix(std::numbers::pi_v<float>);
 	Matrix4x4 billboardMatrix{};
 	if (isBillBoard) {
 		billboardMatrix = Multiply(backToFrontMatrix, cameraMatrix);
@@ -103,7 +103,7 @@ void Particle::Update() {
 		billboardMatrix.m[3][1] = 0.0f;
 		billboardMatrix.m[3][2] = 0.0f;
 	} else {
-		billboardMatrix = MakeIdentity4x4();
+		billboardMatrix = TuboEngine::Math::MakeIdentity4x4();
 	}
 
 	// スケール調整用の倍率を設定
@@ -274,8 +274,8 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 
 	newGroup.instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&newGroup.instancingDataPtr));
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
-		newGroup.instancingDataPtr[index].WVP = MakeIdentity4x4();
-		newGroup.instancingDataPtr[index].World = MakeIdentity4x4();
+		newGroup.instancingDataPtr[index].WVP = TuboEngine::Math::MakeIdentity4x4();
+		newGroup.instancingDataPtr[index].World = TuboEngine::Math::MakeIdentity4x4();
 	}
 
 	// インスタンシング用SRVを確保してSRVインデックスを記録
@@ -436,7 +436,7 @@ void Particle::CreateMaterialData() {
 	materialData_->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	// SpriteはLightingしないのfalseを設定する
 	materialData_->enableLighting = false;
-	materialData_->uvTransform = MakeIdentity4x4();
+	materialData_->uvTransform = TuboEngine::Math::MakeIdentity4x4();
 }
 
 /// <summary>
