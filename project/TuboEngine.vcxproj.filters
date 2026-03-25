@@ -371,6 +371,8 @@
     <ClCompile Include="engine\graphic\2d\TextObject.cpp" />
     <ClCompile Include="application\Stage\StageManager.cpp" />
     <ClCompile Include="application\StageState\StageTransition\StageTransitionState.cpp" />
+    <ClCompile Include="application\Bullet\Enemy\EnemyMissileBullet.cpp" />
+    <ClCompile Include="application\Character\Enemy\MortarEnemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -815,6 +817,8 @@
     <ClInclude Include="engine\graphic\2d\TextManager.h" />
     <ClInclude Include="engine\graphic\2d\TextObject.h" />
     <ClInclude Include="application\Stage\StageManager.h" />
+    <ClInclude Include="application\Bullet\Enemy\EnemyMissileBullet.h" />
+    <ClInclude Include="application\Character\Enemy\MortarEnemy.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli">

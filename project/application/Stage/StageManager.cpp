@@ -7,6 +7,7 @@
 #include "Block/Block.h"
 #include "Character/Enemy/Enemy.h"
 #include "Character/Enemy/RushEnemy.h"
+#include "Character/Enemy/MortarEnemy.h"
 #include "Tile/Tile.h"
 #include "Camera/FollowTopDownCamera.h"
 #include "Collider/CollisionManager.h"
@@ -215,6 +216,17 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                 inst.enemies.push_back(std::move(enemy));
             } else if (type == MapChipType::EnemyShoot) {
                 auto enemy = std::make_unique<Enemy>();
+                enemy->Initialize();
+                if (cam) {
+                    enemy->SetCamera(cam);
+                }
+                enemy->SetPlayer(player);
+                enemy->SetMapChipField(field);
+                enemy->SetPosition(pos);
+                enemy->Update();
+                inst.enemies.push_back(std::move(enemy));
+            } else if (type == MapChipType::EnemyMortar) {
+                auto enemy = std::make_unique<MortarEnemy>();
                 enemy->Initialize();
                 if (cam) {
                     enemy->SetCamera(cam);
