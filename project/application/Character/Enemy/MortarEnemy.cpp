@@ -39,6 +39,11 @@ void MortarEnemy::Initialize() {
         artilleryObject_->SetCamera(camera_);
     }
     artilleryObject_->SetLightType(5); // EnvironmentMap で少し目立たせる
+    
+    // 本体を紫に変更
+    object3d->SetModelColor({0.8f, 0.2f, 1.0f, 1.0f});
+    // 砲台も同系色に
+    artilleryObject_->SetModelColor({0.6f, 0.1f, 0.8f, 1.0f});
 
     // --- 発射エフェクト用 ---
     if (!fireEmitter_) {

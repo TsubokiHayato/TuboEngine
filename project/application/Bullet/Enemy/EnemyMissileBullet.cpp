@@ -4,6 +4,9 @@
 #include "LineManager.h"
 #include <cmath>
 #include <algorithm>
+#include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
+#include "engine/graphic/Particle/ParticleManager.h"
+
 
 namespace {
 constexpr float kDefaultFallSpeed = 40.0f;
@@ -78,7 +81,26 @@ void EnemyMissileBullet::SetCamera(TuboEngine::Camera* camera) {
     if (targetObject_) {
         targetObject_->SetCamera(camera);
     }
+
+    // --- 衝撃波用エミッタ ---
+    if (!impactEmitter_) {
+        ParticlePreset p{};
+        p.name = "MissileImpactRing";
+        p.texture = "gradationLine.png";
+        p.maxInstances = 16;
+        p.autoEmit = false;
+        p.burstCount = 1;
+        p.lifeMin = 0.4f;
+        p.lifeMax = 0.6f;
+        p.scaleStart = {0.5f, 0.5f, 1.0f};
+        p.scaleEnd = {impactRadius_ * 1.5f, impactRadius_ * 1.5f, 1.0f};
+        p.colorStart = {1.0f, 0.5f, 0.2f, 0.8f};
+        p.colorEnd = {1.0f, 0.1f, 0.0f, 0.0f};
+        p.center = targetPosition_;
+        impactEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
+    }
 }
+
 
 
 
@@ -105,8 +127,16 @@ void EnemyMissileBullet::Update() {
         float r = impactRadius_;
         if (dx * dx + dy * dy + dz * dz <= r * r) {
             player_->OnCollision(this);
+            
+            // プレイヤー直撃時も衝撃波
+            if (impactEmitter_) {
+                impactEmitter_->GetPreset().center = position;
+                impactEmitter_->Emit(1);
+            }
+
             isAlive = false;
         }
+
     }
 
     if (isAlive && (position.z <= targetPosition_.z || elapsedTime_ >= flightTime_)) {
@@ -119,8 +149,16 @@ void EnemyMissileBullet::Update() {
                 player_->OnCollision(this);
             }
         }
+        
+        // 衝撃波発生
+        if (impactEmitter_) {
+            impactEmitter_->GetPreset().center = targetPosition_;
+            impactEmitter_->Emit(1);
+        }
+
         isAlive = false;
     }
+
 
     if (!isAlive) {
         return;
