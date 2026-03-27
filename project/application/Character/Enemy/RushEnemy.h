@@ -86,11 +86,15 @@ private:
     // プレビュー表示
     bool  showDashPreview_ = true;     // チャージ中に突進到達予測を表示
 
+    // ドリル用モデル
+    std::unique_ptr<TuboEngine::Object3d> drillObject_;
+
     TuboEngine::Math::Vector3 rushDir_{1.0f, 0.0f, 0.0f}; // 突進の固定進行方向
 
     // --- Helpers ---
     static float NormalizeAngle(float angle);
-	static void MoveWithCollision(TuboEngine::Math::Vector3& positionRef, const TuboEngine::Math::Vector3& desiredMove, MapChipField* field);
+    static void MoveWithCollision(TuboEngine::Math::Vector3& positionRef, const TuboEngine::Math::Vector3& desiredMove, MapChipField* field);
+    void UpdateDrillTransform();
 
     // Update helpers (readability)
     void UpdatePerceptionAndTimers(float dt, bool& canSeePlayer, float& distanceToPlayer);

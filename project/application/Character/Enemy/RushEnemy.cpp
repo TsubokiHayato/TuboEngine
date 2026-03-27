@@ -60,6 +60,15 @@ void RushEnemy::Initialize() {
     lastReactionSource_ = ReactionSource::None; // 直前の反応元初期化
     // スタン初期化
     isStunned_ = false; stunTimer_ = 0.0f;
+
+    // ドリルモデル初期化
+    drillObject_ = std::make_unique<TuboEngine::Object3d>();
+    drillObject_->Initialize("drill/drill.obj"); 
+    if (camera_) {
+        drillObject_->SetCamera(camera_);
+    }
+    // EnvironmentMap ライティングを使用
+    drillObject_->SetLightType(5);
 }
 
 // -------------------------------------------------
@@ -258,6 +267,31 @@ void RushEnemy::HandleReacting(float dt) {
 // -------------------------------------------------
 // Visuals and debug
 // -------------------------------------------------
+
+void RushEnemy::UpdateDrillTransform() {
+    if (!drillObject_) {
+        return;
+    }
+    TuboEngine::Math::Vector3 forward{
+        std::cos(rotation.z),
+        std::sin(rotation.z),
+        0.0f
+    };
+    // エネミーの少し前方に配置
+    const float kDrillOffset = 2.0f;
+    TuboEngine::Math::Vector3 drillPos = position + forward * kDrillOffset;
+  static float drillSpin = 0.0f;
+    // Z軸まわりにスピンさせる
+    drillSpin += 0.35f; // 毎フレーム少しずつ回転
+    if (drillSpin > DirectX::XM_2PI) {
+        drillSpin -= DirectX::XM_2PI;
+    }
+    TuboEngine::Math::Vector3 drillRot = rotation;
+    drillRot.x += drillSpin;
+    drillObject_->SetPosition(drillPos);
+    drillObject_->SetRotation(drillRot);
+    drillObject_->SetScale(scale);
+}
 void RushEnemy::ApplyChargeAndVisuals(float dt) {
 	TuboEngine::Math::Vector3 visualScale = scale;
     // チャージ中は縮み + 赤み
@@ -426,7 +460,7 @@ void RushEnemy::Update() {
         object3d->SetPosition(position);
         // スタン中も描画補正は適用
         {
-			TuboEngine::Math::Vector3 drawRot = rotation;
+            TuboEngine::Math::Vector3 drawRot = rotation;
             drawRot.x = NormalizeAngle(drawRot.x + kRushEnemyModelRotOffsetX);
             drawRot.y = NormalizeAngle(drawRot.y + kRushEnemyModelRotOffsetY);
             drawRot.z = NormalizeAngle(drawRot.z + kRushEnemyModelRotOffsetZ);
@@ -435,6 +469,13 @@ void RushEnemy::Update() {
         object3d->SetScale(scale);
         object3d->SetCamera(camera_);
         object3d->Update();
+
+        // ドリルも位置だけ追従させる
+        UpdateDrillTransform();
+        if (drillObject_) {
+            drillObject_->SetCamera(camera_);
+            drillObject_->Update();
+        }
         if (hitEmitter_) hitEmitter_->GetPreset().center = position;
         if (deathEmitter_ && !deathEffectPlayed_) deathEmitter_->GetPreset().center = position;
         wasHit = isHit; isHit = false;
@@ -487,13 +528,26 @@ void RushEnemy::Update() {
 
     // モデル・パーティクル・デバッグ描画
     ApplyChargeAndVisuals(dt);
+    // ドリル更新
+    UpdateDrillTransform();
+    if (drillObject_) {
+        drillObject_->SetCamera(camera_);
+        drillObject_->Update();
+    }
     if (hitEmitter_) hitEmitter_->GetPreset().center = position;
     if (deathEmitter_ && !deathEffectPlayed_) deathEmitter_->GetPreset().center = position;
     if (!wasHit && isHit) EmitHitParticle(); wasHit = isHit; isHit = false;
     DrawDebugGizmos();
 }
 
-void RushEnemy::Draw() { if (!GetIsAlive()) return; if (object3d) object3d->Draw(); DrawViewCone(); DrawLastSeenMark(); DrawStateIcon(); }
+void RushEnemy::Draw() {
+    if (!GetIsAlive()) return;
+    if (object3d) object3d->Draw();
+    if (drillObject_) drillObject_->Draw();
+    DrawViewCone();
+    DrawLastSeenMark();
+    DrawStateIcon();
+}
 
 void RushEnemy::DrawSprite() {
     if (!GetIsAlive()) return;
