@@ -52,7 +52,7 @@ void DirectXCommon::Device_Initialize() {
 		// デバックレイヤを有効化する
 		debugController->EnableDebugLayer();
 		// さらにGPU側でもチェックを行えるようにする
-		debugController->SetEnableGPUBasedValidation(false);
+		debugController->SetEnableGPUBasedValidation(true);
 	}
 
 #endif
