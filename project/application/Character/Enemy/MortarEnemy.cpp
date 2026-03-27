@@ -69,13 +69,6 @@ void MortarEnemy::Initialize() {
 
 void MortarEnemy::Update() {
     if (!isAlive) {
-        if (!deathEffectPlayed_) {
-            EmitDeathParticle();
-            deathEffectPlayed_ = true;
-        }
-        if (deathEmitter_) {
-            deathEmitter_->GetPreset().center = position;
-        }
         if (missile_ && missile_->GetIsAlive()) {
             missile_->Update();
         } else if (missile_ && !missile_->GetIsAlive()) {
@@ -85,6 +78,50 @@ void MortarEnemy::Update() {
     }
 
     const float dt = 1.0f / 60.0f;
+
+    // --- 霧散演出中の処理 ---
+    if (isDying_) {
+        deathTimer_ -= dt;
+        if (mistEmitter_) {
+            mistEmitter_->GetPreset().center = position;
+            mistEmitter_->Emit(4);
+        }
+        float t = std::clamp(deathTimer_ / kDeathDuration, 0.0f, 1.0f);
+
+        UpdateArtilleryTransform();
+
+        // 共通演出の上書き（縮小のみ。カラーはモデル共有のため変更しない）
+        t = std::clamp(deathTimer_ / kDeathDuration, 0.0f, 1.0f);
+        if (object3d) {
+            object3d->SetScale(scale * t);
+            object3d->Update();
+        }
+        if (artilleryObject_) {
+            artilleryObject_->SetScale(artilleryObject_->GetScale() * t);
+            artilleryObject_->Update();
+        }
+
+
+        if (deathTimer_ <= 0.0f) {
+            isAlive = false;
+        }
+
+        if (missile_ && missile_->GetIsAlive()) {
+            missile_->Update();
+        } else if (missile_ && !missile_->GetIsAlive()) {
+            missile_.reset();
+        }
+        return;
+    }
+
+    // 死亡判定開始
+    if (HP <= 0) {
+        isDying_ = true;
+        deathTimer_ = kDeathDuration;
+        EmitDeathParticle();
+        return;
+    }
+
 
     ApplyHitShake(dt);
 

@@ -130,7 +130,27 @@ void Enemy::Initialize() {
 		p.center = position;
 		deathEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
 	}
+	// 霧散演出用ミスト
+	if (!mistEmitter_) {
+		ParticlePreset p{};
+		p.name = "EnemyMist";
+		p.texture = "particle.png";
+		p.maxInstances = 256;
+		p.autoEmit = false;
+		p.burstCount = 12;
+		p.lifeMin = 0.4f;
+		p.lifeMax = 0.7f;
+		p.scaleStart = {0.15f, 0.15f, 0.15f};
+		p.scaleEnd = {0.5f, 0.5f, 0.5f};
+		p.colorStart = {0.7f, 0.7f, 0.7f, 0.6f};
+		p.colorEnd = {0.3f, 0.3f, 0.3f, 0.0f};
+		p.velMin = {-1.2f, -1.2f, -1.2f};
+		p.velMax = {1.2f, 1.2f, 1.2f};
+		p.center = position;
+		mistEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
+	}
 }
+
 
 static float NormalizeAngle(float angle) {
 	while (angle > kPI)
@@ -355,19 +375,40 @@ bool Enemy::BuildPathTo(const TuboEngine::Math::Vector3& worldGoal) {
 }
 
 void Enemy::Update() {
-	// 死亡演出再生後は描画のみ (Update 最低限)
+	// 死亡後 (完全に消えた後) は何もしない
 	if (!isAlive) {
-		if (!deathEffectPlayed_) {
-			EmitDeathParticle();
-			deathEffectPlayed_ = true;
-		}
-		if (deathEmitter_) {
-			deathEmitter_->GetPreset().center = position;
-		}
 		return;
 	}
 
 	const float dt = 1.0f / 60.0f;
+
+	// --- 霧散演出中の処理 ---
+	if (isDying_) {
+		deathTimer_ -= dt;
+		if (mistEmitter_) {
+			mistEmitter_->GetPreset().center = position;
+			mistEmitter_->Emit(4); // 継続的にミストを出す
+		}
+		// 縮小 (スケールはインスタンスごとなので安全)
+		float t = std::clamp(deathTimer_ / kDeathDuration, 0.0f, 1.0f);
+		object3d->SetScale(scale * t);
+		object3d->Update();
+
+		if (deathTimer_ <= 0.0f) {
+			isAlive = false;
+		}
+		return;
+	}
+
+
+	// 死亡判定開始
+	if (HP <= 0) {
+		isDying_ = true;
+		deathTimer_ = kDeathDuration;
+		EmitDeathParticle(); // 既存のリングエフェクトも一度出す
+		return;
+	}
+
 
 	// --- ヒットシェイク適用 ---
 	ApplyHitShake(dt);
@@ -675,11 +716,12 @@ void Enemy::OnCollision(Collider* other) {
 	hitShakeTimer_ = hitShakeDuration_;
 
 
-	if (HP <= 0 && isAlive) {
-		isAlive = false;
+	if (HP <= 0 && isAlive && !isDying_) {
+		isDying_ = true;
+		deathTimer_ = kDeathDuration;
 		EmitDeathParticle();
-		deathEffectPlayed_ = true;
 	}
+
 	if (state_ == State::Idle || state_ == State::Alert) {
 		if (player_) {
 			lastSeenPlayerPos = player_->GetPosition();
@@ -788,7 +830,9 @@ bool Enemy::CanSeePlayer() {
 }
 
 void Enemy::DrawViewCone() {
+	if (isDying_ || !isAlive) return;
 #if defined(_DEBUG)
+
 	float halfRad = (kViewAngleDeg / 2.0f) * kPI / 180.0f;
 	float baseAngle = rotation.z;
 	TuboEngine::Math::Vector3 center = position;
@@ -873,8 +917,9 @@ TuboEngine::Math::Vector3 Enemy::GetCenterPosition() const {
 
 void Enemy::DrawStateIcon() {
 	// 状態に応じた簡易アイコンラインを頭上に描画
-	if (!isAlive)
+	if (!isAlive || isDying_)
 		return;
+
 	TuboEngine::Math::Vector3 base = position;
 	base.z += 0.0f; // 2D平面なのでそのまま
 	TuboEngine::Math::Vector3 upPos = base + TuboEngine::Math::Vector3{0, 0, 0};
