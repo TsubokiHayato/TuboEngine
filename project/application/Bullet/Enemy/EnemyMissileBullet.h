@@ -38,5 +38,8 @@ private:
     TuboEngine::Camera* camera_ = nullptr;
 
     std::unique_ptr<TuboEngine::Object3d> targetObject_; // 着弾地点表示用
+
+    class IParticleEmitter* impactEmitter_ = nullptr; // 着弾時の衝撃波
 };
+
 
