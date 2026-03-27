@@ -280,13 +280,23 @@ void RushEnemy::UpdateDrillTransform() {
     // エネミーの少し前方に配置
     const float kDrillOffset = 2.0f;
     TuboEngine::Math::Vector3 drillPos = position + forward * kDrillOffset;
-  static float drillSpin = 0.0f;
-    // Z軸まわりにスピンさせる
-    drillSpin += 0.35f; // 毎フレーム少しずつ回転
+    static float drillSpin = 0.0f;
+    // 準備中・突進中だけ回転を強め、そのほかはゆっくり回る or 停止に近い速度にする
+    float spinSpeed = 0.0f;
+    if (isRushing_) {
+        spinSpeed = 0.5f;          // 突進中は速く回転
+    } else if (isPreparing_) {
+        spinSpeed = 0.3f;          // ため中はやや遅め
+    } else {
+        spinSpeed = 0.05f;         // 通常時はごくわずか
+    }
+    drillSpin += spinSpeed;
     if (drillSpin > DirectX::XM_2PI) {
         drillSpin -= DirectX::XM_2PI;
     }
+
     TuboEngine::Math::Vector3 drillRot = rotation;
+    // X軸回転方向にスピンを加える（モデルの向きに合わせる）
     drillRot.x += drillSpin;
     drillObject_->SetPosition(drillPos);
     drillObject_->SetRotation(drillRot);
