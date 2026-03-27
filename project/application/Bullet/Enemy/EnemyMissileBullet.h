@@ -36,4 +36,7 @@ private:
     float flightTime_ = 0.0f;
     float elapsedTime_ = 0.0f;
     TuboEngine::Camera* camera_ = nullptr;
+
+    std::unique_ptr<TuboEngine::Object3d> targetObject_; // 着弾地点表示用
 };
+

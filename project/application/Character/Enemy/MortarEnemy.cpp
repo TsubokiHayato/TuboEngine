@@ -3,6 +3,8 @@
 #include"ImguiManager.h"
 #include <algorithm>
 #include <cmath>
+#include "engine/graphic/Particle/Effects/Primitive/PrimitiveEmitter.h"
+
 
 namespace {
 constexpr float kPI = 3.14159265358979323846f;
@@ -37,7 +39,28 @@ void MortarEnemy::Initialize() {
         artilleryObject_->SetCamera(camera_);
     }
     artilleryObject_->SetLightType(5); // EnvironmentMap で少し目立たせる
+
+    // --- 発射エフェクト用 ---
+    if (!fireEmitter_) {
+        ParticlePreset p{};
+        p.name = "MortarFire";
+        p.texture = "particle.png";
+        p.maxInstances = 64;
+        p.autoEmit = false;
+        p.burstCount = 8;
+        p.lifeMin = 0.2f;
+        p.lifeMax = 0.4f;
+        p.scaleStart = {0.3f, 0.3f, 0.3f};
+        p.scaleEnd = {0.8f, 0.8f, 0.8f};
+        p.colorStart = {1.0f, 0.8f, 0.4f, 1.0f};
+        p.colorEnd = {0.5f, 0.5f, 0.5f, 0.0f};
+        p.velMin = {-1.0f, -1.0f, 1.0f};
+        p.velMax = {1.0f, 1.0f, 3.0f};
+        p.gravity = {0, 0, 0};
+        fireEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
+    }
 }
+
 
 void MortarEnemy::Update() {
     if (!isAlive) {
@@ -58,7 +81,8 @@ void MortarEnemy::Update() {
 
     const float dt = 1.0f / 60.0f;
 
-    ApplyKnockback(dt);
+    ApplyHitShake(dt);
+
 
     bool canSeePlayer = CanSeePlayer();
     wasJustFound_ = (!sawPlayerPrev_ && canSeePlayer);
@@ -127,7 +151,8 @@ void MortarEnemy::Update() {
         missile_.reset();
     }
 
-    object3d->SetPosition(position);
+    object3d->SetPosition(position + hitShakeOffset_);
+
     TuboEngine::Math::Vector3 drawRot = rotation;
     drawRot.x = NormalizeAngle(drawRot.x + kMortarEnemyModelRotOffsetX);
     drawRot.y = NormalizeAngle(drawRot.y + kMortarEnemyModelRotOffsetY);
@@ -178,7 +203,8 @@ void MortarEnemy::UpdateArtilleryTransform() {
     }
 
     // 頭の少し上に配置（ImGui から調整可能）
-    TuboEngine::Math::Vector3 artilleryPos = position + artilleryOffset_;
+    TuboEngine::Math::Vector3 artilleryPos = position + artilleryOffset_ + hitShakeOffset_;
+
 
     // MortarEnemy が向いている方向に合わせて砲台も回転（モデル軸補正を適用）
     TuboEngine::Math::Vector3 artilleryRot = rotation;
@@ -228,7 +254,14 @@ void MortarEnemy::TryFireMissile(bool canSeePlayer, float dt) {
     missile_->SetPlayer(player_);
     missile_->SetCamera(camera_);
     missile_->Initialize(startPos);
+
+    // --- 演出：発射エフェクト ---
+    if (fireEmitter_) {
+        fireEmitter_->GetPreset().center = startPos + artilleryOffset_;
+        fireEmitter_->Emit(fireEmitter_->GetPreset().burstCount);
+    }
 }
+
 
 void MortarEnemy::Draw() {
     if (object3d && isAlive) {
