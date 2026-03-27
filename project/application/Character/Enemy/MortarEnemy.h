@@ -33,4 +33,8 @@ private:
     // ImGui から調整するためのオフセット・スケール係数
     TuboEngine::Math::Vector3 artilleryOffset_ = {0.0f, 0.0f, 1.0f};
     float artilleryScaleFactor_ = 0.8f;
+
+    // 発射エフェクト用
+    IParticleEmitter* fireEmitter_ = nullptr;
 };
+

@@ -88,6 +88,12 @@ private:
 
     // ドリル用モデル
     std::unique_ptr<TuboEngine::Object3d> drillObject_;
+    float drillRotation_ = 0.0f; // ドリル自転角度
+
+    // 新規演出用パーティクルエミッタ
+    IParticleEmitter* chargingEmitter_ = nullptr; // チャージ中
+    IParticleEmitter* trailEmitter_ = nullptr;    // 突進中トレイル
+
 
     TuboEngine::Math::Vector3 rushDir_{1.0f, 0.0f, 0.0f}; // 突進の固定進行方向
 

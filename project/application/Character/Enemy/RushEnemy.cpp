@@ -4,6 +4,9 @@
 #include "ImGuiManager.h"
 #include "LineManager.h"
 #include "Collider/CollisionTypeId.h"
+#include "engine/graphic/Particle/Effects/Primitive/PrimitiveEmitter.h"
+#include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
+#include "engine/graphic/Particle/ParticleManager.h"
 #include <cmath>
 #include <algorithm>
 
@@ -69,7 +72,46 @@ void RushEnemy::Initialize() {
     }
     // EnvironmentMap ライティングを使用
     drillObject_->SetLightType(5);
+
+    // --- 演出用エミッタ生成 ---
+    if (!chargingEmitter_) {
+        ParticlePreset p{};
+        p.name = "RushCharge";
+        p.texture = "particle.png";
+        p.maxInstances = 128;
+        p.autoEmit = false;
+        p.burstCount = 4;
+        p.lifeMin = 0.1f;
+        p.lifeMax = 0.25f;
+        p.scaleStart = {0.2f, 0.2f, 0.2f};
+        p.scaleEnd = {0.05f, 0.05f, 0.05f};
+        p.colorStart = {1.0f, 0.7f, 0.2f, 1.0f};
+        p.colorEnd = {1.0f, 0.4f, 0.1f, 0.0f};
+        p.velMin = {-3.0f, -3.0f, -3.0f};
+        p.velMax = {3.0f, 3.0f, 3.0f};
+        p.gravity = {0, 0, 0};
+        chargingEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
+    }
+    if (!trailEmitter_) {
+        ParticlePreset p{};
+        p.name = "RushTrail";
+        p.texture = "particle.png";
+        p.maxInstances = 256;
+        p.autoEmit = false;
+        p.burstCount = 2;
+        p.lifeMin = 0.3f;
+        p.lifeMax = 0.5f;
+        p.scaleStart = {0.4f, 0.4f, 0.4f};
+        p.scaleEnd = {0.8f, 0.8f, 0.8f};
+        p.colorStart = {0.8f, 0.8f, 0.8f, 0.5f};
+        p.colorEnd = {0.6f, 0.6f, 0.6f, 0.0f};
+        p.velMin = {-0.6f, -0.6f, -0.6f};
+        p.velMax = {0.6f, 0.6f, 0.6f};
+        p.gravity = {0, 0, 0};
+        trailEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
+    }
 }
+
 
 // -------------------------------------------------
 // Update helper: Perception and timers
@@ -269,39 +311,60 @@ void RushEnemy::HandleReacting(float dt) {
 // -------------------------------------------------
 
 void RushEnemy::UpdateDrillTransform() {
-    if (!drillObject_) {
-        return;
+    if (!drillObject_) return;
+
+    // 自転速度の決定
+    float spinSpeed = 0.05f;
+    if (isRushing_) {
+        spinSpeed = 1.0f;          // 突進中は非常に速く回転
+    } else if (isPreparing_) {
+        // ため中は徐々に加速
+        float prepT = std::clamp(1.0f - (prepareTimer_ / std::max(0.0001f, prepareDuration_)), 0.0f, 1.0f);
+        spinSpeed = 0.1f + 0.5f * prepT;
+    } else {
+        spinSpeed = 0.05f;         // 通常時はゆっくり
     }
+    
+    drillRotation_ += spinSpeed;
+    if (drillRotation_ > DirectX::XM_2PI) {
+        drillRotation_ -= DirectX::XM_2PI;
+    }
+
     TuboEngine::Math::Vector3 forward{
         std::cos(rotation.z),
         std::sin(rotation.z),
         0.0f
     };
     // エネミーの少し前方に配置
-    const float kDrillOffset = 2.0f;
-    TuboEngine::Math::Vector3 drillPos = position + forward * kDrillOffset;
-    static float drillSpin = 0.0f;
-    // 準備中・突進中だけ回転を強め、そのほかはゆっくり回る or 停止に近い速度にする
-    float spinSpeed = 0.0f;
-    if (isRushing_) {
-        spinSpeed = 0.5f;          // 突進中は速く回転
-    } else if (isPreparing_) {
-        spinSpeed = 0.3f;          // ため中はやや遅め
-    } else {
-        spinSpeed = 0.05f;         // 通常時はごくわずか
-    }
-    drillSpin += spinSpeed;
-    if (drillSpin > DirectX::XM_2PI) {
-        drillSpin -= DirectX::XM_2PI;
-    }
+    const float kDrillOffset = 1.8f;
+    TuboEngine::Math::Vector3 drillPos = position + forward * kDrillOffset + hitShakeOffset_;
+
 
     TuboEngine::Math::Vector3 drillRot = rotation;
-    // X軸回転方向にスピンを加える（モデルの向きに合わせる）
-    drillRot.x += drillSpin;
+    // Z軸(前方)を中心にスピンを加える（モデルの向きに合わせる）
+    // モデルの初期方向が Z+ とすると、Z軸回転がスピンになる
+    drillRot.x += drillRotation_; 
+    
     drillObject_->SetPosition(drillPos);
     drillObject_->SetRotation(drillRot);
     drillObject_->SetScale(scale);
+	drillObject_->SetCamera(camera_);
+    drillObject_->Update();
+
+    // --- パーティクル放出制御 ---
+    if (isPreparing_ && chargingEmitter_) {
+        // ドリルの先端付近から火花
+        chargingEmitter_->GetPreset().center = drillPos + forward * 1.0f;
+        chargingEmitter_->Emit(chargingEmitter_->GetPreset().burstCount);
+    }
+    if (isRushing_ && trailEmitter_) {
+        // 足元/後方に土煙
+        trailEmitter_->GetPreset().center = position - forward * 0.5f;
+        trailEmitter_->Emit(trailEmitter_->GetPreset().burstCount);
+    }
 }
+
+
 void RushEnemy::ApplyChargeAndVisuals(float dt) {
 	TuboEngine::Math::Vector3 visualScale = scale;
     // チャージ中は縮み + 赤み
@@ -329,7 +392,8 @@ void RushEnemy::ApplyChargeAndVisuals(float dt) {
         visualScale.y *= (1.0f - runningStretch * 0.5f);
     }
 
-    object3d->SetPosition(position);
+    object3d->SetPosition(position + hitShakeOffset_);
+
     // 描画用回転（モデル軸補正込み）
 	TuboEngine::Math::Vector3 drawRot = rotation;
     drawRot.x = NormalizeAngle(drawRot.x + kRushEnemyModelRotOffsetX);
@@ -447,8 +511,9 @@ void RushEnemy::Update() {
     if (!isAlive) { if (!deathEffectPlayed_) { EmitDeathParticle(); deathEffectPlayed_ = true; } if (deathEmitter_) deathEmitter_->GetPreset().center = position; return; }
     const float dt = 1.0f / 60.0f;
 
-    // --- Enemyのノックバック適用を先頭で共有 ---
-    ApplyKnockback(dt);
+    // --- Enemyのヒットシェイク適用を先頭で共有 ---
+    ApplyHitShake(dt);
+
 
     bool canSeePlayer = false; float distanceToPlayer = 0.0f;
     UpdatePerceptionAndTimers(dt, canSeePlayer, distanceToPlayer);
@@ -482,10 +547,7 @@ void RushEnemy::Update() {
 
         // ドリルも位置だけ追従させる
         UpdateDrillTransform();
-        if (drillObject_) {
-            drillObject_->SetCamera(camera_);
-            drillObject_->Update();
-        }
+
         if (hitEmitter_) hitEmitter_->GetPreset().center = position;
         if (deathEmitter_ && !deathEffectPlayed_) deathEmitter_->GetPreset().center = position;
         wasHit = isHit; isHit = false;
@@ -538,12 +600,9 @@ void RushEnemy::Update() {
 
     // モデル・パーティクル・デバッグ描画
     ApplyChargeAndVisuals(dt);
-    // ドリル更新
+    // ドリル更新（内部でUpdate()も呼ぶ）
     UpdateDrillTransform();
-    if (drillObject_) {
-        drillObject_->SetCamera(camera_);
-        drillObject_->Update();
-    }
+
     if (hitEmitter_) hitEmitter_->GetPreset().center = position;
     if (deathEmitter_ && !deathEffectPlayed_) deathEmitter_->GetPreset().center = position;
     if (!wasHit && isHit) EmitHitParticle(); wasHit = isHit; isHit = false;

@@ -54,14 +54,33 @@ void EnemyMissileBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
     if (camera_) {
         object3d->SetCamera(camera_);
     }
+
+    targetObject_ = std::make_unique<TuboEngine::Object3d>();
+    targetObject_->Initialize("star.obj");
+    // 地面に水平に配置 (Z軸が高さなら X-Y平面)
+    targetObject_->SetPosition(targetPosition_ + TuboEngine::Math::Vector3{0, 0, 0.1f});
+    targetObject_->SetRotation({0.0f, 0.0f, 0.0f}); 
+    targetObject_->SetScale({impactRadius_, impactRadius_, 1.0f});
+    targetObject_->SetModelColor({1.0f, 0.3f, 0.1f, 0.7f});
+    if (camera_) {
+        targetObject_->SetCamera(camera_);
+    }
 }
 
+
 void EnemyMissileBullet::SetCamera(TuboEngine::Camera* camera) {
-    camera_ = camera;
+    if (camera) {
+        camera_ = camera;
+    }
     if (object3d) {
         object3d->SetCamera(camera);
     }
+    if (targetObject_) {
+        targetObject_->SetCamera(camera);
+    }
 }
+
+
 
 void EnemyMissileBullet::Update() {
     if (!isAlive) {
@@ -111,16 +130,34 @@ void EnemyMissileBullet::Update() {
     object3d->SetRotation(rotation);
     object3d->SetScale(scale);
     object3d->Update();
+
+
+    if (targetObject_) {
+        targetObject_->Update();
+    }
 }
+
 
 void EnemyMissileBullet::Draw() {
     if (isAlive && object3d) {
         object3d->Draw();
     }
-    if (isAlive) {
-        TuboEngine::LineManager::GetInstance()->DrawLine(startPosition_, targetPosition_, {1.0f, 0.3f, 0.2f, 0.6f});
+    if (isAlive && targetObject_) {
+        targetObject_->Draw();
     }
+
+#ifdef _DEBUG
+    if (isAlive) {
+        // 軌道ライン
+        TuboEngine::LineManager::GetInstance()->DrawLine(startPosition_, targetPosition_, {1.0f, 0.3f, 0.2f, 0.6f});
+        // 垂直ガイドライン (現在地から真下へ)
+        TuboEngine::Math::Vector3 groundPos = position;
+        groundPos.z = targetPosition_.z;
+        TuboEngine::LineManager::GetInstance()->DrawLine(position, groundPos, {1.0f, 1.0f, 1.0f, 0.4f});
+    }
+#endif
 }
+
 
 void EnemyMissileBullet::OnCollision(Collider* other) {
     if (!other) {
