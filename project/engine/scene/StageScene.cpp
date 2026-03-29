@@ -264,8 +264,6 @@ void StageScene::Update() {
 				if (!isRequestSceneChange) {
 					// request animated transition to TITLE
 					pendingNextSceneNo_ = TITLE;
-					// clear demo flag now so other scenes don't treat next scene as demo
-					StageScene::isDemoMode = false;
 					sceneChangeAnimation_->SetPhase(SceneChangeAnimation::Phase::Appearing);
 					isRequestSceneChange = true;
 				}
@@ -283,6 +281,10 @@ void StageScene::Update() {
 			int next = pendingNextSceneNo_;
 			pendingNextSceneNo_ = -1;
 			isRequestSceneChange = false;
+			// デモからTITLEへ戻る場合は、遷移実行直前にフラグを落とす（演出中のUIちらつき防止）
+			if (StageScene::isDemoMode && next == TITLE) {
+				StageScene::isDemoMode = false;
+			}
 			SceneManager::GetInstance()->ChangeScene(next);
 		}
 	}

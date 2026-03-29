@@ -1,5 +1,8 @@
 #include "StageManager.h"
 #include "application/MapChip/MapChipField.h"
+#include "TextureManager.h"
+#include "ParticleManager.h"
+#include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 #include <fstream>
 #include <sstream>
 #include <algorithm>
@@ -273,6 +276,96 @@ void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
             e->Update();
         }
     }
+
+	UpdateEntranceExitEffects();
+}
+
+void StageManager::UpdateEntranceExitEffects() {
+	if (stageInstances_.empty()) {
+		return;
+	}
+	if (mainChunkIndex_ < 0 || mainChunkIndex_ >= static_cast<int>(stageInstances_.size())) {
+		return;
+	}
+
+	// チャンクが切り替わったタイミングで残像を消す
+	if (effectChunkIndex_ != mainChunkIndex_) {
+		effectChunkIndex_ = mainChunkIndex_;
+		for (auto* e : entranceEmitters_) {
+			if (e) {
+				e->ClearAll();
+			}
+		}
+		for (auto* e : exitEmitters_) {
+			if (e) {
+				e->ClearAll();
+			}
+		}
+	}
+
+	auto& inst = stageInstances_[mainChunkIndex_];
+	MapChipField* field = inst.field.get();
+	if (!field) {
+		return;
+	}
+
+	// Entrance / Exit の座標取得
+	const auto entrancePos = field->GetChipPositions(MapChipType::kEntrance);
+	const auto exitPos = field->GetChipPositions(MapChipType::kExit);
+
+	auto EnsureEmitters = [&](std::vector<IParticleEmitter*>& list, size_t needCount, const char* baseName,
+		const TuboEngine::Math::Vector4& colStart, const TuboEngine::Math::Vector4& colEnd) {
+		// 足りない分は生成
+		while (list.size() < needCount) {
+			TuboEngine::TextureManager::GetInstance()->LoadTexture("gradationLine.png");
+			ParticlePreset p{};
+			p.name = baseName;
+			p.texture = "gradationLine.png";
+			p.maxInstances = 64;
+			p.autoEmit = true;
+			p.emitRate = 1.5f;
+			p.lifeMin = 0.55f;
+			p.lifeMax = 0.85f;
+			p.billboard = false;              // 地面に平行なリング
+			p.simulateInWorldSpace = true;
+			p.gravity = {0.0f, 0.0f, 0.0f};
+			p.velMin = {0.0f, 0.0f, 0.0f};
+			p.velMax = {0.0f, 0.0f, 0.0f};
+			p.scaleStart = {0.35f, 0.35f, 1.0f};
+			p.scaleEnd = {0.60f, 0.60f, 1.0f};
+			p.colorStart = colStart;
+			p.colorEnd = colEnd;
+			p.center = {0.0f, 0.0f, 0.05f};
+			IParticleEmitter* created = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
+			list.push_back(created);
+		}
+
+		// 余った分は非表示化
+		for (size_t i = needCount; i < list.size(); ++i) {
+			if (!list[i]) continue;
+			auto& preset = list[i]->GetPreset();
+			preset.autoEmit = false;
+			preset.center = {0.0f, 0.0f, -10000.0f};
+			list[i]->ClearAll();
+		}
+	};
+
+	EnsureEmitters(entranceEmitters_, entrancePos.size(), "EntranceRing", {0.4f, 0.9f, 1.0f, 0.75f}, {0.4f, 0.9f, 1.0f, 0.0f});
+	EnsureEmitters(exitEmitters_, exitPos.size(), "ExitRing", {1.0f, 0.4f, 0.9f, 0.75f}, {1.0f, 0.4f, 0.9f, 0.0f});
+
+	// 座標を反映
+	for (size_t i = 0; i < entrancePos.size() && i < entranceEmitters_.size(); ++i) {
+		if (!entranceEmitters_[i]) continue;
+		auto& preset = entranceEmitters_[i]->GetPreset();
+		preset.autoEmit = true;
+		preset.center = entrancePos[i] + TuboEngine::Math::Vector3{0.0f, 0.0f, 0.05f};
+	}
+	for (size_t i = 0; i < exitPos.size() && i < exitEmitters_.size(); ++i) {
+		if (!exitEmitters_[i]) continue;
+		auto& preset = exitEmitters_[i]->GetPreset();
+		preset.autoEmit = true;
+		preset.center = exitPos[i] + TuboEngine::Math::Vector3{0.0f, 0.0f, 0.05f};
+	}
 }
 
 // 全チャンクの敵が全滅しているか
