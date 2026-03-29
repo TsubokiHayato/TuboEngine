@@ -113,7 +113,12 @@ protected:
     IParticleEmitter* hitEmitter_ = nullptr;       // 既存: スパーク等
     IParticleEmitter* hitRingEmitter_ = nullptr;   // 追加: ヒット時の小リング
     IParticleEmitter* deathEmitter_ = nullptr;
+    IParticleEmitter* mistEmitter_ = nullptr;      // 霧散演出用ミスト
+    bool isDying_ = false;                         // 死亡演出中か
+    float deathTimer_ = 0.0f;                      // 死亡演出のタイマー
+    static constexpr float kDeathDuration = 0.6f;  // 演出の長さ
     bool deathEffectPlayed_ = false;
+
 	TuboEngine::Camera* camera_ = nullptr;
     MapChipField* mapChipField = nullptr;
     Player* player_ = nullptr;
@@ -141,12 +146,12 @@ protected:
     // レイサンプルデバッグ表示切替
     bool showRaySamples_ = false; // デフォルトOFF、ImGuiで切替
 
-    // --- Knockback（被弾時押し戻し）---
-    float knockbackTimer_ = 0.0f;
-	TuboEngine::Math::Vector3 knockbackVelocity_{0.0f, 0.0f, 0.0f};
-    float knockbackStrength_ = 5.0f; // タイル幅の約5.0倍/秒
-    float knockbackDamping_ = 0.85f;
-    void ApplyKnockback(float dt);
+    // --- Hit Shake ---
+    float hitShakeTimer_ = 0.0f;
+    float hitShakeDuration_ = 0.15f;
+    float hitShakeStrength_ = 0.3f;
+    TuboEngine::Math::Vector3 hitShakeOffset_{0.0f, 0.0f, 0.0f};
+    void ApplyHitShake(float dt);
 
 public:
     // アイコン制御API

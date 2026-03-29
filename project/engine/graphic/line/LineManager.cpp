@@ -52,6 +52,10 @@ void TuboEngine::LineManager::Update() {
 /// LineManager描画処理
 ///----------------------------------------------------
 void TuboEngine::LineManager::Draw() {
+   if (disableAll_) {
+		line_->ClearLines();
+		return;
+	}
 	// Line描画共通設定
 	lineCommon_->DrawSettingsCommon();
 	// Line描画
@@ -67,6 +71,8 @@ void TuboEngine::LineManager::DrawImGui() {
 
 #ifdef USE_IMGUI
 	ImGui::Begin("LineManager");
+  ImGui::Checkbox("Disable All", &disableAll_);
+	ImGui::Separator();
 	ImGui::Checkbox("Line", &isDrawLine_);
 	ImGui::Separator();
 	ImGui::Checkbox("Grid", &isDrawGrid_);
@@ -87,7 +93,7 @@ void TuboEngine::LineManager::ClearLines() { line_->ClearLines(); }
 /// ライン描画用頂点追加
 ///----------------------------------------------------
 void TuboEngine::LineManager::DrawLine(const TuboEngine::Math::Vector3& start, const TuboEngine::Math::Vector3& end, const TuboEngine::Math::Vector4& color) {
-	if (!isDrawLine_) {
+ if (disableAll_ || !isDrawLine_) {
 		return;
 	}
 	line_->DrawLine(start, end, color);
@@ -97,6 +103,9 @@ void TuboEngine::LineManager::DrawLine(const TuboEngine::Math::Vector3& start, c
 /// グリッド描画
 ///----------------------------------------------------
 void TuboEngine::LineManager::DrawGrid(float size, int split, const TuboEngine::Math::Vector3& rotation, const TuboEngine::Math::Vector4& color) {
+    if (disableAll_ || !isDrawGrid_) {
+		return;
+	}
 	// グリッドの中心座標
 	TuboEngine::Math::Vector3 center = {0.0f, 0.0f, 0.0f};
 
@@ -129,7 +138,7 @@ void TuboEngine::LineManager::DrawGrid(float size, int split, const TuboEngine::
 /// 球描画
 ///----------------------------------------------------
 void TuboEngine::LineManager::DrawSphere(const TuboEngine::Math::Vector3& center, float radius, const TuboEngine::Math::Vector4& color, int divisions) {
-	if (!isDrawSphere_ || divisions <= 0) {
+ if (disableAll_ || !isDrawSphere_ || divisions <= 0) {
 		return;
 	}
 	float angleStep = 2.0f * static_cast<float>(M_PI) / divisions;

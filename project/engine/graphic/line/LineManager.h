@@ -84,6 +84,12 @@ public:
 	/// <param name="divisions">球の分割数</param>
 	void DrawSphere(const TuboEngine::Math::Vector3& center, float radius, const TuboEngine::Math::Vector4& color, int divisions = 32);
 
+	/// <summary>
+	/// ライン系描画を完全に無効化（デバッグ用）
+	/// </summary>
+	void SetDisableAll(bool disable) { disableAll_ = disable; }
+	bool GetDisableAll() const { return disableAll_; }
+
 	///----------------------------------------------------
 	/// ゲッター・セッター
 	///----------------------------------------------------
@@ -99,6 +105,7 @@ private:
 	std::unique_ptr<TuboEngine::LineCommon> lineCommon_;
 	bool isDrawLine_ = true;
 	bool isDrawGrid_ = true;
+    bool disableAll_ = false;
 	float gridSize_ = 16.0f;
 	int gridDivisions_ = 2;
 	TuboEngine::Math::Vector4 gridColor_ = {0.0f, 0.0f, 0.0f, 1.0f};

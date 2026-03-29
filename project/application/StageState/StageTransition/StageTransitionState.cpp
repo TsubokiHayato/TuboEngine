@@ -38,6 +38,21 @@ void StageTransitionState::Enter(StageScene* scene) {
 	// 次のチャンクに進める
 	if (!stageMgr->AdvanceToNextChunk()) {
 		// 次のチャンクが無い → 全ステージクリア
+		// DEMOモード時は他Stateへ行かず、TITLEへ戻す
+		if (StageScene::isDemoMode) {
+			if (!scene->GetIsRequestSceneChange()) {
+				if (auto* anim = scene->GetSceneChangeAnimation()) {
+					scene->SetPendingNextScene(TITLE);
+					anim->SetPhase(SceneChangeAnimation::Phase::Appearing);
+					scene->SetIsRequestSceneChange(true);
+				} else {
+					StageScene::isDemoMode = false;
+					SceneManager::GetInstance()->ChangeScene(TITLE);
+				}
+			}
+			return;
+		}
+
 		if (auto* mgr = scene->GetStageStateManager()) {
 			mgr->ChangeState(StageType::StageClear, scene);
 		}
@@ -132,21 +147,6 @@ void StageTransitionState::Update(StageScene* scene) {
 		followCamera->Update();
 		TuboEngine::LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	}
-
-#ifdef USE_IMGUI
-	// --- デバッグ: 遷移の出発点(赤)と目的地(マゼンタ)を表示 ---
-	const float mh = 4.0f;
-	Vector3 startTop = { startPos_.x, startPos_.y, startPos_.z + mh };
-	Vector3 targetTop = { targetPos_.x, targetPos_.y, targetPos_.z + mh };
-	// 出発点（現在チャンクの Exit）: 赤
-	TuboEngine::LineManager::GetInstance()->DrawLine(startPos_, startTop, {1.0f, 0.3f, 0.3f, 1.0f});
-	TuboEngine::LineManager::GetInstance()->DrawSphere(startTop, 0.6f, {1.0f, 0.3f, 0.3f, 1.0f});
-	// 目的地（次のチャンクの Entrance）: マゼンタ
-	TuboEngine::LineManager::GetInstance()->DrawLine(targetPos_, targetTop, {1.0f, 0.3f, 1.0f, 1.0f});
-	TuboEngine::LineManager::GetInstance()->DrawSphere(targetTop, 0.6f, {1.0f, 0.3f, 1.0f, 1.0f});
-	// 出発→目的地のライン（白）
-	TuboEngine::LineManager::GetInstance()->DrawLine(startTop, targetTop, {1.0f, 1.0f, 1.0f, 0.8f});
-#endif // USE_IMGUI
 
 	if (t >= 1.0f) {
 		// 目的地（次のチャンクの Entrance）に到達：操作ロック解除して Playing に戻る
