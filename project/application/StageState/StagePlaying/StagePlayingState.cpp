@@ -91,8 +91,23 @@ void StagePlayingState::Update(StageScene* scene) {
 	}
 
 	if (allEnemiesInCurrentChunkDefeated && hasAnyEnemyInCurrentChunk) {
-		// DEMOモード時はタイトルへ戻る (既存ロジックを簡略)
+		// DEMOモード時はシーンチェンジ演出を挟んでタイトルへ戻る
 		if (StageScene::isDemoMode) {
+			// 既に遷移リクエスト中なら待つ
+			if (scene->GetIsRequestSceneChange()) {
+				return;
+			}
+			if (auto* anim = scene->GetSceneChangeAnimation()) {
+				// アニメがまだ動作中なら、完了(=次のSetPhase可能)まで待つ
+				if (!anim->IsFinished()) {
+					return;
+				}
+				scene->SetPendingNextScene(TITLE);
+				anim->SetPhase(SceneChangeAnimation::Phase::Appearing);
+				scene->SetIsRequestSceneChange(true);
+				return;
+			}
+			// フォールバック（アニメが無い場合のみ即遷移）
 			StageScene::isDemoMode = false;
 			SceneManager::GetInstance()->ChangeScene(TITLE);
 			return;
@@ -119,8 +134,26 @@ void StagePlayingState::Update(StageScene* scene) {
 
 	// 全チャンクの敵が全滅している場合は GameClear へ
 	if (allChunksCleared) {
+		if (StageScene::isDemoMode) {
+			if (scene->GetIsRequestSceneChange()) {
+				return;
+			}
+			if (auto* anim = scene->GetSceneChangeAnimation()) {
+				if (!anim->IsFinished()) {
+					return;
+				}
+				scene->SetPendingNextScene(TITLE);
+				anim->SetPhase(SceneChangeAnimation::Phase::Appearing);
+				scene->SetIsRequestSceneChange(true);
+				return;
+			}
+			StageScene::isDemoMode = false;
+			SceneManager::GetInstance()->ChangeScene(TITLE);
+			return;
+		}
+
 		if (auto* mgr = scene->GetStageStateManager()) {
-			mgr->ChangeState(StageType::GameClear, scene);
+			mgr->ChangeState(StageType::StageClear, scene);
 		}
 		return;
 	}
@@ -128,6 +161,18 @@ void StagePlayingState::Update(StageScene* scene) {
 	// ゲームオーバー判定（プレイヤー死亡）
 	if (player && !player->GetIsAlive()) {
 		if (StageScene::isDemoMode) {
+			if (scene->GetIsRequestSceneChange()) {
+				return;
+			}
+			if (auto* anim = scene->GetSceneChangeAnimation()) {
+				if (!anim->IsFinished()) {
+					return;
+				}
+				scene->SetPendingNextScene(TITLE);
+				anim->SetPhase(SceneChangeAnimation::Phase::Appearing);
+				scene->SetIsRequestSceneChange(true);
+				return;
+			}
 			StageScene::isDemoMode = false;
 			SceneManager::GetInstance()->ChangeScene(TITLE);
 			return;
@@ -140,42 +185,6 @@ void StagePlayingState::Update(StageScene* scene) {
 
 	if (pauseGuideSprite_) pauseGuideSprite_->Update();
 	if (scene->GetSkyDome()) scene->GetSkyDome()->Update();
-
-#ifdef USE_IMGUI
-	// --- デバッグ: 入口(青)・出口(黄)にマーカーを表示 ---
-	if (player) {
-		MapChipField* field = player->GetMapChipField();
-		if (field) {
-			auto entrances = field->GetChipPositions(MapChipType::kEntrance);
-			auto exits = field->GetChipPositions(MapChipType::kExit);
-			const float markerHeight = 3.0f;  // マーカーの高さ（縦線の長さ）
-			const float sphereR = 0.8f;
-
-			// 入口: 青い縦線 + 球
-			for (const auto& pos : entrances) {
-				TuboEngine::Math::Vector3 top = { pos.x, pos.y, pos.z + markerHeight };
-				TuboEngine::LineManager::GetInstance()->DrawLine(pos, top, {0.2f, 0.5f, 1.0f, 1.0f}); // 青
-				TuboEngine::LineManager::GetInstance()->DrawSphere(top, sphereR, {0.2f, 0.5f, 1.0f, 1.0f});
-			}
-
-			// 出口: 黄色い縦線 + 球
-			for (const auto& pos : exits) {
-				TuboEngine::Math::Vector3 top = { pos.x, pos.y, pos.z + markerHeight };
-				TuboEngine::LineManager::GetInstance()->DrawLine(pos, top, {1.0f, 0.9f, 0.2f, 1.0f}); // 黄
-				TuboEngine::LineManager::GetInstance()->DrawSphere(top, sphereR, {1.0f, 0.9f, 0.2f, 1.0f});
-			}
-
-			// 入口→出口への案内ライン（緑の点線風）
-			for (const auto& ent : entrances) {
-				for (const auto& ext : exits) {
-					TuboEngine::Math::Vector3 entTop = { ent.x, ent.y, ent.z + markerHeight };
-					TuboEngine::Math::Vector3 extTop = { ext.x, ext.y, ext.z + markerHeight };
-					TuboEngine::LineManager::GetInstance()->DrawLine(entTop, extTop, {0.2f, 1.0f, 0.3f, 0.6f}); // 緑
-				}
-			}
-		}
-	}
-#endif // USE_IMGUI
 }
 
 void StagePlayingState::Exit(StageScene* scene) {
@@ -195,28 +204,7 @@ void StagePlayingState::Object3DDraw(StageScene* scene) {
 	Player* player = scene->GetPlayer();
 	player->Draw();
 
-	// --- 入口・出口の目印を球体のみで描画 ---
-	if (player) {
-		MapChipField* field = player->GetMapChipField();
-		if (field) {
-			auto entrances = field->GetChipPositions(MapChipType::kEntrance);
-			auto exits = field->GetChipPositions(MapChipType::kExit);
-			const float markerHeight = 3.0f;  // 球体の高さ（地面から浮かせる）
-			const float sphereR = 0.8f;
 
-			// 入口: 青い球
-			for (const auto& pos : entrances) {
-				TuboEngine::Math::Vector3 top = { pos.x, pos.y, pos.z + markerHeight };
-				TuboEngine::LineManager::GetInstance()->DrawSphere(top, sphereR, {0.2f, 0.5f, 1.0f, 1.0f});
-			}
-
-			// 出口: 黄色い球
-			for (const auto& pos : exits) {
-				TuboEngine::Math::Vector3 top = { pos.x, pos.y, pos.z + markerHeight };
-				TuboEngine::LineManager::GetInstance()->DrawSphere(top, sphereR, {1.0f, 0.9f, 0.2f, 1.0f});
-			}
-		}
-	}
 }
 
 void StagePlayingState::SpriteDraw(StageScene* scene) {

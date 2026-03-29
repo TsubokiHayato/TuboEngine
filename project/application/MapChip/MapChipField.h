@@ -16,9 +16,11 @@ enum class MapChipType {
 	EnemyRush,   // 追加: 突進敵
 	EnemyShoot,  // 追加: 射撃敵
 	EnemyMortar, // 追加: 迫撃砲敵
+	EnemyCircus, // 追加: 板野サーカス
 	// --- ステージ遷移用マーカー ---
 	kEntrance,   // 追加: ステージ入口
 	kExit,       // 追加: ステージ出口（イージング遷移の目的地）
+
 };
 
 ///--------------------------------------------------

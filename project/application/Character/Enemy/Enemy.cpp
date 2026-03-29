@@ -74,9 +74,9 @@ void Enemy::Initialize() {
 	idleBackStartAngle = rotation.z;
 	idleBackTargetAngle = rotation.z;
 
-	// ノックバック初期化
-	knockbackTimer_ = 0.0f;
-	knockbackVelocity_ = {0.0f, 0.0f, 0.0f};
+	// ヒットシェイク初期化
+	hitShakeTimer_ = 0.0f;
+	hitShakeOffset_ = {0.0f, 0.0f, 0.0f};
 
 	// --- 追加: 演出用エミッタ生成 ---
 	// ヒット時: 小さなスパーク（既存）
@@ -130,7 +130,27 @@ void Enemy::Initialize() {
 		p.center = position;
 		deathEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
 	}
+	// 霧散演出用ミスト
+	if (!mistEmitter_) {
+		ParticlePreset p{};
+		p.name = "EnemyMist";
+		p.texture = "particle.png";
+		p.maxInstances = 256;
+		p.autoEmit = false;
+		p.burstCount = 12;
+		p.lifeMin = 0.4f;
+		p.lifeMax = 0.7f;
+		p.scaleStart = {0.15f, 0.15f, 0.15f};
+		p.scaleEnd = {0.5f, 0.5f, 0.5f};
+		p.colorStart = {0.7f, 0.7f, 0.7f, 0.6f};
+		p.colorEnd = {0.3f, 0.3f, 0.3f, 0.0f};
+		p.velMin = {-1.2f, -1.2f, -1.2f};
+		p.velMax = {1.2f, 1.2f, 1.2f};
+		p.center = position;
+		mistEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
+	}
 }
+
 
 static float NormalizeAngle(float angle) {
 	while (angle > kPI)
@@ -355,22 +375,43 @@ bool Enemy::BuildPathTo(const TuboEngine::Math::Vector3& worldGoal) {
 }
 
 void Enemy::Update() {
-	// 死亡演出再生後は描画のみ (Update 最低限)
+	// 死亡後 (完全に消えた後) は何もしない
 	if (!isAlive) {
-		if (!deathEffectPlayed_) {
-			EmitDeathParticle();
-			deathEffectPlayed_ = true;
-		}
-		if (deathEmitter_) {
-			deathEmitter_->GetPreset().center = position;
-		}
 		return;
 	}
 
 	const float dt = 1.0f / 60.0f;
 
-	// --- ノックバック適用（先に移動へ反映）---
-	ApplyKnockback(dt);
+	// --- 霧散演出中の処理 ---
+	if (isDying_) {
+		deathTimer_ -= dt;
+		if (mistEmitter_) {
+			mistEmitter_->GetPreset().center = position;
+			mistEmitter_->Emit(4); // 継続的にミストを出す
+		}
+		// 縮小 (スケールはインスタンスごとなので安全)
+		float t = std::clamp(deathTimer_ / kDeathDuration, 0.0f, 1.0f);
+		object3d->SetScale(scale * t);
+		object3d->Update();
+
+		if (deathTimer_ <= 0.0f) {
+			isAlive = false;
+		}
+		return;
+	}
+
+
+	// 死亡判定開始
+	if (HP <= 0) {
+		isDying_ = true;
+		deathTimer_ = kDeathDuration;
+		EmitDeathParticle(); // 既存のリングエフェクトも一度出す
+		return;
+	}
+
+
+	// --- ヒットシェイク適用 ---
+	ApplyHitShake(dt);
 
 	float distanceToPlayer = 0.0f;
 	TuboEngine::Math::Vector3 toPlayer = {0, 0, 0};
@@ -581,7 +622,8 @@ void Enemy::Update() {
 	if (bullet && bullet->GetIsAlive())
 		bullet->Update();
 
-	object3d->SetPosition(position);
+	object3d->SetPosition(position + hitShakeOffset_);
+
 	// 描画側へモデル軸の補正を適用（ロジック上のRotationは"前方"のまま）
 	TuboEngine::Math::Vector3 drawRot = rotation;
 	drawRot.x = NormalizeAngle(drawRot.x + kEnemyModelRotOffsetX);
@@ -620,19 +662,21 @@ void Enemy::Update() {
 	}
 }
 
-void Enemy::ApplyKnockback(float dt) {
-	if (knockbackTimer_ > 0.0f) {
-		TuboEngine::Math::Vector3 kbStep = {knockbackVelocity_.x * dt, knockbackVelocity_.y * dt, 0.0f};
-		MoveWithCollision(position, kbStep, mapChipField);
-		knockbackVelocity_.x *= knockbackDamping_;
-		knockbackVelocity_.y *= knockbackDamping_;
-		knockbackTimer_ -= dt;
-		if (knockbackTimer_ <= 0.0f) {
-			knockbackTimer_ = 0.0f;
-			knockbackVelocity_ = {0.0f, 0.0f, 0.0f};
+void Enemy::ApplyHitShake(float dt) {
+	if (hitShakeTimer_ > 0.0f) {
+		hitShakeTimer_ -= dt;
+		if (hitShakeTimer_ <= 0.0f) {
+			hitShakeTimer_ = 0.0f;
+			hitShakeOffset_ = {0.0f, 0.0f, 0.0f};
+		} else {
+			// ランダムなオフセットを生成 (簡易版)
+			float rx = (float(std::rand()) / RAND_MAX * 2.0f - 1.0f) * hitShakeStrength_;
+			float ry = (float(std::rand()) / RAND_MAX * 2.0f - 1.0f) * hitShakeStrength_;
+			hitShakeOffset_ = {rx, ry, 0.0f};
 		}
 	}
 }
+
 
 void Enemy::EmitHitParticle() {
 	// 既存のヒットスパーク
@@ -668,32 +712,16 @@ void Enemy::OnCollision(Collider* other) {
 		exclamationTimer_ = iconDuration_;
 	}
 
-	// ノックバック（弾位置基準）
-	TuboEngine::Math::Vector3 hitPos;
-	if (auto* bullet = dynamic_cast<PlayerBullet*>(other))
-		hitPos = bullet->GetCenterPosition();
-	else if (player_)
-		hitPos = player_->GetPosition();
-	else
-		hitPos = position;
-	TuboEngine::Math::Vector3 away = position - hitPos;
-	away.z = 0.0f;
-	float len = std::sqrt(away.x * away.x + away.y * away.y);
-	if (len > 0.001f) {
-		away.x /= len;
-		away.y /= len;
-	}
-	const float tile = MapChipField::GetBlockSize();
-	float speed = tile * knockbackStrength_;
-	knockbackVelocity_.x = away.x * speed;
-	knockbackVelocity_.y = away.y * speed;
-	knockbackTimer_ = 0.12f;
+	// ヒットシェイク開始
+	hitShakeTimer_ = hitShakeDuration_;
 
-	if (HP <= 0 && isAlive) {
-		isAlive = false;
+
+	if (HP <= 0 && isAlive && !isDying_) {
+		isDying_ = true;
+		deathTimer_ = kDeathDuration;
 		EmitDeathParticle();
-		deathEffectPlayed_ = true;
 	}
+
 	if (state_ == State::Idle || state_ == State::Alert) {
 		if (player_) {
 			lastSeenPlayerPos = player_->GetPosition();
@@ -733,11 +761,7 @@ void Enemy::DrawImGui() {
 		auto& p = deathEmitter_->GetPreset();
 		ImGui::Text("DeathEmitter life:[%.2f,%.2f]", p.lifeMin, p.lifeMax);
 	}
-	ImGui::Separator();
-	ImGui::Text("KnockbackTimer: %.2f", knockbackTimer_);
-	ImGui::DragFloat("KnockbackStrength", &knockbackStrength_, 0.01f, 0.1f, 10.0f);
-	ImGui::DragFloat("KnockbackDamping", &knockbackDamping_, 0.01f, 0.5f, 0.99f);
-	ImGui::Separator();
+
 	// Enemy::DrawImGui 内
 	float atkRange = GetAttackRange();
 	if (ImGui::DragFloat("Attack Range", &atkRange, 0.1f, 0.0f, 50.0f)) {
@@ -806,7 +830,9 @@ bool Enemy::CanSeePlayer() {
 }
 
 void Enemy::DrawViewCone() {
+	if (isDying_ || !isAlive) return;
 #if defined(_DEBUG)
+
 	float halfRad = (kViewAngleDeg / 2.0f) * kPI / 180.0f;
 	float baseAngle = rotation.z;
 	TuboEngine::Math::Vector3 center = position;
@@ -891,8 +917,9 @@ TuboEngine::Math::Vector3 Enemy::GetCenterPosition() const {
 
 void Enemy::DrawStateIcon() {
 	// 状態に応じた簡易アイコンラインを頭上に描画
-	if (!isAlive)
+	if (!isAlive || isDying_)
 		return;
+
 	TuboEngine::Math::Vector3 base = position;
 	base.z += 0.0f; // 2D平面なのでそのまま
 	TuboEngine::Math::Vector3 upPos = base + TuboEngine::Math::Vector3{0, 0, 0};
