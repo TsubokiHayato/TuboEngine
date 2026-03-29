@@ -85,7 +85,10 @@ public:
 	void SetEnemyPosition(const TuboEngine::Math::Vector3& position) { enemyPosition_ = position; }
 	// 敵の回転を設定
 	void SetEnemyRotation(const TuboEngine::Math::Vector3& rotation) { enemyRotation_ = rotation; }
-	
+	//敵の生存状態を設定
+	void SetIsAlive(bool isAlive) { this->isAlive = isAlive; }
+
+
 private:
 	///--------------------------------------------------
 	///				メンバ変数

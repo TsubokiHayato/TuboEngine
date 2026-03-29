@@ -34,7 +34,7 @@ void MortarEnemy::Initialize() {
 
     // 砲台シルエットモデル初期化（頭の上に載せる）
     artilleryObject_ = std::make_unique<TuboEngine::Object3d>();
-    artilleryObject_->Initialize("artillery battery/artillery battery.obj");
+    artilleryObject_->Initialize("artilleryBattery/artillery battery.obj");
     if (camera_) {
         artilleryObject_->SetCamera(camera_);
     }

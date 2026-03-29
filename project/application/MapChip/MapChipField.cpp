@@ -28,6 +28,7 @@ std::map<std::string, MapChipType> mapChipTable = {
     {"4", MapChipType::EnemyRush },
     {"5", MapChipType::EnemyShoot },
     {"8",MapChipType::EnemyMortar},
+    {"9",MapChipType::EnemyCircus},
     {"6", MapChipType::kEntrance },
     {"7", MapChipType::kExit },
 };
@@ -267,6 +268,8 @@ void MapChipField::DrawImGui(const char* windowName) {
                     case MapChipType::Enemy:      label = "E";  color = ImVec4(0.8f, 0.2f, 0.2f, 1.0f); break;
                     case MapChipType::EnemyRush:  label = "ER"; color = ImVec4(1.0f, 0.4f, 0.2f, 1.0f); break;
                     case MapChipType::EnemyShoot: label = "ES"; color = ImVec4(0.9f, 0.6f, 0.2f, 1.0f); break;
+					case MapChipType::EnemyMortar: label = "EM"; color = ImVec4(0.8f, 0.4f, 1.0f, 1.0f); break;
+					case MapChipType::EnemyCircus: label = "EX"; color = ImVec4(1.0f, 0.0f, 1.0f, 1.0f); break;
 					case MapChipType::kEntrance:  label = "IN"; color = ImVec4(0.2f, 0.6f, 1.0f, 1.0f); break;
 					case MapChipType::kExit:      label = "OUT"; color = ImVec4(1.0f, 0.9f, 0.2f, 1.0f); break;
                     default:                      label = "?";  color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); break;
@@ -283,8 +286,9 @@ void MapChipField::DrawImGui(const char* windowName) {
                         case MapChipType::Enemy:      nextType = MapChipType::EnemyRush;   break;
                         case MapChipType::EnemyRush:  nextType = MapChipType::EnemyShoot;  break;
                         case MapChipType::EnemyShoot: nextType = MapChipType::kEntrance;   break;
-					case MapChipType::kEntrance:  nextType = MapChipType::kExit;       break;
-					case MapChipType::kExit:      nextType = MapChipType::kBlank;      break;
+					case MapChipType::kEntrance:  nextType = MapChipType::EnemyCircus; break;
+					case MapChipType::EnemyCircus: nextType = MapChipType::kExit;     break;
+					case MapChipType::kExit:      nextType = MapChipType::kBlank;    break;
                         default:                      nextType = MapChipType::kBlank;      break;
                     }
                     SetMapChipTypeByIndex(xIndex, yIndex, nextType);
