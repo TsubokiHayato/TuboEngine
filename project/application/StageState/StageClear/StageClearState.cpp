@@ -72,7 +72,12 @@ void StageClearState::Update(StageScene* scene) {
 
 	// シーンチェンジアニメーション進行完了後、実際の遷移
 	if (scene->GetIsRequestSceneChange() && scene->GetSceneChangeAnimation()->IsFinished()) {
-		SceneManager::GetInstance()->ChangeScene(SCENE::CLEAR);
+		if (StageScene::isDemoMode) {
+			StageScene::isDemoMode = false;
+			SceneManager::GetInstance()->ChangeScene(TITLE);
+		} else {
+			SceneManager::GetInstance()->ChangeScene(SCENE::CLEAR);
+		}
 		scene->SetIsRequestSceneChange(false);
 	}
 

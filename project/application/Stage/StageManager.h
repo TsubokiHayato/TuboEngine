@@ -6,6 +6,8 @@
 #include "Vector3.h"
 #include "Collider/CollisionManager.h"
 
+class IParticleEmitter;
+
 class Player;
 class Enemy;
 class Block;
@@ -96,6 +98,9 @@ private:
                               Player* player,
                               FollowTopDownCamera* followCamera);
 
+	// Entrance/Exit 表示用のパーティクルを更新
+	void UpdateEntranceExitEffects();
+
 private:
     std::vector<StageInstance> stageInstances_;
 
@@ -113,4 +118,9 @@ private:
 
     // StageScene から借りるだけのプレイヤー参照（所有しない）
     Player* player_ = nullptr;
+
+	// Entrance / Exit 演出
+	std::vector<IParticleEmitter*> entranceEmitters_;
+	std::vector<IParticleEmitter*> exitEmitters_;
+	int effectChunkIndex_ = -1;
 };

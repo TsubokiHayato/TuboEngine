@@ -259,6 +259,20 @@ void Player::UpdateVisualOnly() {
 	object3d->SetRotation(rotation);
 	object3d->SetScale(scale);
 	object3d->Update();
+
+	// Transition 等で Update() を回さない場合でも、移動に追従した演出を出す
+	if (trailEmitter_) {
+		trailEmitter_->GetPreset().center = position;
+	}
+	if (dashRingEmitter_) {
+		TuboEngine::Math::Vector3 center = GetPosition();
+		if (camera_) {
+			TuboEngine::Math::Vector3 camRot = camera_->GetRotation();
+			TuboEngine::Math::Vector3 forward{std::cos(camRot.z), std::sin(camRot.z), 0.0f};
+			center = center + forward * dashRingOffsetForward_;
+		}
+		dashRingEmitter_->GetPreset().center = center;
+	}
 }
 
 //--------------------------------------------------
@@ -416,9 +430,12 @@ void Player::Rotate() {
 	rotation.z = 3.12f+angle;
 }
 
-
-void Player::ReticleDraw() { reticleSprite->Draw(); }
-
+void Player::ReticleDraw() {
+	if (reticleSprite) {
+		reticleSprite->Draw();
+	}
+}
+ 
 //--------------------------------------------------
 // 当たり判定の中心座標を取得
 //--------------------------------------------------
