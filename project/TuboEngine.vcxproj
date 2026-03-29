@@ -113,7 +113,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="application\Bullet\Enemy\EnemyMissileBullet.cpp" />
+    <ClCompile Include="application\Bullet\Enemy\CircusBullet.cpp" />
     <ClCompile Include="application\Character\Enemy\MortarEnemy.cpp" />
+    <ClCompile Include="application\Character\Enemy\CircusEnemy.cpp" />
     <ClCompile Include="application\Character\Enemy\RushEnemy.cpp" />
     <ClCompile Include="application\Character\Player\PlayerAutoController.cpp" />
     <ClCompile Include="application\StageState\Boss\BossState.cpp" />
@@ -255,7 +257,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\Bullet\Enemy\EnemyMissileBullet.h" />
+    <ClInclude Include="application\Bullet\Enemy\CircusBullet.h" />
     <ClInclude Include="application\Character\Enemy\MortarEnemy.h" />
+    <ClInclude Include="application\Character\Enemy\CircusEnemy.h" />
     <ClInclude Include="application\Character\Enemy\RushEnemy.h" />
     <ClInclude Include="application\Character\Player\Player.h" />
     <ClInclude Include="application\Bullet\Player\PlayerBullet.h" />

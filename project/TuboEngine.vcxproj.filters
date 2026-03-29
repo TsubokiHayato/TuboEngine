@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Object3d.PS.hlsl">
@@ -372,7 +372,9 @@
     <ClCompile Include="application\Stage\StageManager.cpp" />
     <ClCompile Include="application\StageState\StageTransition\StageTransitionState.cpp" />
     <ClCompile Include="application\Bullet\Enemy\EnemyMissileBullet.cpp" />
+    <ClCompile Include="application\Bullet\Enemy\CircusBullet.cpp" />
     <ClCompile Include="application\Character\Enemy\MortarEnemy.cpp" />
+    <ClCompile Include="application\Character\Enemy\CircusEnemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -414,6 +416,9 @@
     <ClInclude Include="application\Bullet\Enemy\EnemyNormalBullet.h">
       <Filter>projects\application\Bullet\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="application\Bullet\Enemy\CircusBullet.h">
+      <Filter>projects\application\Bullet\Enemy</Filter>
+    </ClInclude>
     <ClInclude Include="application\Character\BaseCharacter.h">
       <Filter>projects\application\Character</Filter>
     </ClInclude>
@@ -421,6 +426,9 @@
       <Filter>projects\application\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="application\Character\Enemy\RushEnemy.h">
+      <Filter>projects\application\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Character\Enemy\CircusEnemy.h">
       <Filter>projects\application\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="application\Character\Player\Player.h">
