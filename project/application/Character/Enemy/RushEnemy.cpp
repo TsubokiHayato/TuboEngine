@@ -21,42 +21,6 @@ constexpr float kRushEnemyModelRotOffsetY = 0.0f;
 constexpr float kRushEnemyModelRotOffsetZ = -DirectX::XM_PI * 0.5f;
 } // namespace
 
-// 角度正規化 [-PI, PI]
-float RushEnemy::NormalizeAngle(float angle) {
-	while (angle > DirectX::XM_PI)
-		angle -= 2.0f * DirectX::XM_PI;
-	while (angle < -DirectX::XM_PI)
-		angle += 2.0f * DirectX::XM_PI;
-	return angle;
-}
-
-// 単純な矩形衝突付き移動 (X/Y 分離 + サブステップ)
-static void MoveWithCollisionImpl(TuboEngine::Math::Vector3& position, const TuboEngine::Math::Vector3& desiredMove, MapChipField* field) {
-	if (!field) {
-		position = position + desiredMove;
-		return;
-	}
-	const float tile = MapChipField::GetBlockSize();
-	const float width = tile * 0.8f;
-	const float height = tile * 0.8f;
-	float moveLen2D = std::sqrt(desiredMove.x * desiredMove.x + desiredMove.y * desiredMove.y);
-	int subSteps = std::max(1, int(std::ceil(moveLen2D / (tile * 0.5f))));
-
-	// LineManager::GetInstance()->DrawLine(position, position + desiredMove, {1,0,0,1});
-	TuboEngine::Math::Vector3 step = desiredMove / float(subSteps);
-	for (int i = 0; i < subSteps; ++i) {
-		TuboEngine::Math::Vector3 nextX = position;
-		nextX.x += step.x;
-		if (!field->IsRectBlocked(nextX, width, height))
-			position = nextX;
-		TuboEngine::Math::Vector3 nextY = position;
-		nextY.y += step.y;
-		if (!field->IsRectBlocked(nextY, width, height))
-			position = nextY;
-	}
-}
-void RushEnemy::MoveWithCollision(TuboEngine::Math::Vector3& positionRef, const TuboEngine::Math::Vector3& desiredMove, MapChipField* field) { MoveWithCollisionImpl(positionRef, desiredMove, field); }
-
 void RushEnemy::Initialize() {
 	Enemy::Initialize();
 	shootDistance_ = 0.0f;

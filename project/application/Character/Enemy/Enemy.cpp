@@ -63,7 +63,8 @@ void Enemy::Initialize() {
 	exclamationIcon_->SetGetIsAdjustTextureSize(false);
 	exclamationIcon_->SetAnchorPoint({0.5f, 0.5f});
 
-	HP = 10; // 調整: 少し耐える
+   maxHP_ = 10;
+	HP = maxHP_; // 調整: 少し耐える
 
 	// 射撃エネミーの攻撃範囲(停止して撃つ距離)は従来値を初期値として保持
 	attackRange_ = shootDistance_;
@@ -152,7 +153,7 @@ void Enemy::Initialize() {
 }
 
 
-static float NormalizeAngle(float angle) {
+float Enemy::NormalizeAngle(float angle) {
 	while (angle > kPI)
 		angle -= 2.0f * kPI;
 	while (angle < -kPI)
@@ -160,7 +161,7 @@ static float NormalizeAngle(float angle) {
 	return angle;
 }
 
-static void MoveWithCollision(TuboEngine::Math::Vector3& position, const TuboEngine::Math::Vector3& desiredMove, MapChipField* field) {
+void Enemy::MoveWithCollision(TuboEngine::Math::Vector3& position, const TuboEngine::Math::Vector3& desiredMove, MapChipField* field) {
 	if (!field) {
 		position = position + desiredMove;
 		return;

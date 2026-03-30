@@ -98,8 +98,8 @@ private:
     TuboEngine::Math::Vector3 rushDir_{1.0f, 0.0f, 0.0f}; // 突進の固定進行方向
 
     // --- Helpers ---
-    static float NormalizeAngle(float angle);
-    static void MoveWithCollision(TuboEngine::Math::Vector3& positionRef, const TuboEngine::Math::Vector3& desiredMove, MapChipField* field);
+   using Enemy::NormalizeAngle;
+    using Enemy::MoveWithCollision;
     void UpdateDrillTransform();
 
     // Update helpers (readability)

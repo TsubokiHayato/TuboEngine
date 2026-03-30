@@ -8,6 +8,7 @@
 #include "engine/graphic/Particle/ParticleManager.h"
 #include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 #include "engine/graphic/PostEffect/OffScreenRendering.h"
+#include "engine/base/Common/DirectXCommon.h"
 
 //--------------------------------------------------
 // コンストラクタ
@@ -234,7 +235,11 @@ void Player::Update() {
 
 	// Dashポストエフェクトの時間経過で自動復帰
 	if (dashPostEffectTimer_ > 0.0f) {
-		dashPostEffectTimer_ -= 1.0f / 60.0f;
+       float dt = 1.0f / 60.0f;
+		if (auto* dx = TuboEngine::DirectXCommon::GetInstance()) {
+			dt = dx->GetDeltaTime();
+		}
+		dashPostEffectTimer_ -= dt;
 		// 0→1 の進行度（開始直後=1、終了直前=0）
 		float t = dashPostEffectTimer_ / std::max(0.0001f, dashPostEffectDuration_);
 		t = std::clamp(t, 0.0f, 1.0f);

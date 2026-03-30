@@ -74,6 +74,10 @@ public:
 	// 描画後処理 End
 	void PostDraw();
 
+	// delta time (seconds)
+	float GetDeltaTime() const { return deltaTimeSec_; }
+	void ResetDeltaTime();
+
 	// コマンドリストのリセット
 	void CommandExecution();
 
@@ -257,6 +261,10 @@ private:
 
 	// 記録時間(FPS固定用)
 	std::chrono::steady_clock::time_point reference_;
+
+	// --- timing (delta time) ---
+	std::chrono::steady_clock::time_point lastFrameTime_{};
+	float deltaTimeSec_ = 1.0f / 60.0f;
 
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> backBuffers; // Add this line to define backBuffers
 };
