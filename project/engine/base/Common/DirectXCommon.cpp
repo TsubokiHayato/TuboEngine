@@ -349,6 +349,18 @@ void DirectXCommon::dxcCompiler_Create() {
 
 // 描画前処理
 void DirectXCommon::PreDraw() {
+    // --- delta time update ---
+	{
+		const auto now = std::chrono::steady_clock::now();
+		if (lastFrameTime_.time_since_epoch().count() == 0) {
+			lastFrameTime_ = now;
+			deltaTimeSec_ = 1.0f / 60.0f;
+		} else {
+			deltaTimeSec_ = static_cast<float>(std::chrono::duration<double>(now - lastFrameTime_).count());
+			lastFrameTime_ = now;
+		}
+	}
+
 	/*バックバッファの番号取得*/
 
 	// これから書き込むバックバッファのインデックスを取得
@@ -388,6 +400,11 @@ void DirectXCommon::PreDraw() {
 
 	/* シザー矩形の設定*/
 	commandList->RSSetScissorRects(1, &scissorRect); // Scissorを設定
+}
+
+void DirectXCommon::ResetDeltaTime() {
+	lastFrameTime_ = std::chrono::steady_clock::now();
+	deltaTimeSec_ = 1.0f / 60.0f;
 }
 
 // 描画後処理

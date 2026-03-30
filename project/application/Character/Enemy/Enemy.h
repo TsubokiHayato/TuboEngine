@@ -3,9 +3,11 @@
 #include "Character/BaseCharacter.h"
 #include "Bullet/Enemy/EnemyNormalBullet.h"
 #include "MapChip/MapChipField.h"
-#include "Particle.h"
-#include "ParticleEmitter.h"
 #include"Sprite.h"
+
+#undef max
+#undef min
+
 // 演出用: 前方宣言のみで十分
 class IParticleEmitter;
 
@@ -42,7 +44,16 @@ public:
     void SetPlayer(Player* player) { player_ = player; }
     void SetMapChipField(MapChipField* field) { mapChipField = field; }
     int GetHP() const { return HP; }
-    int GetMaxHP() const { return 10; }
+    int GetMaxHP() const { return maxHP_; }
+    void SetMaxHP(int hp) { maxHP_ = std::max(0, hp); HP = std::min(HP, maxHP_); }
+    void SetHP(int hp) { HP = std::clamp(hp, 0, maxHP_); }
+
+protected:
+    // Common utilities for derived enemies
+    static float NormalizeAngle(float angle);
+    static void MoveWithCollision(TuboEngine::Math::Vector3& position,
+                                 const TuboEngine::Math::Vector3& desiredMove,
+                                 MapChipField* field);
 
     // 視野角・距離の取得/設定
     float GetViewAngleDeg() const { return kViewAngleDeg; }
@@ -69,6 +80,7 @@ protected:
     // 0 なら常に Chase しつつ射撃（遠距離射撃）。
     float attackRange_ = 25.0f;
     int HP = 100;
+    int maxHP_ = 100;
     bool isAlive = true;
     bool isHit = false;
     bool wasHit = false;

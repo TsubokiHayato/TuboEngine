@@ -3,9 +3,15 @@
 #include "Collider/CollisionTypeId.h"
 #include <cmath>
 #include <algorithm>
+#include "engine/base/Common/DirectXCommon.h"
 
 namespace {
-    constexpr float kFixedDeltaTime = 1.0f / 60.0f;
+    inline float GetDeltaTimeSec() {
+        if (auto* dx = TuboEngine::DirectXCommon::GetInstance()) {
+            return dx->GetDeltaTime();
+        }
+        return 1.0f / 60.0f;
+    }
 }
 
 void CircusBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
@@ -44,7 +50,8 @@ void CircusBullet::SetCamera(TuboEngine::Camera* camera) {
 void CircusBullet::Update() {
     if (!isAlive) return;
 
-    elapsedTime_ += kFixedDeltaTime;
+    const float dt = GetDeltaTimeSec();
+    elapsedTime_ += dt;
 
     // 即座に追尾フェーズ（以前のフェーズ1と溜めを削除）
     if (player_) {
@@ -61,9 +68,10 @@ void CircusBullet::Update() {
         TuboEngine::Math::Vector3 finalDir = currentDir + (targetDir * homingStrength);
         finalDir.Normalize();
         
-        velocity = finalDir * speed_ * 60.0f; 
+        // speed_ is treated as units per second
+        velocity = finalDir * speed_;
     }
-    position += velocity * kFixedDeltaTime;
+    position += velocity * dt;
 
     // プレイヤー直撃判定
     if (player_) {
