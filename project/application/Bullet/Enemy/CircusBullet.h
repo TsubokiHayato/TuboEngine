@@ -24,7 +24,7 @@ private:
     Player* player_ = nullptr;
     TuboEngine::Camera* camera_ = nullptr;
     
-    float speed_ = 0.6f;
+    float speed_ = 1.0f;
     float turnSpeed_ = 0.08f;
     float chaosAmplitude_ = 0.4f;
     float chaosFrequency_ = 5.0f;

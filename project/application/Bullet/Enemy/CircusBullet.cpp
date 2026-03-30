@@ -46,8 +46,6 @@ void CircusBullet::Update() {
 
     elapsedTime_ += kFixedDeltaTime;
 
-    elapsedTime_ += kFixedDeltaTime;
-
     // 即座に追尾フェーズ（以前のフェーズ1と溜めを削除）
     if (player_) {
         TuboEngine::Math::Vector3 targetPos = player_->GetCenterPosition() + targetOffset_;
