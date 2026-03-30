@@ -117,9 +117,15 @@ void StageScene::Initialize() {
 	// StageManager の生成と基本設定のみ行う（実ロードは ReadyState でカメラ初期化後に行う）
 	stageManager_ = std::make_unique<StageManager>();
 	stageManager_->Configure(10, 10, 15.0f);
+
+
+
 	// ★ ここでチャンクIDごとのCSVを登録
 	stageManager_->RegisterChunkCsv(1, "Resources/Stage/Stage1.csv");
 	stageManager_->RegisterChunkCsv(2, "Resources/Stage/Stage2.csv");
+	stageManager_->RegisterChunkCsv(3, "Resources/Stage/Stage3.csv");
+
+
 
 	// 衝突マネージャの生成
 	collisionManager_->Initialize();
