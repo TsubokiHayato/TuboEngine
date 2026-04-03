@@ -309,9 +309,20 @@ void StageManager::UpdateEntranceExitEffects() {
 		return;
 	}
 
-	// Entrance / Exit の座標取得
-	const auto entrancePos = field->GetChipPositions(MapChipType::kEntrance);
-	const auto exitPos = field->GetChipPositions(MapChipType::kExit);
+    // Entrance / Exit の座標取得
+    auto entrancePos = field->GetChipPositions(MapChipType::kEntrance);
+    const auto exitPos = field->GetChipPositions(MapChipType::kExit);
+
+    // Entrance が無いチャンクでも演出が消えないようフォールバック
+    if (entrancePos.empty()) {
+        if (inst.playerMapX >= 0 && inst.playerMapY >= 0) {
+            entrancePos.push_back(field->GetMapChipPositionByIndex(
+                static_cast<uint32_t>(inst.playerMapX),
+                static_cast<uint32_t>(inst.playerMapY)));
+        } else {
+            entrancePos.push_back(inst.origin);
+        }
+    }
 
 	auto EnsureEmitters = [&](std::vector<IParticleEmitter*>& list, size_t needCount, const char* baseName,
 		const TuboEngine::Math::Vector4& colStart, const TuboEngine::Math::Vector4& colEnd) {

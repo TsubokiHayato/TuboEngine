@@ -178,6 +178,11 @@ void RushEnemy::UpdatePerceptionAndTimers(float dt, bool& canSeePlayer, float& d
 		if (distanceToPlayer > exitThresh)
 			requireExitBeforeNextRush_ = false;
 	}
+	if (requireExitBeforeNextRush_ && rushCooldownTimer_ <= 0.0f && player_) {
+		if (distanceToPlayer <= rushTriggerDistance_) {
+			requireExitBeforeNextRush_ = false;
+		}
+	}
 
 	// scanning sway (無効化したいなら早期Returnにしても良い)
 	if (isScanning_) {
