@@ -20,7 +20,7 @@ void TuboEngine::Line::Initialize(TuboEngine::LineCommon* lineCommon) {
     CreateTransformationMatrixBuffer();
 
     // Debug時のpush_back再確保による高負荷を防ぐため事前予約
-    vertices_.reserve(100000);
+    vertices_.reserve(1000000);
 
     // Transformの初期化
     transform_ = {
@@ -62,6 +62,9 @@ void TuboEngine::Line::Update() {
 /// ライン描画用頂点追加
 ///----------------------------------------------------
 void TuboEngine::Line::DrawLine(const TuboEngine::Math::Vector3& start, const TuboEngine::Math::Vector3& end, const TuboEngine::Math::Vector4& color) {
+    if (vertices_.size() + 2 > 1000000) {
+        return;
+    }
     vertices_.push_back({start, color});
     vertices_.push_back({end, color});
 }
@@ -100,8 +103,8 @@ void TuboEngine::Line::ClearLines() {
 void TuboEngine::Line::CreateVertexBuffer() {
     // デバイスの取得
 	auto device = TuboEngine::DirectXCommon::GetInstance()->GetDevice();
-    // バッファサイズ（最大100000頂点分）
-    auto bufferSize = sizeof(LineVertex) * 100000;
+    // バッファサイズ（最大1000000頂点分）
+    auto bufferSize = sizeof(LineVertex) * 1000000;
     // ヒーププロパティ設定（UPLOAD）
     D3D12_HEAP_PROPERTIES heapProps = {};
     heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;

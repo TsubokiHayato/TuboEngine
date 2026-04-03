@@ -31,6 +31,14 @@ public:
 	void Draw();
 
 	/// <summary>
+	/// インスタンス描画処理
+	/// </summary>
+	/// <param name="instanceCount">インスタンス数</param>
+	/// <param name="instanceBufferAddr">インスタンスデータのGPUアドレス</param>
+	/// <param name="commonBufferAddr">共通データのGPUアドレス</param>
+	void DrawInstanced(uint32_t instanceCount, D3D12_GPU_VIRTUAL_ADDRESS instanceBufferAddr, D3D12_GPU_VIRTUAL_ADDRESS commonBufferAddr);
+
+	/// <summary>
 	/// マテリアルテンプレートファイルを読み込む
 	/// </summary>
 	/// <param name="directoryPath">ディレクトリパス</param>
@@ -93,5 +101,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 
 	std::string textureFileName_;
+
+	// インスタンスフラグ保持用
+	Microsoft::WRL::ComPtr<ID3D12Resource> instancingFlagBuffer_;
 };
 } // namespace TuboEngine

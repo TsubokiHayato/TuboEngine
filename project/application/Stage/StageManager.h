@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include"DirectXCommon.h"
 #include "Vector3.h"
 #include "Collider/CollisionManager.h"
 
@@ -33,7 +34,7 @@ public:
         std::unique_ptr<MapChipField> field;
         std::vector<std::unique_ptr<Block>> blocks;
         std::vector<std::unique_ptr<Enemy>> enemies;
-        std::unique_ptr<Tile> tile;
+        std::vector<std::unique_ptr<Tile>> tiles;
 
         int playerMapX = -1;
         int playerMapY = -1;
@@ -123,4 +124,7 @@ private:
 	std::vector<IParticleEmitter*> entranceEmitters_;
 	std::vector<IParticleEmitter*> exitEmitters_;
 	int effectChunkIndex_ = -1;
+
+	// インスタンス描画用のバッファがコマンドリスト終了まで解体されないように保持する。
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> temporaryBuffers_;
 };

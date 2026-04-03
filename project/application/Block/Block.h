@@ -75,6 +75,8 @@ public:
 	/// </summary>
 	void SetCamera(TuboEngine::Camera* camera);
 
+	TuboEngine::Object3d* GetObject3d() const { return object3d_.get(); }
+
 private:
 	TuboEngine::Math::Vector3 position_{};
 	TuboEngine::Math::Vector3 scale_{1.0f, 1.0f, 1.0f};
