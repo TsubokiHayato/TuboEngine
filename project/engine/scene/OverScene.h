@@ -85,9 +85,5 @@ private:
 
 	// 画像ファイルパスのプレフィックス（例: "Resources/UI/GameOver/")
 	std::string letterTexturePrefix_ = "";
-	// 互換のため、単一テクスチャ使用時のファイル名（未使用だが残置）
-	std::string letterTexture_ = "barrier.png"; // 仮のテクスチャ
 
-	
-	std::unique_ptr<TuboEngine::Sprite> restartSprite_;
 };

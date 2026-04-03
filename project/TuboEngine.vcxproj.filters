@@ -375,6 +375,8 @@
     <ClCompile Include="application\Bullet\Enemy\CircusBullet.cpp" />
     <ClCompile Include="application\Character\Enemy\MortarEnemy.cpp" />
     <ClCompile Include="application\Character\Enemy\CircusEnemy.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\Effects\VHS\VHSEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\VHSPSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -827,6 +829,8 @@
     <ClInclude Include="application\Stage\StageManager.h" />
     <ClInclude Include="application\Bullet\Enemy\EnemyMissileBullet.h" />
     <ClInclude Include="application\Character\Enemy\MortarEnemy.h" />
+    <ClInclude Include="engine\graphic\PostEffect\Effects\VHS\VHSEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\VHSPSO.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli">
