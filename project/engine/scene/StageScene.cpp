@@ -120,6 +120,7 @@ void StageScene::Initialize() {
 	// ★ ここでチャンクIDごとのCSVを登録
 	stageManager_->RegisterChunkCsv(1, "Resources/Stage/Stage1.csv");
 	stageManager_->RegisterChunkCsv(2, "Resources/Stage/Stage2.csv");
+	stageManager_->RegisterChunkCsv(3, "Resources/Stage/Stage3.csv");
 
 	// 衝突マネージャの生成
 	collisionManager_->Initialize();
