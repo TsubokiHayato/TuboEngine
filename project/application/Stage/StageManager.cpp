@@ -15,8 +15,11 @@
 #include "Tile/Tile.h"
 #include "Camera/FollowTopDownCamera.h"
 #include "Collider/CollisionManager.h"
-#include "ImGuiManager.h" // ImGui 用
-#include "engine/scene/StageScene.h" // 追加: Demo判定用
+#include "ImGuiManager.h" 
+#include "engine/scene/StageScene.h" 
+#include "engine/graphic/data/InstanceData.h"
+#include <map>
+#include <unordered_map>
 
 void StageManager::Configure(uint32_t chunkWidth, uint32_t chunkHeight, float tileScale) {
     chunkWidth_  = chunkWidth;
@@ -54,7 +57,6 @@ static std::vector<std::vector<int>> LoadIntGridCsv(const std::string& path) {
 void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
                                   Player* player,
                                   FollowTopDownCamera* followCamera) {
-    // 保持プレイヤーを更新（null でなければ優先）
     if (player) {
         player_ = player;
     }
@@ -62,7 +64,6 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
 
     // Demoモード時は Stage.csv を使わず、中央に 1 チャンクだけ Demo.csv を配置する
     if (StageScene::isDemoMode) {
-        // 中心(0,0) に ID=1 チャンクとして Demo.csv を生成
         CreateChunkFromId(1, 0, 0, player, followCamera);
         if (player) {
             player->SetPosition(GetPlayerStartPosition());
@@ -76,7 +77,6 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
         return;
     }
 
-    // 各行の最大列数を取得（行ごとに列数が違っても対応）
     int maxCols = 0;
     for (const auto& row : grid) {
         maxCols = std::max<int>(maxCols, static_cast<int>(row.size()));
@@ -85,10 +85,6 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
         return;
     }
 
-    // 可変サイズ Stage.csv 全体の中心セルが (0,0) 付近になるように、
-    // 行・列の中心オフセットを計算する。
-    // 例) 3x3 -> centerRow=1, centerCol=1 (5 が中心)
-    //     3x5 -> centerRow=1, centerCol=2 (8 が中心)
     const float centerRow = (rows   - 1) * 0.5f;
     const float centerCol = (maxCols - 1) * 0.5f;
 
@@ -96,11 +92,7 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
         const int cols = static_cast<int>(grid[r].size());
         for (int c = 0; c < cols; ++c) {
             int id = grid[r][c];
-            // 0: 何も置かない, 1/2/...: 登録済みCSVを使ったチャンクを生成
             if (id != 0) {
-                // Demoモードでない通常ステージのみここを通る
-
-                // 元のグリッド座標(r,c)を、ステージ全体中心が (0,0) になるように平行移動
                 const float relRowF = static_cast<float>(r) - centerRow;
                 const float relColF = static_cast<float>(c) - centerCol;
                 const int   relRow  = static_cast<int>(std::round(relRowF));
@@ -118,7 +110,6 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
 
 TuboEngine::Math::Vector3 StageManager::ComputeOriginForChunk(int row, int col) const {
     TuboEngine::Math::Vector3 origin;
-    // gapScale_ でステージ同士の間隔を調整できるようにする
     origin.x = static_cast<float>(col) * static_cast<float>(chunkWidth_) * tileScale_ * gapScale_;
     origin.y = -static_cast<float>(row) * static_cast<float>(chunkHeight_) * tileScale_ * gapScale_;
     origin.z = 0.0f;
@@ -130,15 +121,13 @@ void StageManager::CreateChunkFromId(int id, int row, int col,
                                      FollowTopDownCamera* followCamera) {
     StageInstance inst;
 
-    // ID -> CSV パスの対応からパスを決定（見つからなければデフォルト）
     auto it = idToCsvPath_.find(id);
     if (it != idToCsvPath_.end()) {
         inst.csvPath = it->second;
     } else {
-        inst.csvPath = "Resources/Stage/MapChip.csv"; // デフォルト
+        inst.csvPath = "Resources/Stage/MapChip.csv"; 
     }
 
-    // Demoモード時は強制的に Demo.csv を使用
     if (StageScene::isDemoMode) {
         inst.csvPath = "Resources/Stage/Demo.csv";
     }
@@ -184,18 +173,20 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
 
     inst.blocks.clear();
     inst.enemies.clear();
-    inst.tile = std::make_unique<Tile>();
-
-    TuboEngine::Math::Vector3 tilePos = field->GetMapChipPositionByIndex(0, 0);
-    tilePos.z = -1.0f;
-    inst.tile->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile30x30.obj");
-    if (cam) {
-        inst.tile->SetCamera(cam);
-    }
-    inst.tile->Update();
+    inst.tiles.clear();
 
     for (uint32_t y = 0; y < field->GetNumBlockVirtical(); ++y) {
         for (uint32_t x = 0; x < field->GetNumBlockHorizontal(); ++x) {
+            TuboEngine::Math::Vector3 tilePos = field->GetMapChipPositionByIndex(x, y);
+            tilePos.z = -1.0f;
+            auto tile = std::make_unique<Tile>();
+            tile->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile.obj");
+            if (cam) {
+                tile->SetCamera(cam);
+            }
+            tile->Update();
+            inst.tiles.push_back(std::move(tile));
+
             MapChipType type = field->GetMapChipTypeByIndex(x, y);
             TuboEngine::Math::Vector3 pos = field->GetMapChipPositionByIndex(x, y);
 
@@ -257,14 +248,13 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
 }
 
 void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
-    // プレイヤーの Update はシーン/ステート側で行うため、ここでは行わない
 	TuboEngine::Camera* cam = followCamera ? followCamera->GetCamera() : nullptr;
 
     for (auto& inst : stageInstances_) {
         if (!inst.visible) continue;
-        if (inst.tile) {
-            if (cam) inst.tile->SetCamera(cam);
-            inst.tile->Update();
+        for (auto& t : inst.tiles) {
+            if (cam) t->SetCamera(cam);
+            t->Update();
         }
         for (auto& b : inst.blocks) {
             if (cam) b->SetCamera(cam);
@@ -288,32 +278,26 @@ void StageManager::UpdateEntranceExitEffects() {
 		return;
 	}
 
-	// チャンクが切り替わったタイミングで残像を消す
 	if (effectChunkIndex_ != mainChunkIndex_) {
 		effectChunkIndex_ = mainChunkIndex_;
 		for (auto* e : entranceEmitters_) {
 			if (e) {
-				e->ClearAll();
-			}
-		}
-		for (auto* e : exitEmitters_) {
-			if (e) {
+				auto& p = e->GetPreset();
+				p.autoEmit = false;
 				e->ClearAll();
 			}
 		}
 	}
 
 	auto& inst = stageInstances_[mainChunkIndex_];
-	MapChipField* field = inst.field.get();
+	auto* field = inst.field.get();
 	if (!field) {
 		return;
 	}
 
-    // Entrance / Exit の座標取得
     auto entrancePos = field->GetChipPositions(MapChipType::kEntrance);
     const auto exitPos = field->GetChipPositions(MapChipType::kExit);
 
-    // Entrance が無いチャンクでも演出が消えないようフォールバック
     if (entrancePos.empty()) {
         if (inst.playerMapX >= 0 && inst.playerMapY >= 0) {
             entrancePos.push_back(field->GetMapChipPositionByIndex(
@@ -326,7 +310,6 @@ void StageManager::UpdateEntranceExitEffects() {
 
 	auto EnsureEmitters = [&](std::vector<IParticleEmitter*>& list, size_t needCount, const char* baseName,
 		const TuboEngine::Math::Vector4& colStart, const TuboEngine::Math::Vector4& colEnd) {
-		// 足りない分は生成
 		while (list.size() < needCount) {
 			TuboEngine::TextureManager::GetInstance()->LoadTexture("gradationLine.png");
 			ParticlePreset p{};
@@ -337,7 +320,7 @@ void StageManager::UpdateEntranceExitEffects() {
 			p.emitRate = 1.5f;
 			p.lifeMin = 0.55f;
 			p.lifeMax = 0.85f;
-			p.billboard = false;              // 地面に平行なリング
+			p.billboard = false;              
 			p.simulateInWorldSpace = true;
 			p.gravity = {0.0f, 0.0f, 0.0f};
 			p.velMin = {0.0f, 0.0f, 0.0f};
@@ -351,7 +334,6 @@ void StageManager::UpdateEntranceExitEffects() {
 			list.push_back(created);
 		}
 
-		// 余った分は非表示化
 		for (size_t i = needCount; i < list.size(); ++i) {
 			if (!list[i]) continue;
 			auto& preset = list[i]->GetPreset();
@@ -364,7 +346,6 @@ void StageManager::UpdateEntranceExitEffects() {
 	EnsureEmitters(entranceEmitters_, entrancePos.size(), "EntranceRing", {0.4f, 0.9f, 1.0f, 0.75f}, {0.4f, 0.9f, 1.0f, 0.0f});
 	EnsureEmitters(exitEmitters_, exitPos.size(), "ExitRing", {1.0f, 0.4f, 0.9f, 0.75f}, {1.0f, 0.4f, 0.9f, 0.0f});
 
-	// 座標を反映
 	for (size_t i = 0; i < entrancePos.size() && i < entranceEmitters_.size(); ++i) {
 		if (!entranceEmitters_[i]) continue;
 		auto& preset = entranceEmitters_[i]->GetPreset();
@@ -392,11 +373,10 @@ bool StageManager::AreAllEnemiesDefeated() const {
 			}
 		}
 	}
-	// 敵が一体もいない場合は false とする（任意仕様）
 	return hasAnyEnemy;
 }
 
-// mainChunkIndex_ を一つ進める（次のチャンクが存在すれば true を返す）
+// mainChunkIndex_ を一つ進める
 bool StageManager::AdvanceToNextChunk() {
 	int next = mainChunkIndex_ + 1;
 	if (next < 0 || next >= static_cast<int>(stageInstances_.size())) {
@@ -407,17 +387,84 @@ bool StageManager::AdvanceToNextChunk() {
 }
 
 void StageManager::Draw3D() {
+    temporaryBuffers_.clear();
+
+    struct BatchInfo {
+        std::vector<TuboEngine::InstanceData> instances;
+        TuboEngine::Object3d* representative = nullptr;
+    };
+    std::unordered_map<TuboEngine::Model*, BatchInfo> instancedDataMap;
+    
+    TuboEngine::Math::Vector3 camPos = player_ ? player_->GetPosition() : TuboEngine::Math::Vector3{0, 0, 0};
+    const float kCullingRadiusSq = 150.0f * 150.0f; 
+
+    auto collectData = [&](auto& list) {
+        for (auto& item : list) {
+            TuboEngine::Math::Vector3 pos = item->GetPosition();
+            float distSq = (pos.x - camPos.x) * (pos.x - camPos.x) + (pos.y - camPos.y) * (pos.y - camPos.y);
+            if (distSq > kCullingRadiusSq) continue;
+
+            TuboEngine::Object3d* obj = item->GetObject3d();
+            if (!obj) continue;
+            TuboEngine::Model* model = obj->GetModel();
+            if (!model) continue;
+
+            TuboEngine::TransformationMatrix* matrixData = obj->GetTransformationMatrixData();
+            if (!matrixData) continue;
+
+            TuboEngine::InstanceData data;
+            data.WVP = matrixData->WVP;
+            data.World = matrixData->World;
+            data.Color = obj->GetModelColor();
+            
+            auto& batch = instancedDataMap[model];
+            batch.instances.push_back(data);
+            if (!batch.representative) {
+                batch.representative = obj; 
+            }
+        }
+    };
+
     for (auto& inst : stageInstances_) {
         if (!inst.visible) continue;
-        if (inst.tile) {
-            inst.tile->Draw();
-        }
-        for (auto& b : inst.blocks) {
-            b->Draw();
-        }
+        collectData(inst.tiles);
+        collectData(inst.blocks);
         for (auto& e : inst.enemies) {
-            e->Draw();
+            if (e) e->Draw();
         }
+    }
+
+    auto commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
+
+    for (auto& [model, info] : instancedDataMap) {
+        if (info.instances.empty() || !info.representative) continue;
+
+        auto rep = info.representative;
+        if (!rep->GetCubeMapFilePath().empty()) {
+            commandList->SetGraphicsRootDescriptorTable(3, TuboEngine::TextureManager::GetInstance()->GetSrvHandleGPU(rep->GetCubeMapFilePath()));
+        }
+        commandList->SetGraphicsRootConstantBufferView(4, rep->GetDirectionalLightResource()->GetGPUVirtualAddress());
+        commandList->SetGraphicsRootConstantBufferView(5, rep->GetCameraForGPUResource()->GetGPUVirtualAddress());
+        commandList->SetGraphicsRootConstantBufferView(6, rep->GetLightTypeResource()->GetGPUVirtualAddress());
+        commandList->SetGraphicsRootConstantBufferView(7, rep->GetPointLightResource()->GetGPUVirtualAddress());
+        commandList->SetGraphicsRootConstantBufferView(8, rep->GetSpotLightResource()->GetGPUVirtualAddress());
+
+        size_t bufferSize = sizeof(TuboEngine::InstanceData) * info.instances.size();
+        auto instanceBuffer = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(bufferSize);
+        void* pData = nullptr;
+        instanceBuffer->Map(0, nullptr, &pData);
+        std::memcpy(pData, info.instances.data(), bufferSize);
+        instanceBuffer->Unmap(0, nullptr);
+        temporaryBuffers_.push_back(instanceBuffer);
+
+        auto commonBuffer = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(int32_t));
+        int32_t* pCommon = nullptr;
+        commonBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pCommon));
+        *pCommon = 1;
+        commonBuffer->Unmap(0, nullptr);
+        temporaryBuffers_.push_back(commonBuffer);
+
+        model->DrawInstanced(static_cast<uint32_t>(info.instances.size()), instanceBuffer->GetGPUVirtualAddress(), commonBuffer->GetGPUVirtualAddress());
     }
 }
 
@@ -469,7 +516,6 @@ void StageManager::DrawImGui() {
 #ifdef USE_IMGUI
     ImGui::Begin("StageManager");
 
-    // チャンク間隔調整スライダー
     ImGui::SliderFloat("Gap Scale", &gapScale_, 0.1f, 2.0f, "%.2f");
     ImGui::Separator();
 
@@ -506,7 +552,6 @@ void StageManager::DrawImGui() {
 
     ImGui::Text("Main Chunk Index: %d", mainChunkIndex_);
 
-    // チャンクごとの敵数/生存数を表示
     const auto enemyInfos = GetChunkEnemyInfos();
     for (size_t i = 0; i < stageInstances_.size(); ++i) {
         const auto& inst = stageInstances_[i];
@@ -518,10 +563,9 @@ void StageManager::DrawImGui() {
     }
 
     ImGui::End();
-#endif // USE_IMGUI
+#endif 
 }
 
-// デバッグ用: 各チャンクの敵数・生存数を取得
 std::vector<StageManager::ChunkEnemyInfo> StageManager::GetChunkEnemyInfos() const {
 	std::vector<ChunkEnemyInfo> result;
 	result.reserve(stageInstances_.size());

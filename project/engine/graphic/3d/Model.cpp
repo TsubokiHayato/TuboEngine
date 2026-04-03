@@ -51,10 +51,16 @@ void TuboEngine::Model::Initialize(const std::string& directoryPath, const std::
 	// テクスチャを読み込む
 	TuboEngine::TextureManager::GetInstance()->LoadTexture(textureFileName_);
 	modelData.material.textureIndex = TuboEngine::TextureManager::GetInstance()->GetSrvIndex(textureFileName_);
+
+	// インスタンスフラグ（0固定）を初期化して保持
+	instancingFlagBuffer_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(int32_t));
+	int32_t* commonData = nullptr;
+	instancingFlagBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&commonData));
+	*commonData = 0; // UseInstancing = false
+	instancingFlagBuffer_->Unmap(0, nullptr);
 }
 
 void TuboEngine::Model::Draw() {
-
 	// 頂点バッファをセット
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 
@@ -63,8 +69,32 @@ void TuboEngine::Model::Draw() {
 
 	// SRVのDescriptorTableの先頭を設定。2はRootParameter[2]である。
 	commandList->SetGraphicsRootDescriptorTable(2, TuboEngine::TextureManager::GetInstance()->GetSrvHandleGPU(textureFileName_));
+	
+	// 共通データ（フラグ=0）をセット (RootParameter 10: b1 in VS)
+	commandList->SetGraphicsRootConstantBufferView(10, instancingFlagBuffer_->GetGPUVirtualAddress());
+
 	// 描画
 	commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+}
+
+void TuboEngine::Model::DrawInstanced(uint32_t instanceCount, D3D12_GPU_VIRTUAL_ADDRESS instanceBufferAddr, D3D12_GPU_VIRTUAL_ADDRESS commonBufferAddr) {
+	// 頂点バッファをセット
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+
+	// マテリアルバッファをセット
+	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+
+	// テクスチャをセット
+	commandList->SetGraphicsRootDescriptorTable(2, TuboEngine::TextureManager::GetInstance()->GetSrvHandleGPU(textureFileName_));
+
+	// インスタンスデータをセット (RootParameter 9: t0 in VS)
+	commandList->SetGraphicsRootShaderResourceView(9, instanceBufferAddr);
+
+	// 共通データ（フラグ）をセット (RootParameter 10: b1 in VS)
+	commandList->SetGraphicsRootConstantBufferView(10, commonBufferAddr);
+
+	// 描画
+	commandList->DrawInstanced(UINT(modelData.vertices.size()), instanceCount, 0, 0);
 }
 
 TuboEngine::MaterialData TuboEngine::Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filePath) {

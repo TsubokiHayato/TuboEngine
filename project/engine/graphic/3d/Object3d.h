@@ -139,6 +139,17 @@ public:
 	// モデルの色
 	Vector4 GetModelColor();
 
+	// Getter for Batching
+	TuboEngine::Model* GetModel() const { return model_; }
+	TransformationMatrix* GetTransformationMatrixData() const { return transformMatrixData; }
+	
+	ID3D12Resource* GetDirectionalLightResource() const { return directionalLightResource.Get(); }
+	ID3D12Resource* GetPointLightResource() const { return pointLightResource.Get(); }
+	ID3D12Resource* GetSpotLightResource() const { return spotLightResource.Get(); }
+	ID3D12Resource* GetCameraForGPUResource() const { return cameraForGPUResource.Get(); }
+	ID3D12Resource* GetLightTypeResource() const { return lightTypeResource.Get(); }
+	std::string GetCubeMapFilePath() const { return cubeMapFilePath_; }
+
 	//-------------------------------------------------------------------------------------------------
 	// Material
 
