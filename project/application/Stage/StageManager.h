@@ -40,6 +40,9 @@ public:
         int playerMapY = -1;
 
         StageBounds boundsWorld{};
+
+        bool isCleared = false;
+        float clearAnimationT = 0.0f;
     };
 
 public:
@@ -127,4 +130,6 @@ private:
 
 	// インスタンス描画用のバッファがコマンドリスト終了まで解体されないように保持する。
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> temporaryBuffers_;
+
+    float globalTimer_ = 0.0f;
 };

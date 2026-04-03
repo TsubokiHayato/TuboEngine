@@ -249,6 +249,7 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
 
 void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
 	TuboEngine::Camera* cam = followCamera ? followCamera->GetCamera() : nullptr;
+    globalTimer_ += 0.016f;
 
     for (auto& inst : stageInstances_) {
         if (!inst.visible) continue;
@@ -264,6 +265,33 @@ void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
             if (cam) e->SetCamera(cam);
             e->SetPlayer(player);
             e->Update();
+        }
+
+        // クリア判定: 敵が全滅したらフラグを立てる
+        if (!inst.isCleared) {
+            bool hasEnemy = false;
+            bool anyAlive = false;
+            for (auto& e : inst.enemies) {
+                if (e) {
+                    hasEnemy = true;
+                    if (e->GetIsAlive()) {
+                        anyAlive = true;
+                        break;
+                    }
+                }
+            }
+            if (hasEnemy && !anyAlive) {
+                inst.isCleared = true;
+            }
+        }
+
+        // クリア演出アニメーション更新 (1枚ずつ広がるようにするため最大値を大きめに)
+        if (inst.isCleared) {
+            const float kAnimSpeed = 0.02f; 
+            inst.clearAnimationT += kAnimSpeed;
+            if (inst.clearAnimationT > 5.0f) { // 波が端まで届くのに十分な時間
+                inst.clearAnimationT = 5.0f;
+            }
         }
     }
 
@@ -398,7 +426,7 @@ void StageManager::Draw3D() {
     TuboEngine::Math::Vector3 camPos = player_ ? player_->GetPosition() : TuboEngine::Math::Vector3{0, 0, 0};
     const float kCullingRadiusSq = 150.0f * 150.0f; 
 
-    auto collectData = [&](auto& list) {
+    auto collectData = [&](StageInstance& inst, auto& list) {
         for (auto& item : list) {
             TuboEngine::Math::Vector3 pos = item->GetPosition();
             float distSq = (pos.x - camPos.x) * (pos.x - camPos.x) + (pos.y - camPos.y) * (pos.y - camPos.y);
@@ -415,7 +443,45 @@ void StageManager::Draw3D() {
             TuboEngine::InstanceData data;
             data.WVP = matrixData->WVP;
             data.World = matrixData->World;
-            data.Color = obj->GetModelColor();
+
+            // --- Radial Synthwave Wave ---
+            TuboEngine::Math::Vector3 center = {
+                (inst.boundsWorld.left + inst.boundsWorld.right) * 0.5f,
+                (inst.boundsWorld.bottom + inst.boundsWorld.top) * 0.5f,
+                0.0f
+            };
+            float distance = std::sqrt((pos.x - center.x) * (pos.x - center.x) + (pos.y - center.y) * (pos.y - center.y));
+            
+            // 波の伝播パラメータ
+            const float waveSpeed = 100.0f; // 広がる速さ
+            const float fadeWidth = 20.0f;  // 色が変わるときの境界のぼかし幅
+            
+            // このタイル個別の進行度 (0.0 ~ 1.0)
+            float localTimer = inst.clearAnimationT * waveSpeed;
+            float localT = std::clamp((localTimer - distance) / fadeWidth, 0.0f, 1.0f);
+            
+            // 通常時: 明るめの紫
+            TuboEngine::Math::Vector4 baseColor = {0.25f, 0.15f, 0.45f, 1.0f}; 
+            // クリア時: マゼンタ
+            TuboEngine::Math::Vector4 clearColor = {1.0f, 0.2f, 0.9f, 1.0f}; 
+            
+            // 基本の色補間
+            data.Color.x = baseColor.x + (clearColor.x - baseColor.x) * localT;
+            data.Color.y = baseColor.y + (clearColor.y - baseColor.y) * localT;
+            data.Color.z = baseColor.z + (clearColor.z - baseColor.z) * localT;
+            data.Color.w = 1.0f;
+
+            // クリア後のパルス (localT が 1.0 に達したタイルのみ)
+            if (localT >= 1.0f) {
+                float pulse = (std::sin(globalTimer_ * 3.0f + distance * 0.1f) * 0.5f + 0.5f) * 0.5f; 
+                TuboEngine::Math::Vector4 pulseColor = {0.0f, 1.0f, 1.0f, 0.0f}; // シアン
+                data.Color.x += pulseColor.x * pulse;
+                data.Color.y += pulseColor.y * pulse;
+                data.Color.z += pulseColor.z * pulse;
+                data.Color.x *= 1.3f;
+                data.Color.y *= 1.3f;
+                data.Color.z *= 1.3f;
+            }
             
             auto& batch = instancedDataMap[model];
             batch.instances.push_back(data);
@@ -427,8 +493,8 @@ void StageManager::Draw3D() {
 
     for (auto& inst : stageInstances_) {
         if (!inst.visible) continue;
-        collectData(inst.tiles);
-        collectData(inst.blocks);
+        collectData(inst, inst.tiles);
+        collectData(inst, inst.blocks);
         for (auto& e : inst.enemies) {
             if (e) e->Draw();
         }

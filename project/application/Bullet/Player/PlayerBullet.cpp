@@ -61,7 +61,7 @@ void PlayerBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
 	rotation = s_rotation;
 
 	// モデルファイル名
-	const std::string modelFileNamePath = "star.obj";
+	const std::string modelFileNamePath = "playerBullet/playerBullet.obj";
 	// 3Dオブジェクト生成・初期化
 	object3d = std::make_unique<TuboEngine::Object3d>();
 	object3d->Initialize(modelFileNamePath);
