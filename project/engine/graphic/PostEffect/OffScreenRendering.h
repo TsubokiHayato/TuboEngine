@@ -106,6 +106,10 @@ public:
 	void SetLowHpVignetteEnabled(bool enable);
 	void SetLowHpVignettePower(float power);
 
+	// VHSEffectを有効/無効にする（有効にすると画面全体がノイズっぽくなります）
+	// enable=falseにすると元のポストエフェクトへ戻す
+	void SetVHSEffect(bool enabled);
+
 private:
 	///-----------------------------------------------------------------------
 	///                             メンバ変数
@@ -168,4 +172,9 @@ private:
 	// LowHP用状態
 	bool lowHpVignetteEnabled_ = false;
 	float savedVignettePower_ = 0.8f;
+
+	//VHS
+	bool vhsPostEffectEnabled_ = false;
+	int32_t vhsEffectIndex_ = -1; // VHSEffect の index
+	int32_t savedVhsEffectIndex_ = 0; // 復帰用
 };

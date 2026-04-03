@@ -24,6 +24,9 @@ namespace {
 }
 
 void OverScene::Initialize() {
+
+	//ポストエフェクト設定
+	OffScreenRendering::GetInstance()->SetVHSEffect(true);
 	// カメラの初期化
 	camera = std::make_unique<TuboEngine::Camera>();
 	cameraTransform.rotate = {0.0f, 0.0f, 0.0f};      // カメラの回転を初期化
@@ -131,7 +134,10 @@ void OverScene::Update() {
 	restartSprite_->Update();
 }
 
-void OverScene::Finalize() {}
+void OverScene::Finalize() {
+	// ポストエフェクト設定
+	OffScreenRendering::GetInstance()->SetVHSEffect(false);
+}
 
 void OverScene::Object3DDraw() { player->Draw(); }
 
