@@ -16,6 +16,7 @@
 #include "Effects/Vignette/VignetteEffect.h"
 #include "Effects/randam/randomEffect.h"
 #include "Effects/FlickerGlow/FlickerGlowEffect.h"
+#include "Effects/VHS/VHSEffect.h"
 
 OffScreenRendering* OffScreenRendering::instance = nullptr;
 
@@ -70,6 +71,7 @@ void OffScreenRendering::Initialize() {
 	postEffectManager.AddEffect(std::make_unique<ToonEffect>());              // トゥーンエフェクト
 	postEffectManager.AddEffect(std::make_unique<BloomEffect>());             // ブルームエフェクト
 	postEffectManager.AddEffect(std::make_unique<FlickerGlowEffect>());       // フリッカー＋グローエフェクト
+	postEffectManager.AddEffect(std::make_unique<VHSEffect>());              // VHSエフェクト
 	// PostEffectManagerの初期化
 	postEffectManager.InitializeAll();
 
@@ -146,6 +148,28 @@ void OffScreenRendering::SetLowHpVignettePower(float power) {
 		return;
 	}
 	params->vignettePower = power;
+}
+
+void OffScreenRendering::SetVHSEffect(bool enabled) {
+	if (vhsEffectIndex_ < 0 || static_cast<size_t>(vhsEffectIndex_) >= postEffectManager.GetEffectCount()) {
+		return;
+	}
+
+	if (enabled) {
+		if (vhsPostEffectEnabled_) {
+			return;
+		}
+		savedVhsEffectIndex_ = static_cast<int32_t>(postEffectManager.GetCurrentIndex());
+		postEffectManager.SetCurrentEffect(static_cast<size_t>(vhsEffectIndex_));
+		vhsPostEffectEnabled_ = true;
+	} else {
+		if (!vhsPostEffectEnabled_) {
+			return;
+		}
+		postEffectManager.SetCurrentEffect(static_cast<size_t>(savedVhsEffectIndex_));
+		vhsPostEffectEnabled_ = false;
+	}
+
 }
 
 void OffScreenRendering::Update() {
@@ -229,24 +253,24 @@ void OffScreenRendering::TransitionRenderTextureToRenderTarget() {
 /// 全画面三角形を描画します。
 /// </summary>
 void OffScreenRendering::Draw() {
-
+	auto dxCommon = TuboEngine::DirectXCommon::GetInstance();
 	// 4. SRV用ディスクリプタヒープをセット
-	ID3D12DescriptorHeap* descriptorHeaps[] = {TuboEngine::DirectXCommon::GetInstance()->GetSrvDescriptorHeap().Get()};
+	ID3D12DescriptorHeap* descriptorHeaps[] = {dxCommon->GetSrvDescriptorHeap().Get()};
 	commandList->SetDescriptorHeaps(1, descriptorHeaps);
+
+	// レンダターゲットをバックバッファに切り替える
+	uint32_t backBufferIndex = dxCommon->GetSwapChain()->GetCurrentBackBufferIndex();
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = dxCommon->GetRTVCPUDescriptorHandle(backBufferIndex);
+	commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
 	// 5. PSO・ルートシグネチャ設定
 	postEffectManager.DrawCurrent(commandList.Get());
 
 	// 6. SRV（オフスクリーンテクスチャ）をルートパラメータにセット
-	// ※ルートシグネチャのSRVインデックスに合わせて変更（例: 0番なら0）
-
-	commandList->SetGraphicsRootDescriptorTable(0, TuboEngine::DirectXCommon::GetInstance()->GetSRVGPUDescriptorHandle(0));
+	commandList->SetGraphicsRootDescriptorTable(0, dxCommon->GetSRVGPUDescriptorHandle(0));
 
 	// 7. 全画面三角形を描画
 	commandList->DrawInstanced(3, 1, 0, 0); // 全画面三角形
-
-	// ポストエフェクト描画
-	postEffectManager.DrawCurrent(commandList.Get());
 }
 
 void OffScreenRendering::DrawImGui() {
@@ -271,6 +295,7 @@ void OffScreenRendering::DrawImGui() {
 	    "Toon",              // トゥーンエフェクト
 	    "Bloom",             // ブルームエフェクト
 	    "FlickerGlow",       // 徐々に点灯＋ノイズ＋軽いグロー
+	    "VHS",               // VHSエフェクト
 	};
 
 	int effectIndex = static_cast<int>(postEffectManager.GetCurrentIndex());

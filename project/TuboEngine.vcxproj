@@ -254,6 +254,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\2d\Font.cpp" />
     <ClCompile Include="engine\graphic\2d\TextManager.cpp" />
     <ClCompile Include="engine\graphic\2d\TextObject.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\Effects\VHS\VHSEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\VHSPSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\Bullet\Enemy\EnemyMissileBullet.h" />
@@ -414,6 +416,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\2d\Font.h" />
     <ClInclude Include="engine\graphic\2d\TextManager.h" />
     <ClInclude Include="engine\graphic\2d\TextObject.h" />
+    <ClInclude Include="engine\graphic\PostEffect\Effects\VHS\VHSEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\VHSPSO.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
