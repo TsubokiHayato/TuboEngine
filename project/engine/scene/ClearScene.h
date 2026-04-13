@@ -13,6 +13,12 @@
 class Camera;
 class Player;
 class SceneChangeAnimation;
+class IParticleEmitter;
+
+namespace TuboEngine {
+    class Object3d;
+    class TextObject;
+}
 
 class ClearScene : public IScene {
 public:
@@ -67,38 +73,27 @@ private:
     // プレイヤー
     std::unique_ptr<Player> player_;
 
-    // 文字スプライト
-	std::vector<std::unique_ptr<TuboEngine::Sprite>> letterSprites_;
-	std::vector<TuboEngine::Math::Vector2> letterBaseSizes_;
-    std::vector<std::string> letterTextureNames_;
-    float letterSpacing_ = 120.0f;
-    float letterYOffset_ = 0.0f;
-    float letterDelay_ = 0.06f;
-    float fadeDuration_ = 0.6f;
+    // CLEAR 文字 (TextManager用)
+    TuboEngine::TextObject* textClear_ = nullptr;
+    float textFadeInTimer_ = 0.0f;
+
+    // リスタート用テキスト
+    TuboEngine::TextObject* textRestart_ = nullptr;
+    float textRestartBlinkTimer_ = 0.0f;
+
+    // お祝いパーティクル用エミッター
+    IParticleEmitter* confettiGold_ = nullptr;
+    IParticleEmitter* confettiColor_ = nullptr;
+    bool hasEmittedConfetti_ = false;
 
     // 入場演出（シーンチェンジ終了後に開始）
     bool delayEntranceUntilSceneChangeDone_ = true; // かぶり防止のため既定ON
-    bool lettersEnterActive_ = false;               // 入場演出開始済み
-    float lettersEnterTimer_ = 0.0f;               // 入場演出の経過時間
+    bool entranceActive_ = false;               // 入場演出開始済み
+    float entranceTimer_ = 0.0f;               // 入場演出の経過時間
 
-    // クリア（退場）演出
-    struct LetterClearAnim {
-		TuboEngine::Math::Vector2 startPos{};
-		TuboEngine::Math::Vector2 velocity{};
-        float delay = 0.0f;
-        float life = 0.6f;
-        float startAlpha = 1.0f;
-    };
-    bool lettersClearActive_ = false;
-    float lettersClearTimer_ = 0.0f;
-    std::vector<LetterClearAnim> letterClearAnims_;
-
-    // クリア演出パラメータ
-    float lettersClearDuration_ = 0.7f;
-    float lettersClearMaxDelay_ = 0.05f;
-    float lettersClearOutwardSpeed_ = 280.0f;
-    float lettersClearUpwardSpeed_ = 180.0f;
-    float lettersClearEndScale_ = 0.55f;
+    // 王冠（戴冠）演出
+    std::unique_ptr<TuboEngine::Object3d> crownModel_;
+    bool isCrowned_ = false;
 
     // シーンチェンジ
     std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation_;
@@ -107,20 +102,10 @@ private:
     // 経過時間
     float elapsed_ = 0.0f;
 
-    // スペースジャンプ演出（既存）
-    bool spaceAnimActive_ = false;
-    float spaceAnimTimer_ = 0.0f;
-    float spaceAnimDuration_ = 1.0f;
-    float spaceJumpHeight_ = 0.5f;
-    bool spaceLaunchRight_ = true;
-	TuboEngine::Math::Vector3 spaceOrigPos_{};
-	TuboEngine::Math::Vector3 spaceOrigRot_{};
-	TuboEngine::Math::Vector3 spaceOrigScale_{};
-
     // UI
-	std::unique_ptr<TuboEngine::Sprite> restartSprite_;
+    std::unique_ptr<TuboEngine::Sprite> restartSprite_;
 
 private:
-    void SetupLettersClearAnim(); // 文字のクリア演出初期化
+
 };
 
