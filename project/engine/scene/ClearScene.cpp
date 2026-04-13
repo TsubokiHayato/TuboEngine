@@ -8,14 +8,11 @@
 
 #include <cmath>
 #include <format>
-#include "TextureManager.h"
 #include "WinApp.h"
 #include "externals/imgui/imgui.h"
 #include"Animation/SceneChangeAnimation.h"
 #include "Input.h"
-#include "SceneManager.h" // 追加：シーン遷移呼び出し用
-#include <random>         // 追加：ランダム変化に使用
-#include <algorithm>
+#include "SceneManager.h" //シーン遷移呼び出し用
 #undef max
 #undef min
 
