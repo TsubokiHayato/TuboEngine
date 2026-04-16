@@ -6,20 +6,18 @@
 using TuboEngine::Math::Matrix4x4;
 using TuboEngine::Math::Vector4;
 
-namespace TuboEngine {
-// マテリアル
+//マテリアル
 struct Material {
 	//	色
 	Vector4 color;
-	// ライティングを有効にするか
+	//ライティングを有効にするか
 	int32_t enableLighting;
-	// パディング
+	//パディング
 	float padding[3];
-	// UV変換行列
+	//UV変換行列
 	Matrix4x4 uvTransform;
-	// 光沢度
+	//光沢度
 	float shininess;
 	// 環境マップ寄与度 [0:無し, 1:全反射]
 	float environmentCoefficient;
 };
-} // namespace TuboEngine

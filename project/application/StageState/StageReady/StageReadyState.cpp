@@ -9,60 +9,123 @@
 #include <algorithm>
 
 namespace {
-constexpr float kDeltaSec = 1.0f / 60.0f;
+	constexpr float kDeltaSec = 1.0f / 60.0f;
+}
+
+// 汎用: マップチップを走査してコールバック（StageScene版）
+template<typename Func> static void ForEachMapChip(StageScene* scene, Func func) {
+	auto* field = scene ? scene->GetMapChipField() : nullptr;
+	if (!field) {
+		return;
+	}
+	for (uint32_t y = 0; y < field->GetNumBlockVirtical(); ++y) {
+		for (uint32_t x = 0; x < field->GetNumBlockHorizontal(); ++x) {
+			func(x, y, field->GetMapChipTypeByIndex(x, y));
+		}
+	}
+}
+
+// 追加: 指定MapChipFieldを走査してコールバック（プレビュー用）
+template<typename Func> static void ForEachMapChipField(MapChipField* field, Func func) {
+	if (!field) {
+		return;
+	}
+	for (uint32_t y = 0; y < field->GetNumBlockVirtical(); ++y) {
+		for (uint32_t x = 0; x < field->GetNumBlockHorizontal(); ++x) {
+			func(x, y, field->GetMapChipTypeByIndex(x, y));
+		}
+	}
 }
 
 void StageReadyState::Enter(StageScene* scene) {
-	if (!scene)
-		return;
+	// Stage0（実プレイ）のCSVをロード
+	scene->GetMapChipField()->LoadMapChipCsv(scene->GetMapChipCsvFilePath());
 
-	auto* stageMgr = scene->GetStageManager();
-	auto* followCam = scene->GetFollowCamera();
-	auto* player = scene->GetPlayer();
-
-	// プレイヤー初期化
-	if (player) {
-		player->Initialize();
-	}
-
-	// カメラ初期化
-	if (followCam && player) {
-		followCam->Initialize(player, TuboEngine::Math::Vector3{0.0f, 0.0f, -70.0f}, 0.08f);
-		followCam->SetZoomLimits(0.1f, 1.0f);
-		followCam->SetZoom(0.1f);
-		followCam->SnapToTarget();
-		followCam->StartIntroZoom(0.1f, 1.0f, 0.8f);
-		TuboEngine::Camera* cam = followCam->GetCamera();
-		TuboEngine::LineManager::GetInstance()->SetDefaultCamera(cam);
-		player->SetCamera(cam);
-
-		// SkyDome 初期化
-		if (auto* sky = scene->GetSkyDome().get()) {
-			sky->Initialize();
-			sky->SetCamera(cam);
-			sky->Update();
+	// プレイヤー座標（Stage0）
+	int playerMapX = -1, playerMapY = -1;
+	ForEachMapChip(scene, [&](uint32_t x, uint32_t y, MapChipType type) {
+		if (type == MapChipType::Player) {
+			playerMapX = static_cast<int>(x);
+			playerMapY = static_cast<int>(y);
 		}
+	});
+	if (playerMapX < 0 || playerMapY < 0) {
+		playerMapX = 0;
+		playerMapY = 0;
 	}
+	TuboEngine::Math::Vector3 playerPos = scene->GetMapChipField()->GetMapChipPositionByIndex(playerMapX, playerMapY);
 
-	// ★ カメラ初期化後に StageManager のメタレイアウトをロード
-	if (stageMgr && followCam && player && scene->GetDrawPreviewStages()) {
-		stageMgr->LoadMetaLayout("Resources/Stage/Stage.csv", player, followCam);
+	// プレイヤー初期化（Stage0のみ）
+	scene->GetPlayer()->Initialize();
+	scene->GetPlayer()->SetMapChipField(scene->GetMapChipField());
+	scene->GetPlayer()->SetMovementLocked(false);
+	scene->GetPlayer()->SetPosition(playerPos);
 
-		// LoadMetaLayout 後に、StageManager 側の開始位置 & Field に合わせて再設定
-		TuboEngine::Math::Vector3 startPos = stageMgr->GetPlayerStartPosition();
-		MapChipField* startField = stageMgr->GetPlayerStartField();
-		if (startField) {
-			player->SetMapChipField(startField);
+	// フォローカメラ初期化（プレビュー生成にも使う）
+	scene->GetFollowCamera()->Initialize(scene->GetPlayer(), TuboEngine::Math::Vector3{0.0f, 0.0f, -70.0f}, 0.08f);
+	// ズーム制限設定
+	scene->GetFollowCamera()->SetZoomLimits(0.1f, 1.0f);
+	// 開始時は近い(0.1)状態に固定してからカメラ位置を確定
+	scene->GetFollowCamera()->SetZoom(0.1f);
+	// 初回だけは補間せずスナップして「追従している状態」から開始したい
+	scene->GetFollowCamera()->SnapToTarget();
+	// 開始時カメラ演出: Zoomをイージングで変化（0.1 -> 1.0）
+	scene->GetFollowCamera()->StartIntroZoom(0.1f, 1.0f, 0.8f);
+	Camera* cam = scene->GetFollowCamera()->GetCamera();
+	LineManager::GetInstance()->SetDefaultCamera(cam);
+	scene->GetPlayer()->SetCamera(cam);
+	scene->GetPlayer()->Update();
+
+	// ブロック・エネミーの生成（Stage0）
+	auto& blocks = scene->GetBlocks();
+	auto& enemies = scene->GetEnemies();
+	blocks.clear();
+	enemies.clear();
+
+	ForEachMapChip(scene, [&](uint32_t x, uint32_t y, MapChipType type) {
+		TuboEngine::Math::Vector3 pos = scene->GetMapChipField()->GetMapChipPositionByIndex(x, y);
+
+		if (type == MapChipType::kBlock) {
+			auto block = std::make_unique<Block>();
+			block->Initialize(pos);
+			block->SetCamera(cam);
+			block->Update();
+			blocks.push_back(std::move(block));
+		} else if (type == MapChipType::Enemy || type == MapChipType::EnemyRush) {
+			auto enemy = std::make_unique<RushEnemy>();
+			enemy->Initialize();
+			enemy->SetCamera(cam);
+			enemy->SetPlayer(scene->GetPlayer());
+			enemy->SetPosition(pos);
+			enemy->Update();
+			enemies.push_back(std::move(enemy));
+		} else if (type == MapChipType::EnemyShoot) {
+			auto enemy = std::make_unique<Enemy>();
+			enemy->Initialize();
+			enemy->SetCamera(cam);
+			enemy->SetPlayer(scene->GetPlayer());
+			enemy->SetPosition(pos);
+			enemy->Update();
+			enemies.push_back(std::move(enemy));
 		}
-		player->SetPosition(startPos);
-		// カメラにもターゲット変更を反映
-		followCam->SetTarget(player);
-	}
+	});
+
+	// タイル（Stage0）
+	TuboEngine::Math::Vector3 tilePos = scene->GetMapChipField()->GetMapChipPositionByIndex(0, 0);
+	tilePos.z = -1.0f;
+	scene->GetTile()->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile30x30.obj");
+	scene->GetTile()->SetCamera(cam);
+	scene->GetTile()->Update();
+
+	// SkyDome
+	scene->GetSkyDome()->Initialize();
+	scene->GetSkyDome()->SetCamera(cam);
+	scene->GetSkyDome()->Update();
 
 	// タイマー初期化
 	prevTime_ = std::chrono::steady_clock::now();
 
-	// Ready/Start スプライト初期化（従来通り）
+	// --- Ready/Start 演出用スプライト ---
 	phase_ = Phase::Ready;
 	phaseTimer_ = 0.0f;
 
@@ -70,6 +133,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	const float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
 	const TuboEngine::Math::Vector2 center = {screenW * 0.5f, screenH * 0.5f};
 
+	// テクスチャはプロジェクト側の配置に合わせて差し替えてください
 	const std::string readyTex = "ready.png";
 	const std::string startTex = "start.png";
 	TuboEngine::TextureManager::GetInstance()->LoadTexture(readyTex);
@@ -77,18 +141,18 @@ void StageReadyState::Enter(StageScene* scene) {
 
 	readySprite_ = std::make_unique<TuboEngine::Sprite>();
 	readySprite_->Initialize(readyTex);
-	readySprite_->SetAnchorPoint({0.5f, 0.5f});
+	readySprite_->SetAnchorPoint({ 0.5f, 0.5f });
 	readySprite_->SetGetIsAdjustTextureSize(true);
 	readySprite_->SetPosition(center);
-	readySprite_->SetColor({1, 1, 1, 1});
+	readySprite_->SetColor({ 1,1,1,1 });
 	readySprite_->Update();
 
 	startSprite_ = std::make_unique<TuboEngine::Sprite>();
 	startSprite_->Initialize(startTex);
-	startSprite_->SetAnchorPoint({0.5f, 0.5f});
+	startSprite_->SetAnchorPoint({ 0.5f, 0.5f });
 	startSprite_->SetGetIsAdjustTextureSize(true);
 	startSprite_->SetPosition(center);
-	startSprite_->SetColor({1, 1, 1, 0});
+	startSprite_->SetColor({ 1,1,1,0 }); // Startは最初非表示
 	startSprite_->Update();
 }
 
@@ -99,40 +163,37 @@ void StageReadyState::Update(StageScene* scene) {
 	(void)deltaTime;
 	prevTime_ = now;
 
-	if (!scene)
-		return;
-
-	auto* player = scene->GetPlayer();
-	auto* followCam = scene->GetFollowCamera();
-	auto* stageMgr = scene->GetStageManager();
-
-	// 先にプレイヤーを更新してからカメラを更新
-	if (player && followCam) {
-		player->SetMovementLocked(true);
-		player->SetCamera(followCam->GetCamera());
-		player->Update();
-
-		followCam->Update();
-		TuboEngine::LineManager::GetInstance()->SetDefaultCamera(followCam->GetCamera());
+	// 先にプレイヤーを更新してからカメラを更新する（追従対象が最新になる）
+	if (scene && scene->GetPlayer()) {
+		scene->GetPlayer()->SetMovementLocked(true); // 移動禁止
+		scene->GetPlayer()->SetCamera(scene->GetFollowCamera()->GetCamera());
+		scene->GetPlayer()->Update();
 	}
 
-	// StageManager 管理下のステージオブジェクトを更新
-	if (stageMgr && followCam) {
-		stageMgr->Update(player, followCam);
-	}
+	scene->GetFollowCamera()->Update();
 
-	// SkyDome
-	if (auto* sky = scene->GetSkyDome().get()) {
-		sky->SetCamera(followCam->GetCamera());
-		sky->Update();
+	LineManager::GetInstance()->SetDefaultCamera(scene->GetFollowCamera()->GetCamera());
+
+	for (auto& block : scene->GetBlocks()) {
+		block->SetCamera(scene->GetFollowCamera()->GetCamera());
+		block->Update();
 	}
+	for (auto& enemy : scene->GetEnemies()) {
+		enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
+		enemy->SetPlayer(scene->GetPlayer());
+		enemy->Update();
+	}
+	scene->GetTile()->SetCamera(scene->GetFollowCamera()->GetCamera());
+	scene->GetTile()->Update();
+
+	scene->GetSkyDome()->SetCamera(scene->GetFollowCamera()->GetCamera());
+	scene->GetSkyDome()->Update();
 
 	// --- Ready/Start 演出フェーズ進行 ---
 	phaseTimer_ += kDeltaSec;
 
 	auto SetSpriteAlpha = [](TuboEngine::Sprite* spr, float a) {
-		if (!spr)
-			return;
+		if (!spr) return;
 		Vector4 c = spr->GetColor();
 		c.w = std::clamp(a, 0.0f, 1.0f);
 		spr->SetColor(c);
@@ -153,47 +214,36 @@ void StageReadyState::Update(StageScene* scene) {
 		}
 	}
 
-	if (readySprite_)
-		readySprite_->Update();
-	if (startSprite_)
-		startSprite_->Update();
+	if (readySprite_) readySprite_->Update();
+	if (startSprite_) startSprite_->Update();
 
 	// 演出が終わったらPlayingへ
-	if (phase_ == Phase::Done && followCam && !followCam->IsIntroZoomPlaying()) {
-		if (auto* mgr = scene->GetStageStateManager()) {
-			mgr->ChangeState(StageType::Playing, scene);
-		}
+	if (phase_ == Phase::Done && !scene->GetFollowCamera()->IsIntroZoomPlaying()) {
+		scene->GetStageStateManager()->ChangeState(StageType::Playing, scene);
 	}
 }
 
-void StageReadyState::Exit(StageScene* scene) { (void)scene; }
+void StageReadyState::Exit(StageScene* scene) {}
 
 void StageReadyState::Object3DDraw(StageScene* scene) {
-	if (!scene)
-		return;
-	auto* stageMgr = scene->GetStageManager();
-	if (stageMgr) {
-		stageMgr->Draw3D();
+	// Stage0
+	for (auto& block : scene->GetBlocks()) {
+		block->Draw();
 	}
-	if (auto* sky = scene->GetSkyDome().get()) {
-		sky->Draw();
+	scene->GetPlayer()->Draw();
+	for (auto& enemy : scene->GetEnemies()) {
+		enemy->Draw();
 	}
-
-	Player* player = scene->GetPlayer();
-	player->Draw();
+	scene->GetTile()->Draw();
+	scene->GetSkyDome()->Draw();
 }
 
 void StageReadyState::SpriteDraw(StageScene* scene) {
 	(void)scene;
-	if (readySprite_)
-		readySprite_->Draw();
-	if (startSprite_)
-		startSprite_->Draw();
+	if (readySprite_) readySprite_->Draw();
+	if (startSprite_) startSprite_->Draw();
 }
 
-void StageReadyState::ImGuiDraw(StageScene* scene) {
-	if (scene && scene->GetFollowCamera())
-		scene->GetFollowCamera()->DrawImGui();
-}
+void StageReadyState::ImGuiDraw(StageScene* scene) { scene->GetFollowCamera()->DrawImGui(); }
 
 void StageReadyState::ParticleDraw(StageScene* scene) { (void)scene; }

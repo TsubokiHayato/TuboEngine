@@ -1,15 +1,19 @@
 #pragma once
 #include"DirectXcommon.h"
+#include"WinApp.h"
 
 #include"VertexData.h"
+#include"Material.h"
 #include"TransformationMatrix.h"
 #include"Transform.h"
+#include"ModelData.h"
+#include"BlendMode.h"
 #include"CameraForGPU.h"
 #include"SkyBox.h"
-#include"Model.h"
 //前方宣言
 class Object3dCommon;
 class ModelCommon;
+class Model;
 class Camera;
 
 //平行光源
@@ -122,13 +126,13 @@ public:
 		lightTypeData->type = type;
 	}
 
-	void SetModel(TuboEngine::Model* model) {
+	void SetModel(Model* model) {
 		assert(model);
 		this->model_ = model;
 	}
 	void SetModel(const std::string& filePath);
-	void SetCamera(TuboEngine::Camera* camera) { this->camera = camera; }
-	TuboEngine::Camera* GetCamera() const { return camera; }
+	void SetCamera(Camera* camera) { this->camera = camera; }
+	Camera* GetCamera() const { return camera; }
 
 	void SetModelColor(const TuboEngine::Math::Vector4& color);
 
@@ -138,17 +142,6 @@ public:
 	TuboEngine::Math::Vector3 GetPosition() const { return transform.translate; }
 	// モデルの色
 	Vector4 GetModelColor();
-
-	// Getter for Batching
-	TuboEngine::Model* GetModel() const { return model_; }
-	TransformationMatrix* GetTransformationMatrixData() const { return transformMatrixData; }
-	
-	ID3D12Resource* GetDirectionalLightResource() const { return directionalLightResource.Get(); }
-	ID3D12Resource* GetPointLightResource() const { return pointLightResource.Get(); }
-	ID3D12Resource* GetSpotLightResource() const { return spotLightResource.Get(); }
-	ID3D12Resource* GetCameraForGPUResource() const { return cameraForGPUResource.Get(); }
-	ID3D12Resource* GetLightTypeResource() const { return lightTypeResource.Get(); }
-	std::string GetCubeMapFilePath() const { return cubeMapFilePath_; }
 
 	//-------------------------------------------------------------------------------------------------
 	// Material
@@ -183,9 +176,9 @@ private:
 	// モデル共通部分
 	ModelCommon* modelCommon_ = nullptr;
 	// モデルデータ
-	TuboEngine::Model* model_ = nullptr;
+	Model* model_ = nullptr;
 	// カメラ
-	TuboEngine::Camera* camera;
+	Camera* camera;
 
 	// 座標のバッファリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformMatrixResource;

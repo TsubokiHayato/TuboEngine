@@ -27,10 +27,6 @@ std::map<std::string, MapChipType> mapChipTable = {
     {"3", MapChipType::Enemy },
     {"4", MapChipType::EnemyRush },
     {"5", MapChipType::EnemyShoot },
-    {"8",MapChipType::EnemyMortar},
-    {"9",MapChipType::EnemyCircus},
-    {"6", MapChipType::kEntrance },
-    {"7", MapChipType::kExit },
 };
 }
 
@@ -39,18 +35,15 @@ std::map<std::string, MapChipType> mapChipTable = {
 //--------------------------------------------------
 MapChipField::IndexSet MapChipField::GetMapChipIndexSetByPosition(const TuboEngine::Math::Vector3& position) const {
     IndexSet indexSet = {};
-    // 原点を考慮したローカル座標でインデックス計算
-    float localX = position.x - origin_.x;
-    float localY = position.y - origin_.y;
-    indexSet.xIndex = static_cast<uint32_t>((localX + kBlockWidth_ / 2) / kBlockWidth_);
-    indexSet.yIndex = static_cast<uint32_t>((localY + kBlockHeight_ / 2) / kBlockHeight_);
+    indexSet.xIndex = static_cast<uint32_t>((position.x + kBlockWidth_ / 2) / kBlockWidth_);
+    indexSet.yIndex = static_cast<uint32_t>((position.y + kBlockHeight_ / 2) / kBlockHeight_);
     return indexSet;
 }
 
 //--------------------------------------------------
 // インデックスから矩形領域を取得
 //--------------------------------------------------
-MapChipField::Rect MapChipField::GetRectByIndex(uint32_t xIndex, uint32_t yIndex) const {
+MapChipField::Rect MapChipField::GetRectByIndex(uint32_t xIndex, uint32_t yIndex) {
 	TuboEngine::Math::Vector3 center = GetMapChipPositionByIndex(xIndex, yIndex);
 
 	Rect rect;
@@ -90,12 +83,29 @@ void MapChipField::LoadMapChipCsv(const std::string& filePath) {
 		std::stringstream ss(line);
 		std::string cell;
 		while (std::getline(ss, cell, ',')) {
-			// マップチップ種別テーブルを利用して変換
-			auto it = mapChipTable.find(cell);
-			if (it != mapChipTable.end()) {
-				row.push_back(it->second);
-			} else {
+			int value = std::stoi(cell);
+			switch (value) {
+			case 0:
 				row.push_back(MapChipType::kBlank);
+				break;
+			case 1:
+				row.push_back(MapChipType::kBlock);
+				break;
+			case 2:
+				row.push_back(MapChipType::Player);
+				break;
+			case 3:
+				row.push_back(MapChipType::Enemy);
+				break;
+			case 4:
+				row.push_back(MapChipType::EnemyRush);
+				break;
+			case 5:
+				row.push_back(MapChipType::EnemyShoot);
+				break;
+			default:
+				row.push_back(MapChipType::kBlank);
+				break;
 			}
 		}
 		mapChipData_.data.push_back(row);
@@ -121,11 +131,11 @@ MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex
 //--------------------------------------------------
 // インデックスからマップチップの座標を取得
 //--------------------------------------------------
-TuboEngine::Math::Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex)const {
+TuboEngine::Math::Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex) {
 	return TuboEngine::Math::Vector3(
-        origin_.x + kBlockWidth_ * xIndex,      // X: 右へ+
-        origin_.y + kBlockHeight_ * yIndex,     // Y: 上へ+
-        origin_.z                        // Z: 原点に合わせる
+        kBlockWidth_ * xIndex,      // X: 右へ+
+        kBlockHeight_ * yIndex,     // Y: 上へ+
+        0.0f                        // Z: 高さ（固定）
     );
 }
 
@@ -160,13 +170,13 @@ bool MapChipField::IsWalkable(const TuboEngine::Math::Vector3& position) const {
 bool MapChipField::IsBlocked(const TuboEngine::Math::Vector3& position) const {
     IndexSet index = GetMapChipIndexSetByPosition(position);
 
-    // 実データで境界チェック（範囲外は通行可能扱いに変更）
+    // 実データで境界チェック（範囲外はブロック扱い）
     if (index.yIndex >= mapChipData_.data.size()) {
-        return false;
+        return true;
     }
     const auto& row = mapChipData_.data[index.yIndex];
     if (index.xIndex >= row.size()) {
-        return false;
+        return true;
     }
 
     MapChipType type = row[index.xIndex];
@@ -177,65 +187,21 @@ bool MapChipField::IsBlocked(const TuboEngine::Math::Vector3& position) const {
 // 指定矩形領域（プレイヤーの四隅など）が衝突しているか判定
 //--------------------------------------------------
 bool MapChipField::IsRectBlocked(const TuboEngine::Math::Vector3& center, float width, float height) const {
-    // 矩形範囲をインデックス範囲に変換
-    float halfW = width / 2.0f;
-    float halfH = height / 2.0f;
-    
-    // 少し内側を判定対象にする（境界ギリギリでの誤検知防止）
-    float margin = 0.01f;
-    IndexSet minIdx = GetMapChipIndexSetByPosition({center.x - halfW + margin, center.y - halfH + margin, center.z});
-    IndexSet maxIdx = GetMapChipIndexSetByPosition({center.x + halfW - margin, center.y + halfH - margin, center.z});
-
-    // 範囲内の全チップをチェック
-    for (uint32_t y = minIdx.yIndex; y <= maxIdx.yIndex; ++y) {
-        if (y >= mapChipData_.data.size()) continue;
-        const auto& row = mapChipData_.data[y];
-        for (uint32_t x = minIdx.xIndex; x <= maxIdx.xIndex; ++x) {
-            if (x >= row.size()) continue;
-            if (row[x] == MapChipType::kBlock) {
-                return true;
-            }
+    // 四隅の座標を計算
+	std::array<TuboEngine::Math::Vector3, 4> corners = {
+	    TuboEngine::Math::Vector3(center.x + width / 2.0f, center.y - height / 2.0f, center.z), // 右下
+	    TuboEngine::Math::Vector3(center.x - width / 2.0f, center.y - height / 2.0f, center.z), // 左下
+	    TuboEngine::Math::Vector3(center.x + width / 2.0f, center.y + height / 2.0f, center.z), // 右上
+	    TuboEngine::Math::Vector3(center.x - width / 2.0f, center.y + height / 2.0f, center.z)  // 左上
+    };
+    for (const auto& pos : corners) {
+        if (IsBlocked(pos)) {
+            return true;
         }
     }
     return false;
 }
 
-//--------------------------------------------------
-// 指定タイプのチップのワールド座標リストを取得
-//--------------------------------------------------
-std::vector<TuboEngine::Math::Vector3> MapChipField::GetChipPositions(MapChipType type) const {
-	std::vector<TuboEngine::Math::Vector3> result;
-	for (uint32_t y = 0; y < mapChipData_.data.size(); ++y) {
-		const auto& row = mapChipData_.data[y];
-		for (uint32_t x = 0; x < row.size(); ++x) {
-			if (row[x] == type) {
-				// 座標計算では origin_ とブロックサイズを利用
-				TuboEngine::Math::Vector3 pos(
-					origin_.x + kBlockWidth_ * x,
-					origin_.y + kBlockHeight_ * y,
-					origin_.z);
-				result.push_back(pos);
-			}
-		}
-	}
-	return result;
-}
-
-//--------------------------------------------------
-// 指定座標の衝突法線を取得 (反射用)
-//--------------------------------------------------
-TuboEngine::Math::Vector3 MapChipField::GetCollisionNormal(const TuboEngine::Math::Vector3& pos, const TuboEngine::Math::Vector3& velocity) const {
-	IndexSet index = GetMapChipIndexSetByPosition(pos);
-	TuboEngine::Math::Vector3 center = GetMapChipPositionByIndex(index.xIndex, index.yIndex);
-	TuboEngine::Math::Vector3 diff = pos - center;
-
-	// X, Y のどちらの面に近いかで法線を決定
-	if (std::abs(diff.x * kBlockHeight_) > std::abs(diff.y * kBlockWidth_)) {
-		return { (diff.x > 0) ? 1.0f : -1.0f, 0.0f, 0.0f };
-	} else {
-		return { 0.0f, (diff.y > 0) ? 1.0f : -1.0f, 0.0f };
-	}
-}
 
 //--------------------------------------------------
 // ImGuiの描画処理
@@ -262,17 +228,13 @@ void MapChipField::DrawImGui(const char* windowName) {
                 const char* label = nullptr;
                 ImVec4 color;
                 switch (mapChipType) {
-                    case MapChipType::kBlank:     label = "";   color = ImVec4(0.8f, 0.8f, 0.8f, 1.0f); break;
-                    case MapChipType::kBlock:     label = "B";  color = ImVec4(0.3f, 0.3f, 0.8f, 1.0f); break;
-                    case MapChipType::Player:     label = "P";  color = ImVec4(0.2f, 0.8f, 0.2f, 1.0f); break;
-                    case MapChipType::Enemy:      label = "E";  color = ImVec4(0.8f, 0.2f, 0.2f, 1.0f); break;
+                    case MapChipType::kBlank:     label = "";  color = ImVec4(0.8f, 0.8f, 0.8f, 1.0f); break;
+                    case MapChipType::kBlock:     label = "B"; color = ImVec4(0.3f, 0.3f, 0.8f, 1.0f); break;
+                    case MapChipType::Player:     label = "P"; color = ImVec4(0.2f, 0.8f, 0.2f, 1.0f); break;
+                    case MapChipType::Enemy:      label = "E"; color = ImVec4(0.8f, 0.2f, 0.2f, 1.0f); break;
                     case MapChipType::EnemyRush:  label = "ER"; color = ImVec4(1.0f, 0.4f, 0.2f, 1.0f); break;
                     case MapChipType::EnemyShoot: label = "ES"; color = ImVec4(0.9f, 0.6f, 0.2f, 1.0f); break;
-					case MapChipType::EnemyMortar: label = "EM"; color = ImVec4(0.8f, 0.4f, 1.0f, 1.0f); break;
-					case MapChipType::EnemyCircus: label = "EX"; color = ImVec4(1.0f, 0.0f, 1.0f, 1.0f); break;
-					case MapChipType::kEntrance:  label = "IN"; color = ImVec4(0.2f, 0.6f, 1.0f, 1.0f); break;
-					case MapChipType::kExit:      label = "OUT"; color = ImVec4(1.0f, 0.9f, 0.2f, 1.0f); break;
-                    default:                      label = "?";  color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); break;
+                    default:                      label = "?"; color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); break;
                 }
                 ImGui::PushStyleColor(ImGuiCol_Button, color);
                 ImGui::PushID(yIndex * kNumBlockHorizontal + xIndex);
@@ -285,10 +247,7 @@ void MapChipField::DrawImGui(const char* windowName) {
                         case MapChipType::Player:     nextType = MapChipType::Enemy;       break;
                         case MapChipType::Enemy:      nextType = MapChipType::EnemyRush;   break;
                         case MapChipType::EnemyRush:  nextType = MapChipType::EnemyShoot;  break;
-                        case MapChipType::EnemyShoot: nextType = MapChipType::kEntrance;   break;
-					case MapChipType::kEntrance:  nextType = MapChipType::EnemyCircus; break;
-					case MapChipType::EnemyCircus: nextType = MapChipType::kExit;     break;
-					case MapChipType::kExit:      nextType = MapChipType::kBlank;    break;
+                        case MapChipType::EnemyShoot: nextType = MapChipType::kBlank;      break;
                         default:                      nextType = MapChipType::kBlank;      break;
                     }
                     SetMapChipTypeByIndex(xIndex, yIndex, nextType);

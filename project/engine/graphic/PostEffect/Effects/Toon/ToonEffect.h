@@ -27,10 +27,10 @@ public:
 	ToonParams* GetParams() { return toonParams_; }
 
 public:
-	void SetMainCamera(TuboEngine::Camera* camera) override;
+	void SetMainCamera(Camera* camera) override;
 
 private:
-	TuboEngine::Camera* camera_ = nullptr; // メインカメラへのポインタ
+	Camera* camera_ = nullptr; // メインカメラへのポインタ
 	std::unique_ptr<ToonPSO> pso_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> toonCB_;
 	ToonParams* toonParams_ = nullptr;
