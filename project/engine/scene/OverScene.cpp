@@ -1,5 +1,6 @@
 #include "OverScene.h"
 #include"OffScreenRendering.h"
+#include"TextManager.h"
 #include "WinApp.h"
 #include"Input.h"
 #include"SceneManager.h"
@@ -24,8 +25,11 @@ namespace {
 }
 
 void OverScene::Initialize() {
+
+	//ポストエフェクト設定
+	OffScreenRendering::GetInstance()->SetVHSEffect(true);
 	// カメラの初期化
-	camera = std::make_unique<Camera>();
+	camera = std::make_unique<TuboEngine::Camera>();
 	cameraTransform.rotate = {0.0f, 0.0f, 0.0f};      // カメラの回転を初期化
 	cameraTransform.scale = {1.0f, 1.0f, 1.0f};       // カメラのスケールを初期化
 	cameraTransform.translate = {0.0f, 0.0f, -15.0f}; // カメラの位置を初期化
@@ -68,14 +72,15 @@ void OverScene::Initialize() {
 		x += letterSize_.x + lettersGap_;
 	}
 
-	
-	restartSprite_ = std::make_unique<TuboEngine::Sprite>();
-	restartSprite_->Initialize("restart.png");
-	restartSprite_->SetPosition({640.0f, 680.0f});
-	restartSprite_->SetAnchorPoint({0.5f, 0.5f});
-	restartSprite_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	//TextManager
+	TuboEngine::TextManager::GetInstance()->Initialize();
+	TuboEngine::TextManager::GetInstance()->LoadTextLayout("GameOver.json");
 }
 void OverScene::Update() {
+
+	// ポストエフェクト設定
+	OffScreenRendering::GetInstance()->SetVHSEffect(true);
+
 	// カメラ更新
 	camera->SetTranslate(cameraTransform.translate);
 	camera->setRotation(cameraTransform.rotate);
@@ -128,21 +133,31 @@ void OverScene::Update() {
 	}
 
 
-	restartSprite_->Update();
+	// TextManager
+	TuboEngine::TextManager::GetInstance()->UpdateAll();
 }
 
-void OverScene::Finalize() {}
+void OverScene::Finalize() {
+	// ポストエフェクト設定
+	OffScreenRendering::GetInstance()->SetVHSEffect(false);
+
+}
 
 void OverScene::Object3DDraw() { player->Draw(); }
 
 void OverScene::SpriteDraw() {
 	for (auto& l : letters_) { l.sprite->Draw(); }
-	restartSprite_->Draw();
+
+	 // TextManager Draw
+	TuboEngine::TextManager::GetInstance()->DrawAll();
 }
 
 void OverScene::ImGuiDraw() {
 
 #ifdef USE_IMGUI
+	TuboEngine::TextManager::GetInstance()->DrawImGui();
+
+
 	ImGui::Begin("OVERScene");
 	ImGui::Text("OVERScene");
 	ImGui::Checkbox("Loop", &loopBounce_);
