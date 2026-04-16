@@ -1,5 +1,5 @@
 #include "TitleScene.h"
-#include "StageScene.h" // 追加: isDemoModeフラグ操作のため
+#include"StageScene.h"//isDemo用
 #include "ImGuiManager.h"
 #include "Input.h"
 #include "LineManager.h"
@@ -14,13 +14,13 @@ void TitleScene::Initialize() {
 
 	
     // カメラ（3D向けに調整）
-	camera = std::make_unique<TuboEngine::Camera>();
+	camera = std::make_unique<Camera>();
 	camera->SetTranslate(cameraPosition);
 	camera->setRotation(cameraRotation);
 	camera->setScale(cameraScale);
 
 	// Line 描画用にデフォルトカメラをセット（ここで一度登録しておく）
-	TuboEngine::LineManager::GetInstance()->SetDefaultCamera(camera.get());
+	LineManager::GetInstance()->SetDefaultCamera(camera.get());
 
 	// タイトル用スカイドーム
 	skyDome_ = std::make_unique<SkyDome>();
@@ -54,8 +54,6 @@ void TitleScene::Initialize() {
 
 	// 背景タイマー
 	time_ = 0.0f;
-	// デモタイマーリセット
-	demoTimer_ = 0.0f;
 }
 
 void TitleScene::Update() {
@@ -145,8 +143,8 @@ void TitleScene::Update() {
 	camera->Update();
 
 	// LineManager にカメラを渡し、Line の内部更新を行う（カメラが未設定だとスクリーン変換されない）
-	TuboEngine::LineManager::GetInstance()->SetDefaultCamera(camera.get());
-	TuboEngine::LineManager::GetInstance()->Update();
+	LineManager::GetInstance()->SetDefaultCamera(camera.get());
+	LineManager::GetInstance()->Update();
 
 	// シーンチェンジアニメーション更新
 	sceneChangeAnimation->Update(dt);
@@ -157,8 +155,6 @@ void TitleScene::Update() {
 	// UIからのシーン遷移要求を受け取って、演出開始
 	if (!isRequestSceneChange && titleUI && titleUI->GetrRequestSceneChange_()) {
 		if (sceneChangeAnimation->IsFinished()) {
-			// pending に UI の希望を保存してアニメ開始
-			pendingNextSceneType_ = titleUI->GetNextSceneType();
 			sceneChangeAnimation->SetPhase(SceneChangeAnimation::Phase::Appearing);
 			isRequestSceneChange = true;
 		}
@@ -167,9 +163,9 @@ void TitleScene::Update() {
 	// シーン遷移完了判定（UIの要求に応じて遷移）
 	if (isRequestSceneChange && sceneChangeAnimation->IsFinished()) {
 		int next = TITLE;
-		// UI 主導の遷移があれば優先
-		if (titleUI && titleUI->GetrRequestSceneChange_()) {
+		if (titleUI) {
 			switch (titleUI->GetNextSceneType()) {
+
 			case SceneType::Select: next = STAGE; break;
 			// Tutorialには行けないようにする
 			case SceneType::Tutorial: next = TITLE; break;
@@ -187,12 +183,12 @@ void TitleScene::Update() {
 			// reset pending
 			pendingNextSceneType_ = SceneType::Title;
 		}
-		// ChangeScene 実行
 		SceneManager::GetInstance()->ChangeScene(next);
 		isRequestSceneChange = false;
 	}
 
 	// 背景アニメ（時間のみで更新、Object3DDraw で参照）
+
 
 	// --- Demo Timer Logic ---
 	// 何か入力があればタイマーリセット

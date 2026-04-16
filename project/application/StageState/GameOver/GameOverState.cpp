@@ -14,18 +14,14 @@ void GameOverState::Enter(StageScene* scene) {
 	phase_ = Phase::None;
 
 	// フォローカメラ初期化（演出は無し）
-	if (scene->GetFollowCamera()) {
-		scene->GetFollowCamera()->Update();
-	}
+	scene->GetFollowCamera()->Update();
 
 	// プレイヤーは操作停止のみ
 	if (player_) {
 		player_->SetMovementLocked(true);
 		player_->SetModelAlpha(1.0f);
 		player_->SetScale({1.0f, 1.0f, 1.0f});
-		if (scene->GetFollowCamera()) {
-			player_->SetCamera(scene->GetFollowCamera()->GetCamera());
-		}
+		player_->SetCamera(scene->GetFollowCamera()->GetCamera());
 		player_->Update();
 	}
 
@@ -38,81 +34,68 @@ void GameOverState::Enter(StageScene* scene) {
 	blackoutSprite_->Update();
 
 	// SkyDome初期化
-	if (auto* sky = scene->GetSkyDome().get()) {
-		sky->Initialize();
-		if (scene->GetFollowCamera()) {
-			sky->SetCamera(scene->GetFollowCamera()->GetCamera());
-		}
-		sky->Update();
-	}
+	scene->GetSkyDome()->Initialize();
+	scene->GetSkyDome()->SetCamera(scene->GetFollowCamera()->GetCamera());
+	scene->GetSkyDome()->Update();
 }
 
 void GameOverState::Update(StageScene* scene) {
-	if (!scene) return;
-
-	// 各オブジェクトの更新のみ（StageManager 統合後は StageManager に一任）
-	if (auto* follow = scene->GetFollowCamera()) {
-		follow->Update();
-	}
-	if (auto* sky = scene->GetSkyDome().get()) {
-		if (auto* follow = scene->GetFollowCamera()) {
-			sky->SetCamera(follow->GetCamera());
-		}
-		sky->Update();
-	}
-	if (auto* stageMgr = scene->GetStageManager()) {
-		// Game Over 中も最終フレームの見た目を維持するため描画更新のみ（ロジックは基本停止済み想定）
-		Player* player = scene->GetPlayer();
-		FollowTopDownCamera* follow = scene->GetFollowCamera();
-		stageMgr->Update(player, follow);
-	}
+	// 各オブジェクトの更新のみ
+	if (scene->GetFollowCamera())
+		scene->GetFollowCamera()->Update();
 	if (player_) {
-		if (auto* follow = scene->GetFollowCamera()) {
-			player_->SetCamera(follow->GetCamera());
-		}
+		player_->SetCamera(scene->GetFollowCamera()->GetCamera());
 		player_->Update();
+	}
+	scene->GetSkyDome()->SetCamera(scene->GetFollowCamera()->GetCamera());
+	scene->GetSkyDome()->Update();
+
+	scene->GetTile()->SetCamera(scene->GetFollowCamera()->GetCamera());
+	scene->GetTile()->Update();
+
+	for (auto& block : scene->GetBlocks()) {
+		block->SetCamera(scene->GetFollowCamera()->GetCamera());
+		block->Update();
+	}
+
+	for (auto& enemy : scene->GetEnemies()) {
+		enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
+		enemy->Update();
 	}
 
 	// 暗転アニメーション（維持）。徐々にアルファを上げ、最大でシーン遷移
-	if (blackoutSprite_) {
-		float alpha = blackoutSprite_->GetColor().w;
-		const float maxAlpha = 1.0f;
-		alpha = std::min(maxAlpha, alpha + 0.01f);
-		blackoutSprite_->SetColor({0.0f, 0.0f, 0.0f, alpha});
-		blackoutSprite_->Update();
-		if (alpha >= maxAlpha) {
-			scene->ChangeNextScene(OVER);
-		}
+	float alpha = blackoutSprite_->GetColor().w;
+	const float maxAlpha = 1.0f;
+	alpha = std::min(maxAlpha, alpha + 0.01f);
+	blackoutSprite_->SetColor({0.0f, 0.0f, 0.0f, alpha});
+	blackoutSprite_->Update();
+	if (alpha >= maxAlpha) {
+		scene->ChangeNextScene(OVER);
 	}
 }
 
-void GameOverState::Exit(StageScene* scene) { (void)scene; }
+void GameOverState::Exit(StageScene* scene) {}
 
 void GameOverState::Object3DDraw(StageScene* scene) {
-	if (!scene) return;
+	// 各オブジェクトの描画のみ
+	// 3Dオブジェクト描画
+	for (auto& block : scene->GetBlocks())
+		block->Draw();
+	player_->Draw();
+	for (auto& enemy : scene->GetEnemies())
+		enemy->Draw();
 
-	// StageManager 管理のステージと SkyDome を描画
-	if (auto* stageMgr = scene->GetStageManager()) {
-		stageMgr->Draw3D();
-	}
-	if (auto* sky = scene->GetSkyDome().get()) {
-		sky->Draw();
-	}
+	scene->GetTile()->Draw();
 
-	// プレイヤーのみ直接描画（他の敵やブロックは StageManager 内に存在）
-	if (auto* player = scene->GetPlayer()) {
-		player->Draw();
-	}
+	scene->GetSkyDome()->Draw();
 }
 
 void GameOverState::SpriteDraw(StageScene* scene) {
-	(void)scene;
 	// 暗転のみ描画（維持）
-	if (blackoutSprite_) {
+	if (blackoutSprite_)
 		blackoutSprite_->Draw();
-	}
 }
 
-void GameOverState::ImGuiDraw(StageScene* scene) { (void)scene; }
+void GameOverState::ImGuiDraw(StageScene* scene) {}
 
-void GameOverState::ParticleDraw(StageScene* scene) { (void)scene; }
+void GameOverState::ParticleDraw(StageScene* scene) {}

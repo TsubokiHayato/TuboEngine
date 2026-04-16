@@ -11,17 +11,13 @@
 ///----------------------------------------------------
 /// Lineクラスの初期化処理
 ///----------------------------------------------------
-void TuboEngine::Line::Initialize(TuboEngine::LineCommon* lineCommon) {
+void Line::Initialize(LineCommon* lineCommon) {
     // Line描画の共通処理管理クラスをセット
     lineCommon_ = lineCommon;
     // 頂点バッファ生成
     CreateVertexBuffer();
     // 座標変換行列バッファ生成
     CreateTransformationMatrixBuffer();
-
-    // Debug時のpush_back再確保による高負荷を防ぐため事前予約
-    vertices_.reserve(1000000);
-
     // Transformの初期化
     transform_ = {
         {1.0f, 1.0f, 1.0f},
@@ -35,11 +31,11 @@ void TuboEngine::Line::Initialize(TuboEngine::LineCommon* lineCommon) {
 ///----------------------------------------------------
 /// Lineクラスの更新処理
 ///----------------------------------------------------
-void TuboEngine::Line::Update() {
+void Line::Update() {
     // デフォルトカメラ取得
     camera_ = lineCommon_->GetDefaultCamera();
     // ワールド行列作成
-	TuboEngine::Math::Matrix4x4 worldMatrix = TuboEngine::Math::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	TuboEngine::Math::Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 	TuboEngine::Math::Matrix4x4 worldViewProjectionMatrix;
     if (camera_) {
         // ビュー・プロジェクション行列取得
@@ -61,10 +57,7 @@ void TuboEngine::Line::Update() {
 ///----------------------------------------------------
 /// ライン描画用頂点追加
 ///----------------------------------------------------
-void TuboEngine::Line::DrawLine(const TuboEngine::Math::Vector3& start, const TuboEngine::Math::Vector3& end, const TuboEngine::Math::Vector4& color) {
-    if (vertices_.size() + 2 > 1000000) {
-        return;
-    }
+void Line::DrawLine(const TuboEngine::Math::Vector3& start, const TuboEngine::Math::Vector3& end, const TuboEngine::Math::Vector4& color) {
     vertices_.push_back({start, color});
     vertices_.push_back({end, color});
 }
@@ -72,7 +65,7 @@ void TuboEngine::Line::DrawLine(const TuboEngine::Math::Vector3& start, const Tu
 ///----------------------------------------------------
 /// ライン描画処理
 ///----------------------------------------------------
-void TuboEngine::Line::Draw() {
+void Line::Draw() {
     if (vertices_.empty()) {
         return;
     }
@@ -93,18 +86,18 @@ void TuboEngine::Line::Draw() {
 ///----------------------------------------------------
 /// ライン頂点情報のクリア
 ///----------------------------------------------------
-void TuboEngine::Line::ClearLines() {
+void Line::ClearLines() {
     vertices_.clear();
 }
 
 ///----------------------------------------------------
 /// 頂点バッファ生成
 ///----------------------------------------------------
-void TuboEngine::Line::CreateVertexBuffer() {
+void Line::CreateVertexBuffer() {
     // デバイスの取得
 	auto device = TuboEngine::DirectXCommon::GetInstance()->GetDevice();
-    // バッファサイズ（最大1000000頂点分）
-    auto bufferSize = sizeof(LineVertex) * 1000000;
+    // バッファサイズ（最大100000頂点分）
+    auto bufferSize = sizeof(LineVertex) * 100000;
     // ヒーププロパティ設定（UPLOAD）
     D3D12_HEAP_PROPERTIES heapProps = {};
     heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -129,15 +122,15 @@ void TuboEngine::Line::CreateVertexBuffer() {
 ///----------------------------------------------------
 /// 座標変換行列バッファ生成
 ///----------------------------------------------------
-void TuboEngine::Line::CreateTransformationMatrixBuffer() {
+void Line::CreateTransformationMatrixBuffer() {
     // 定数バッファのサイズを 256 バイトの倍数に設定
-	size_t bufferSize = (sizeof(TuboEngine::TransformationMatrix) + 255) & ~255;
+    size_t bufferSize = (sizeof(TransformationMatrix) + 255) & ~255;
 	transfomationMatrixBuffer_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(bufferSize);
     // TransformationMatrixの初期化
-	TuboEngine::TransformationMatrix transformationMatrix = {};
+    TransformationMatrix transformationMatrix = {};
     // 書き込むためのアドレスを取得
     transfomationMatrixBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
     // 単位行列を書き込む
-	transformationMatrix.WVP = TuboEngine::Math::MakeIdentity4x4();
+    transformationMatrix.WVP = MakeIdentity4x4();
     *transformationMatrixData_ = transformationMatrix;
 }

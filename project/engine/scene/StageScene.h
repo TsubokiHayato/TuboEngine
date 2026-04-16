@@ -36,10 +36,9 @@
 #include "application/UI/HP/Enemy/EnemyHpUI.h"
 #include "application/UI/Guide/GuideUI.h"
 
-#include "application/Stage/StageManager.h" // 追加: StageManager の完全型定義
-
 #include <string>
 #include <vector>
+
 
 class StageScene : public IScene {
 public:
@@ -85,7 +84,7 @@ public:
 	/// <summary>
 	/// メインカメラ取得
 	/// </summary>
-	TuboEngine::Camera* GetMainCamera() const { return followCamera->GetCamera(); }
+	Camera* GetMainCamera() const { return followCamera->GetCamera(); }
 
 	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
 
@@ -96,13 +95,14 @@ public:
 
 public:
 	///----------------------------------------------------------------------------------------
-	///			引き渡し用変数
+	///				引き渡し用変数
 	///-----------------------------------------------------------------------------------------
 
 	Player* GetPlayer() const { return player_.get(); }
 	MapChipField* GetMapChipField() const { return mapChipField_.get(); }
-	// Stage オブジェクトはすべて StageManager 管理に移行したため、
-	// 旧 blocks_/tile_/enemies の Getter は削除済み。
+	std::vector<std::unique_ptr<Block>>& GetBlocks() { return blocks_; }
+	std::unique_ptr<Tile>& GetTile() { return tile_; }
+	std::vector<std::unique_ptr<Enemy>>& GetEnemies() { return enemies; }
 
 	FollowTopDownCamera* GetFollowCamera() const { return followCamera.get(); }
 	std::string& GetMapChipCsvFilePath() { return mapChipCsvFilePath_; }
@@ -128,14 +128,35 @@ public:
 		float top{};
 	};
 
-	StageManager* GetStageManager() const { return stageManager_.get(); }
+	struct StageInstance {
+		std::string csvPath;
+		TuboEngine::Math::Vector3 origin{0.0f, 0.0f, 0.0f};
+		bool visible = true;
 
+		std::unique_ptr<MapChipField> field;
+		std::vector<std::unique_ptr<Block>> blocks;
+		std::vector<std::unique_ptr<Enemy>> enemies;
+		std::unique_ptr<Tile> tile;
+
+		// Stage[0]用（Playerチップ探索結果）
+		int playerMapX = -1;
+		int playerMapY = -1;
+
+		StageBounds boundsWorld{};
+	};
+
+	std::vector<StageInstance>& GetStageInstances() { return stageInstances_; }
+	const std::vector<StageInstance>& GetStageInstances() const { return stageInstances_; }
+
+	// デバッグ表示用：Stage[1..] のプレビューを描画するか
 	bool GetDrawPreviewStages() const { return drawPreviewStages_; }
 	void SetDrawPreviewStages(bool draw) { drawPreviewStages_ = draw; }
 
+	// ...existing code...
+
 private:
 	///----------------------------------------------------------------------------------------
-	///			メンバ変数
+	///				メンバ変数
 	///----------------------------------------------------------------------------------------
 
 	std::unique_ptr<Audio> audio = nullptr;
@@ -143,26 +164,23 @@ private:
 	std::unique_ptr<CollisionManager> collisionManager_;
 
 	std::unique_ptr<FollowTopDownCamera> followCamera;
-	std::unique_ptr<TuboEngine::Camera> camera = nullptr;
+	std::unique_ptr<Camera> camera = nullptr;
 	TuboEngine::Math::Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
 	TuboEngine::Math::Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	TuboEngine::Math::Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
 
 	std::unique_ptr<Player> player_ = nullptr;
-	std::unique_ptr<Enemy> enemy_ = nullptr; // TODO: 旧世代の単体 Enemy。必要なければ将来削除。
+	std::unique_ptr<Enemy> enemy_ = nullptr;
+	std::vector<std::unique_ptr<Enemy>> enemies;
 
-	std::unique_ptr<TuboEngine::SkyBox> skyBox_ = nullptr;
+	std::unique_ptr<SkyBox> skyBox_ = nullptr;
 
 	std::unique_ptr<MapChipField> mapChipField_ = nullptr;
-	std::string mapChipCsvFilePath_ = "Resources/Stage/MapChip.csv";
-	// Demo専用CSVパス（デモプレイ時にこちらを読み込む）
-	std::string demoMapChipCsvFilePath_ = "Resources/Stage/Demo.csv";
+	std::string mapChipCsvFilePath_ = "Resources/MapChip.csv";
 
-public:
-	// Demo用CSVパス取得
-	const std::string& GetDemoMapChipCsvFilePath() const { return demoMapChipCsvFilePath_; }
+	std::vector<std::unique_ptr<Block>> blocks_;
 
-	// 旧: blocks_/tile_/enemies は StageManager 統合により削除
+	std::unique_ptr<Tile> tile_;
 
 	std::unique_ptr<StageStateManager> stateManager_;
 
@@ -170,13 +188,6 @@ public:
 
 	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation_ = nullptr;
 	bool isRequestSceneChange = false;
-	// シーンチェンジで遷移先を一時保持する（SceneChangeAnimation 完了時に遷移する）
-	int pendingNextSceneNo_ = -1;
-
-public:
-	// シーンチェンジ遷移先設定 (SceneChangeAnimation を使う場合)
-	void SetPendingNextScene(int sceneNo) { pendingNextSceneNo_ = sceneNo; }
-	int GetPendingNextScene() const { return pendingNextSceneNo_; }
 
 	// 追加: ステート切替(リスタート等)用のトランジション状態
 	bool isStateChangeTransitionActive_ = false;
@@ -187,13 +198,9 @@ public:
 	std::unique_ptr<EnemyHpUI> enemyHpUI_;
 	std::unique_ptr<GuideUI> guideUI_;
 
-	// Demo overlay sprites
-	std::unique_ptr<TuboEngine::Sprite> demoLabelSprite_ = nullptr;     // "ーDEMOー"
-	std::unique_ptr<TuboEngine::Sprite> demoPressAnySprite_ = nullptr;  // "PRESS ANY BUTTON"
-
 	// Multi-stage layout data (debug / editor)
 	bool useMultiStageLayout_ = true;
 	bool drawPreviewStages_ = true;
+	std::vector<StageInstance> stageInstances_;
 
-	std::unique_ptr<StageManager> stageManager_;
 };
