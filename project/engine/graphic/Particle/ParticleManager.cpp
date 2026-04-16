@@ -135,7 +135,7 @@ std::string TuboEngine::ParticleManager::GenerateUniqueName(const std::string& b
     if (!exists) return base; int counter = 2; while (true) { std::string c = base + "(" + std::to_string(counter) + ")"; bool dup=false; for (auto& e:emitters_) if (e->GetName()==c){dup=true;break;} if(!dup) return c; ++counter; }
 }
 
-void TuboEngine::ParticleManager::Update(float dt, Camera* cam) {
+void TuboEngine::ParticleManager::Update(float dt, TuboEngine::Camera* cam) {
     for (auto& e : emitters_) {
         auto& preset = e->GetPreset();
         if (preset.autoEmit && preset.emitRate > 0.0f) {

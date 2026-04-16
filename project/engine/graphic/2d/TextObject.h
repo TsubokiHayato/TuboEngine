@@ -26,6 +26,10 @@ public:
     void SetScale(float scale);
     void SetFont(Font* font);
 
+    // 揃え設定（0: Left/Top, 1: Center/Middle, 2: Right/Bottom）
+    void SetHorizontalAlign(int align) { horizontalAlign_ = align; dirty_ = true; }
+    void SetVerticalAlign(int align) { verticalAlign_ = align; dirty_ = true; }
+
     // Getter
     const Math::Vector2& GetPosition() const { return position_; }
     const Math::Vector4& GetColor() const { return color_; }
@@ -41,6 +45,10 @@ private:
     Math::Vector4 color_{1.0f, 1.0f, 1.0f, 1.0f};
     float scale_ = 1.0f;
     Font* font_ = nullptr;
+
+    // 揃えモード
+    int horizontalAlign_ = 0; // 0: Left, 1: Center, 2: Right
+    int verticalAlign_   = 0; // 0: Top, 1: Middle, 2: Bottom
 
     // 頂点バッファ / インデックスバッファ
     Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer_;
