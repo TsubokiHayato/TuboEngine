@@ -14,6 +14,8 @@
 #include <string>
 #include <unordered_map>
 
+
+
 // 古いレガシー方式パーティクル用クラス（Emitterシステムとは別）
 class Particle {
 public:
@@ -22,10 +24,10 @@ public:
 	void Initialize(ParticleType particleType);
 	void Update();
 	void Draw();
-	void Emit(const std::string name, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime, uint32_t count);
+	void Emit(const std::string name, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime, uint32_t count);
 	void CreateParticleGroup(const std::string& name, const std::string& textureFilePath);
 
-	// 追加: 明示解放用デストラクタ（カメラ delete と各種 Unmap を実行）
+	//明示解放用デストラクタ（カメラ delete と各種 Unmap を実行）
 	~Particle();
 
 private:
@@ -38,15 +40,16 @@ private:
 	void CreateMaterialData();
 
 	// 旧パーティクル生成関数（新Emitterとは別物）
-	ParticleInfo CreateNewParticle(std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime);
 	ParticleInfo
-	    CreateNewParticleForPrimitive(std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime);
-	ParticleInfo
-	    CreateNewParticleForRing(std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime);
-	ParticleInfo
-	    CreateNewParticleForCylinder(std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime);
-	ParticleInfo
-	    CreateNewParticleForOriginal(std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime);
+	    CreateNewParticle(std::mt19937& randomEngine, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime);
+	ParticleInfo CreateNewParticleForPrimitive(
+	    std::mt19937& randomEngine, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime);
+	ParticleInfo CreateNewParticleForRing(
+	    std::mt19937& randomEngine, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime);
+	ParticleInfo CreateNewParticleForCylinder(
+	    std::mt19937& randomEngine, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime);
+	ParticleInfo CreateNewParticleForOriginal(
+	    std::mt19937& randomEngine, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime);
 
 private:
 	struct ParticleGroup {
@@ -71,19 +74,19 @@ private:
 
 	// 頂点データ（旧）
 	struct ModelData {
-		std::vector<VertexData> vertices;
+		std::vector<TuboEngine::VertexData> vertices;
 	} modelData_;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
-	VertexData* vertexData_ = nullptr;
+	TuboEngine::VertexData* vertexData_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialBuffer_;
-	Material* materialData_ = nullptr;
+	TuboEngine::Material* materialData_ = nullptr;
 
 	std::unordered_map<std::string, ParticleGroup> particleGroups;
 
-	Camera* camera_ = nullptr;
+	TuboEngine::Camera* camera_ = nullptr;
 
 	// カスタムサイズ指定（>0 のときテクスチャサイズを上書き）
 	TuboEngine::Math::Vector2 customTextureSize{0, 0};
