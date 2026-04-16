@@ -3,13 +3,15 @@
 #include <vector>
 #include "Sprite.h"
 #include "Vector3.h"
+#include"Camera.h"
 class Enemy; // ベースEnemyに変更
-class Camera;
+
 
 class EnemyHpUI {
 public:
     void Initialize(const std::string& frameTexturePath, const std::string& fillTexturePath);
-    void Update(const std::vector<std::unique_ptr<Enemy>>& enemies, Camera* cam);
+    // 全チャンクの敵をまとめて扱えるように Enemy* 配列を受け取る
+	void Update(const std::vector<Enemy*>& enemies, TuboEngine::Camera* cam);
     void Draw();
 
     void SetScale(float s) { scale_ = s; }

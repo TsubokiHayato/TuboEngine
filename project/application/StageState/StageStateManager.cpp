@@ -2,6 +2,7 @@
 #include"StageScene.h"
 #include "ImGuiManager.h"
 #include"Input.h"
+#include "StageState/StageTransition/StageTransitionState.h"
 
 void StageStateManager::Initialize(StageScene* scene) {
     states_[StageType::Ready]        = std::make_unique<StageReadyState>();
@@ -14,6 +15,8 @@ void StageStateManager::Initialize(StageScene* scene) {
 
     // 新規: TutorialState（他Stateと合併せず、独立して存在させる）
     states_[StageType::Tutorial]     = std::make_unique<TutorialState>();
+	// 新規: ステージ遷移用ステート
+	states_[StageType::Transition]   = std::make_unique<StageTransitionState>();
 
     // 最初のステートをセットしてEnterのみ呼ぶ
     state_ = StageType::Ready;
@@ -114,6 +117,9 @@ void StageStateManager::DrawImGui(StageScene* scene) {
         case StageType::Tutorial:
             ImGui::Text("Tutorial");
             break;
+        case StageType::Transition:
+            ImGui::Text("Transition");
+            break;
         default:
             ImGui::Text("Unknown State");
             break;
@@ -148,6 +154,9 @@ void StageStateManager::DrawImGui(StageScene* scene) {
 	}
 	if (ImGui::Button("Tutorial")) {
 		pendingState_ = StageType::Tutorial;
+	}
+	if (ImGui::Button("Transition")) {
+		pendingState_ = StageType::Transition;
 	}
 
     ImGui::End();
