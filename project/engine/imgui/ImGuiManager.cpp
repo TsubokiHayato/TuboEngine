@@ -6,7 +6,7 @@
 #endif // USE_IMGUI
 
 #include <cassert>
-
+namespace TuboEngine {
 ImGuiManager* ImGuiManager::instance = nullptr; // シングルトンインスタンス
 void ImGuiManager::Initialize() {
 
@@ -58,7 +58,7 @@ void ImGuiManager::Begin() {
 #endif // USE_IMGUI
 }
 
-void ImGuiManager::End(){ 
+void ImGuiManager::End() {
 #ifdef USE_IMGUI
 	// ImGuiの受付終了
 	ImGui::Render();
@@ -77,3 +77,4 @@ void ImGuiManager::Draw() {
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
 #endif // USE_IMGUI
 }
+} // namespace TuboEngine

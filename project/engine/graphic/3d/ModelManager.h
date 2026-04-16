@@ -16,7 +16,7 @@ private:
 	ModelManager& operator=(ModelManager&) = delete;//代入演算子の封印
 
 
-	std::map<std::string, std::unique_ptr<Model>> models;
+	std::map<std::string, std::unique_ptr<TuboEngine::Model>> models;
 	
 public:
 
@@ -48,6 +48,6 @@ public:
 	/// </summary>
 	/// <param name="filePath">モデルファイルのパス</param>
 	/// <returns>モデル</returns>
-	Model* FindModel(const std::string& filePath);
+	TuboEngine::Model* FindModel(const std::string& filePath);
 
 };

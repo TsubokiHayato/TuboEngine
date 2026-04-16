@@ -73,7 +73,9 @@ public:
 	/// <summary>
 	/// 使用カメラを設定。
 	/// </summary>
-	void SetCamera(Camera* camera);
+	void SetCamera(TuboEngine::Camera* camera);
+
+	TuboEngine::Object3d* GetObject3d() const { return object3d_.get(); }
 
 private:
 	TuboEngine::Math::Vector3 position_{};

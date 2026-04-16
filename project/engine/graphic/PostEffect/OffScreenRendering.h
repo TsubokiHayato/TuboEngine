@@ -94,7 +94,7 @@ public:
 	    CreateRenderTargetResource(Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height, DXGI_FORMAT format, const TuboEngine::Math::Vector4& clearColor);
 
 public:
-	void SetCamera(Camera* camera) { this->camera_ = camera; }
+	void SetCamera(TuboEngine::Camera* camera) { this->camera_ = camera; }
 
 	// Dash演出用: 一時的にRadialBlurへ切り替えて強度をブーストする
 	// enable=false にすると元のポストエフェクトへ戻す
@@ -106,11 +106,15 @@ public:
 	void SetLowHpVignetteEnabled(bool enable);
 	void SetLowHpVignettePower(float power);
 
+	// VHSEffectを有効/無効にする（有効にすると画面全体がノイズっぽくなります）
+	// enable=falseにすると元のポストエフェクトへ戻す
+	void SetVHSEffect(bool enabled);
+
 private:
 	///-----------------------------------------------------------------------
 	///                             メンバ変数
 	///-----------------------------------------------------------------------
-	Camera* camera_ = nullptr; // カメラオブジェクトへのポインタ
+	TuboEngine::Camera* camera_ = nullptr; // カメラオブジェクトへのポインタ
 
 	// D3D12デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device;
@@ -168,4 +172,9 @@ private:
 	// LowHP用状態
 	bool lowHpVignetteEnabled_ = false;
 	float savedVignettePower_ = 0.8f;
+
+	//VHS
+	bool vhsPostEffectEnabled_ = false;
+	int32_t vhsEffectIndex_ = -1; // VHSEffect の index
+	int32_t savedVhsEffectIndex_ = 0; // 復帰用
 };

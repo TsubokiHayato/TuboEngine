@@ -28,7 +28,7 @@ void ModelManager::LoadModel(const std::string& filePath)
 		return;
 	}
 	//モデルの生成とファイルの読み込み、初期化
-	std::unique_ptr<Model> model = std::make_unique<Model>();
+	std::unique_ptr<TuboEngine::Model> model = std::make_unique<TuboEngine::Model>();
 	model->Initialize("Resources/Models", filePath);
 	
 	//モデルをmapコンテナに格納する
@@ -36,8 +36,7 @@ void ModelManager::LoadModel(const std::string& filePath)
 
 }
 
-Model* ModelManager::FindModel(const std::string& filePath)
-{
+TuboEngine::Model* ModelManager::FindModel(const std::string& filePath) {
 	//モデルの検索
 	if (models.contains(filePath)) {
 		return models.at(filePath).get();

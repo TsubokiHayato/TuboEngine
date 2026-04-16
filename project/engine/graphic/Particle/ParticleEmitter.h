@@ -3,11 +3,11 @@
 #include "Particle.h"
 #include "ParticleCommon.h"
 #include <vector>
+namespace TuboEngine {
 
-class ParticleEmitter {					
+class ParticleEmitter {
 public:
-
-    // コンストラクタ
+	// コンストラクタ
 	/// @brief パーティクルエミッターのコンストラクタ
 	/// @param particle パーティクルのインスタンス
 	/// @param name パーティクルグループ名
@@ -19,28 +19,26 @@ public:
 	/// @param count 発生させるパーティクルの数
 	/// @param frequency 発生頻度
 	/// @param repeat 繰り返し発生させるかどうかのフラグ
-	ParticleEmitter(Particle* particle, const std::string& name, 
-		const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime,
-		uint32_t count, float frequency, bool repeat = false);
+	ParticleEmitter(
+	    Particle* particle, const std::string& name, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime,
+	    uint32_t count, float frequency, bool repeat = false);
 
+	// 更新
+	void Update();
 
-	//更新
-    void Update();
+	// 描画
+	void Draw();
 
-	//描画
-    void Draw();
+	// エミッション
+	void Emit();
 
-	//エミッション
-    void Emit();
-
-	//繰り返し設定
-    void SetRepeat(bool repeat);
-
+	// 繰り返し設定
+	void SetRepeat(bool repeat);
 
 public:
 	///-----------------------------------------------------------------
 	/// Getters & Setters
-	/// 
+	///
 	void SetScale(const TuboEngine::Math::Vector3& scale) { transform_.scale = scale; }
 	TuboEngine::Math::Vector3 GetScale() { return transform_.scale; }
 	void SetPosition(const TuboEngine::Math::Vector3& position) { transform_.translate = position; }
@@ -57,18 +55,17 @@ public:
 	float GetCurrentTime() { return currentTime_; }
 	void SetCount(uint32_t count) { count_ = count; }
 
-
 private:
 	std::unique_ptr<Particle> particle_; // Particleのインスタンスを保持
-    std::string name_;   // パーティクルグループ名
-    Transform transform_;// エミッターの位置・回転・スケール
+	std::string name_;                   // パーティクルグループ名
+	TuboEngine::Transform transform_;    // エミッターの位置・回転・スケール
 	TuboEngine::Math::Vector3 velocity_; // 速度
 	TuboEngine::Math::Vector4 color_;    // カラー
-	float lifeTime_;   // 寿命
-	float currentTime_; // 経過時間
-	uint32_t count_; // 発生させるパーティクルの数
-    float frequency_;    // 発生頻度
-    float elapsedTime_;  // 経過時間
-    bool repeat_;        // 繰り返し発生させるかどうかのフラグ
-
+	float lifeTime_;                     // 寿命
+	float currentTime_;                  // 経過時間
+	uint32_t count_;                     // 発生させるパーティクルの数
+	float frequency_;                    // 発生頻度
+	float elapsedTime_;                  // 経過時間
+	bool repeat_;                        // 繰り返し発生させるかどうかのフラグ
 };
+} // namespace TuboEngine

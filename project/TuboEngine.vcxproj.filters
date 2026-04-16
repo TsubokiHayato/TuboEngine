@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Object3d.PS.hlsl">
@@ -363,6 +363,20 @@
     <ClCompile Include="engine\graphic\Particle\Effects\ClearFirework\ClearFireworkEmitter.cpp">
       <Filter>projects\engine\graphic\Particle\Effects\ClearFirework</Filter>
     </ClCompile>
+    <ClCompile Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.cpp" />
+    <ClCompile Include="application\Character\Player\PlayerAutoController.cpp" />
+    <ClCompile Include="engine\graphic\2d\Font.cpp" />
+    <ClCompile Include="engine\graphic\2d\TextManager.cpp" />
+    <ClCompile Include="engine\graphic\2d\TextObject.cpp" />
+    <ClCompile Include="application\Stage\StageManager.cpp" />
+    <ClCompile Include="application\StageState\StageTransition\StageTransitionState.cpp" />
+    <ClCompile Include="application\Bullet\Enemy\EnemyMissileBullet.cpp" />
+    <ClCompile Include="application\Bullet\Enemy\CircusBullet.cpp" />
+    <ClCompile Include="application\Character\Enemy\MortarEnemy.cpp" />
+    <ClCompile Include="application\Character\Enemy\CircusEnemy.cpp" />
+    <ClCompile Include="engine\graphic\PostEffect\Effects\VHS\VHSEffect.cpp" />
+    <ClCompile Include="engine\graphic\PSO\PostEffect\VHSPSO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -404,6 +418,9 @@
     <ClInclude Include="application\Bullet\Enemy\EnemyNormalBullet.h">
       <Filter>projects\application\Bullet\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="application\Bullet\Enemy\CircusBullet.h">
+      <Filter>projects\application\Bullet\Enemy</Filter>
+    </ClInclude>
     <ClInclude Include="application\Character\BaseCharacter.h">
       <Filter>projects\application\Character</Filter>
     </ClInclude>
@@ -411,6 +428,9 @@
       <Filter>projects\application\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="application\Character\Enemy\RushEnemy.h">
+      <Filter>projects\application\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Character\Enemy\CircusEnemy.h">
       <Filter>projects\application\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="application\Character\Player\Player.h">
@@ -800,6 +820,17 @@
     <ClInclude Include="engine\graphic\Particle\Effects\Ring\RingEmitter.h">
       <Filter>projects\engine\graphic\Particle\Effects\Ring</Filter>
     </ClInclude>
+    <ClInclude Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.h" />
+    <ClInclude Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.h" />
+    <ClInclude Include="application\Character\Player\PlayerAutoController.h" />
+    <ClInclude Include="engine\graphic\2d\Font.h" />
+    <ClInclude Include="engine\graphic\2d\TextManager.h" />
+    <ClInclude Include="engine\graphic\2d\TextObject.h" />
+    <ClInclude Include="application\Stage\StageManager.h" />
+    <ClInclude Include="application\Bullet\Enemy\EnemyMissileBullet.h" />
+    <ClInclude Include="application\Character\Enemy\MortarEnemy.h" />
+    <ClInclude Include="engine\graphic\PostEffect\Effects\VHS\VHSEffect.h" />
+    <ClInclude Include="engine\graphic\PSO\PostEffect\VHSPSO.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli">
@@ -1022,7 +1053,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="CG2.rc">
+    <ResourceCompile Include="TuboEngine.rc">
       <Filter>projects</Filter>
     </ResourceCompile>
   </ItemGroup>
