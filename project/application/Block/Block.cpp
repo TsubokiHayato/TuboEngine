@@ -84,7 +84,7 @@ void Block::SetRotation(const TuboEngine::Math::Vector3& rot) {
 	}
 }
 
-void Block::SetCamera(Camera* camera) {
+void Block::SetCamera(TuboEngine::Camera* camera) {
 	// カメラ設定は `Object3d` に委譲。
 	// 初期化前に呼ばれる可能性があるのでガードする。
 	if (object3d_) {
