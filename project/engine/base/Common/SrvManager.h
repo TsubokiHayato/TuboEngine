@@ -1,19 +1,19 @@
 #pragma once
 #include "DirectXCommon.h"
-
-class SrvManager
-{
+namespace TuboEngine {
+class SrvManager {
 public:
 	/// <summary>
 	/// シングルトンインスタンス取得
 	/// </summary>
 	static SrvManager* GetInstance() {
-		
+
 		if (!instance) {
 			instance = new SrvManager();
 		}
 		return instance;
 	}
+
 private:
 	// コンストラクタ・デストラクタ・コピー禁止
 	static SrvManager* instance;
@@ -59,7 +59,6 @@ public:
 
 	void Finalize();
 
-
 	//-------------------Getter & Setter-------------------//
 	/// <summary>
 	/// ディスクリプタヒープのCPUハンドルを取得
@@ -67,7 +66,7 @@ public:
 	/// <param name="index">ディスクリプタヒープのインデックス</param>
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);
 
-	ID3D12DescriptorHeap* GetDescriptorHeap()const { return descriptorHeap.Get(); }
+	ID3D12DescriptorHeap* GetDescriptorHeap() const { return descriptorHeap.Get(); }
 	/// <summary>
 	/// ディスクリプタヒープのGPUハンドルを取得
 	/// </summary>
@@ -78,22 +77,17 @@ public:
 		TuboEngine::DirectXCommon::GetInstance()->GetCommandList()->SetGraphicsRootDescriptorTable(rootParameterIndex, GetGPUDescriptorHandle(srvIndex));
 	}
 
-	//最大SRV数(最大テクスチャ枚数)
+	// 最大SRV数(最大テクスチャ枚数)
 	static const uint32_t kMaxSRVCount;
 
 private:
-
-	
-
-
-
-	//SRV用のディスクリプタサイズ
+	// SRV用のディスクリプタサイズ
 	uint32_t descriptorSize = 0;
-	//SRVヒープ
+	// SRVヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap;
 
-	//次に使用するSRVのインデックス
+	// 次に使用するSRVのインデックス
 	uint32_t useIndex = 0;
-
 };
 
+} // namespace TuboEngine

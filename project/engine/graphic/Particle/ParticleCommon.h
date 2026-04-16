@@ -4,17 +4,16 @@
 #include"DirectXCommon.h"
 #include"SrvManager.h"
 #include"Particle/ParticlePSO.h"
-
+namespace TuboEngine {
 class Camera;
-class ParticleCommon
-{
+class ParticleCommon {
 
 public:
 	/// <summary>
 	/// シングルトンインスタンス取得
 	/// </summary>
 	static ParticleCommon* GetInstance() {
-	
+
 		if (!instance) {
 			instance = new ParticleCommon();
 		}
@@ -43,15 +42,12 @@ public:
 	/// </summary>
 	void DrawSettingsCommon();
 
-	
-
 	void SetDefaultCamera(Camera* camera) { defaultCamera = camera; }
-	Camera* GetDefaultCamera()const { return defaultCamera; }
+	Camera* GetDefaultCamera() const { return defaultCamera; }
 
 private:
-
 	std::unique_ptr<ParticlePSO> pso = nullptr; // PSOのユニークポインタ
-	Camera* defaultCamera = nullptr;//デフォルトカメラ
-
+	Camera* defaultCamera = nullptr;            // デフォルトカメラ
 };
 
+} // namespace TuboEngine
