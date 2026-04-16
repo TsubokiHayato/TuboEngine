@@ -78,8 +78,8 @@ void ClearScene::Initialize() {
 
     isCrowned_ = false;
 
-    // TextManagerの初期化と「C L E A R」テキストの生成
-    TuboEngine::TextManager::GetInstance()->Initialize();
+    // TextManagerはアプリ起動時に初期化される想定。シーン側ではInitializeしない。
+    // （シーン遷移で複数回InitializeするとUpdateAllで落ちる原因になる）
     
     // ベースとなるフォント名を指定
     std::string fontName = TuboEngine::TextManager::PresetFontNames::Best10;
