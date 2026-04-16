@@ -22,44 +22,14 @@ public:
     }
 
 protected:
-	void BuildGeometry(std::vector<TuboEngine::VertexData>& outVertices) override {
+    void BuildGeometry(std::vector<VertexData>& outVertices) override {
         outVertices.clear();
-		outVertices.push_back(
-		    TuboEngine::VertexData{
-		        .position = {1, 1, 0, 1},
-                  .texcoord = {0, 0},
-                  .normal = {0, 0, 1}
-        });
-		outVertices.push_back(
-		    TuboEngine::VertexData{
-		        .position = {-1, 1, 0, 1},
-                  .texcoord = {1, 0},
-                  .normal = {0, 0, 1}
-        });
-		outVertices.push_back(
-		    TuboEngine::VertexData{
-		        .position = {1, -1, 0, 1},
-                  .texcoord = {0, 1},
-                  .normal = {0, 0, 1}
-        });
-		outVertices.push_back(
-		    TuboEngine::VertexData{
-		        .position = {1, -1, 0, 1},
-                  .texcoord = {0, 1},
-                  .normal = {0, 0, 1}
-        });
-		outVertices.push_back(
-		    TuboEngine::VertexData{
-		        .position = {-1, 1, 0, 1},
-                  .texcoord = {1, 0},
-                  .normal = {0, 0, 1}
-        });
-		outVertices.push_back(
-		    TuboEngine::VertexData{
-		        .position = {-1, -1, 0, 1},
-                  .texcoord = {1, 1},
-                  .normal = {0, 0, 1}
-        });
+        outVertices.push_back(VertexData{ .position = { 1, 1, 0, 1 }, .texcoord = {0,0}, .normal = {0,0,1} });
+        outVertices.push_back(VertexData{ .position = {-1, 1, 0, 1 }, .texcoord = {1,0}, .normal = {0,0,1} });
+        outVertices.push_back(VertexData{ .position = { 1,-1, 0, 1 }, .texcoord = {0,1}, .normal = {0,0,1} });
+        outVertices.push_back(VertexData{ .position = { 1,-1, 0, 1 }, .texcoord = {0,1}, .normal = {0,0,1} });
+        outVertices.push_back(VertexData{ .position = {-1, 1, 0, 1 }, .texcoord = {1,0}, .normal = {0,0,1} });
+        outVertices.push_back(VertexData{ .position = {-1,-1, 0, 1 }, .texcoord = {1,1}, .normal = {0,0,1} });
     }
 
     ParticleInfo GenerateParticle() override {
@@ -77,7 +47,7 @@ protected:
         return p;
     }
 
-    void Update(float dt, const TuboEngine::Camera* camera) override {
+    void Update(float dt, const Camera* camera) override {
         IParticleEmitter::Update(dt, camera);
         prevCenter_ = preset_.center;
     }

@@ -31,7 +31,5 @@ protected:
 	TuboEngine::Math::Vector3 rotation;
 	TuboEngine::Math::Vector3 scale;
 	bool isAlive = false;
-	int reflectCount = 0;    // 現在の反射回数
-	int maxReflectCount = 2; // 最大反射回数 (初期値を2に増やす)
 	std::unique_ptr<TuboEngine::Object3d> object3d;
 };
