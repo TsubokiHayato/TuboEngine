@@ -55,7 +55,7 @@ void ToonEffect::Draw(ID3D12GraphicsCommandList* commandList) {
 	commandList->SetGraphicsRootDescriptorTable(2, TuboEngine::DirectXCommon::GetInstance()->GetSRVGPUDescriptorHandle(1));
 }
 
-void ToonEffect::SetMainCamera(Camera* camera) {
+void ToonEffect::SetMainCamera(TuboEngine::Camera* camera) {
 
 // カメラの設定を行う
 	camera_ = camera;

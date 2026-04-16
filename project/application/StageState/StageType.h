@@ -9,4 +9,5 @@ enum class StageType {
 	GameClear,
 	GameOver,
 	Tutorial,
+	Transition, // プレイヤーイージング付きステージ遷移
 };
