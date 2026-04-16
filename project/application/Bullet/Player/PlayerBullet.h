@@ -69,7 +69,7 @@ public:
 	void SetVelocity(const TuboEngine::Math::Vector3& velocity) { this->velocity = velocity; }
 
 	// カメラ設定
-	void SetCamera(Camera* camera) { object3d->SetCamera(camera); }
+	void SetCamera(TuboEngine::Camera* camera) { object3d->SetCamera(camera); }
 
 	// プレイヤーの位置を設定
 	void SetPlayerPosition(const TuboEngine::Math::Vector3& playerPosition) { playerPosition_ = playerPosition; }
