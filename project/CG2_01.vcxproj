@@ -14,9 +14,9 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{25904d25-df3e-42c3-b3d3-c97f05e23136}</ProjectGuid>
-    <RootNamespace>TuboEngine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
-    <ProjectName>TuboEngine</ProjectName>
+    <RootNamespace>CG201</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>CG2</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -112,12 +112,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="application\Bullet\Enemy\EnemyMissileBullet.cpp" />
-    <ClCompile Include="application\Bullet\Enemy\CircusBullet.cpp" />
-    <ClCompile Include="application\Character\Enemy\MortarEnemy.cpp" />
-    <ClCompile Include="application\Character\Enemy\CircusEnemy.cpp" />
     <ClCompile Include="application\Character\Enemy\RushEnemy.cpp" />
-    <ClCompile Include="application\Character\Player\PlayerAutoController.cpp" />
     <ClCompile Include="application\StageState\Boss\BossState.cpp" />
     <ClCompile Include="application\StageState\GameClear\GameClearState.cpp" />
     <ClCompile Include="application\StageState\GameOver\GameOverState.cpp" />
@@ -127,9 +122,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\StageState\StagePlaying\StagePlayingState.cpp" />
     <ClCompile Include="application\StageState\StageReady\StageReadyState.cpp" />
     <ClCompile Include="application\StageState\StageStateManager.cpp" />
-    <ClCompile Include="application\StageState\StageTransition\StageTransitionState.cpp" />
     <ClCompile Include="application\StageState\Tutorial\TutorialState.cpp" />
-    <ClCompile Include="application\Stage\StageManager.cpp" />
     <ClCompile Include="application\UI\Guide\GuideUI.cpp" />
     <ClCompile Include="application\UI\Title\TitleUI.cpp" />
     <ClCompile Include="application\UI\HP\Enemy\EnemyHpUI.cpp" />
@@ -140,7 +133,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\Particle\IParticleEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\ParticleManager.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\Effects\Bloom\BloomEffect.cpp" />
-    <ClCompile Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\Blend\BlendPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\BloomPSO.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\Effects\DepthBasedOutline\DepthBasedOutlineEffect.cpp" />
@@ -159,7 +151,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Collider\Collider.cpp" />
     <ClCompile Include="application\Collider\CollisionManager.cpp" />
     <ClCompile Include="application\Character\Enemy\Enemy.cpp" />
-    <ClCompile Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.cpp" />
     <ClCompile Include="engine\graphic\PSO\PostEffect\ToonPSO.cpp" />
     <ClCompile Include="engine\scene\ClearScene.cpp" />
     <ClCompile Include="engine\scene\DebugScene.cpp" />
@@ -251,28 +242,18 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Tile\Tile.cpp" />
     <ClCompile Include="engine\scene\OverScene.cpp" />
     <ClCompile Include="application\SkyDome\SkyDome.cpp" />
-    <ClCompile Include="engine\graphic\2d\Font.cpp" />
-    <ClCompile Include="engine\graphic\2d\TextManager.cpp" />
-    <ClCompile Include="engine\graphic\2d\TextObject.cpp" />
-    <ClCompile Include="engine\graphic\PostEffect\Effects\VHS\VHSEffect.cpp" />
-    <ClCompile Include="engine\graphic\PSO\PostEffect\VHSPSO.cpp" />
+    <ClCompile Include="project\engine\graphic\2d\Font.cpp" />
+    <ClCompile Include="project\engine\graphic\2d\TextManager.cpp" />
+    <ClCompile Include="project\engine\graphic\2d\TextObject.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="application\Bullet\Enemy\EnemyMissileBullet.h" />
-    <ClInclude Include="application\Bullet\Enemy\CircusBullet.h" />
-    <ClInclude Include="application\Character\Enemy\MortarEnemy.h" />
-    <ClInclude Include="application\Character\Enemy\CircusEnemy.h" />
     <ClInclude Include="application\Character\Enemy\RushEnemy.h" />
     <ClInclude Include="application\Character\Player\Player.h" />
     <ClInclude Include="application\Bullet\Player\PlayerBullet.h" />
-    <ClInclude Include="application\Character\Player\PlayerAutoController.h" />
     <ClInclude Include="application\StageState\Pause\PauseState.h" />
     <ClInclude Include="application\StageState\Tutorial\TutorialState.h" />
-    <ClInclude Include="application\Stage\StageManager.h" />
     <ClInclude Include="application\UI\Guide\GuideUI.h" />
-    <ClInclude Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.h" />
     <ClInclude Include="engine\graphic\PSO\Blend\BlendPSO.h" />
-    <ClInclude Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.h" />
     <ClInclude Include="engine\scene\SceneType.h" />
     <ClInclude Include="application\scene\StageState\ClearState.h" />
     <ClInclude Include="application\StageState\Boss\BossState.h" />
@@ -413,11 +394,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Tile\Tile.h" />
     <ClInclude Include="engine\scene\OverScene.h" />
     <ClInclude Include="application\SkyDome\SkyDome.h" />
-    <ClInclude Include="engine\graphic\2d\Font.h" />
-    <ClInclude Include="engine\graphic\2d\TextManager.h" />
-    <ClInclude Include="engine\graphic\2d\TextObject.h" />
-    <ClInclude Include="engine\graphic\PostEffect\Effects\VHS\VHSEffect.h" />
-    <ClInclude Include="engine\graphic\PSO\PostEffect\VHSPSO.h" />
+    <ClInclude Include="project\engine\graphic\2d\Font.h" />
+    <ClInclude Include="project\engine\graphic\2d\TextManager.h" />
+    <ClInclude Include="project\engine\graphic\2d\TextObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -425,7 +404,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="TuboEngine.rc" />
+    <ResourceCompile Include="CG2.rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="tools\README_Filters.md" />
