@@ -8,7 +8,7 @@
 #include <fstream>
 #include <sstream>
 
-void TuboEngine::Model::Initialize(const std::string& directoryPath, const std::string& filename) {
+void Model::Initialize(const std::string& directoryPath, const std::string& filename) {
 
 	
 	commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();
@@ -39,7 +39,7 @@ void TuboEngine::Model::Initialize(const std::string& directoryPath, const std::
 	// 今回は赤を書き込んでみる
 	materialData->color = {1.0f, 1.0f, 1.0f, 1.0f};
 	materialData->enableLighting = true;
-	materialData->uvTransform = TuboEngine::Math::MakeIdentity4x4();
+	materialData->uvTransform = MakeIdentity4x4();
 	materialData->shininess = 70.0f;
 	materialData->environmentCoefficient = 1.0f;
 
@@ -51,16 +51,10 @@ void TuboEngine::Model::Initialize(const std::string& directoryPath, const std::
 	// テクスチャを読み込む
 	TuboEngine::TextureManager::GetInstance()->LoadTexture(textureFileName_);
 	modelData.material.textureIndex = TuboEngine::TextureManager::GetInstance()->GetSrvIndex(textureFileName_);
-
-	// インスタンスフラグ（0固定）を初期化して保持
-	instancingFlagBuffer_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(int32_t));
-	int32_t* commonData = nullptr;
-	instancingFlagBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&commonData));
-	*commonData = 0; // UseInstancing = false
-	instancingFlagBuffer_->Unmap(0, nullptr);
 }
 
-void TuboEngine::Model::Draw() {
+void Model::Draw() {
+
 	// 頂点バッファをセット
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 
@@ -69,35 +63,11 @@ void TuboEngine::Model::Draw() {
 
 	// SRVのDescriptorTableの先頭を設定。2はRootParameter[2]である。
 	commandList->SetGraphicsRootDescriptorTable(2, TuboEngine::TextureManager::GetInstance()->GetSrvHandleGPU(textureFileName_));
-	
-	// 共通データ（フラグ=0）をセット (RootParameter 10: b1 in VS)
-	commandList->SetGraphicsRootConstantBufferView(10, instancingFlagBuffer_->GetGPUVirtualAddress());
-
 	// 描画
 	commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 }
 
-void TuboEngine::Model::DrawInstanced(uint32_t instanceCount, D3D12_GPU_VIRTUAL_ADDRESS instanceBufferAddr, D3D12_GPU_VIRTUAL_ADDRESS commonBufferAddr) {
-	// 頂点バッファをセット
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-
-	// マテリアルバッファをセット
-	commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-
-	// テクスチャをセット
-	commandList->SetGraphicsRootDescriptorTable(2, TuboEngine::TextureManager::GetInstance()->GetSrvHandleGPU(textureFileName_));
-
-	// インスタンスデータをセット (RootParameter 9: t0 in VS)
-	commandList->SetGraphicsRootShaderResourceView(9, instanceBufferAddr);
-
-	// 共通データ（フラグ）をセット (RootParameter 10: b1 in VS)
-	commandList->SetGraphicsRootConstantBufferView(10, commonBufferAddr);
-
-	// 描画
-	commandList->DrawInstanced(UINT(modelData.vertices.size()), instanceCount, 0, 0);
-}
-
-TuboEngine::MaterialData TuboEngine::Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filePath) {
+MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filePath) {
 
 	/*------------------------
 	1 : 中で必要になる変数の宣言
@@ -137,7 +107,7 @@ TuboEngine::MaterialData TuboEngine::Model::LoadMaterialTemplateFile(const std::
 	return materialData;
 }
 
-TuboEngine::ModelData TuboEngine::Model::LoadModelFile(const std::string& directoryPath, const std::string& filename) {
+ModelData Model::LoadModelFile(const std::string& directoryPath, const std::string& filename) {
 
 	/*-------------
 	1 : OBJファイル
@@ -221,7 +191,7 @@ TuboEngine::ModelData TuboEngine::Model::LoadModelFile(const std::string& direct
 	return modelData;
 }
 
-TuboEngine::Node TuboEngine::Model::ReadNode(aiNode* node) {
+Node Model::ReadNode(aiNode* node) {
 
 	Node result;
 	aiMatrix4x4 aiLocalMatrix = node->mTransformation; // ノードのローカル行列を取得

@@ -41,7 +41,7 @@ private:
 	//DescriptorRange作成
 	D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
 	//RootParameter作成。
-	D3D12_ROOT_PARAMETER rootParameters[11] = {};
+	D3D12_ROOT_PARAMETER rootParameters[9] = {};
 	//Sampler作成
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
 	//シリアライズしてバイナリにする

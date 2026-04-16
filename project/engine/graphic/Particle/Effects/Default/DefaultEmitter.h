@@ -25,11 +25,11 @@ public:
         // Do NOT multiply scale; keep as-is to avoid over-large quads
     }
 
-    void BuildGeometry(std::vector<TuboEngine::VertexData>& out) override {
+    void BuildGeometry(std::vector<VertexData>& out) override {
         // Unit quad geometry (same scale behavior as PrimitiveEmitter)
         out.clear();
         out.reserve(6);
-		TuboEngine::VertexData v0{}, v1{}, v2{}, v3{};
+        VertexData v0{}, v1{}, v2{}, v3{};
         v0.position = { 1.0f,  1.0f, 0.0f, 1.0f}; v0.texcoord = {0.0f, 0.0f}; v0.normal = {0,0,1};
         v1.position = {-1.0f,  1.0f, 0.0f, 1.0f}; v1.texcoord = {1.0f, 0.0f}; v1.normal = {0,0,1};
         v2.position = { 1.0f, -1.0f, 0.0f, 1.0f}; v2.texcoord = {0.0f, 1.0f}; v2.normal = {0,0,1};

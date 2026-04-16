@@ -24,7 +24,7 @@ private:
 	float elapsed_ = 0.0f;
 	int step_ = 0;
 	bool built_ = false;
-	std::string tutorialCsvPath_ = "Resources/Stage/Tutorial.csv";
+	std::string tutorialCsvPath_ = "Resources/Tutorial.csv";
 
 	// Tutorial UI sprites (text baked into textures)
 	std::unique_ptr<TuboEngine::Sprite> tutorialHeaderSprite_;
@@ -33,7 +33,4 @@ private:
 	std::unique_ptr<TuboEngine::Sprite> tutorialDashSprite_;
 	std::unique_ptr<TuboEngine::Sprite> howtoNextSprite_;
 	std::unique_ptr<TuboEngine::Sprite> titleBackSprite_;
-
-	// Tutorial用: PlayerAutoController の有効フラグ（ImGui から ON/OFF）
-	bool autoPlayEnabled_ = false;
 };

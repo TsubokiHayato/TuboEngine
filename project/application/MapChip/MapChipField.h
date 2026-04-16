@@ -15,12 +15,6 @@ enum class MapChipType {
 	Enemy,       // 旧: 敵（互換用。今後は下の個別タイプを推奨）
 	EnemyRush,   // 追加: 突進敵
 	EnemyShoot,  // 追加: 射撃敵
-	EnemyMortar, // 追加: 迫撃砲敵
-	EnemyCircus, // 追加: 板野サーカス
-	// --- ステージ遷移用マーカー ---
-	kEntrance,   // 追加: ステージ入口
-	kExit,       // 追加: ステージ出口（イージング遷移の目的地）
-
 };
 
 ///--------------------------------------------------
@@ -46,8 +40,8 @@ public:
 	// インデックスからマップチップ種別を取得
 	MapChipType GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex) const ;
 	// インデックスからマップチップの座標を取得
-	TuboEngine::Math::Vector3 GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex) const;
-
+	TuboEngine::Math::Vector3 GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex);
+	
 	uint32_t GetNumBlockVirtical() const { return static_cast<uint32_t>(mapChipData_.data.size()); }
 	uint32_t GetNumBlockHorizontal() const { return mapChipData_.data.empty() ? 0 : static_cast<uint32_t>(mapChipData_.data[0].size()); }
 
@@ -72,7 +66,7 @@ public:
 	// 座標からマップチップのインデックスセットを取得
 	IndexSet GetMapChipIndexSetByPosition(const TuboEngine::Math::Vector3& position) const;
 	// インデックスから矩形領域を取得
-	Rect GetRectByIndex(uint32_t xIndex, uint32_t yIndex) const;
+	Rect GetRectByIndex(uint32_t xIndex, uint32_t yIndex);
 
 	// インデックスでマップチップ種別を設定
 	void SetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex, MapChipType mapChipType);
@@ -85,12 +79,6 @@ public:
 
 	// 指定矩形領域（プレイヤーの四隅など）が衝突しているか判定
 	bool IsRectBlocked(const TuboEngine::Math::Vector3& center, float width, float height) const;
-
-	// 指定タイプのチップのワールド座標リストを取得（出口探索などに使用）
-	std::vector<TuboEngine::Math::Vector3> GetChipPositions(MapChipType type) const;
-
-	// 指定座標の衝突法線を取得 (反射用)
-	TuboEngine::Math::Vector3 GetCollisionNormal(const TuboEngine::Math::Vector3& pos, const TuboEngine::Math::Vector3& velocity) const;
 
 	// ImGuiの描画処理
 	void DrawImGui(const char* windowName = "MapChipField");
@@ -105,10 +93,6 @@ public:
 	static void SetBlockWidth(float w) { kBlockWidth_ = w; }
 	static void SetBlockHeight(float h) { kBlockHeight_ = h; }
 	static void SetBlockSize(float s) { kBlockSize_ = s; }
-
-	// --- 追加: フィールド原点 ---
-	void SetOrigin(const TuboEngine::Math::Vector3& origin) { origin_ = origin; }
-	const TuboEngine::Math::Vector3& GetOrigin() const { return origin_; }
 
 
 private:
@@ -128,7 +112,4 @@ private:
 
 	// マップチップデータ
 	MapChipData mapChipData_;
-
-	// フィールド原点
-	TuboEngine::Math::Vector3 origin_{0.0f, 0.0f, 0.0f};
 };
