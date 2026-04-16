@@ -43,6 +43,11 @@ void TextManager::DestroyInstance() {
 // - プリセットフォント(BaseFont)の読み込み
 // - BaseFont 名リストの構築
 void TextManager::Initialize() {
+   if (initialized_) {
+        return;
+    }
+    initialized_ = true;
+
 #ifdef _WIN32
     windowsFontDir_ = "C:/Windows/Fonts/";
 #endif
@@ -68,6 +73,8 @@ void TextManager::Finalize() {
     baseFontNames_.clear();
     addedFontNames_.clear();
     sizedFontNames_.clear();
+   textAlive_.clear();
+    initialized_ = false;
 }
 
 //----------------------------------------------------------------------------
@@ -88,7 +95,9 @@ void TextManager::UpdateAll() {
     for (size_t i = texts_.size(); i-- > 0;) {
         if (i < textAlive_.size() && !textAlive_[i]) {
             texts_.erase(texts_.begin() + static_cast<std::ptrdiff_t>(i));
-            textDefs_.erase(textDefs_.begin() + static_cast<std::ptrdiff_t>(i));
+            if (i < textDefs_.size()) {
+                textDefs_.erase(textDefs_.begin() + static_cast<std::ptrdiff_t>(i));
+            }
             textAlive_.erase(textAlive_.begin() + static_cast<std::ptrdiff_t>(i));
         }
     }

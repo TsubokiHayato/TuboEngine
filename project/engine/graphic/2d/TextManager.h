@@ -100,6 +100,8 @@ private:
     std::string projectFontDir_ = "Resources/Font/";
     std::string externalFontDir_ = "Resources/Font/external/";
     std::string windowsFontDir_{};
+
+    bool initialized_ = false;
 };
 
 } // namespace TuboEngine
