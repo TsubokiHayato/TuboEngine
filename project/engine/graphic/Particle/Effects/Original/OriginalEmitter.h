@@ -5,7 +5,7 @@
 
 class OriginalEmitter : public IParticleEmitter {
 protected:
-    void BuildGeometry(std::vector<VertexData>& out) override {
+	void BuildGeometry(std::vector<TuboEngine::VertexData>& out) override {
         // 中央クアッド
         out.push_back({ { 1, 1, 0, 1 }, {0,0}, {0,0,1} });
         out.push_back({ {-1, 1, 0, 1 }, {1,0}, {0,0,1} });

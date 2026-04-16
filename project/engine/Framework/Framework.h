@@ -23,10 +23,10 @@ class OffScreenRenderingPSO;
 
 // フレームワーク基底クラス
 // ゲームやアプリケーションのメインループや共通処理を管理します。
-class Framework
-{
-public:
 
+namespace TuboEngine {
+class Framework {
+public:
 	/// <summary>
 	/// 仮想デストラクタ
 	/// </summary>
@@ -57,7 +57,6 @@ public:
 	virtual void Draw() = 0;
 
 public:
-
 	/// <summary>
 	/// オフスクリーン描画前処理
 	/// </summary>
@@ -103,17 +102,13 @@ public:
 	/// </summary>
 	void FrameworkSwapChainPostDraw();
 
-
-
 public:
-
 	/// <summary>
 	/// 終了リクエストがあったかどうか
 	/// </summary>
 	virtual bool IsEndRequest() { return endRequest; }
 
 public:
-
 	/// <summary>
 	/// メインループの実行
 	/// </summary>
@@ -136,5 +131,5 @@ protected:
 	int spriteBlendModeNum = 1; // スプライトのブレンドモード
 
 	// 基盤システム
-
 };
+} // namespace TuboEngine
