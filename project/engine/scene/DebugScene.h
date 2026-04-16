@@ -23,7 +23,7 @@
 #include"SkyBox.h"
 #include"Animation/SceneChangeAnimation.h"
 
-#include "project/engine/graphic/2d/TextManager.h"
+#include "TextManager.h"
 
 // パーティクル
 #include "engine/graphic/Particle/ParticleManager.h"
@@ -47,12 +47,12 @@ public:
 	void ImGuiDraw() override;
 	void ParticleDraw() override;
 
-	Camera* GetMainCamera() const { return camera.get(); }
+	TuboEngine::Camera* GetMainCamera() const { return camera.get(); }
 
 private:
 	std::unique_ptr<Audio> audio = nullptr;
 
-	std::unique_ptr<Camera> camera = nullptr;
+	std::unique_ptr<TuboEngine::Camera> camera = nullptr;
 	TuboEngine::Math::Vector3 cameraPosition = {0.0f, 1.0f, -15.0f};
 	TuboEngine::Math::Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	TuboEngine::Math::Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
@@ -67,7 +67,7 @@ private:
 	TuboEngine::Math::Vector4 pointLightColor = {1.0f, 1.0f, 1.0f, 1.0f};
 	float pointLightIntensity = 1.0f;
 
-	std::unique_ptr<SkyBox> skyBox = nullptr;
+	std::unique_ptr<TuboEngine::SkyBox> skyBox = nullptr;
 
 	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation = nullptr;
 	bool isRequestSceneChange = false;

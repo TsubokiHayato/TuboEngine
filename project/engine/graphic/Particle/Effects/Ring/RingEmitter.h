@@ -4,7 +4,7 @@
 
 class RingEmitter : public IParticleEmitter {
 protected:
-    void BuildGeometry(std::vector<VertexData>& out) override {
+	void BuildGeometry(std::vector<TuboEngine::VertexData>& out) override {
         const uint32_t div = 64;
         const float outerR = 1.0f;
         const float innerR = 0.2f;
