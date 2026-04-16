@@ -121,7 +121,7 @@
       <Filter>projects\application\StageState\StageReady</Filter>
     </ClCompile>
     <ClCompile Include="engine\camera\Camera.cpp">
-      <Filter>projects\camera</Filter>
+      <Filter>projects\engine\graphic\2d\camera</Filter>
     </ClCompile>
     <ClCompile Include="engine\audio\AudioCommon.cpp">
       <Filter>projects\engine\audio</Filter>
@@ -363,20 +363,48 @@
     <ClCompile Include="engine\graphic\Particle\Effects\ClearFirework\ClearFireworkEmitter.cpp">
       <Filter>projects\engine\graphic\Particle\Effects\ClearFirework</Filter>
     </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.cpp" />
-    <ClCompile Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.cpp" />
-    <ClCompile Include="application\Character\Player\PlayerAutoController.cpp" />
-    <ClCompile Include="engine\graphic\2d\Font.cpp" />
-    <ClCompile Include="engine\graphic\2d\TextManager.cpp" />
-    <ClCompile Include="engine\graphic\2d\TextObject.cpp" />
-    <ClCompile Include="application\Stage\StageManager.cpp" />
-    <ClCompile Include="application\StageState\StageTransition\StageTransitionState.cpp" />
-    <ClCompile Include="application\Bullet\Enemy\EnemyMissileBullet.cpp" />
-    <ClCompile Include="application\Bullet\Enemy\CircusBullet.cpp" />
-    <ClCompile Include="application\Character\Enemy\MortarEnemy.cpp" />
-    <ClCompile Include="application\Character\Enemy\CircusEnemy.cpp" />
-    <ClCompile Include="engine\graphic\PostEffect\Effects\VHS\VHSEffect.cpp" />
-    <ClCompile Include="engine\graphic\PSO\PostEffect\VHSPSO.cpp" />
+    <ClCompile Include="engine\graphic\2d\Font.cpp">
+      <Filter>projects\engine\graphic\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\graphic\2d\TextManager.cpp">
+      <Filter>projects\engine\graphic\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\graphic\2d\TextObject.cpp">
+      <Filter>projects\engine\graphic\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Stage\StageManager.cpp">
+      <Filter>projects\application\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Bullet\Enemy\CircusBullet.cpp">
+      <Filter>projects\application\Bullet\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Bullet\Enemy\EnemyMissileBullet.cpp">
+      <Filter>projects\application\Bullet\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Character\Enemy\CircusEnemy.cpp">
+      <Filter>projects\application\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.cpp">
+      <Filter>projects\engine\graphic\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\graphic\PostEffect\Effects\VHS\VHSEffect.cpp">
+      <Filter>projects\engine\graphic\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="application\StageState\StageTransition\StageTransitionState.cpp">
+      <Filter>projects\application\StageState</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\graphic\PSO\PostEffect\VHSPSO.cpp">
+      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.cpp">
+      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Character\Enemy\MortarEnemy.cpp">
+      <Filter>projects\application\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Character\Player\PlayerAutoController.cpp">
+      <Filter>projects\application\Character\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -503,7 +531,7 @@
       <Filter>projects\application\StageState\StageReady</Filter>
     </ClInclude>
     <ClInclude Include="engine\camera\Camera.h">
-      <Filter>projects\camera</Filter>
+      <Filter>projects\engine\graphic\2d\camera</Filter>
     </ClInclude>
     <ClInclude Include="engine\audio\AudioCommon.h">
       <Filter>projects\engine\audio</Filter>
@@ -820,17 +848,39 @@
     <ClInclude Include="engine\graphic\Particle\Effects\Ring\RingEmitter.h">
       <Filter>projects\engine\graphic\Particle\Effects\Ring</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.h" />
-    <ClInclude Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.h" />
-    <ClInclude Include="application\Character\Player\PlayerAutoController.h" />
-    <ClInclude Include="engine\graphic\2d\Font.h" />
-    <ClInclude Include="engine\graphic\2d\TextManager.h" />
-    <ClInclude Include="engine\graphic\2d\TextObject.h" />
-    <ClInclude Include="application\Stage\StageManager.h" />
-    <ClInclude Include="application\Bullet\Enemy\EnemyMissileBullet.h" />
-    <ClInclude Include="application\Character\Enemy\MortarEnemy.h" />
-    <ClInclude Include="engine\graphic\PostEffect\Effects\VHS\VHSEffect.h" />
-    <ClInclude Include="engine\graphic\PSO\PostEffect\VHSPSO.h" />
+    <ClInclude Include="engine\graphic\2d\Font.h">
+      <Filter>projects\engine\graphic\2d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\graphic\2d\TextManager.h">
+      <Filter>projects\engine\graphic\2d</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\graphic\2d\TextObject.h">
+      <Filter>projects\engine\graphic\2d</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Stage\StageManager.h">
+      <Filter>projects\application\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Bullet\Enemy\EnemyMissileBullet.h">
+      <Filter>projects\application\Bullet\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.h">
+      <Filter>projects\engine\graphic\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\graphic\PostEffect\Effects\VHS\VHSEffect.h">
+      <Filter>projects\engine\graphic\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\graphic\PSO\PostEffect\VHSPSO.h">
+      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.h">
+      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Character\Enemy\MortarEnemy.h">
+      <Filter>projects\application\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Character\Player\PlayerAutoController.h">
+      <Filter>projects\application\Character\Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli">
@@ -874,17 +924,8 @@
     <Filter Include="projects\application\Block">
       <UniqueIdentifier>{1bdc6543-a572-4353-a2ae-7503422887c8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="projects\application\Bullet">
-      <UniqueIdentifier>{8415edf8-3d54-4966-b46f-2a23dfa9733e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="projects\application\Camera">
       <UniqueIdentifier>{93ced935-cd98-4a70-868b-a1c9daae4202}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\application\Bullet\Enemy">
-      <UniqueIdentifier>{e22fd438-1494-4b19-b2cb-8ddb788c53db}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\application\Bullet\Player">
-      <UniqueIdentifier>{fb18588c-34ec-4e26-a44d-d33dc25682ec}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\application\Character">
       <UniqueIdentifier>{ace072e4-c6fb-4578-986a-08323722ccc5}</UniqueIdentifier>
@@ -967,9 +1008,6 @@
     <Filter Include="projects\engine\base\Utilities">
       <UniqueIdentifier>{0d188ef6-4972-40be-8fbe-6c5060e94b94}</UniqueIdentifier>
     </Filter>
-    <Filter Include="projects\camera">
-      <UniqueIdentifier>{2ff74f3f-2b86-43d2-8b7a-7e2fa016aade}</UniqueIdentifier>
-    </Filter>
     <Filter Include="projects\engine\graphic\2d">
       <UniqueIdentifier>{e88f3d9f-6567-4f33-b74a-8a27c30c1c2f}</UniqueIdentifier>
     </Filter>
@@ -1050,6 +1088,21 @@
     </Filter>
     <Filter Include="projects\tools">
       <UniqueIdentifier>{d325ec7a-ae6a-4048-af89-69a69ef602dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="projects\engine\graphic\2d\camera">
+      <UniqueIdentifier>{2ff74f3f-2b86-43d2-8b7a-7e2fa016aade}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="projects\application\Stage">
+      <UniqueIdentifier>{e5b2494b-4ec6-4375-a8ef-45d7004de744}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="projects\application\Bullet">
+      <UniqueIdentifier>{8415edf8-3d54-4966-b46f-2a23dfa9733e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="projects\application\Bullet\Enemy">
+      <UniqueIdentifier>{e22fd438-1494-4b19-b2cb-8ddb788c53db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="projects\application\Bullet\Player">
+      <UniqueIdentifier>{fb18588c-34ec-4e26-a44d-d33dc25682ec}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
