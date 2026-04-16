@@ -6,8 +6,9 @@
 #include "externals/imgui/imgui_impl_win32.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #endif // USE_IMGUI
-namespace TuboEngine {
-class ImGuiManager {
+
+class ImGuiManager
+{
 public:
 	/// <summary>
 	/// シングルトンインスタンス取得
@@ -18,7 +19,6 @@ public:
 		}
 		return instance;
 	}
-
 private:
 	// コンストラクタ・デストラクタ・コピー禁止
 	static ImGuiManager* instance;
@@ -39,7 +39,7 @@ public:
 	void Finalize();
 
 	/// <summary>
-	/// ImGui受付開始
+	///ImGui受付開始
 	/// </summary>
 	void Begin();
 
@@ -54,10 +54,10 @@ public:
 	void Draw();
 
 private:
+	
 #ifdef USE_IMGUI
-	// SRVディスクリプタヒープ
+	//SRVディスクリプタヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
 #endif // USE_IMGUI
 };
 
-} // namespace TuboEngine

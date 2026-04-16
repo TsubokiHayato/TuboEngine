@@ -17,7 +17,7 @@ public:
 
 	~ParticleManager() { Finalize(); }
 
-	void Update(float dt, TuboEngine::Camera* defaultCam);
+	void Update(float dt, Camera* defaultCam);
 	void Draw();
 	void DrawImGui();
 

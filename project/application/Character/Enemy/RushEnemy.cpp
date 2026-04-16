@@ -1,14 +1,11 @@
 #include "RushEnemy.h"
+#include "MapChip/MapChipField.h"
 #include "Character/Player/Player.h"
-#include "Collider/CollisionTypeId.h"
 #include "ImGuiManager.h"
 #include "LineManager.h"
-#include "MapChip/MapChipField.h"
-#include "engine/graphic/Particle/Effects/Primitive/PrimitiveEmitter.h"
-#include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
-#include "engine/graphic/Particle/ParticleManager.h"
-#include <algorithm>
+#include "Collider/CollisionTypeId.h"
 #include <cmath>
+#include <algorithm>
 
 #include "WinApp.h"
 #include "engine/camera/Camera.h"
@@ -19,32 +16,27 @@ namespace {
 constexpr float kRushEnemyModelRotOffsetX = 0.0f;
 constexpr float kRushEnemyModelRotOffsetY = 0.0f;
 constexpr float kRushEnemyModelRotOffsetZ = -DirectX::XM_PI * 0.5f;
-} // namespace
+}
 
 // 角度正規化 [-PI, PI]
 float RushEnemy::NormalizeAngle(float angle) {
-	while (angle > DirectX::XM_PI)
-		angle -= 2.0f * DirectX::XM_PI;
-	while (angle < -DirectX::XM_PI)
-		angle += 2.0f * DirectX::XM_PI;
-	return angle;
+    while (angle > DirectX::XM_PI) angle -= 2.0f * DirectX::XM_PI;
+    while (angle < -DirectX::XM_PI) angle += 2.0f * DirectX::XM_PI;
+    return angle;
 }
 
 // 単純な矩形衝突付き移動 (X/Y 分離 + サブステップ)
 static void MoveWithCollisionImpl(TuboEngine::Math::Vector3& position, const TuboEngine::Math::Vector3& desiredMove, MapChipField* field) {
-	if (!field) {
-		position = position + desiredMove;
-		return;
-	}
-	const float tile = MapChipField::GetBlockSize();
-	const float width = tile * 0.8f;
-	const float height = tile * 0.8f;
-	float moveLen2D = std::sqrt(desiredMove.x * desiredMove.x + desiredMove.y * desiredMove.y);
-	int subSteps = std::max(1, int(std::ceil(moveLen2D / (tile * 0.5f))));
+    if (!field) { position = position + desiredMove; return; }
+    const float tile = MapChipField::GetBlockSize();
+    const float width  = tile * 0.8f;
+    const float height = tile * 0.8f;
+    float moveLen2D = std::sqrt(desiredMove.x*desiredMove.x + desiredMove.y*desiredMove.y);
+    int subSteps = std::max(1, int(std::ceil(moveLen2D / (tile * 0.5f))));
 
-	// LineManager::GetInstance()->DrawLine(position, position + desiredMove, {1,0,0,1});
+    // LineManager::GetInstance()->DrawLine(position, position + desiredMove, {1,0,0,1});
 	TuboEngine::Math::Vector3 step = desiredMove / float(subSteps);
-	for (int i = 0; i < subSteps; ++i) {
+    for (int i=0;i<subSteps;++i) {
 		TuboEngine::Math::Vector3 nextX = position;
 		nextX.x += step.x;
 		if (!field->IsRectBlocked(nextX, width, height))
@@ -53,447 +45,272 @@ static void MoveWithCollisionImpl(TuboEngine::Math::Vector3& position, const Tub
 		nextY.y += step.y;
 		if (!field->IsRectBlocked(nextY, width, height))
 			position = nextY;
-	}
+    }
 }
 void RushEnemy::MoveWithCollision(TuboEngine::Math::Vector3& positionRef, const TuboEngine::Math::Vector3& desiredMove, MapChipField* field) { MoveWithCollisionImpl(positionRef, desiredMove, field); }
 
 void RushEnemy::Initialize() {
-	Enemy::Initialize();
-	shootDistance_ = 0.0f;
-	moveSpeed_ = baseMoveSpeed_;
-	isPreparing_ = false;
-	isRushing_ = false;
-	isStopping_ = false;
-	isScanning_ = false;
-	rushCooldownTimer_ = 0.0f;
-	requireExitBeforeNextRush_ = false;
-	lookAroundTimer_ = 0.0f;
-	isReacting_ = false;
-	reactionTimer_ = 0.0f;
-	reactionDir_ = {0, 0, 0};
-	// 本体をオレンジ系に変更
-	if (object3d) {
-		object3d->SetModelColor({1.0f, 0.5f, 0.0f, 1.0f});
-	}
-
-	endedRushWithoutWall_ = false;              // 新規追加フラグ初期化
-	rushStretchTimer_ = 0.0f;                   // 伸び演出初期化
-	lastReactionSource_ = ReactionSource::None; // 直前の反応元初期化
-	// スタン初期化
-	isStunned_ = false;
-	stunTimer_ = 0.0f;
-
-	// ドリルモデル初期化
-	drillObject_ = std::make_unique<TuboEngine::Object3d>();
-	drillObject_->Initialize("drill/drill.obj");
-	if (camera_) {
-		drillObject_->SetCamera(camera_);
-	}
-	// EnvironmentMap ライティングを使用
-	drillObject_->SetLightType(5);
-
-	// --- 演出用エミッタ生成 ---
-	if (!chargingEmitter_) {
-		ParticlePreset p{};
-		p.name = "RushCharge";
-		p.texture = "particle.png";
-		p.maxInstances = 128;
-		p.autoEmit = false;
-		p.burstCount = 4;
-		p.lifeMin = 0.1f;
-		p.lifeMax = 0.25f;
-		p.scaleStart = {0.2f, 0.2f, 0.2f};
-		p.scaleEnd = {0.05f, 0.05f, 0.05f};
-		p.colorStart = {1.0f, 0.7f, 0.2f, 1.0f};
-		p.colorEnd = {1.0f, 0.4f, 0.1f, 0.0f};
-		p.velMin = {-3.0f, -3.0f, -3.0f};
-		p.velMax = {3.0f, 3.0f, 3.0f};
-		p.gravity = {0, 0, 0};
-		chargingEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
-	}
-	if (!trailEmitter_) {
-		ParticlePreset p{};
-		p.name = "RushTrail";
-		p.texture = "particle.png";
-		p.maxInstances = 256;
-		p.autoEmit = false;
-		p.burstCount = 2;
-		p.lifeMin = 0.3f;
-		p.lifeMax = 0.5f;
-		p.scaleStart = {0.4f, 0.4f, 0.4f};
-		p.scaleEnd = {0.8f, 0.8f, 0.8f};
-		p.colorStart = {0.8f, 0.8f, 0.8f, 0.5f};
-		p.colorEnd = {0.6f, 0.6f, 0.6f, 0.0f};
-		p.velMin = {-0.6f, -0.6f, -0.6f};
-		p.velMax = {0.6f, 0.6f, 0.6f};
-		p.gravity = {0, 0, 0};
-		trailEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
-	}
+    Enemy::Initialize();
+    shootDistance_ = 0.0f; moveSpeed_ = baseMoveSpeed_;
+    isPreparing_ = false; isRushing_ = false; isStopping_ = false; isScanning_ = false;
+    rushCooldownTimer_ = 0.0f; requireExitBeforeNextRush_ = false; lookAroundTimer_ = 0.0f;
+    isReacting_ = false; reactionTimer_ = 0.0f; reactionDir_ = {0,0,0};
+    endedRushWithoutWall_ = false; // 新規追加フラグ初期化
+    rushStretchTimer_ = 0.0f;       // 伸び演出初期化
+    lastReactionSource_ = ReactionSource::None; // 直前の反応元初期化
+    // スタン初期化
+    isStunned_ = false; stunTimer_ = 0.0f;
 }
 
 // -------------------------------------------------
 // Update helper: Perception and timers
 // -------------------------------------------------
 void RushEnemy::UpdatePerceptionAndTimers(float dt, bool& canSeePlayer, float& distanceToPlayer) {
-	distanceToPlayer = 0.0f;
-	if (player_) {
+    distanceToPlayer = 0.0f;
+    if (player_) {
 		TuboEngine::Math::Vector3 toPlayer = player_->GetPosition() - position;
-		distanceToPlayer = std::sqrt(toPlayer.x * toPlayer.x + toPlayer.y * toPlayer.y + toPlayer.z * toPlayer.z);
-	}
-	canSeePlayer = CanSeePlayer();
-	if (canSeePlayer) {
-		lastSeenPlayerPos = player_->GetPosition();
-		lastSeenTimer = kLastSeenDuration;
-		ClearPath();
-	} else if (lastSeenTimer > 0.0f) {
-		lastSeenTimer -= dt;
-	}
-	if (wasHit && state_ == State::Idle)
-		state_ = State::Alert;
+        distanceToPlayer = std::sqrt(toPlayer.x*toPlayer.x + toPlayer.y*toPlayer.y + toPlayer.z*toPlayer.z);
+    }
+    canSeePlayer = CanSeePlayer();
+    if (canSeePlayer) {
+        lastSeenPlayerPos = player_->GetPosition();
+        lastSeenTimer = kLastSeenDuration;
+        ClearPath();
+    } else if (lastSeenTimer > 0.0f) {
+        lastSeenTimer -= dt;
+    }
+    if (wasHit && state_ == State::Idle) state_ = State::Alert;
 
-	// クールダウン更新
-	if (rushCooldownTimer_ > 0.0f) {
-		rushCooldownTimer_ -= dt;
-		if (rushCooldownTimer_ < 0.0f)
-			rushCooldownTimer_ = 0.0f;
-	}
-	// スタン判定: ノックバック(リアクション)が完全に終わってからクールダウン残りの間だけ硬直
-	if (rushCooldownTimer_ > 0.0f) {
-		if (!isReacting_) {
-			isStunned_ = true;
-			stunTimer_ = rushCooldownTimer_;
-		} else {
-			// リアクション中はスタン扱いにしない
-			isStunned_ = false;
-		}
-	} else {
-		if (isStunned_) {
-			isStunned_ = false;
-			stunTimer_ = 0.0f;
-		}
-	}
+    // クールダウン更新
+    if (rushCooldownTimer_ > 0.0f) {
+        rushCooldownTimer_ -= dt;
+        if (rushCooldownTimer_ < 0.0f) rushCooldownTimer_ = 0.0f;
+    }
+    // スタン判定: ノックバック(リアクション)が完全に終わってからクールダウン残りの間だけ硬直
+    if (rushCooldownTimer_ > 0.0f) {
+        if (!isReacting_) {
+            isStunned_ = true;
+            stunTimer_ = rushCooldownTimer_;
+        } else {
+            // リアクション中はスタン扱いにしない
+            isStunned_ = false;
+        }
+    } else {
+        if (isStunned_) { isStunned_ = false; stunTimer_ = 0.0f; }
+    }
 
-	if (requireExitBeforeNextRush_ && player_) {
-		float exitThresh = rushTriggerDistance_ + exitHysteresis_;
-		if (distanceToPlayer > exitThresh)
-			requireExitBeforeNextRush_ = false;
-	}
-	if (requireExitBeforeNextRush_ && rushCooldownTimer_ <= 0.0f && player_) {
-		if (distanceToPlayer <= rushTriggerDistance_) {
-			requireExitBeforeNextRush_ = false;
-		}
-	}
+    if (requireExitBeforeNextRush_ && player_) {
+        float exitThresh = rushTriggerDistance_ + exitHysteresis_;
+        if (distanceToPlayer > exitThresh) requireExitBeforeNextRush_ = false;
+    }
 
-	// scanning sway (無効化したいなら早期Returnにしても良い)
-	if (isScanning_) {
-		lookAroundTimer_ -= dt;
-		if (lookAroundTimer_ <= 0.0f) {
-			isScanning_ = false;
-			state_ = State::Idle;
-		}
-		float t = std::max(0.0f, lookAroundTimer_) / std::max(0.0001f, lookAroundDuration_);
-		float sway = std::sin((1.0f - t) * DirectX::XM_PI * 1.5f) * 0.35f;
-		rotation.z = NormalizeAngle(rotation.z + sway * 0.02f);
-	}
+    // scanning sway (無効化したいなら早期Returnにしても良い)
+    if (isScanning_) {
+        lookAroundTimer_ -= dt;
+        if (lookAroundTimer_ <= 0.0f) { isScanning_ = false; state_ = State::Idle; }
+        float t = std::max(0.0f, lookAroundTimer_) / std::max(0.0001f, lookAroundDuration_);
+        float sway = std::sin((1.0f - t) * DirectX::XM_PI * 1.5f) * 0.35f;
+        rotation.z = NormalizeAngle(rotation.z + sway * 0.02f);
+    }
 }
 
 // -------------------------------------------------
 // Update helper: State update by vision
 // -------------------------------------------------
 void RushEnemy::UpdateStateByVision(bool canSeePlayer, float distanceToPlayer) {
-	if (isScanning_ || isPreparing_ || isRushing_ || isStopping_ || isReacting_)
-		return;
-	if (!player_)
-		return;
-	if (canSeePlayer) {
-		if (distanceToPlayer > moveStartDistance_) {
-			state_ = State::Idle;
-		} else if (distanceToPlayer > rushTriggerDistance_) {
-			// 突進トリガー外: 追跡は許可
-			state_ = State::Chase;
-		} else {
-			// 突進トリガー内: 突進のみ許可（通常の追跡はしない）
-			if (rushCooldownTimer_ <= 0.0f && !requireExitBeforeNextRush_) {
-				state_ = State::Attack;
-				isPreparing_ = true;
-				prepareTimer_ = prepareDuration_;
+    if (isScanning_ || isPreparing_ || isRushing_ || isStopping_ || isReacting_) return;
+    if (!player_) return;
+    if (canSeePlayer) {
+        if (distanceToPlayer > moveStartDistance_) {
+            state_ = State::Idle;
+        } else if (distanceToPlayer > rushTriggerDistance_) {
+            // 突進トリガー外: 追跡は許可
+            state_ = State::Chase;
+        } else {
+            // 突進トリガー内: 突進のみ許可（通常の追跡はしない）
+            if (rushCooldownTimer_ <= 0.0f && !requireExitBeforeNextRush_) {
+                state_ = State::Attack;
+                isPreparing_ = true;
+                prepareTimer_ = prepareDuration_;
 				TuboEngine::Math::Vector3 dir = player_->GetPosition() - position;
 				dir.z = 0.0f;
 				float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-				if (len > 0.001f)
-					rushDir_ = {dir.x / len, dir.y / len, 0.0f};
-				rotation.z = std::atan2(rushDir_.y, rushDir_.x);
-				endedRushWithoutWall_ = false;
-			} else {
-				// クールダウン中や退出条件未満のときはその場で待機
-				state_ = State::Idle;
-			}
-		}
-	} else if (lastSeenTimer > 0.0f)
-		state_ = State::Alert;
-	else if (state_ == State::Alert)
-		state_ = State::LookAround;
-	else if (state_ != State::LookAround)
-		state_ = State::Idle;
+                if (len > 0.001f) rushDir_ = {dir.x/len, dir.y/len, 0.0f};
+                rotation.z = std::atan2(rushDir_.y, rushDir_.x);
+                endedRushWithoutWall_ = false;
+            } else {
+                // クールダウン中や退出条件未満のときはその場で待機
+                state_ = State::Idle;
+            }
+        }
+    } else if (lastSeenTimer > 0.0f) state_ = State::Alert;
+    else if (state_ == State::Alert) state_ = State::LookAround;
+    else if (state_ != State::LookAround) state_ = State::Idle;
 }
 
 // -------------------------------------------------
 // Update helper: Facing rotation
 // -------------------------------------------------
 void RushEnemy::UpdateFacingWhenNeeded(bool canSeePlayer) {
-	if (isRushing_ || isPreparing_ || isStopping_ || isScanning_ || isReacting_)
-		return;
-	if (!player_)
-		return;
-	if (!(state_ == State::Chase || state_ == State::Alert))
-		return;
+    if (isRushing_ || isPreparing_ || isStopping_ || isScanning_ || isReacting_) return;
+    if (!player_) return;
+    if (!(state_ == State::Chase || state_ == State::Alert)) return;
 	TuboEngine::Math::Vector3 targetPos = (canSeePlayer) ? player_->GetPosition() : lastSeenPlayerPos;
 	TuboEngine::Math::Vector3 toTarget = targetPos - position;
-	float angleZ = std::atan2(toTarget.y, toTarget.x);
-	float diff = NormalizeAngle(angleZ - rotation.z);
-	float maxTurn = turnSpeed_;
-	if (std::fabs(diff) < maxTurn)
-		rotation.z = angleZ;
-	else {
-		rotation.z += (diff > 0 ? 1 : -1) * maxTurn;
-		rotation.z = NormalizeAngle(rotation.z);
-	}
+    float angleZ = std::atan2(toTarget.y, toTarget.x);
+    float diff = NormalizeAngle(angleZ - rotation.z);
+    float maxTurn = turnSpeed_;
+    if (std::fabs(diff) < maxTurn) rotation.z = angleZ;
+    else { rotation.z += (diff > 0 ? 1 : -1) * maxTurn; rotation.z = NormalizeAngle(rotation.z); }
 }
 
 // -------------------------------------------------
 // Update helper: Attack state
 // -------------------------------------------------
 void RushEnemy::UpdateAttackState(float dt) {
-	if (isPreparing_) {
-		HandlePrepare(dt);
-		return;
-	}
-	if (isRushing_) {
-		HandleRushing(dt);
-		return;
-	}
-	if (isStopping_) {
-		// 停止終了後は見回しせずIdleへ
-		stopTimer_ -= dt;
-		if (stopTimer_ <= 0.0f) {
-			isStopping_ = false;
-			state_ = State::Idle;
-		}
-	}
-	if (isReacting_) {
-		HandleReacting(dt);
-	}
+    if (isPreparing_) { HandlePrepare(dt); return; }
+    if (isRushing_)   { HandleRushing(dt); return; }
+    if (isStopping_) {
+        // 停止終了後は見回しせずIdleへ
+        stopTimer_ -= dt;
+        if (stopTimer_ <= 0.0f) { isStopping_ = false; state_ = State::Idle; }
+    }
+    if (isReacting_)  { HandleReacting(dt); }
 }
 
 void RushEnemy::HandlePrepare(float dt) {
-	prepareTimer_ -= dt;
-	if (prepareTimer_ <= 0.0f) {
-		isPreparing_ = false;
-		isRushing_ = true;
-		rushTimer_ = rushDuration_;
-		endedRushWithoutWall_ = false;
-		// 突進開始瞬間の伸び演出
-		rushStretchTimer_ = rushStretchDuration_;
-	}
+    prepareTimer_ -= dt;
+    if (prepareTimer_ <= 0.0f) {
+        isPreparing_ = false;
+        isRushing_ = true;
+        rushTimer_ = rushDuration_;
+        endedRushWithoutWall_ = false;
+        // 突進開始瞬間の伸び演出
+        rushStretchTimer_ = rushStretchDuration_;
+    }
 }
 
 bool RushEnemy::CheckWallHit(const TuboEngine::Math::Vector3& desiredMove, TuboEngine::Math::Vector3& outHitNormal) const {
-	if (!mapChipField)
-		return false;
-	const float tile = MapChipField::GetBlockSize();
-	const float w = tile * 0.8f;
-	const float h = tile * 0.8f;
+    if (!mapChipField) return false;
+    const float tile = MapChipField::GetBlockSize();
+    const float w = tile * 0.8f; const float h = tile * 0.8f;
 	TuboEngine::Math::Vector3 nextPos = position + desiredMove;
-	if (!mapChipField->IsRectBlocked(nextPos, w, h))
-		return false;
-	// 近似法：軸分離で詰まり方向から法線推定
+    if (!mapChipField->IsRectBlocked(nextPos, w, h)) return false;
+    // 近似法：軸分離で詰まり方向から法線推定
 	TuboEngine::Math::Vector3 testX = position + TuboEngine::Math::Vector3{desiredMove.x, 0, 0};
 	TuboEngine::Math::Vector3 testY = position + TuboEngine::Math::Vector3{0, desiredMove.y, 0};
-	bool blockX = mapChipField->IsRectBlocked(testX, w, h);
-	bool blockY = mapChipField->IsRectBlocked(testY, w, h);
-	if (blockX && !blockY)
-		outHitNormal = {(desiredMove.x > 0 ? -1.0f : 1.0f), 0, 0};
-	else if (!blockX && blockY)
-		outHitNormal = {0, (desiredMove.y > 0 ? -1.0f : 1.0f), 0};
-	else
-		outHitNormal = {-rushDir_.x, -rushDir_.y, 0};
-	return true;
+    bool blockX = mapChipField->IsRectBlocked(testX, w, h);
+    bool blockY = mapChipField->IsRectBlocked(testY, w, h);
+    if (blockX && !blockY) outHitNormal = {(desiredMove.x>0?-1.0f:1.0f),0,0};
+    else if (!blockX && blockY) outHitNormal = {0,(desiredMove.y>0?-1.0f:1.0f),0};
+    else outHitNormal = {-rushDir_.x, -rushDir_.y, 0};
+    return true;
 }
 
 void RushEnemy::HandleRushing(float dt) {
 	TuboEngine::Math::Vector3 desiredMove{rushDir_.x * rushSpeed_, rushDir_.y * rushSpeed_, 0};
 	TuboEngine::Math::Vector3 hitNormal{0, 0, 0};
-	bool hitWall = CheckWallHit(desiredMove, hitNormal);
-	if (!hitWall) {
-		MoveWithCollision(position, desiredMove, mapChipField);
-		rushTimer_ -= dt;
-		if (rushTimer_ <= 0.0f) {
-			isRushing_ = false;
-			isStopping_ = true;
-			stopTimer_ = stopDuration_;
-			rushCooldownTimer_ = rushCooldownDuration_;
-			requireExitBeforeNextRush_ = true;
-			endedRushWithoutWall_ = true;
-		}
-	} else {
+    bool hitWall = CheckWallHit(desiredMove, hitNormal);
+    if (!hitWall) {
+        MoveWithCollision(position, desiredMove, mapChipField);
+        rushTimer_ -= dt;
+        if (rushTimer_ <= 0.0f) { isRushing_ = false; isStopping_ = true; stopTimer_ = stopDuration_; rushCooldownTimer_ = rushCooldownDuration_; requireExitBeforeNextRush_ = true; endedRushWithoutWall_ = true; }
+    } else {
 		TuboEngine::Math::Vector3 v = rushDir_;
-		float nlen = std::sqrt(hitNormal.x * hitNormal.x + hitNormal.y * hitNormal.y);
+        float nlen = std::sqrt(hitNormal.x*hitNormal.x + hitNormal.y*hitNormal.y);
 		TuboEngine::Math::Vector3 n = (nlen > 0.0001f) ? TuboEngine::Math::Vector3{hitNormal.x / nlen, hitNormal.y / nlen, 0} : TuboEngine::Math::Vector3{-v.x, -v.y, 0};
-		float dot = v.x * n.x + v.y * n.y;
+        float dot = v.x*n.x + v.y*n.y;
 		TuboEngine::Math::Vector3 reflect{v.x - 2.0f * dot * n.x, v.y - 2.0f * dot * n.y, 0};
-		reactionDir_ = reflect;
-		isRushing_ = false;
-		isReacting_ = true;
-		reactionTimer_ = reactionDuration_;
-		rushCooldownTimer_ = rushCooldownDuration_;
-		requireExitBeforeNextRush_ = true;
-		endedRushWithoutWall_ = false;
-		lastReactionSource_ = ReactionSource::Wall; // 壁反射リアクション
+        reactionDir_ = reflect; isRushing_ = false; isReacting_ = true; reactionTimer_ = reactionDuration_;
+        rushCooldownTimer_ = rushCooldownDuration_; requireExitBeforeNextRush_ = true; endedRushWithoutWall_ = false;
+        lastReactionSource_ = ReactionSource::Wall; // 壁反射リアクション
 		TuboEngine::Math::Vector3 bounce = reactionDir_ * reactionBackoffSpeed_;
-		MoveWithCollision(position, bounce, mapChipField);
-	}
+        MoveWithCollision(position, bounce, mapChipField);
+    }
 }
 
 void RushEnemy::HandleReacting(float dt) {
-	float t = std::clamp(reactionTimer_ / std::max(0.0001f, reactionDuration_), 0.0f, 1.0f);
-	float sp = reactionBackoffSpeed_ * t;
+    float t = std::clamp(reactionTimer_/std::max(0.0001f,reactionDuration_),0.0f,1.0f);
+    float sp = reactionBackoffSpeed_ * t;
 	TuboEngine::Math::Vector3 mv = reactionDir_ * sp;
-	MoveWithCollision(position, mv, mapChipField);
-	reactionTimer_ -= dt;
-	if (reactionTimer_ <= 0.0f) {
-		isReacting_ = false;
-		// プレイヤーにぶつかった時だけは振り向かない（向き/突進方向を維持）
-		if (lastReactionSource_ == ReactionSource::Wall) {
-			rotation.z = std::atan2(reactionDir_.y, reactionDir_.x);
-			rushDir_ = reactionDir_;
-		}
-		// 見回しに入らずIdleへ
-		isScanning_ = false;
-		state_ = State::Idle;
-		endedRushWithoutWall_ = false;
-		// リアクションが終わった時点で、クールダウンが残っていればスタン開始
-		if (rushCooldownTimer_ > 0.0f) {
-			isStunned_ = true;
-			stunTimer_ = rushCooldownTimer_;
-		}
-		lastReactionSource_ = ReactionSource::None;
-	}
+    MoveWithCollision(position, mv, mapChipField);
+    reactionTimer_ -= dt;
+    if (reactionTimer_ <= 0.0f) {
+        isReacting_ = false;
+        // プレイヤーにぶつかった時だけは振り向かない（向き/突進方向を維持）
+        if (lastReactionSource_ == ReactionSource::Wall) {
+            rotation.z = std::atan2(reactionDir_.y, reactionDir_.x);
+            rushDir_ = reactionDir_;
+        }
+        // 見回しに入らずIdleへ
+        isScanning_ = false;
+        state_ = State::Idle;
+        endedRushWithoutWall_ = false;
+        // リアクションが終わった時点で、クールダウンが残っていればスタン開始
+        if (rushCooldownTimer_ > 0.0f) {
+            isStunned_ = true;
+            stunTimer_ = rushCooldownTimer_;
+        }
+        lastReactionSource_ = ReactionSource::None;
+    }
 }
 
 // -------------------------------------------------
 // Visuals and debug
 // -------------------------------------------------
-
-void RushEnemy::UpdateDrillTransform() {
-	if (!drillObject_)
-		return;
-
-	// 自転速度の決定
-	float spinSpeed = 0.05f;
-	if (isRushing_) {
-		spinSpeed = 1.0f; // 突進中は非常に速く回転
-	} else if (isPreparing_) {
-		// ため中は徐々に加速
-		float prepT = std::clamp(1.0f - (prepareTimer_ / std::max(0.0001f, prepareDuration_)), 0.0f, 1.0f);
-		spinSpeed = 0.1f + 0.5f * prepT;
-	} else {
-		spinSpeed = 0.05f; // 通常時はゆっくり
-	}
-
-	drillRotation_ += spinSpeed;
-	if (drillRotation_ > DirectX::XM_2PI) {
-		drillRotation_ -= DirectX::XM_2PI;
-	}
-
-	TuboEngine::Math::Vector3 forward{std::cos(rotation.z), std::sin(rotation.z), 0.0f};
-	// エネミーの少し前方に配置
-	const float kDrillOffset = 1.8f;
-	TuboEngine::Math::Vector3 drillPos = position + forward * kDrillOffset + hitShakeOffset_;
-
-	TuboEngine::Math::Vector3 drillRot = rotation;
-	// Z軸(前方)を中心にスピンを加える（モデルの向きに合わせる）
-	// モデルの初期方向が Z+ とすると、Z軸回転がスピンになる
-	drillRot.x += drillRotation_;
-
-	drillObject_->SetPosition(drillPos);
-	drillObject_->SetRotation(drillRot);
-	drillObject_->SetScale(scale);
-	drillObject_->SetCamera(camera_);
-	drillObject_->Update();
-
-	// --- パーティクル放出制御 ---
-	if (isPreparing_ && chargingEmitter_) {
-		// ドリルの先端付近から火花
-		chargingEmitter_->GetPreset().center = drillPos + forward * 1.0f;
-		chargingEmitter_->Emit(chargingEmitter_->GetPreset().burstCount);
-	}
-	if (isRushing_ && trailEmitter_) {
-		// 足元/後方に土煙
-		trailEmitter_->GetPreset().center = position - forward * 0.5f;
-		trailEmitter_->Emit(trailEmitter_->GetPreset().burstCount);
-	}
-}
-
 void RushEnemy::ApplyChargeAndVisuals(float dt) {
 	TuboEngine::Math::Vector3 visualScale = scale;
-	// チャージ中は縮み + 赤み
-	if (isPreparing_) {
-		float prepT = std::clamp(1.0f - (prepareTimer_ / std::max(0.0001f, prepareDuration_)), 0.0f, 1.0f);
-		float pulse = 0.18f * std::sin(prepT * DirectX::XM_PI * 2.0f);
-		float sx = 1.0f - 0.25f * prepT + pulse * 0.5f; // 徐々に縮む + 少し脈動
-		float sy = 1.0f - 0.25f * prepT - pulse * 0.3f;
-		visualScale.x *= std::max(0.6f, sx);
-		visualScale.y *= std::max(0.6f, sy);
-	}
-	// 突進開始直後の一瞬伸び（進行方向=ローカルXを伸ばす）
-	if (rushStretchTimer_ > 0.0f) {
-		float t = std::clamp(rushStretchTimer_ / std::max(0.0001f, rushStretchDuration_), 0.0f, 1.0f);
-		float stretch = 0.35f * t;
-		visualScale.x *= (1.0f + stretch);
-		visualScale.y *= (1.0f - stretch * 0.5f);
-		rushStretchTimer_ -= dt;
-		if (rushStretchTimer_ < 0.0f)
-			rushStretchTimer_ = 0.0f;
-	}
-	// 突進継続中はわずかに伸ばしてスピード感
-	if (isRushing_) {
-		float runningStretch = 0.12f;
-		visualScale.x *= (1.0f + runningStretch);
-		visualScale.y *= (1.0f - runningStretch * 0.5f);
-	}
+    // チャージ中は縮み + 赤み
+    if (isPreparing_) {
+        float prepT = std::clamp(1.0f - (prepareTimer_ / std::max(0.0001f, prepareDuration_)), 0.0f, 1.0f);
+        float pulse = 0.18f * std::sin(prepT * DirectX::XM_PI * 2.0f);
+        float sx = 1.0f - 0.25f * prepT + pulse * 0.5f; // 徐々に縮む + 少し脈動
+        float sy = 1.0f - 0.25f * prepT - pulse * 0.3f;
+        visualScale.x *= std::max(0.6f, sx);
+        visualScale.y *= std::max(0.6f, sy);
+    }
+    // 突進開始直後の一瞬伸び（進行方向=ローカルXを伸ばす）
+    if (rushStretchTimer_ > 0.0f) {
+        float t = std::clamp(rushStretchTimer_ / std::max(0.0001f, rushStretchDuration_), 0.0f, 1.0f);
+        float stretch = 0.35f * t;
+        visualScale.x *= (1.0f + stretch);
+        visualScale.y *= (1.0f - stretch * 0.5f);
+        rushStretchTimer_ -= dt;
+        if (rushStretchTimer_ < 0.0f) rushStretchTimer_ = 0.0f;
+    }
+    // 突進継続中はわずかに伸ばしてスピード感
+    if (isRushing_) {
+        float runningStretch = 0.12f;
+        visualScale.x *= (1.0f + runningStretch);
+        visualScale.y *= (1.0f - runningStretch * 0.5f);
+    }
 
-	object3d->SetPosition(position + hitShakeOffset_);
-
-	// 描画用回転（モデル軸補正込み）
+    object3d->SetPosition(position);
+    // 描画用回転（モデル軸補正込み）
 	TuboEngine::Math::Vector3 drawRot = rotation;
-	drawRot.x = NormalizeAngle(drawRot.x + kRushEnemyModelRotOffsetX);
-	drawRot.y = NormalizeAngle(drawRot.y + kRushEnemyModelRotOffsetY);
-	drawRot.z = NormalizeAngle(drawRot.z + kRushEnemyModelRotOffsetZ);
-	object3d->SetRotation(drawRot);
-	object3d->SetScale(visualScale);
-	object3d->SetCamera(camera_);
-	object3d->Update();
+    drawRot.x = NormalizeAngle(drawRot.x + kRushEnemyModelRotOffsetX);
+    drawRot.y = NormalizeAngle(drawRot.y + kRushEnemyModelRotOffsetY);
+    drawRot.z = NormalizeAngle(drawRot.z + kRushEnemyModelRotOffsetZ);
+    object3d->SetRotation(drawRot);
+    object3d->SetScale(visualScale);
+    object3d->SetCamera(camera_);
+    object3d->Update();
 }
 
 void RushEnemy::DrawDebugGizmos() {
 #if defined(_DEBUG)
-	const int div = 8;
-	Vector4 triggerCol{0.3f, 0.9f, 0.3f, 0.35f};
+    const int div = 24; Vector4 triggerCol{0.3f,0.9f,0.3f,0.35f};
 	for (int i = 0; i < div; ++i) {
 		float a0 = (2.0f * DirectX::XM_PI) * (float(i) / div);
 		float a1 = (2.0f * DirectX::XM_PI) * (float(i + 1) / div);
 		TuboEngine::Math::Vector3 p0 = position + TuboEngine::Math::Vector3{std::cos(a0) * rushTriggerDistance_, std::sin(a0) * rushTriggerDistance_, 0};
 		TuboEngine::Math::Vector3 p1 = position + TuboEngine::Math::Vector3{std::cos(a1) * rushTriggerDistance_, std::sin(a1) * rushTriggerDistance_, 0};
-		TuboEngine::LineManager::GetInstance()->DrawLine(p0, p1, triggerCol);
-	}
-	TuboEngine::Math::Vector4 dirCol =
-	    isPreparing_ ? Vector4{1, 0.6f, 0.2f, 1}
-	                 : (isRushing_ ? Vector4{1, 0.2f, 0.2f, 1}
-	                               : (isStopping_ ? Vector4{0.8f, 0.8f, 0.8f, 1}
-	                                              : (isScanning_ ? Vector4{0.2f, 0.7f, 1.0f, 1} : (rushCooldownTimer_ > 0.0f ? Vector4{0.4f, 0.4f, 0.4f, 1} : Vector4{0.4f, 0.4f, 0.9f, 1}))));
+		LineManager::GetInstance()->DrawLine(p0, p1, triggerCol);
+	}    
+   TuboEngine::Math:: Vector4 dirCol = isPreparing_? Vector4{1,0.6f,0.2f,1} : (isRushing_? Vector4{1,0.2f,0.2f,1} : (isStopping_? Vector4{0.8f,0.8f,0.8f,1} : (isScanning_? Vector4{0.2f,0.7f,1.0f,1} : (rushCooldownTimer_>0.0f? Vector4{0.4f,0.4f,0.4f,1}:Vector4{0.4f,0.4f,0.9f,1}))));
 	TuboEngine::Math::Vector3 head = position + TuboEngine::Math::Vector3{rushDir_.x * 2.2f, rushDir_.y * 2.2f, 0};
-	TuboEngine::LineManager::GetInstance()->DrawLine(position, head, dirCol);
-	if (isPreparing_ && showDashPreview_) {
+	LineManager::GetInstance()->DrawLine(position, head, dirCol);
+    if (isPreparing_ && showDashPreview_) {
 		TuboEngine::Math::Vector3 predicted = position + TuboEngine::Math::Vector3{rushDir_.x * rushSpeed_ * rushDuration_, rushDir_.y * rushSpeed_ * rushDuration_, 0};
 		float previewR = 0.9f;
 		Vector4 previewCol{1, 0.15f, 0.15f, 0.85f};
@@ -502,14 +319,15 @@ void RushEnemy::DrawDebugGizmos() {
 			float a1 = (2.0f * DirectX::XM_PI) * (float(i + 1) / div);
 			TuboEngine::Math::Vector3 p0 = predicted + TuboEngine::Math::Vector3{std::cos(a0) * previewR, std::sin(a0) * previewR, 0};
 			TuboEngine::Math::Vector3 p1 = predicted + TuboEngine::Math::Vector3{std::cos(a1) * previewR, std::sin(a1) * previewR, 0};
-			TuboEngine::LineManager::GetInstance()->DrawLine(p0, p1, previewCol);
+			LineManager::GetInstance()->DrawLine(p0, p1, previewCol);
 		}
 		float cross = previewR;
 
-		TuboEngine::LineManager::GetInstance()->DrawLine(predicted + TuboEngine::Math::Vector3{-cross, 0, 0}, predicted + TuboEngine::Math::Vector3{cross, 0, 0}, previewCol);
-		TuboEngine::LineManager::GetInstance()->DrawLine(predicted + TuboEngine::Math::Vector3{0, -cross, 0}, predicted + TuboEngine::Math::Vector3{0, cross, 0}, previewCol);
-		TuboEngine::LineManager::GetInstance()->DrawLine(position, predicted, Vector4{1, 0.3f, 0.3f, 0.3f});
-	}
+		LineManager::GetInstance()->DrawLine(predicted + TuboEngine::Math::Vector3{-cross, 0, 0}, predicted + TuboEngine::Math::Vector3{cross, 0, 0}, previewCol);
+		LineManager::GetInstance()->DrawLine(predicted + TuboEngine::Math::Vector3{0, -cross, 0}, predicted + TuboEngine::Math::Vector3{0, cross, 0}, previewCol);
+		LineManager::GetInstance()->DrawLine(position, predicted, Vector4{1, 0.3f, 0.3f, 0.3f});
+
+    }
 #endif
 }
 
@@ -517,219 +335,138 @@ void RushEnemy::DrawDebugGizmos() {
 // Collision helpers
 // -------------------------------------------------
 bool RushEnemy::HandleReactingEarly(Collider* other, uint32_t typeID) {
-	if (!isReacting_)
-		return false;
-	if (typeID == static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon)) {
-		Enemy::OnCollision(other);
-	}
-	return true;
+    if (!isReacting_) return false;
+    if (typeID == static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon)) {
+        Enemy::OnCollision(other);
+    }
+    return true;
 }
 
 bool RushEnemy::HandlePlayerCollision(Collider* other) {
-	Player* hitPlayer = dynamic_cast<Player*>(other);
-	if (!hitPlayer)
-		return false;
+    Player* hitPlayer = dynamic_cast<Player*>(other);
+    if (!hitPlayer) return false;
 	TuboEngine::Math::Vector3 pPos = hitPlayer->GetPosition();
 	TuboEngine::Math::Vector3 dir = position - pPos;
 	dir.z = 0.0f;
 	float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-	if (len > 0.0001f) {
+    if (len > 0.0001f) {
 		TuboEngine::Math::Vector3 away{dir.x / len, dir.y / len, 0.0f};
-		reactionDir_ = away;
-		isRushing_ = false;
-		isReacting_ = true;
-		reactionTimer_ = reactionDuration_;
-		rushCooldownTimer_ = rushCooldownDuration_;
-		// Do not force "require exit before next rush" on player collision.
-		// Forcing exit was causing the enemy to never attack again if knocked back
-		// but still within rush range. Only wall collisions should require exit.
-		requireExitBeforeNextRush_ = false;
-		endedRushWithoutWall_ = false;
-		lastReactionSource_ = ReactionSource::Player; // プレイヤー接触リアクション
+        reactionDir_ = away;
+        isRushing_ = false;
+        isReacting_ = true;
+        reactionTimer_ = reactionDuration_;
+        rushCooldownTimer_ = rushCooldownDuration_;
+        requireExitBeforeNextRush_ = true;
+        endedRushWithoutWall_ = false;
+        lastReactionSource_ = ReactionSource::Player; // プレイヤー接触リアクション
 		TuboEngine::Math::Vector3 knock = reactionDir_ * reactionBackoffSpeed_;
-		MoveWithCollision(position, knock, mapChipField);
-	}
-	return true;
+        MoveWithCollision(position, knock, mapChipField);
+    }
+    return true;
 }
 
 void RushEnemy::HandleWeaponAfterRush(Collider* other, uint32_t typeID) {
-	if (typeID != static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon) || !endedRushWithoutWall_)
-		return;
-	// 一度のみ
-	endedRushWithoutWall_ = false;
-	isStopping_ = false;
-	isScanning_ = false;
+    if (typeID != static_cast<uint32_t>(CollisionTypeId::kPlayerWeapon) || !endedRushWithoutWall_) return;
+    // 一度のみ
+    endedRushWithoutWall_ = false;
+    isStopping_ = false;
+    isScanning_ = false;
 
-	if (!player_) {
-		state_ = State::Idle;
-		return;
-	}
+    if (!player_) { state_ = State::Idle; return; }
 
-	// プレイヤーとの距離で分岐
+    // プレイヤーとの距離で分岐
 	TuboEngine::Math::Vector3 toP = player_->GetPosition() - position;
 	toP.z = 0.0f;
-	float len = std::sqrt(toP.x * toP.x + toP.y * toP.y);
-	if (len > rushTriggerDistance_) {
-		// 突進可能範囲外：Chase は許可（即時移動はしない）
-		state_ = State::Chase;
-	} else {
-		// 突進可能範囲内：突進以外で接近しない
-		if (rushCooldownTimer_ <= 0.0f && !requireExitBeforeNextRush_) {
+    float len = std::sqrt(toP.x*toP.x + toP.y*toP.y);
+    if (len > rushTriggerDistance_) {
+        // 突進可能範囲外：Chase は許可（即時移動はしない）
+        state_ = State::Chase;
+    } else {
+        // 突進可能範囲内：突進以外で接近しない
+        if (rushCooldownTimer_ <= 0.0f && !requireExitBeforeNextRush_) {
 			TuboEngine::Math::Vector3 dir{toP.x / len, toP.y / len, 0.0f};
-			rushDir_ = dir;
-			rotation.z = std::atan2(dir.y, dir.x);
-			state_ = State::Attack;
-			isPreparing_ = true;
-			prepareTimer_ = prepareDuration_;
-		} else {
-			state_ = State::Idle; // クールダウン中は足を止める
-		}
-	}
+            rushDir_ = dir;
+            rotation.z = std::atan2(dir.y, dir.x);
+            state_ = State::Attack;
+            isPreparing_ = true;
+            prepareTimer_ = prepareDuration_;
+        } else {
+            state_ = State::Idle; // クールダウン中は足を止める
+        }
+    }
 }
 
 void RushEnemy::Update() {
-	if (!isAlive) {
-		return;
-	}
-	const float dt = 1.0f / 60.0f;
+    if (!isAlive) { if (!deathEffectPlayed_) { EmitDeathParticle(); deathEffectPlayed_ = true; } if (deathEmitter_) deathEmitter_->GetPreset().center = position; return; }
+    const float dt = 1.0f / 60.0f;
 
-	// --- 霧散演出中の処理 ---
-	if (isDying_) {
-		deathTimer_ -= dt;
-		if (mistEmitter_) {
-			mistEmitter_->GetPreset().center = position;
-			mistEmitter_->Emit(4);
-		}
+    // --- Enemyのノックバック適用を先頭で共有 ---
+    ApplyKnockback(dt);
 
-		UpdateDrillTransform();
-		ApplyChargeAndVisuals(dt);
+    bool canSeePlayer = false; float distanceToPlayer = 0.0f;
+    UpdatePerceptionAndTimers(dt, canSeePlayer, distanceToPlayer);
 
-		// 共通演出の上書き（縮小のみ。カラーはモデル共有のため変更しない）
-		float t = std::clamp(deathTimer_ / kDeathDuration, 0.0f, 1.0f);
-		if (object3d) {
-			object3d->SetScale(object3d->GetScale() * t);
-		}
-		if (drillObject_) {
-			drillObject_->SetScale(drillObject_->GetScale() * t);
-		}
+    // 可視/不可視の瞬間イベントをRushEnemyでも処理（アイコンタイマー設定）
+    wasJustFound_ = (!sawPlayerPrev_ && canSeePlayer);
+    wasJustLost_  = (sawPlayerPrev_ && !canSeePlayer);
+    sawPlayerPrev_ = canSeePlayer;
+    if (wasJustFound_) { exclamationTimer_ = iconDuration_; }
+    if (wasJustLost_)  { questionTimer_    = iconDuration_; }
 
-		if (deathTimer_ <= 0.0f) {
-			isAlive = false;
-		}
-		return;
-	}
+    // タイマー減衰
+    if (questionTimer_ > 0.0f) { questionTimer_ -= dt; if (questionTimer_ < 0.0f) questionTimer_ = 0.0f; }
+    if (exclamationTimer_ > 0.0f) { exclamationTimer_ -= dt; if (exclamationTimer_ < 0.0f) exclamationTimer_ = 0.0f; }
+    if (surpriseTimer_ > 0.0f) { surpriseTimer_ -= dt; if (surpriseTimer_ < 0.0f) surpriseTimer_ = 0.0f; }
 
-	// 死亡判定開始
-	if (HP <= 0) {
-		isDying_ = true;
-		deathTimer_ = kDeathDuration;
-		EmitDeathParticle();
-		return;
-	}
-
-	// --- Enemyのヒットシェイク適用を先頭で共有 ---
-	ApplyHitShake(dt);
-
-	bool canSeePlayer = false;
-	float distanceToPlayer = 0.0f;
-	UpdatePerceptionAndTimers(dt, canSeePlayer, distanceToPlayer);
-
-	// 可視/不可視の瞬間イベントをRushEnemyでも処理（アイコンタイマー設定）
-	wasJustFound_ = (!sawPlayerPrev_ && canSeePlayer);
-	wasJustLost_ = (sawPlayerPrev_ && !canSeePlayer);
-	sawPlayerPrev_ = canSeePlayer;
-	if (wasJustFound_) {
-		exclamationTimer_ = iconDuration_;
-	}
-	if (wasJustLost_) {
-		questionTimer_ = iconDuration_;
-	}
-
-	// タイマー減衰
-	if (questionTimer_ > 0.0f) {
-		questionTimer_ -= dt;
-		if (questionTimer_ < 0.0f)
-			questionTimer_ = 0.0f;
-	}
-	if (exclamationTimer_ > 0.0f) {
-		exclamationTimer_ -= dt;
-		if (exclamationTimer_ < 0.0f)
-			exclamationTimer_ = 0.0f;
-	}
-	if (surpriseTimer_ > 0.0f) {
-		surpriseTimer_ -= dt;
-		if (surpriseTimer_ < 0.0f)
-			surpriseTimer_ = 0.0f;
-	}
-
-	// スタン中は完全停止（向き/状態維持）。見た目更新のみして早期Return。
-	if (isStunned_) {
-		object3d->SetPosition(position);
-		// スタン中も描画補正は適用
-		{
+    // スタン中は完全停止（向き/状態維持）。見た目更新のみして早期Return。
+    if (isStunned_) {
+        object3d->SetPosition(position);
+        // スタン中も描画補正は適用
+        {
 			TuboEngine::Math::Vector3 drawRot = rotation;
-			drawRot.x = NormalizeAngle(drawRot.x + kRushEnemyModelRotOffsetX);
-			drawRot.y = NormalizeAngle(drawRot.y + kRushEnemyModelRotOffsetY);
-			drawRot.z = NormalizeAngle(drawRot.z + kRushEnemyModelRotOffsetZ);
-			object3d->SetRotation(drawRot);
-		}
-		object3d->SetScale(scale);
-		object3d->SetCamera(camera_);
-		object3d->Update();
+            drawRot.x = NormalizeAngle(drawRot.x + kRushEnemyModelRotOffsetX);
+            drawRot.y = NormalizeAngle(drawRot.y + kRushEnemyModelRotOffsetY);
+            drawRot.z = NormalizeAngle(drawRot.z + kRushEnemyModelRotOffsetZ);
+            object3d->SetRotation(drawRot);
+        }
+        object3d->SetScale(scale);
+        object3d->SetCamera(camera_);
+        object3d->Update();
+        if (hitEmitter_) hitEmitter_->GetPreset().center = position;
+        if (deathEmitter_ && !deathEffectPlayed_) deathEmitter_->GetPreset().center = position;
+        wasHit = isHit; isHit = false;
+        return;
+    }
 
-		// ドリルも位置だけ追従させる
-		UpdateDrillTransform();
-
-		if (hitEmitter_)
-			hitEmitter_->GetPreset().center = position;
-		if (deathEmitter_ && !deathEffectPlayed_)
-			deathEmitter_->GetPreset().center = position;
-		wasHit = isHit;
-		isHit = false;
-		return;
-	}
-
-	// クールダウン/スタンが終了した直後に、突進可能範囲内なら即座に突進準備へ移行
-	if (!isStunned_ && !isPreparing_ && !isRushing_ && !isReacting_ && !isStopping_) {
-		if (rushCooldownTimer_ <= 0.0f && !requireExitBeforeNextRush_ && player_ && canSeePlayer) {
+    // クールダウン/スタンが終了した直後に、突進可能範囲内なら即座に突進準備へ移行
+    if (!isStunned_ && !isPreparing_ && !isRushing_ && !isReacting_ && !isStopping_) {
+        if (rushCooldownTimer_ <= 0.0f && !requireExitBeforeNextRush_ && player_ && canSeePlayer) {
 			TuboEngine::Math::Vector3 toP = player_->GetPosition() - position;
 			toP.z = 0.0f;
-			float len = std::sqrt(toP.x * toP.x + toP.y * toP.y);
-			if (len <= rushTriggerDistance_ && len > 0.001f) {
+            float len = std::sqrt(toP.x*toP.x + toP.y*toP.y);
+            if (len <= rushTriggerDistance_ && len > 0.001f) {
 				TuboEngine::Math::Vector3 dir{toP.x / len, toP.y / len, 0.0f};
-				rushDir_ = dir;
-				rotation.z = std::atan2(dir.y, dir.x);
-				state_ = State::Attack;
-				isPreparing_ = true;
-				prepareTimer_ = prepareDuration_;
-			}
-		}
-	}
+                rushDir_ = dir;
+                rotation.z = std::atan2(dir.y, dir.x);
+                state_ = State::Attack;
+                isPreparing_ = true;
+                prepareTimer_ = prepareDuration_;
+            }
+        }
+    }
 
-	UpdateStateByVision(canSeePlayer, distanceToPlayer);
+    UpdateStateByVision(canSeePlayer, distanceToPlayer);
 
-	if (state_ != State::Attack && !isScanning_) {
-		isPreparing_ = false;
-		if (isRushing_)
-			isRushing_ = false;
-		if (isStopping_)
-			isStopping_ = false;
-	}
+    if (state_ != State::Attack && !isScanning_) { isPreparing_ = false; if (isRushing_) isRushing_ = false; if (isStopping_) isStopping_ = false; }
 
-	UpdateFacingWhenNeeded(canSeePlayer);
+    UpdateFacingWhenNeeded(canSeePlayer);
 
-	switch (state_) {
-	case State::Idle:
-		break;
-	case State::Alert:
-		break;
-	case State::LookAround:
-		state_ = State::Idle;
-		break;
-	case State::Patrol:
-		state_ = State::Idle;
-		break;
-	case State::Chase: {
+    switch (state_) {
+    case State::Idle: break;
+    case State::Alert: break;
+    case State::LookAround: state_ = State::Idle; break;
+    case State::Patrol: state_ = State::Idle; break;
+    case State::Chase: {
 		if (player_) {
 			TuboEngine::Math::Vector3 dir = player_->GetPosition() - position;
 			dir.z = 0.0f;
@@ -741,146 +478,115 @@ void RushEnemy::Update() {
 				MoveWithCollision(position, move, mapChipField);
 			}
 		}
-		break;
-	}
-	case State::Attack: {
-		UpdateAttackState(dt);
-		break;
-	}
-	}
+        break; }
+    case State::Attack: { UpdateAttackState(dt); break; }
+    }
 
-	// モデル・パーティクル・デバッグ描画
-	ApplyChargeAndVisuals(dt);
-	// ドリル更新（内部でUpdate()も呼ぶ）
-	UpdateDrillTransform();
-
-	if (hitEmitter_)
-		hitEmitter_->GetPreset().center = position;
-	if (deathEmitter_ && !deathEffectPlayed_)
-		deathEmitter_->GetPreset().center = position;
-	if (!wasHit && isHit)
-		EmitHitParticle();
-	wasHit = isHit;
-	isHit = false;
-	DrawDebugGizmos();
+    // モデル・パーティクル・デバッグ描画
+    ApplyChargeAndVisuals(dt);
+    if (hitEmitter_) hitEmitter_->GetPreset().center = position;
+    if (deathEmitter_ && !deathEffectPlayed_) deathEmitter_->GetPreset().center = position;
+    if (!wasHit && isHit) EmitHitParticle(); wasHit = isHit; isHit = false;
+    DrawDebugGizmos();
 }
 
-void RushEnemy::Draw() {
-	if (!GetIsAlive())
-		return;
-	if (object3d)
-		object3d->Draw();
-	if (drillObject_)
-		drillObject_->Draw();
-	DrawViewCone();
-	DrawLastSeenMark();
-	DrawStateIcon();
-}
+void RushEnemy::Draw() { if (!GetIsAlive()) return; if (object3d) object3d->Draw(); DrawViewCone(); DrawLastSeenMark(); DrawStateIcon(); }
 
 void RushEnemy::DrawSprite() {
-	if (!GetIsAlive() || isDying_)
-		return;
+    if (!GetIsAlive()) return;
+    if (!camera_) return; // カメラ必須
 
-	if (!camera_)
-		return; // カメラ必須
-
-	// 頭上ワールド座標
+    // 頭上ワールド座標
 	TuboEngine::Math::Vector3 world = position;
-	world.y += iconOffsetY_;
+    world.y += iconOffsetY_;
 
-	// ワールド→スクリーン座標変換
-	const Matrix4x4& vp = camera_->GetViewProjectionMatrix();
-	// 行列は左手座標系の想定。Vector4に拡張
-	float x = world.x, y = world.y, z = world.z;
-	float sx = vp.m[0][0] * x + vp.m[1][0] * y + vp.m[2][0] * z + vp.m[3][0];
-	float sy = vp.m[0][1] * x + vp.m[1][1] * y + vp.m[2][1] * z + vp.m[3][1];
-	float sw = vp.m[0][3] * x + vp.m[1][3] * y + vp.m[2][3] * z + vp.m[3][3];
-	if (sw == 0.0f)
-		return;
-	sx /= sw;
-	sy /= sw; // NDC
+    // ワールド→スクリーン座標変換
+    const Matrix4x4& vp = camera_->GetViewProjectionMatrix();
+    // 行列は左手座標系の想定。Vector4に拡張
+    float x = world.x, y = world.y, z = world.z;
+    float sx = vp.m[0][0]*x + vp.m[1][0]*y + vp.m[2][0]*z + vp.m[3][0];
+    float sy = vp.m[0][1]*x + vp.m[1][1]*y + vp.m[2][1]*z + vp.m[3][1];
+    float sw = vp.m[0][3]*x + vp.m[1][3]*y + vp.m[2][3]*z + vp.m[3][3];
+    if (sw == 0.0f) return; sx/=sw; sy/=sw; // NDC
 	int w = TuboEngine::WinApp::GetInstance()->GetClientWidth();
 	int h = TuboEngine::WinApp::GetInstance()->GetClientHeight();
-	float baseX = (sx * 0.5f + 0.5f) * float(w);
-	float baseY = (-sy * 0.5f + 0.5f) * float(h);
-	baseY += iconScreenOffsetY_; // スクリーンYの追加オフセット（上方向は負）
+    float baseX = (sx * 0.5f + 0.5f) * float(w);
+    float baseY = (-sy * 0.5f + 0.5f) * float(h);
+    baseY += iconScreenOffsetY_; // スクリーンYの追加オフセット（上方向は負）
 
-	if (sw < 0.0f)
-		return;
-	if (baseX < -50 || baseX > w + 50 || baseY < -50 || baseY > h + 50) {
-		return;
-	}
+    if (sw < 0.0f) return;
+    if (baseX < -50 || baseX > w + 50 || baseY < -50 || baseY > h + 50) { return; }
 
-	bool showQ = (questionTimer_ > 0.0f && questionIcon_ != nullptr);
-	bool showE = (exclamationTimer_ > 0.0f && exclamationIcon_ != nullptr);
+    bool showQ = (questionTimer_ > 0.0f && questionIcon_ != nullptr);
+    bool showE = (exclamationTimer_ > 0.0f && exclamationIcon_ != nullptr);
 
-	// 両方表示時は重ならないようにオフセット（順序: ！ → ？）
-	if (showQ && showE) {
-		float gap = std::max(8.0f, iconSize_.x * 0.6f);
-		float ex = baseX - gap * 0.5f; // 左に！
-		float qx = baseX + gap * 0.5f; // 右に？
+    // 両方表示時は重ならないようにオフセット（順序: ！ → ？）
+    if (showQ && showE) {
+        float gap = std::max(8.0f, iconSize_.x * 0.6f);
+        float ex = baseX - gap * 0.5f; // 左に！ 
+        float qx = baseX + gap * 0.5f; // 右に？
 
-		exclamationIcon_->SetPosition({ex, baseY});
-		exclamationIcon_->SetSize(iconSize_);
-		exclamationIcon_->Update();
-		exclamationIcon_->Draw();
+        exclamationIcon_->SetPosition({ex, baseY});
+        exclamationIcon_->SetSize(iconSize_);
+        exclamationIcon_->Update();
+        exclamationIcon_->Draw();
 
-		questionIcon_->SetPosition({qx, baseY});
-		questionIcon_->SetSize(iconSize_);
-		questionIcon_->Update();
-		questionIcon_->Draw();
-		return;
-	}
+        questionIcon_->SetPosition({qx, baseY});
+        questionIcon_->SetSize(iconSize_);
+        questionIcon_->Update();
+        questionIcon_->Draw();
+        return;
+    }
 
-	if (showQ) {
-		questionIcon_->SetPosition({baseX, baseY});
-		questionIcon_->SetSize(iconSize_);
-		questionIcon_->Update();
-		questionIcon_->Draw();
-	}
-	if (showE) {
-		exclamationIcon_->SetPosition({baseX, baseY});
-		exclamationIcon_->SetSize(iconSize_);
-		exclamationIcon_->Update();
-		exclamationIcon_->Draw();
-	}
+    if (showQ) {
+        questionIcon_->SetPosition({baseX, baseY});
+        questionIcon_->SetSize(iconSize_);
+        questionIcon_->Update();
+        questionIcon_->Draw();
+    }
+    if (showE) {
+        exclamationIcon_->SetPosition({baseX, baseY});
+        exclamationIcon_->SetSize(iconSize_);
+        exclamationIcon_->Update();
+        exclamationIcon_->Draw();
+    }
 }
 
 void RushEnemy::DrawImGui() {
 #ifdef USE_IMGUI
-	ImGui::Begin("RushEnemy");
-	ImGui::Text("Pos:(%.2f,%.2f,%.2f)", position.x, position.y, position.z);
-	ImGui::Text("HP:%d", HP);
-	ImGui::Text("State:%d", (int)state_);
-	ImGui::Text("Preparing:%s", isPreparing_ ? "true" : "false");
-	ImGui::Text("Rushing:%s", isRushing_ ? "true" : "false");
-	ImGui::Text("Stopping:%s", isStopping_ ? "true" : "false");
-	ImGui::Text("Scanning:%s", isScanning_ ? "true" : "false");
-	ImGui::Text("Reacting:%s", isReacting_ ? "true" : "false");
-	ImGui::Text("EndedRushWithoutWall:%s", endedRushWithoutWall_ ? "true" : "false");
+    ImGui::Begin("RushEnemy");
+    ImGui::Text("Pos:(%.2f,%.2f,%.2f)", position.x, position.y, position.z);
+    ImGui::Text("HP:%d", HP);
+    ImGui::Text("State:%d", (int)state_);
+    ImGui::Text("Preparing:%s", isPreparing_?"true":"false");
+    ImGui::Text("Rushing:%s", isRushing_?"true":"false");
+    ImGui::Text("Stopping:%s", isStopping_?"true":"false");
+    ImGui::Text("Scanning:%s", isScanning_?"true":"false");
+    ImGui::Text("Reacting:%s", isReacting_?"true":"false");
+    ImGui::Text("EndedRushWithoutWall:%s", endedRushWithoutWall_?"true":"false");
 
-	ImGui::Checkbox("ShowDashPreview", &showDashPreview_);
+    ImGui::Checkbox("ShowDashPreview", &showDashPreview_);
 
-	ImGui::DragFloat("BaseMoveSpeed", &baseMoveSpeed_, 0.005f, 0.0f, 2.0f);
-	ImGui::DragFloat("PrepareMoveSpeed", &prepareMoveSpeed_, 0.002f, 0.0f, 0.2f);
-	ImGui::DragFloat("RushSpeed", &rushSpeed_, 0.01f, 0.0f, 3.0f);
+    ImGui::DragFloat("BaseMoveSpeed", &baseMoveSpeed_, 0.005f, 0.0f, 2.0f);
+    ImGui::DragFloat("PrepareMoveSpeed", &prepareMoveSpeed_, 0.002f, 0.0f, 0.2f);
+    ImGui::DragFloat("RushSpeed", &rushSpeed_, 0.01f, 0.0f, 3.0f);
 
-	ImGui::DragFloat("RushTriggerDistance", &rushTriggerDistance_, 0.05f, 0.0f, 20.0f);
-	ImGui::DragFloat("PrepareDuration", &prepareDuration_, 0.01f, 0.05f, 5.0f);
-	ImGui::DragFloat("RushDuration", &rushDuration_, 0.01f, 0.05f, 5.0f);
+    ImGui::DragFloat("RushTriggerDistance", &rushTriggerDistance_, 0.05f, 0.0f, 20.0f);
+    ImGui::DragFloat("PrepareDuration", &prepareDuration_, 0.01f, 0.05f, 5.0f);
+    ImGui::DragFloat("RushDuration", &rushDuration_, 0.01f, 0.05f, 5.0f);
 
-	ImGui::DragFloat("StopDuration", &stopDuration_, 0.01f, 0.0f, 5.0f);
-	ImGui::DragFloat("LookAroundDuration", &lookAroundDuration_, 0.01f, 0.0f, 5.0f);
-	ImGui::DragFloat("RushCooldown", &rushCooldownDuration_, 0.01f, 0.0f, 10.0f);
+    ImGui::DragFloat("StopDuration", &stopDuration_, 0.01f, 0.0f, 5.0f);
+    ImGui::DragFloat("LookAroundDuration", &lookAroundDuration_, 0.01f, 0.0f, 5.0f);
+    ImGui::DragFloat("RushCooldown", &rushCooldownDuration_, 0.01f, 0.0f, 10.0f);
 
-	ImGui::DragFloat("ExitHysteresis", &exitHysteresis_, 0.01f, 0.0f, 5.0f);
-	ImGui::DragFloat("TurnSpeed", &turnSpeed_, 0.001f, 0.0f, 1.0f);
+    ImGui::DragFloat("ExitHysteresis", &exitHysteresis_, 0.01f, 0.0f, 5.0f);
+    ImGui::DragFloat("TurnSpeed", &turnSpeed_, 0.001f, 0.0f, 1.0f);
 
-	ImGui::DragFloat("ReactionDuration", &reactionDuration_, 0.01f, 0.0f, 3.0f);
-	ImGui::DragFloat("ReactionBackoffSpeed", &reactionBackoffSpeed_, 0.005f, 0.0f, 3.0f);
+    ImGui::DragFloat("ReactionDuration", &reactionDuration_, 0.01f, 0.0f, 3.0f);
+    ImGui::DragFloat("ReactionBackoffSpeed", &reactionBackoffSpeed_, 0.005f, 0.0f, 3.0f);
 
-	moveSpeed_ = baseMoveSpeed_;
-	ImGui::End();
+    moveSpeed_ = baseMoveSpeed_;
+    ImGui::End();
 #endif
 }
 
@@ -889,13 +595,10 @@ void RushEnemy::DrawImGui() {
 //  2) 壁に当たらず突進がタイマー終了した後(endedRushWithoutWall_==true)の最初の弾被弾のみ追跡開始演出
 //  3) プレイヤー直接接触はノックバックリアクション (突進中断)
 void RushEnemy::OnCollision(Collider* other) {
-	if (!other)
-		return;
-	uint32_t typeID = other->GetTypeID();
-	if (HandleReactingEarly(other, typeID))
-		return;
-	Enemy::OnCollision(other);
-	if (HandlePlayerCollision(other))
-		return;
-	HandleWeaponAfterRush(other, typeID);
+    if (!other) return;
+    uint32_t typeID = other->GetTypeID();
+    if (HandleReactingEarly(other, typeID)) return;
+    Enemy::OnCollision(other);
+    if (HandlePlayerCollision(other)) return;
+    HandleWeaponAfterRush(other, typeID);
 }

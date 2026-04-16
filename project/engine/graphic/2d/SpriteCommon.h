@@ -3,8 +3,8 @@
 #include"Object/PSO.h"
 #include"BlendPSO.h"
 
-namespace TuboEngine {
-class SpriteCommon {
+class SpriteCommon
+{
 public:
 	/// <summary>
 	/// シングルトンインスタンス取得
@@ -26,7 +26,7 @@ private:
 
 public:
 	/*------------------------------------------------------------
-	        関数
+			関数
 	------------------------------------------------------------*/
 
 	/// <summary>
@@ -37,24 +37,24 @@ public:
 	void Finalize();
 
 	/// <summary>
-	/// 共通描画設定
-	/// </summary>
-	/// <param name="blendMode">ブレンドモード</param>
-	/// <remarks>
-	/// 0: NoneBlendPSO
-	/// 1: NormalBlendPSO
-	/// 2: AddBlendPSO
-	/// 3: SubtractBlendPSO
-	/// 4: MultiplyBlendPSO
-	/// 5: ScreenBlendPSO
-	/// </remarks>
+   /// 共通描画設定
+   /// </summary>
+   /// <param name="blendMode">ブレンドモード</param>
+   /// <remarks>
+   /// 0: NoneBlendPSO
+   /// 1: NormalBlendPSO
+   /// 2: AddBlendPSO
+   /// 3: SubtractBlendPSO
+   /// 4: MultiplyBlendPSO
+   /// 5: ScreenBlendPSO
+   /// </remarks>
 	void DrawSettingsCommon(int blendMode);
-
+	
 private:
-	std::unique_ptr<PSO> pso = nullptr;  // PSOのユニークポインタ
-	std::unique_ptr<BlendPSO> blendPso_; // ブレンドPSOのユニークポインタ
 
-	int blenderMode_; // ブレンダーモード
+	std::unique_ptr <PSO> pso = nullptr;//PSOのユニークポインタ
+	std::unique_ptr <BlendPSO> blendPso_;//ブレンドPSOのユニークポインタ
+
+	int blenderMode_;//ブレンダーモード
 };
 
-} // namespace TuboEngine

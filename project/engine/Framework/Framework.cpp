@@ -1,13 +1,14 @@
 #include "Framework.h"
 #include"WinApp.h"
 #include <dxcapi.h>
-#include "TextManager.h"
+#include "project/engine/graphic/2d/TextManager.h"
 
-void TuboEngine::Framework::Initialize() {
+void Framework::Initialize() {
 
 	TuboEngine::WinApp::GetInstance()->Initialize();
 
-	// DirectX共通部分
+	//DirectX共通部分
+
 
 	TuboEngine::DirectXCommon::GetInstance()->Initialize();
 
@@ -18,39 +19,43 @@ void TuboEngine::Framework::Initialize() {
 
 #ifdef USE_IMGUI
 
-	// ImGuiの初期化
+	//ImGuiの初期化
 
-	TuboEngine::ImGuiManager::GetInstance()->Initialize();
+
+	ImGuiManager::GetInstance()->Initialize();
 
 #endif // USE_IMGUI
 
-	// SRVマネージャーの初期化
-	TuboEngine::SrvManager::GetInstance()->Initialize();
-	// スプライト共通部分
+	//SRVマネージャーの初期化
+	SrvManager::GetInstance()->Initialize();
+	//スプライト共通部分
 	SpriteCommon::GetInstance()->Initialize();
 
-	// オブジェクト3Dの共通部分
+	//オブジェクト3Dの共通部分
 	Object3dCommon::GetInstance()->Initialize();
 
-	// パーティクル共通部分
+
+	//パーティクル共通部分
 	ParticleCommon::GetInstance()->Initialize();
 
-	// テクスチャマネージャーの初期化
+
+
+	//テクスチャマネージャーの初期化
 	TuboEngine::TextureManager::GetInstance()->Initialize();
 
-	// モデルマネージャーの初期化
+	//モデルマネージャーの初期化
 	ModelManager::GetInstance()->initialize();
 
-	// オーディオ共通部
+	//オーディオ共通部
 	AudioCommon::GetInstance()->Initialize();
 
-	// 入力初期化
+	//入力初期化
 	TuboEngine::Input::GetInstance()->Initialize(TuboEngine::WinApp::GetInstance()->GetHWND());
 
-	// オフスクリーンレンダリングの初期化
+	//オフスクリーンレンダリングの初期化
 	OffScreenRendering::GetInstance()->Initialize();
 
-	// ラインマネージャーの初期化
+	//ラインマネージャーの初期化
 	LineManager::GetInstance()->Initialize();
 
 	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
@@ -59,21 +64,22 @@ void TuboEngine::Framework::Initialize() {
 	// TextManagerの初期化
 	TuboEngine::TextManager::GetInstance()->Initialize();
 
-	// シーンマネージャーの初期化
+	//シーンマネージャーの初期化
 	SceneManager::GetInstance()->Initialize(STAGE); // タイトルシーンから開始
+
 }
-void TuboEngine::Framework::Update() {
-	// メッセージ処理
+void Framework::Update() {
+	//メッセージ処理
 	if (TuboEngine::WinApp::GetInstance()->ProcessMessage()) {
 		endRequest = true;
 	}
-	// 入力の更新
+	//入力の更新
 	TuboEngine::Input::GetInstance()->Update();
-
-	// シーンマネージャーの更新
+	
+	//シーンマネージャーの更新
 	SceneManager::GetInstance()->Update();
 
-	TuboEngine::Camera* mainCamera = SceneManager::GetInstance()->GetMainCamera();
+	Camera* mainCamera = SceneManager::GetInstance()->GetMainCamera();
 
 	if (mainCamera) {
 		// ラインマネージャーのカメラ設定
@@ -81,14 +87,14 @@ void TuboEngine::Framework::Update() {
 		OffScreenRendering::GetInstance()->SetCamera(mainCamera);
 	}
 
-	// オフスクリーンレンダリングの更新
+	//オフスクリーンレンダリングの更新
 	OffScreenRendering::GetInstance()->Update();
-	//
+//
 	LineManager::GetInstance()->Update();
 }
-void TuboEngine::Framework::Finalize() {
+void Framework::Finalize() {
 #ifdef USE_IMGUI
-	TuboEngine::ImGuiManager::GetInstance()->Finalize();
+	ImGuiManager::GetInstance()->Finalize();
 #endif // USE_IMGUI
 
 	TuboEngine::Input::GetInstance()->Finalize();
@@ -104,7 +110,7 @@ void TuboEngine::Framework::Finalize() {
 	CloseHandle(TuboEngine::DirectXCommon::GetInstance()->GetFenceEvent());
 
 	OffScreenRendering::GetInstance()->Finalize();
-	TuboEngine::SrvManager::GetInstance()->Finalize();
+	SrvManager::GetInstance()->Finalize();
 	SceneManager::GetInstance()->Finalize();
 
 	ParticleCommon::GetInstance()->Finalize();
@@ -112,65 +118,69 @@ void TuboEngine::Framework::Finalize() {
 	Object3dCommon::GetInstance()->Finalize();
 	TuboEngine::SkyBoxCommon::GetInstance()->Finalize();
 	LineManager::GetInstance()->Finalize();
-
+	
 	AudioCommon::GetInstance()->Finalize();
 	TuboEngine::DirectXCommon::GetInstance()->Finalize();
 	TuboEngine::WinApp::GetInstance()->Finalize();
 }
 
-void TuboEngine::Framework::Run() {
-	// 初期化
+
+
+void Framework::Run() {
+	//初期化
 	Initialize();
-	// メインループ
+	//メインループ
 	while (true) {
-		// 更新
+		//更新
 		Update();
 
-		// 終了リクエストがあったら
+		//終了リクエストがあったら
 		if (IsEndRequest()) {
-			// ループを抜ける
+			//ループを抜ける
 			break;
 		}
 
-		// 描画
+		//描画
 		Draw();
 	}
-	// 終了処理
+	//終了処理
 	Finalize();
 }
 
-void TuboEngine::Framework::FrameworkSwapChainPreDraw() {
-	// 描画前処理
+void Framework::FrameworkSwapChainPreDraw() {
+	//描画前処理
 	TuboEngine::DirectXCommon::GetInstance()->PreDraw();
+
 }
 
-void TuboEngine::Framework::FrameworkSwapChainPostDraw() {
+void Framework::FrameworkSwapChainPostDraw() {
 #ifdef USE_IMGUI
-	// ImGuiの描画
-	TuboEngine::ImGuiManager::GetInstance()->Draw();
+	//ImGuiの描画
+	ImGuiManager::GetInstance()->Draw();
 #endif // USE_IMGUI
 
 	OffScreenRendering::GetInstance()->TransitionRenderTextureToRenderTarget();
-	// 描画
+	//描画
 	TuboEngine::DirectXCommon::GetInstance()->PostDraw();
 }
 
-void TuboEngine::Framework::ImguiPreDraw() {
+void Framework::ImguiPreDraw() {
 #ifdef USE_IMGUI
-	// ImGuiの受付開始
-	TuboEngine::ImGuiManager::GetInstance()->Begin();
+	//ImGuiの受付開始
+	ImGuiManager::GetInstance()->Begin();
 
 	SceneManager::GetInstance()->ImGuiDraw();
 
 	OffScreenRendering::GetInstance()->DrawImGui();
 #endif // USE_IMGUI
+
 }
 
-void TuboEngine::Framework::ImguiPostDraw() {
+void Framework::ImguiPostDraw() {
 #ifdef USE_IMGUI
-	// ImGuiの受付終了
+	//ImGuiの受付終了
 	ImGui::ShowDemoWindow();
-	// BlendMode変更
+	//BlendMode変更
 	ImGui::Begin("BlendNum");
 	ImGui::Text("BlendMode");
 	ImGui::Text("0: None");
@@ -183,44 +193,58 @@ void TuboEngine::Framework::ImguiPostDraw() {
 	ImGui::SliderInt("SpriteBlendNum", &spriteBlendModeNum, 0, 5);
 	ImGui::End();
 
+
+
 	ImGuiManager::GetInstance()->End();
 #endif // USE_IMGUI
+
 }
 
-void TuboEngine::Framework::FrameWorkRenderTargetPreDraw() {
+void Framework::FrameWorkRenderTargetPreDraw() {
 
-	// ImGuiの受付開始
+	//ImGuiの受付開始
 	OffScreenRendering::GetInstance()->PreDraw();
 
-	TuboEngine::SrvManager::GetInstance()->PreDraw();
+	SrvManager::GetInstance()->PreDraw();
+
+	
+	
 }
 
-void TuboEngine::Framework::Object3dCommonDraw() {
-	// オブジェクト3Dの描画
-	TuboEngine::Object3dCommon::GetInstance()->DrawSettingsCommon(objectBlendModeNum);
 
-	// 3Dオブジェクトの描画
+
+
+void Framework::Object3dCommonDraw() {
+	//オブジェクト3Dの描画
+	Object3dCommon::GetInstance()->DrawSettingsCommon(objectBlendModeNum);
+	
+	//3Dオブジェクトの描画
 	SceneManager::GetInstance()->Object3DDraw();
+	
+
 }
 
-void TuboEngine::Framework::SpriteCommonDraw() {
-
-	// スプライトの描画
+void Framework::SpriteCommonDraw() {
+	
+	//スプライトの描画
 	SpriteCommon::GetInstance()->DrawSettingsCommon(spriteBlendModeNum);
 	SceneManager::GetInstance()->SpriteDraw();
+	
+
 }
 
-void TuboEngine::Framework::ParticleCommonDraw() {
-	// パーティクルの描画
+void Framework::ParticleCommonDraw() {
+	//パーティクルの描画
 	ParticleCommon::GetInstance()->DrawSettingsCommon();
 	SceneManager::GetInstance()->ParticleDraw();
 }
 
-void TuboEngine::Framework::OffScreenRenderingDraw() {
+void Framework::OffScreenRenderingDraw() {
 	OffScreenRendering::GetInstance()->TransitionRenderTextureToShaderResource();
 
 	OffScreenRendering::GetInstance()->TransitionDepthTo(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-	// オフスクリーンレンダリングの描画
+	//オフスクリーンレンダリングの描画
 	OffScreenRendering::GetInstance()->Draw();
 }
+

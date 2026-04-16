@@ -2,10 +2,11 @@
 #include <iostream>
 #include <cassert>
 
-const uint32_t TuboEngine::SrvManager::kMaxSRVCount = 1024;
+const uint32_t SrvManager::kMaxSRVCount = 1024;
 
-TuboEngine::SrvManager* TuboEngine::SrvManager::instance = nullptr; // シングルトンインスタンス
-void TuboEngine::SrvManager::Initialize() {
+SrvManager* SrvManager::instance = nullptr; // シングルトンインスタンス
+void SrvManager::Initialize()
+{
 	
 	//ディスクリプタヒープの生成
 	descriptorHeap = TuboEngine::DirectXCommon::GetInstance()->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
@@ -16,7 +17,8 @@ void TuboEngine::SrvManager::Initialize() {
 
 }
 
-uint32_t TuboEngine::SrvManager::Allocate() {
+uint32_t SrvManager::Allocate()
+{
 
 	// returnする番号を一旦記録
 	uint32_t index = useIndex;
@@ -25,7 +27,7 @@ uint32_t TuboEngine::SrvManager::Allocate() {
 	//上で記録した番号を返す
 	return index;
 }
-void TuboEngine::SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> pResource, DXGI_FORMAT format, UINT mipLevels) {
+void SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> pResource, DXGI_FORMAT format, UINT mipLevels) {
 	//========================================
 	// ディスクリプタハンドルの取得
 	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -44,7 +46,7 @@ void TuboEngine::SrvManager::CreateSRVforTexture2D(uint32_t srvIndex, Microsoft:
 
 ///=============================================================================
 ///						SRV生成(構造化バッファ用)
-void TuboEngine::SrvManager::CreateSRVForStructuredBuffer(uint32_t index, Microsoft::WRL::ComPtr<ID3D12Resource> pResource, UINT elements, UINT structureByteStride) {
+void SrvManager::CreateSRVForStructuredBuffer(uint32_t index, Microsoft::WRL::ComPtr<ID3D12Resource> pResource, UINT elements, UINT structureByteStride) {
 	//========================================
 	// ディスクリプタハンドルの取得
 	//D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();
@@ -61,7 +63,8 @@ void TuboEngine::SrvManager::CreateSRVForStructuredBuffer(uint32_t index, Micros
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 	TuboEngine::DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(pResource.Get(), &srvDesc, GetCPUDescriptorHandle(index));
 }
-void TuboEngine::SrvManager::PreDraw() {
+void SrvManager::PreDraw()
+{
 	//ディスクリプタヒープのインデックスをリセット
 	ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap.Get() };
 	//SRV用のディスクリプタヒープを指定する
@@ -69,7 +72,8 @@ void TuboEngine::SrvManager::PreDraw() {
 }
 
 
-D3D12_CPU_DESCRIPTOR_HANDLE TuboEngine::SrvManager::GetCPUDescriptorHandle(uint32_t index) {
+D3D12_CPU_DESCRIPTOR_HANDLE SrvManager::GetCPUDescriptorHandle(uint32_t index)
+{
 	//CPUハンドルを取得
 	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	//インデックス分ずらす
@@ -78,7 +82,8 @@ D3D12_CPU_DESCRIPTOR_HANDLE TuboEngine::SrvManager::GetCPUDescriptorHandle(uint3
 	return handleCPU;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE TuboEngine::SrvManager::GetGPUDescriptorHandle(uint32_t index) {
+D3D12_GPU_DESCRIPTOR_HANDLE SrvManager::GetGPUDescriptorHandle(uint32_t index)
+{
 	//GPUハンドルを取得
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	//インデックス分ずらす
@@ -87,7 +92,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE TuboEngine::SrvManager::GetGPUDescriptorHandle(uint3
 	return handleGPU;
 }
 
-void TuboEngine::SrvManager::Finalize() {
+void SrvManager::Finalize() {
 	//インスタンスを削除
 	delete instance;
 	instance = nullptr;

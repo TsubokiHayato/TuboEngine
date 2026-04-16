@@ -10,7 +10,7 @@ void DepthBasedOutlineEffect::Initialize() {
 	materialCB_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(ToonDepthOutlineParams));
 	materialCB_->Map(0, nullptr, reinterpret_cast<void**>(&materialCBData_));
 	// 初期値（単位行列）
-	materialCBData_->projectionInverse = TuboEngine::Math::MakeIdentity4x4();
+	materialCBData_->projectionInverse = MakeIdentity4x4();
 	materialCBData_->outlineColor = {0.0f, 0.0f, 0.0f, 1.0f}; // アウトラインの色（黒)
 	materialCBData_->outlineThickness = 1.0f;                 // アウトラインの太さ
 	materialCBData_->outlineDepthThreshold = 1.0f;           // アウトラインの深度しきい値
@@ -31,7 +31,7 @@ void DepthBasedOutlineEffect::Initialize() {
 void DepthBasedOutlineEffect::Update() {
 	// 必要に応じてProjectionMatrixを更新
 	// 例: カメラや画面サイズに応じて行列をセット
-	materialCBData_->projectionInverse = TuboEngine::Math::Inverse(camera_->GetProjectionMatrix());
+	materialCBData_->projectionInverse = Inverse(camera_->GetProjectionMatrix());
 }
 
 void DepthBasedOutlineEffect::DrawImGui() {
@@ -47,12 +47,12 @@ void DepthBasedOutlineEffect::DrawImGui() {
 #endif // USE_IMGUI
 }
 
-void DepthBasedOutlineEffect::SetMainCamera(TuboEngine::Camera* camera) {
+void DepthBasedOutlineEffect::SetMainCamera(Camera* camera) {
 	// カメラの設定を行う
 	camera_ = camera;
 	if (camera) {
 		// ここでカメラのプロジェクション行列を取得し、materialCBData_にセットする
-		materialCBData_->projectionInverse = TuboEngine::Math::Inverse(camera->GetProjectionMatrix());
+		materialCBData_->projectionInverse = Inverse(camera->GetProjectionMatrix());
 	}
 }
 

@@ -13,7 +13,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-namespace TuboEngine {
+
 class Model {
 public:
 	//------------------------------------
@@ -23,20 +23,12 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="modelCommon">モデル共通部分</param>
-	void Initialize(const std::string& directoryPath, const std::string& filename);
+	void Initialize( const std::string& directoryPath, const std::string& filename);
 
 	/// <summary>
 	/// 描画処理
 	/// </summary>
 	void Draw();
-
-	/// <summary>
-	/// インスタンス描画処理
-	/// </summary>
-	/// <param name="instanceCount">インスタンス数</param>
-	/// <param name="instanceBufferAddr">インスタンスデータのGPUアドレス</param>
-	/// <param name="commonBufferAddr">共通データのGPUアドレス</param>
-	void DrawInstanced(uint32_t instanceCount, D3D12_GPU_VIRTUAL_ADDRESS instanceBufferAddr, D3D12_GPU_VIRTUAL_ADDRESS commonBufferAddr);
 
 	/// <summary>
 	/// マテリアルテンプレートファイルを読み込む
@@ -65,7 +57,8 @@ public:
 	//-----------------------------------------------------------
 	// Setter&Getter
 
-	// モデルのカラー
+	
+	//モデルのカラー
 	Vector4 GetModelColor() { return materialData->color; }
 	void SetModelColor(const Vector4& color) { materialData->color = color; }
 
@@ -73,7 +66,7 @@ public:
 	float GetModelShininess() { return materialData->shininess; }
 	void SetModelShininess(float shininess) { materialData->shininess = shininess; }
 
-	// 環境マップ寄与度
+	//環境マップ寄与度
 	float GetModelEnvironmentCoefficient() { return materialData->environmentCoefficient; }
 	void SetModelEnvironmentCoefficient(float coefficient) { materialData->environmentCoefficient = coefficient; }
 
@@ -81,7 +74,10 @@ public:
 	Matrix4x4 GetRootNodeLocalMatrix() { return modelData.rootNode.localMatrix; }
 	void SetRootNodeLocalMatrix(const Matrix4x4& matrix) { modelData.rootNode.localMatrix = matrix; }
 
+
 private:
+
+
 	// モデルデータ
 	ModelData modelData;
 
@@ -101,8 +97,4 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 
 	std::string textureFileName_;
-
-	// インスタンスフラグ保持用
-	Microsoft::WRL::ComPtr<ID3D12Resource> instancingFlagBuffer_;
 };
-} // namespace TuboEngine

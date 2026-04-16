@@ -39,7 +39,7 @@ void FollowTopDownCamera::Initialize(Player* target, const TuboEngine::Math::Vec
 	offset_ = offset;
 	followSpeed_ = followSpeed;
 
-	camera_ = std::make_unique<TuboEngine::Camera>();
+	camera_ = std::make_unique<Camera>();
 	if (target_) {
 		camera_->SetTranslate(target_->GetPosition() + offset_);
 	} else {

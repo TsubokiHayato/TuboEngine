@@ -9,9 +9,9 @@
 #include <cmath>
 
 // 初期化
-void TuboEngine::Animator::Initialize(std::string modelFileNamePath) {
+void Animator::Initialize(std::string modelFileNamePath) {
 
-	this->camera = TuboEngine::Object3dCommon::GetInstance()->GetDefaultCamera();
+	this->camera = Object3dCommon::GetInstance()->GetDefaultCamera();
 
 	ModelManager::GetInstance()->LoadModel(modelFileNamePath);
 	SetModel(modelFileNamePath);
@@ -30,8 +30,8 @@ void TuboEngine::Animator::Initialize(std::string modelFileNamePath) {
 	// 書き込むためのアドレスを取得
 	transformMatrixResource->Map(0, nullptr, reinterpret_cast<void**>(&transformMatrixData));
 	// 単位行列を書き込んでいく
-	transformMatrixData->WVP = TuboEngine::Math::MakeIdentity4x4();
-	transformMatrixData->World = TuboEngine::Math::MakeIdentity4x4();
+	transformMatrixData->WVP = MakeIdentity4x4();
+	transformMatrixData->World = MakeIdentity4x4();
 
 #pragma endregion TransformMatrixResource
 
@@ -129,7 +129,7 @@ void TuboEngine::Animator::Initialize(std::string modelFileNamePath) {
 	    animationNodeName_ = ""; // アニメーションが無い場合
 	}
 }
-void TuboEngine::Animator::Update() {
+void Animator::Update() {
     animationTime_ += 1.0f / 60.0f; // 60FPS
     animationTime_ = std::fmod(animationTime_, animation_.duration);
 
@@ -146,11 +146,11 @@ void TuboEngine::Animator::Update() {
     cameraForGPUData->worldPosition = camera->GetTranslate();
 
     // 行列を更新する
-	TuboEngine::Math::Matrix4x4 worldMatrix = TuboEngine::Math::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	TuboEngine::Math::Matrix4x4 cameraMatrix = TuboEngine::Math::MakeAffineMatrix(camera->GetScale(), camera->GetRotation(), camera->GetTranslate());
-	TuboEngine::Math::Matrix4x4 viewMatrix = TuboEngine::Math::Inverse(cameraMatrix);
+	TuboEngine::Math::Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	TuboEngine::Math::Matrix4x4 cameraMatrix = MakeAffineMatrix(camera->GetScale(), camera->GetRotation(), camera->GetTranslate());
+	TuboEngine::Math::Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 	TuboEngine::Math::Matrix4x4 projectionMatrix =
-	    TuboEngine::Math::MakePerspectiveMatrix(0.45f,
+	    MakePerspectiveMatrix(0.45f,
 	        float(TuboEngine::WinApp::GetInstance()->GetClientWidth()) /
 	        float(TuboEngine::WinApp::GetInstance()->GetClientHeight()),
 	        0.1f, 100.0f);
@@ -170,17 +170,17 @@ void TuboEngine::Animator::Update() {
 }
 
 // モデルの設定
-void TuboEngine::Animator::SetModel(TuboEngine::Model* model) {
+void Animator::SetModel(Model* model) {
 	assert(model);
 	this->model_ = model;
 }
 
-void TuboEngine::Animator::SetModel(const std::string& filePath) {
+void Animator::SetModel(const std::string& filePath) {
 	this->model_ = ModelManager::GetInstance()->FindModel(filePath);
 }
 
 // 描画処理
-void TuboEngine::Animator::Draw() {
+void Animator::Draw() {
 	// TransformMatrix (b0, VertexShader)
 	commandList->SetGraphicsRootConstantBufferView(1, transformMatrixResource->GetGPUVirtualAddress());
 
@@ -206,7 +206,7 @@ void TuboEngine::Animator::Draw() {
 }
 
 // ImGui描画
-void TuboEngine::Animator::DrawImGui(const char* windowName) {
+void Animator::DrawImGui(const char* windowName) {
 
 #ifdef USE_IMGUI
 	ImGui::Begin(windowName);
@@ -308,14 +308,14 @@ void TuboEngine::Animator::DrawImGui(const char* windowName) {
 }
 
 // モデルの色設定
-void TuboEngine::Animator::SetModelColor(const TuboEngine::Math::Vector4& color) {
+void Animator::SetModelColor(const TuboEngine::Math::Vector4& color) {
 	if (model_) {
 		model_->SetModelColor(color);
 	}
 }
 
 // モデルの色取得
-TuboEngine::Math::Vector4 TuboEngine::Animator::GetModelColor() {
+TuboEngine::Math::Vector4 Animator::GetModelColor() {
 	if (model_) {
 		return model_->GetModelColor();
 	}
@@ -323,7 +323,7 @@ TuboEngine::Math::Vector4 TuboEngine::Animator::GetModelColor() {
 }
 
 //Vector3
-TuboEngine::Math::Vector3 TuboEngine::Animator::CalculateValue(const std::vector<KeyFrame<TuboEngine::Math::Vector3>>& keyframes, float time) {
+TuboEngine::Math::Vector3 Animator::CalculateValue(const std::vector<KeyFrame<TuboEngine::Math::Vector3>>& keyframes, float time) {
 	assert(!keyframes.empty());
 	if (keyframes.size() == 1 || time <= keyframes[0].time) {
 		return keyframes[0].value;
@@ -338,7 +338,7 @@ TuboEngine::Math::Vector3 TuboEngine::Animator::CalculateValue(const std::vector
 	return keyframes.back().value;
 }
 // Quaternion
-TuboEngine::Math::Quaternion TuboEngine::Animator::CalculateValue(const std::vector<KeyFrame<TuboEngine::Math::Quaternion>>& keyframes, float time) {
+TuboEngine::Math::Quaternion Animator::CalculateValue(const std::vector<KeyFrame<TuboEngine::Math::Quaternion>>& keyframes, float time) {
 	assert(!keyframes.empty());
 	if (keyframes.size() == 1 || time <= keyframes[0].time) {
 		return keyframes[0].value;

@@ -1,12 +1,11 @@
 #pragma once
-namespace TuboEngine {
-class D3DResourceLeakChecker {
+class D3DResourceLeakChecker
+{
 public:
-	///< summary>
-	/// デストラクタ
+	///<summary>
+	///デストラクタ
 	///</summary>
-	// リソースリークチェック
+	//リソースリークチェック
 	~D3DResourceLeakChecker();
 };
 
-} // namespace TuboEngine

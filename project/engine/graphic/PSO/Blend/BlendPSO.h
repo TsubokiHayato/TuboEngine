@@ -37,7 +37,7 @@ private:
 	// RootSignature
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
-	D3D12_ROOT_PARAMETER rootParameters[11] = {};
+	D3D12_ROOT_PARAMETER rootParameters[9] = {};
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
 	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
 	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;

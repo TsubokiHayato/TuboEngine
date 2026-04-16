@@ -1,12 +1,11 @@
 #pragma once
 #include"Object/PSO.h"
 #include"BlendPSO.h"
-#include"Camera.h"
 
 
 class Camera;
-namespace TuboEngine {
-class Object3dCommon {
+class Object3dCommon
+{
 public:
 	/// <summary>
 	/// シングルトンインスタンス取得
@@ -36,32 +35,37 @@ public:
 	void Finalize();
 
 	/// <summary>
-	/// 共通描画設定
-	/// </summary>
-	/// <param name="blendMode">ブレンドモード</param>
-	/// <remarks>
-	/// 0: NoneBlendPSO
-	/// 1: NormalBlendPSO
-	/// 2: AddBlendPSO
-	/// 3: SubtractBlendPSO
-	/// 4: MultiplyBlendPSO
-	/// 5: ScreenBlendPSO
-	/// </remarks>
+   /// 共通描画設定
+   /// </summary>
+   /// <param name="blendMode">ブレンドモード</param>
+   /// <remarks>
+   /// 0: NoneBlendPSO
+   /// 1: NormalBlendPSO
+   /// 2: AddBlendPSO
+   /// 3: SubtractBlendPSO
+   /// 4: MultiplyBlendPSO
+   /// 5: ScreenBlendPSO
+   /// </remarks>
 	void DrawSettingsCommon(int blendMode);
 
 	/*---------------------------------------------------
-	        GETTER & SETTER
+			GETTER & SETTER
 	---------------------------------------------------*/
 
-	void SetDefaultCamera(TuboEngine::Camera* camera) { defaultCamera = camera; }
-	TuboEngine::Camera* GetDefaultCamera() const { return defaultCamera; }
+	void SetDefaultCamera(Camera* camera) { defaultCamera = camera; }
+	Camera* GetDefaultCamera()const { return defaultCamera; }
 
+
+
+    
 private:
-	std::unique_ptr<PSO> pso = nullptr;  // PSOのユニークポインタ
-	std::unique_ptr<BlendPSO> blendPso_; // ブレンドPSOのユニークポインタ
 
-	TuboEngine::Camera* defaultCamera = nullptr; // デフォルトカメラ
-	int blenderMode_ = 0;                        // ブレンダーモード
+
+	std::unique_ptr <PSO> pso = nullptr;//PSOのユニークポインタ
+	std::unique_ptr <BlendPSO> blendPso_;//ブレンドPSOのユニークポインタ
+
+	Camera* defaultCamera = nullptr;//デフォルトカメラ
+	int blenderMode_=0;//ブレンダーモード
+
 };
 
-} // namespace TuboEngine

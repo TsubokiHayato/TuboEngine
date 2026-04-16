@@ -82,7 +82,6 @@ PixcelShaderOutput main(VertexShaderOutPut input)
     float4 tranceformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float4 textureColor = gTexture.Sample(gSampler, tranceformedUV.xy);
    
-    float4 materialColor = gMaterial.color * input.color;
   
     if (gMaterial.enableLighting != 0)
     {
@@ -91,8 +90,8 @@ PixcelShaderOutput main(VertexShaderOutPut input)
         {
             float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
             float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-            output.color.rgb = materialColor.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
-            output.color.a = materialColor.a * textureColor.a;
+            output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+            output.color.a = gMaterial.color.a * textureColor.a;
         }
         //PhongReflection
         else if (gLightType.type == 1)
@@ -105,12 +104,12 @@ PixcelShaderOutput main(VertexShaderOutPut input)
             float RtoE = dot(reflectLight, toEye);
             float specularPow = pow(saturate(RtoE), gMaterial.shininess);
         
-            float3 diffuse = materialColor.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+            float3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
         
             float3 specular = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
         
             output.color.rgb = diffuse + specular;
-            output.color.a = materialColor.a * textureColor.a;
+            output.color.a = gMaterial.color.a * textureColor.a;
         }
         //BlinnPhong
         else if (gLightType.type == 2)
@@ -125,11 +124,11 @@ PixcelShaderOutput main(VertexShaderOutPut input)
             float NDotH = dot(normalize(input.normal), halfVector);
             float specularPow = pow(saturate(NDotH), gMaterial.shininess);
 
-            float3 diffuse = materialColor.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+            float3 diffuse = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
             float3 specular = gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * float3(1.0f, 1.0f, 1.0f);
 
             output.color.rgb = diffuse + specular;
-            output.color.a = materialColor.a * textureColor.a;
+            output.color.a = gMaterial.color.a * textureColor.a;
       
         }
         //PointLight
@@ -144,12 +143,12 @@ PixcelShaderOutput main(VertexShaderOutPut input)
             float RtoEPoint = dot(reflectPointLight, toEye);
             float specularPowPoint = pow(saturate(RtoEPoint), gMaterial.shininess);
 
-            float3 diffusePointLight = materialColor.rgb * textureColor.rgb * gPointLight.color.rgb * cosPoint * gPointLight.intensity;
+            float3 diffusePointLight = gMaterial.color.rgb * textureColor.rgb * gPointLight.color.rgb * cosPoint * gPointLight.intensity;
             float3 specularPointLight = gPointLight.color.rgb * gPointLight.intensity * specularPowPoint * float3(1.0f, 1.0f, 1.0f);
 
     // Combine lights
             output.color.rgb = diffusePointLight + specularPointLight;
-            output.color.a = materialColor.a * textureColor.a;
+            output.color.a = gMaterial.color.a * textureColor.a;
         }
         //SpotLight
         else if (gLightType.type == 4)
@@ -161,7 +160,7 @@ PixcelShaderOutput main(VertexShaderOutPut input)
             float cosAngle = dot(spotLightDirectionOnSurface, gSpotLight.direction);
             float falloffFactor = saturate((cosAngle - gSpotLight.cosAngle) / (1.0f - gSpotLight.cosAngle));
             
-            float3 diffuseSpotLight = materialColor.rgb * textureColor.rgb * gSpotLight.color.rgb * gSpotLight.intensity * attenuationFactor * falloffFactor;
+            float3 diffuseSpotLight = gMaterial.color.rgb * textureColor.rgb * gSpotLight.color.rgb * gSpotLight.intensity * attenuationFactor * falloffFactor;
             float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
             float3 reflectSpotLight = reflect(spotLightDirectionOnSurface, normalize(input.normal));
             float RtoESpot = dot(reflectSpotLight, toEye);
@@ -169,7 +168,7 @@ PixcelShaderOutput main(VertexShaderOutPut input)
             float3 specularSpotLight = gSpotLight.color.rgb * gSpotLight.intensity * specularPowSpot * float3(1.0f, 1.0f, 1.0f) * attenuationFactor * falloffFactor;
 
             output.color.rgb = diffuseSpotLight + specularSpotLight;
-            output.color.a = materialColor.a * textureColor.a;
+            output.color.a = gMaterial.color.a * textureColor.a;
         }
         // 環境マッピング
         else if (gLightType.type == 5)
@@ -181,15 +180,15 @@ PixcelShaderOutput main(VertexShaderOutPut input)
         // 通常のライティング
             float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
             float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-            float3 baseColor = materialColor.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+            float3 baseColor = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
 
         // 環境マップ色とベースカラーをenvironmentCoefficientで線形補間
             output.color.rgb = lerp(baseColor, environmentColor.rgb, gMaterial.environmentCoefficient);
-            output.color.a = materialColor.a * textureColor.a;
+            output.color.a = gMaterial.color.a * textureColor.a;
         }
         else
         {
-            output.color = materialColor * textureColor;
+            output.color = gMaterial.color * textureColor;
         }
 
         
@@ -197,7 +196,7 @@ PixcelShaderOutput main(VertexShaderOutPut input)
     }
     else
     {
-        output.color = materialColor * textureColor;
+        output.color = gMaterial.color * textureColor;
     }
     
     

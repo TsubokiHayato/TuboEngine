@@ -44,7 +44,7 @@ public:
 	void ChangeScene(int sceneNo);
 
 	// MainCamera取得
-	TuboEngine::Camera* GetMainCamera() const {
+	Camera* GetMainCamera() const {
 		if (currentScene) {
 			return currentScene->GetMainCamera();
 		}

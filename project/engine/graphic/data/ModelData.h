@@ -4,14 +4,12 @@
 #include<vector>
 #include"Node.h"
 
-namespace TuboEngine {
-// モデルデータ
+//モデルデータ
 struct ModelData {
-	// 頂点データ
+	//頂点データ
 	std::vector<VertexData> vertices;
-	// マテリアルデータ
+	//マテリアルデータ
 	MaterialData material;
-	// ノードデータ
+	//ノードデータ
 	Node rootNode;
 };
-} // namespace TuboEngine

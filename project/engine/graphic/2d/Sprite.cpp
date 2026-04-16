@@ -67,8 +67,8 @@ void TuboEngine::Sprite::Initialize(std::string textureFilePath) {
 	//書き込むためのアドレスを取得
 	transformationMatrixResource->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
 	//単位行列を書き込んでおく
-	transformationMatrixData->WVP = TuboEngine::Math::MakeIdentity4x4();
-	transformationMatrixData->World = TuboEngine::Math::MakeIdentity4x4();
+	transformationMatrixData->WVP = MakeIdentity4x4();
+	transformationMatrixData->World = MakeIdentity4x4();
 
 
 #pragma endregion
@@ -104,7 +104,7 @@ void TuboEngine::Sprite::Initialize(std::string textureFilePath) {
 	//今回は白を書き込んでみる
 	materialData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	materialData->enableLighting = false;
-	materialData->uvTransform = TuboEngine::Math::MakeIdentity4x4();
+	materialData->uvTransform = MakeIdentity4x4();
 
 
 #pragma endregion
@@ -193,9 +193,9 @@ void TuboEngine::Sprite::Update() {
 	materialData->uvTransform = uvTransformMatrix;
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	Matrix4x4 viewMatrix = TuboEngine::Math::MakeIdentity4x4();
+	Matrix4x4 viewMatrix = MakeIdentity4x4();
 	Matrix4x4 projectionMatrix =
-	    TuboEngine::Math::MakeOrthographicMatrix(0.0f, 0.0f, float(TuboEngine::WinApp::GetInstance()->GetClientWidth()), float(TuboEngine::WinApp::GetInstance()->GetClientHeight()), 0.0f, 100.0f);
+	    MakeOrthographicMatrix(0.0f, 0.0f, float(TuboEngine::WinApp::GetInstance()->GetClientWidth()), float(TuboEngine::WinApp::GetInstance()->GetClientHeight()), 0.0f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData->WVP = worldViewProjectionMatrix;
 	transformationMatrixData->World = worldMatrix;

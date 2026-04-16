@@ -9,9 +9,10 @@
 #include <assimp/Importer.hpp> // Assimpのインポーターを使用するために必要
 #include"assert.h"
 
-namespace TuboEngine {
-template<typename tValue> struct AnimationCurve {
-	std::vector<TuboEngine::KeyFrame<tValue>> keyframes; // キーフレームのリスト
+
+template<typename tValue>
+struct AnimationCurve {
+	std::vector<KeyFrame<tValue>> keyframes; // キーフレームのリスト
 };
 
 struct NodeAnimation {
@@ -28,4 +29,3 @@ struct Animation {
 
 Animation LoadAnimation(const std::string& directoryPath, const std::string& filename);
 std::vector<std::string> GetAnimationNodeNames(const std::string& directoryPath, const std::string& filename);
-} // namespace MyNamespace

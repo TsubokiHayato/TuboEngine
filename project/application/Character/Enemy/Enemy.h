@@ -30,7 +30,7 @@ public:
     void OnCollision(Collider* other) override;
 	TuboEngine::Math::Vector3 GetCenterPosition() const override;
 
-    void SetCamera(TuboEngine::Camera* camera) { camera_ = camera; }
+    void SetCamera(Camera* camera) { camera_ = camera; }
 	TuboEngine::Math::Vector3 GetPosition() const { return position; }
 	void SetPosition(const TuboEngine::Math::Vector3& pos) { position = pos; }
 	TuboEngine::Math::Vector3 GetRotation() const { return rotation; }
@@ -50,10 +50,6 @@ public:
     float GetViewDistance() const { return kViewDistance; }
     void SetViewDistance(float dist) { kViewDistance = (dist < 0.0f) ? 0.0f : dist; }
 
-    // 攻撃範囲（射撃エネミー用）
-    float GetAttackRange() const { return attackRange_; }
-    void SetAttackRange(float range) { attackRange_ = (range < 0.0f) ? 0.0f : range; }
-
     enum class State { Idle, Alert, LookAround, Patrol, Chase, Attack };
 
 protected: 
@@ -63,11 +59,8 @@ protected:
 	TuboEngine::Math::Vector3 velocity;
     float turnSpeed_ = 0.1f;
     float moveSpeed_ = 0.08f;
-	float shootDistance_ = 25.0f;
-    float moveStartDistance_ = 50.0f;
-
-    // 0 なら常に Chase しつつ射撃（遠距離射撃）。
-    float attackRange_ = 25.0f;
+    float shootDistance_ = 7.0f;
+    float moveStartDistance_ = 15.0f;
     int HP = 100;
     bool isAlive = true;
     bool isHit = false;
@@ -75,8 +68,8 @@ protected:
 	std::unique_ptr<TuboEngine::Object3d> object3d;
     State state_ = State::Idle;
     float kViewAngleDeg = 90.0f;
-    float kViewDistance = 50.0f;
-    int kViewLineDiv = 8;
+    float kViewDistance = 15.0f;
+    int kViewLineDiv = 16;
 	TuboEngine::Math::Vector4 kViewColor = {1.0f, 1.0f, 0.0f, 0.7f};
 	TuboEngine::Math::Vector3 lastSeenPlayerPos = {0.0f, 0.0f, 0.0f};
     float lastSeenTimer = 0.0f;
@@ -113,13 +106,8 @@ protected:
     IParticleEmitter* hitEmitter_ = nullptr;       // 既存: スパーク等
     IParticleEmitter* hitRingEmitter_ = nullptr;   // 追加: ヒット時の小リング
     IParticleEmitter* deathEmitter_ = nullptr;
-    IParticleEmitter* mistEmitter_ = nullptr;      // 霧散演出用ミスト
-    bool isDying_ = false;                         // 死亡演出中か
-    float deathTimer_ = 0.0f;                      // 死亡演出のタイマー
-    static constexpr float kDeathDuration = 0.6f;  // 演出の長さ
     bool deathEffectPlayed_ = false;
-
-	TuboEngine::Camera* camera_ = nullptr;
+	Camera* camera_ = nullptr;
     MapChipField* mapChipField = nullptr;
     Player* player_ = nullptr;
     void ClearPath() { currentPath_.clear(); pathCursor_ = 0; lastPathGoalIndex_ = -1; }
@@ -146,12 +134,12 @@ protected:
     // レイサンプルデバッグ表示切替
     bool showRaySamples_ = false; // デフォルトOFF、ImGuiで切替
 
-    // --- Hit Shake ---
-    float hitShakeTimer_ = 0.0f;
-    float hitShakeDuration_ = 0.15f;
-    float hitShakeStrength_ = 0.3f;
-    TuboEngine::Math::Vector3 hitShakeOffset_{0.0f, 0.0f, 0.0f};
-    void ApplyHitShake(float dt);
+    // --- Knockback（被弾時押し戻し）---
+    float knockbackTimer_ = 0.0f;
+	TuboEngine::Math::Vector3 knockbackVelocity_{0.0f, 0.0f, 0.0f};
+    float knockbackStrength_ = 5.0f; // タイル幅の約5.0倍/秒
+    float knockbackDamping_ = 0.85f;
+    void ApplyKnockback(float dt);
 
 public:
     // アイコン制御API
