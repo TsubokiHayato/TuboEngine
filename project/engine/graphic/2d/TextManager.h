@@ -38,6 +38,11 @@ public:
         Math::Vector2 position{0.0f, 0.0f};
         Math::Vector4 color{1.0f, 1.0f, 1.0f, 1.0f};
         float       scale = 1.0f;     // 見た目のスケール
+        // 揃え/アンカー情報
+        // 0: Left   1: Center   2: Right
+        int         horizontalAlign = 0;
+        // 0: Top    1: Middle   2: Bottom
+        int         verticalAlign   = 0;
     };
 
     // フォント管理
@@ -88,10 +93,15 @@ private:
     // 保存用のテキスト定義と TextObject の対応
     std::vector<TextDefinition> textDefs_;
 
+    // TextManager.h（texts_ と同じサイズを保つフラグ）
+    std::vector<bool> textAlive_;
+
     // フォント検索用ディレクトリ
     std::string projectFontDir_ = "Resources/Font/";
     std::string externalFontDir_ = "Resources/Font/external/";
     std::string windowsFontDir_{};
+
+    bool initialized_ = false;
 };
 
 } // namespace TuboEngine

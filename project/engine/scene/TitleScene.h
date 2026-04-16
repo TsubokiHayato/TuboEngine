@@ -54,12 +54,12 @@ public:
 	/// <summary>
 	/// カメラの取得
 	/// </summary>
-	Camera* GetMainCamera() const { return camera.get(); }
+	TuboEngine::Camera* GetMainCamera() const { return camera.get(); }
 
 	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
 
 private:
-	std::unique_ptr<Camera> camera;
+	std::unique_ptr<TuboEngine::Camera> camera;
 	TuboEngine::Math::Vector3 cameraPosition = {0.0f, 0.0f, -10.0f};
 	TuboEngine::Math::Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	TuboEngine::Math::Vector3 cameraScale = {1.0f, 1.0f, 1.0f};

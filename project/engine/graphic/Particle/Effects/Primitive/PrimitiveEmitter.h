@@ -26,7 +26,7 @@ public:
     }
 
 protected:
-    void BuildGeometry(std::vector<VertexData>& out) override {
+	void BuildGeometry(std::vector<TuboEngine::VertexData>& out) override {
         // シンプルな板
         out.push_back({{ 1, 1,0,1},{0,0},{0,0,1}});
         out.push_back({{-1, 1,0,1},{1,0},{0,0,1}});

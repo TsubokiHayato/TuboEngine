@@ -27,8 +27,8 @@ void TuboEngine::Object3d::Initialize(std::string modelFileNamePath) {
 	// 書き込むためのアドレスを取得
 	transformMatrixResource->Map(0, nullptr, reinterpret_cast<void**>(&transformMatrixData));
 	// 単位行列を書き込んでいく
-	transformMatrixData->WVP = MakeIdentity4x4();
-	transformMatrixData->World = MakeIdentity4x4();
+	transformMatrixData->WVP = TuboEngine::Math::MakeIdentity4x4();
+	transformMatrixData->World = TuboEngine::Math::MakeIdentity4x4();
 
 #pragma endregion TransformMatrixResource
 
@@ -129,7 +129,7 @@ void TuboEngine::Object3d::Update() {
 	TuboEngine::Math::Matrix4x4 cameraMatrix = MakeAffineMatrix(camera->GetScale(), camera->GetRotation(), camera->GetTranslate());
 	TuboEngine::Math::Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 	TuboEngine::Math::Matrix4x4 projectionMatrix =
-	    MakePerspectiveMatrix(0.45f, float(TuboEngine::WinApp::GetInstance()->GetClientWidth()) / float(TuboEngine::WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
+	    TuboEngine::Math::MakePerspectiveMatrix(0.45f, float(TuboEngine::WinApp::GetInstance()->GetClientWidth()) / float(TuboEngine::WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
 	TuboEngine::Math::Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
 	if (camera) {

@@ -3,11 +3,12 @@
 #include "Collider/CollisionManager.h"
 #include "LineManager.h"
 #include "ParticleManager.h" // 追加: パーティクル描画/更新
+#include"SceneType.h"
 
+#include "engine/input/Input.h" // 追加
 
 // 静的メンバ定義
 bool StageScene::isDemoMode = false;
-
 
 namespace {
 StageScene::StageBounds ComputeBoundsWorld(const TuboEngine::Math::Vector3& origin, const MapChipField& field) {
@@ -76,7 +77,7 @@ StageScene::StageBounds ComputeBoundsWorld(const TuboEngine::Math::Vector3& orig
 	    TuboEngine::Math::Vector3 p1{b.right, b.bottom, z};
 	    TuboEngine::Math::Vector3 p2{b.right, b.top, z};
 	    TuboEngine::Math::Vector3 p3{b.left, b.top, z};
-		auto* lm = LineManager::GetInstance();
+	    auto* lm = TuboEngine::LineManager::GetInstance();
 		lm->DrawLine(p0, p1, color);
 		lm->DrawLine(p1, p2, color);
 		lm->DrawLine(p2, p3, color);
@@ -106,12 +107,20 @@ void StageScene::Initialize() {
 	mapChipField_ = std::make_unique<MapChipField>();
 	player_ = std::make_unique<Player>();
 	followCamera = std::make_unique<FollowTopDownCamera>();
-	camera = std::make_unique<Camera>();
+	camera = std::make_unique<TuboEngine::Camera>();
 	collisionManager_ = std::make_unique<CollisionManager>();
 	stateManager_ = std::make_unique<StageStateManager>();
 	skyDome_ = std::make_unique<SkyDome>();
-	tile_ = std::make_unique<Tile>();
+	// tile_ = std::make_unique<Tile>(); // StageManager に統合済みのため未使用
 	sceneChangeAnimation_ = std::make_unique<SceneChangeAnimation>(1280, 720, 80, 1.5f, "barrier.png");
+
+	// StageManager の生成と基本設定のみ行う（実ロードは ReadyState でカメラ初期化後に行う）
+	stageManager_ = std::make_unique<StageManager>();
+	stageManager_->Configure(10, 10, 15.0f);
+	// ★ ここでチャンクIDごとのCSVを登録
+	stageManager_->RegisterChunkCsv(1, "Resources/Stage/Stage1.csv");
+	stageManager_->RegisterChunkCsv(2, "Resources/Stage/Stage2.csv");
+	stageManager_->RegisterChunkCsv(3, "Resources/Stage/Stage3.csv");
 
 	// 衝突マネージャの生成
 	collisionManager_->Initialize();
@@ -126,18 +135,10 @@ void StageScene::Initialize() {
 		stateManager_->ChangeState(StageType::Tutorial, this);
 	}
 
-	// Multi-stage (debug/editor): 初期ステージを2つ用意しておく
-	stageInstances_.clear();
-	{
-		StageInstance st0;
-		st0.csvPath = mapChipCsvFilePath_;
-		st0.origin = {0.0f, 0.0f, 0.0f};
-		stageInstances_.push_back(std::move(st0));
-
-		StageInstance st1;
-		st1.csvPath = mapChipCsvFilePath_; // とりあえず同じCSV（差し替えはImGui）
-		st1.origin = {MapChipField::GetBlockWidth() * 110.0f, 0.0f, 0.0f};
-		stageInstances_.push_back(std::move(st1));
+	// デモモード初期化
+	if (isDemoMode) {
+		player_->SetAutoControlEnabled(true);
+		// デモ中はUIを非表示にする設定などがあればここで行う
 	}
 
 	// HP UI (Player)
@@ -163,20 +164,41 @@ void StageScene::Initialize() {
 	// Guide UI (WASD)
 	guideUI_ = std::make_unique<GuideUI>();
 	guideUI_->Initialize();
+
+	// Demo sprites (two textures expected: "DemoLabel.png" and "PressAny.png")
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("DemoLabel.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("PressAny.png");
+	demoLabelSprite_ = std::make_unique<TuboEngine::Sprite>();
+	demoPressAnySprite_ = std::make_unique<TuboEngine::Sprite>();
+	demoLabelSprite_->Initialize("DEMO/DemoLabel.png");
+	demoPressAnySprite_->Initialize("DEMO/PressAny.png");
+	// Anchor to center for both
+	demoLabelSprite_->SetAnchorPoint({0.5f, 0.5f});
+	demoPressAnySprite_->SetAnchorPoint({0.5f, 0.5f});
+	// Start invisible
+	demoLabelSprite_->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
+	demoPressAnySprite_->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
+	demoLabelSprite_->Update();
+	demoPressAnySprite_->Update();
 }
 
 void StageScene::Update() {
 
+	// Scene change animation update
 	sceneChangeAnimation_->Update(1.0f / 60.0f);
 
-	if (sceneChangeAnimation_->IsFinished()) {
-		// ステートマネージャの更新
-		if (stateManager_) {
-			stateManager_->Update(this);
-		}
+	// ★ StageManager の更新は各ステート（Playing/Ready/Tutorial など）に委譲する
+	// if (stageManager_) {
+	// 	stageManager_->Update(player_.get(), followCamera.get());
+	// }
+
+	// Always update state manager so states can respond to animation/request flags
+	if (stateManager_) {
+		stateManager_->Update(this);
 	}
+
 	// デフォルトカメラをFollowCameraに設定
-	LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
+	TuboEngine::LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	// 衝突マネージャの更新
 	collisionManager_->Update();
 	// 全ての衝突をチェック
@@ -187,48 +209,103 @@ void StageScene::Update() {
 
 	// HP UI 更新
 	if (hpUI_) { hpUI_->Update(player_.get()); }
-	// Enemy HP UI 更新（エネミーに追従）
-	if (enemyHpUI_) { enemyHpUI_->Update(enemies, followCamera->GetCamera()); }
+	// Enemy HP UI 更新（エネミーに追従）"
+	if (enemyHpUI_ && stageManager_ && followCamera) {
+		std::vector<Enemy*> enemyPtrs;
+		const auto& insts = stageManager_->GetStageInstances();
+		for (const auto& inst : insts) {
+			if (!inst.visible) continue;
+			for (const auto& e : inst.enemies) {
+				if (e && e->GetIsAlive()) {
+					enemyPtrs.push_back(e.get());
+				}
+			}
+		}
+		enemyHpUI_->Update(enemyPtrs, followCamera->GetCamera());
+	}
 	// Guide UI 更新
 	if (guideUI_) { guideUI_->Update(); }
+
+	// --- Demo Mode Logic ---
+	if (isDemoMode) {
+		// Demo中は常に自動操作ONを維持する
+		if (player_ && !player_->IsAutoControlEnabled()) {
+			player_->SetAutoControlEnabled(true);
+		}
+
+		// 敵リストをプレイヤー(AutoController)に渡す
+		if (player_ && player_->IsAutoControlEnabled()) {
+			std::vector<Enemy*> enemyPtrs;
+			if (stageManager_) {
+				const auto& insts = stageManager_->GetStageInstances();
+				for (const auto& inst : insts) {
+					if (!inst.visible) continue;
+					for (const auto& e : inst.enemies) {
+						if (e && e->GetIsAlive()) {
+							enemyPtrs.push_back(e.get());
+						}
+					}
+				}
+			}
+			player_->SetEnemyList(enemyPtrs);
+		}
+
+		// 入力があればタイトルへ戻る
+		bool pressAny = false;
+		auto* input = TuboEngine::Input::GetInstance();
+		if (input->TriggerKey(DIK_SPACE) || input->TriggerKey(DIK_RETURN) ||
+			input->TriggerKey(DIK_Z) || input->TriggerKey(DIK_X) ||
+			input->IsTriggerMouse(0) || input->IsTriggerMouse(1)) {
+			pressAny = true;
+		}
+
+		if (pressAny) {
+			// Use scene-change animation if available, otherwise fallback to immediate transition
+			if (sceneChangeAnimation_) {
+				if (!isRequestSceneChange) {
+					// request animated transition to TITLE
+					pendingNextSceneNo_ = TITLE;
+					sceneChangeAnimation_->SetPhase(SceneChangeAnimation::Phase::Appearing);
+					isRequestSceneChange = true;
+				}
+			} else {
+				// fallback: immediate change
+				StageScene::isDemoMode = false;
+				SceneManager::GetInstance()->ChangeScene(TITLE);
+			}
+		}
+	}
+
+	// SceneChangeAnimation がリクエストされており完了しているなら遷移を実行
+	if (isRequestSceneChange && sceneChangeAnimation_ && sceneChangeAnimation_->IsFinished()) {
+		if (pendingNextSceneNo_ >= 0) {
+			int next = pendingNextSceneNo_;
+			pendingNextSceneNo_ = -1;
+			isRequestSceneChange = false;
+			// デモからTITLEへ戻る場合は、遷移実行直前にフラグを落とす（演出中のUIちらつき防止）
+			if (StageScene::isDemoMode && next == TITLE) {
+				StageScene::isDemoMode = false;
+			}
+			SceneManager::GetInstance()->ChangeScene(next);
+		}
+	}
 }
 
 void StageScene::Finalize() {}
 
 void StageScene::Object3DDraw() {
 
-	// Multi-stage bounds visualization (debug). Lines are cleared in some scenes; keep additive here.
-	#ifdef USE_IMGUI
-	if (useMultiStageLayout_) {
-		// Ensure bounds are computed if fields are loaded
-		for (auto& st : stageInstances_) {
-			if (st.visible && st.field) {
-				st.boundsWorld = ComputeBoundsWorld(st.origin, *st.field);
-			}
-		}
-		// collision check
-		for (size_t i = 0; i < stageInstances_.size(); ++i) {
-			auto& a = stageInstances_[i];
-			if (!a.visible || !a.field) continue;
-			bool overlapped = false;
-			for (size_t j = 0; j < stageInstances_.size(); ++j) {
-				if (i == j) continue;
-				auto& b = stageInstances_[j];
-				if (!b.visible || !b.field) continue;
-				if (Intersects(a.boundsWorld, b.boundsWorld)) {
-					overlapped = true;
-					break;
-				}
-			}
-			DrawBounds(a.boundsWorld, -0.5f, overlapped ? Vector4{1.0f, 0.2f, 0.2f, 1.0f} : Vector4{0.2f, 1.0f, 0.2f, 1.0f});
-		}
-	}
-	#endif
+	// ★ ステージ(タイル/ブロック/敵)の描画も各ステート側に委譲する
+	// if (stageManager_) {
+	// 	stageManager_->Draw3D();
+	// }
 
 	// ステートマネージャの3Dオブジェクト描画
 	if (stateManager_) {
 		stateManager_->Object3DDraw(this);
 	}
+
+	
 }
 
 void StageScene::SpriteDraw() {
@@ -239,12 +316,44 @@ void StageScene::SpriteDraw() {
 	}
 	
 	// HP UI 描画
-	if (hpUI_) { hpUI_->Draw(); }
+	if (hpUI_ && !isDemoMode) { hpUI_->Draw(); }
 	// Enemy HP UI 描画（追従）
-	if (enemyHpUI_) { enemyHpUI_->Draw(); }
+	if (enemyHpUI_ && !isDemoMode) { enemyHpUI_->Draw(); }
 	// Guide UI 描画
-	if (guideUI_) { guideUI_->Draw(); }
-	
+	if (guideUI_ && !isDemoMode) { guideUI_->Draw(); }
+
+	// Demo sprites
+	if (isDemoMode) {
+		const float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
+		const float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
+
+		// Position demo label at upper center
+		if (demoLabelSprite_) {
+			float x = screenW * 0.5f;
+			float y = screenH * 0.28f;
+			demoLabelSprite_->SetPosition({x, y});
+			// set a consistent size (scale as needed)
+			// if texture large, adjust size; here we keep texture native size
+			Vector4 c = demoLabelSprite_->GetColor();
+			c.w = 1.0f; // visible
+			demoLabelSprite_->SetColor(c);
+			demoLabelSprite_->Update();
+			demoLabelSprite_->Draw();
+		}
+
+		// Position press-any at lower center
+		if (demoPressAnySprite_) {
+			float x = screenW * 0.5f;
+			float y = screenH * 0.72f;
+			demoPressAnySprite_->SetPosition({x, y});
+			Vector4 c = demoPressAnySprite_->GetColor();
+			c.w = 1.0f; // visible
+			demoPressAnySprite_->SetColor(c);
+			demoPressAnySprite_->Update();
+			demoPressAnySprite_->Draw();
+		}
+	}
+
 	// アニメーション描画
 	if (sceneChangeAnimation_) {
 		sceneChangeAnimation_->Draw();
@@ -256,229 +365,11 @@ void StageScene::ImGuiDraw() {
 	
 	#ifdef USE_IMGUI
 
-	LineManager::GetInstance()->DrawImGui();
+	TuboEngine::LineManager::GetInstance()->DrawImGui();
 	stateManager_->DrawImGui(this);
-
-	bool open = true;
-	if (ImGui::Begin("Stage Layout (CSV)", &open)) {
-		ImGui::Checkbox("Enable Multi Stage (debug)", &useMultiStageLayout_);
-
-		static float snapCells = 1.0f;
-		ImGui::SliderFloat("Snap (cells)", &snapCells, 0.0f, 10.0f, "%.1f");
-		const float snapX = (snapCells <= 0.0f) ? 0.0f : MapChipField::GetBlockWidth() * snapCells;
-		const float snapY = (snapCells <= 0.0f) ? 0.0f : MapChipField::GetBlockHeight() * snapCells;
-
-		static float gapCellsX = 2.0f;
-		static float gapCellsY = 2.0f;
-		ImGui::SliderFloat("Gap X (cells)", &gapCellsX, 0.0f, 10.0f, "%.1f");
-		ImGui::SliderFloat("Gap Y (cells)", &gapCellsY, 0.0f, 10.0f, "%.1f");
-		const float gapX = MapChipField::GetBlockWidth() * gapCellsX;
-		const float gapY = MapChipField::GetBlockHeight() * gapCellsY;
-
-		if (ImGui::Button("Add Stage")) {
-			StageInstance st;
-			st.csvPath = mapChipCsvFilePath_;
-			st.origin = {0.0f, 0.0f, 0.0f};
-			stageInstances_.push_back(std::move(st));
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Load All CSV")) {
-			for (auto& st : stageInstances_) {
-				st.field = std::make_unique<MapChipField>();
-				st.field->LoadMapChipCsv(st.csvPath);
-				st.boundsWorld = ComputeBoundsWorld(st.origin, *st.field);
-			}
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Auto Arrange X")) {
-			float cursorX = 0.0f;
-			for (auto& st : stageInstances_) {
-				if (!st.field) {
-					st.field = std::make_unique<MapChipField>();
-					st.field->LoadMapChipCsv(st.csvPath);
-				}
-				st.origin.x = cursorX;
-				st.origin.y = 0.0f;
-				st.boundsWorld = ComputeBoundsWorld(st.origin, *st.field);
-				const float w = st.boundsWorld.right - st.boundsWorld.left;
-				cursorX += w + gapX;
-			}
-		}
-
-		ImGui::Separator();
-
-		// 近傍配置UI（十字のみ / 中央は押せない）
-		ImGui::Text("Spawn neighbor stage (cross)");
-		if (!stageInstances_.empty()) {
-			auto& centerSt = stageInstances_[0];
-			if (!centerSt.field) {
-				centerSt.field = std::make_unique<MapChipField>();
-				centerSt.field->LoadMapChipCsv(centerSt.csvPath);
-				centerSt.boundsWorld = ComputeBoundsWorld(centerSt.origin, *centerSt.field);
-			}
-			StageBounds centerB = centerSt.boundsWorld;
-
-			// 次に置くステージCSV（新規作成用）
-			static char spawnCsv[256] = "Resources/MapChip.csv";
-			ImGui::InputText("Spawn CSV", spawnCsv, sizeof(spawnCsv));
-
-			auto spawnNeighbor = [&](NeighborDir dir) {
-				StageInstance next;
-				next.csvPath = spawnCsv;
-				next.field = std::make_unique<MapChipField>();
-				next.field->LoadMapChipCsv(next.csvPath);
-
-				StageBounds nextAtOrigin = ComputeBoundsWorld(TuboEngine::Math::Vector3{0, 0, 0}, *next.field);
-				next.origin = ComputeSpawnOriginFromCenter(centerB, nextAtOrigin, dir, gapX, gapY);
-
-				if (snapX > 0.0f) next.origin.x = std::round(next.origin.x / snapX) * snapX;
-				if (snapY > 0.0f) next.origin.y = std::round(next.origin.y / snapY) * snapY;
-
-				next.boundsWorld = ComputeBoundsWorld(next.origin, *next.field);
-
-				for (auto& st : stageInstances_) {
-					if (!st.field) {
-						continue;
-					}
-					if (Intersects(next.boundsWorld, st.boundsWorld)) {
-						return; // spawn failed
-					}
-				}
-
-				stageInstances_.push_back(std::move(next));
-			};
-
-			const float cellSize = 28.0f;
-			auto blankBtn = [&](const char* id, NeighborDir dir) {
-				if (ImGui::Button(id, ImVec2(cellSize, cellSize))) {
-					spawnNeighbor(dir);
-				}
-			};
-
-			// Row1: [ ] [Up] [ ]
-			ImGui::Button("##empty00", ImVec2(cellSize, cellSize)); ImGui::SameLine();
-			blankBtn("##up", NeighborDir::Down); ImGui::SameLine();
-			ImGui::Button("##empty02", ImVec2(cellSize, cellSize));
-
-			// Row3: [ ] [Down] [ ]
-			ImGui::Button("##empty20", ImVec2(cellSize, cellSize)); ImGui::SameLine();
-			blankBtn("##down", NeighborDir::Up); ImGui::SameLine();
-			ImGui::Button("##empty22", ImVec2(cellSize, cellSize));
-		} else {
-			ImGui::Text("No center stage. Add one first.");
-		}
-
-		ImGui::Separator();
-
-		// 追加: プレビュー用オブジェクトの再生成（scene再起動なしで反映）
-		ImGui::Text("Preview Objects");
-		if (ImGui::Button("Rebuild Preview Objects")) {
-			for (auto& st : stageInstances_) {
-				if (!st.visible) {
-					continue;
-				}
-				// フィールドが未ロードならロード
-				if (!st.field) {
-					st.field = std::make_unique<MapChipField>();
-					st.field->LoadMapChipCsv(st.csvPath);
-				}
-				// Stage0は既存生成ロジックに任せる（ここでは1+のみ生成）
-				if (&st == &stageInstances_[0]) {
-					continue;
-				}
-
-				st.blocks.clear();
-				st.enemies.clear();
-				st.tile = std::make_unique<Tile>();
-
-				TuboEngine::Math::Vector3 tilePos = st.origin;
-				tilePos.z = -1.0f;
-				st.tile->Initialize(tilePos, {1.0f, 1.0f, 1.0f}, "tile/tile30x30.obj");
-				st.tile->SetCamera(followCamera->GetCamera());
-				st.tile->Update();
-
-				ForEachMapChipField(st.field.get(), [&](uint32_t x, uint32_t y, MapChipType type) {
-					TuboEngine::Math::Vector3 pos = st.field->GetMapChipPositionByIndex(x, y) + st.origin;
-					if (type == MapChipType::kBlock) {
-						auto block = std::make_unique<Block>();
-						block->Initialize(pos);
-						block->SetCamera(followCamera->GetCamera());
-						block->Update();
-						st.blocks.push_back(std::move(block));
-					} else if (type == MapChipType::Enemy || type == MapChipType::EnemyRush) {
-						auto enemy = std::make_unique<RushEnemy>();
-						enemy->Initialize();
-						enemy->SetCamera(followCamera->GetCamera());
-						enemy->SetPlayer(player_.get());
-						enemy->SetPosition(pos);
-						enemy->Update();
-						st.enemies.push_back(std::move(enemy));
-					} else if (type == MapChipType::EnemyShoot) {
-						auto enemy = std::make_unique<Enemy>();
-						enemy->Initialize();
-						enemy->SetCamera(followCamera->GetCamera());
-						enemy->SetPlayer(player_.get());
-						enemy->SetPosition(pos);
-						enemy->Update();
-						st.enemies.push_back(std::move(enemy));
-					}
-				});
-			}
-		}
-
-		ImGui::Separator();
-
-		for (size_t i = 0; i < stageInstances_.size(); ++i) {
-			auto& st = stageInstances_[i];
-			ImGui::PushID(static_cast<int>(i));
-
-			ImGui::Checkbox("Visible", &st.visible);
-			ImGui::SameLine();
-			ImGui::Text("Stage %zu", i);
-
-			char buf[256]{};
-			strncpy_s(buf, st.csvPath.c_str(), sizeof(buf) - 1);
-			if (ImGui::InputText("CSV", buf, sizeof(buf))) {
-				st.csvPath = buf;
-			}
-
-			TuboEngine::Math::Vector3 origin = st.origin;
-			float o[2] = { origin.x, origin.y };
-			if (ImGui::DragFloat2("Origin", o, 0.1f)) {
-				origin.x = o[0];
-				origin.y = o[1];
-				if (snapX > 0.0f) origin.x = std::round(origin.x / snapX) * snapX;
-				if (snapY > 0.0f) origin.y = std::round(origin.y / snapY) * snapY;
-				st.origin = origin;
-				if (st.field) {
-					st.boundsWorld = ComputeBoundsWorld(st.origin, *st.field);
-				}
-			}
-
-			if (ImGui::Button("Reload CSV")) {
-				st.field = std::make_unique<MapChipField>();
-				st.field->LoadMapChipCsv(st.csvPath);
-				st.boundsWorld = ComputeBoundsWorld(st.origin, *st.field);
-			}
-			ImGui::SameLine();
-			if (ImGui::Button("Remove")) {
-				stageInstances_.erase(stageInstances_.begin() + static_cast<long long>(i));
-				ImGui::PopID();
-				break;
-			}
-
-			if (st.field) {
-				ImGui::Text("Size (cells): %u x %u", st.field->GetNumBlockHorizontal(), st.field->GetNumBlockVirtical());
-				ImGui::Text("Bounds: L%.1f R%.1f B%.1f T%.1f", st.boundsWorld.left, st.boundsWorld.right, st.boundsWorld.bottom, st.boundsWorld.top);
-			}
-
-			ImGui::Separator();
-			ImGui::PopID();
-		}
-
-		ImGui::End();
-	} else {
-		ImGui::End();
+	// StageManager の各チャンク情報を表示
+	if (stageManager_) {
+		stageManager_->DrawImGui();
 	}
 
 	#endif // USE_IMGUI
@@ -492,35 +383,22 @@ void StageScene::ParticleDraw() {
 	}
 	// 追加: 全エミッター描画 (PlayerTrail 含む)
 	TuboEngine::ParticleManager::GetInstance()->Draw();
+
+#ifdef USE_IMGUI
+	if (isDemoMode) {
+		ImGui::SetNextWindowPos(ImVec2(TuboEngine::WinApp::GetInstance()->GetClientWidth() * 0.5f, 100.0f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+		ImGui::SetNextWindowBgAlpha(0.0f); // 背景透明
+	
+	}
+#endif
 }
 void StageScene::CheckAllCollisions() {
-	/// 衝突マネージャのリセット ///
 	collisionManager_->Reset();
 
-	/// コライダーをリストに登録 ///
-	// プレイヤー
-	collisionManager_->AddCollider(player_.get());
-
-	// 敵（生存中のみ登録）
-	for (const auto& enemy : enemies) {
-		if (!enemy) {
-			continue;
-		}
-		if (enemy->GetIsAlive() && enemy->GetHP() > 0) {
-			collisionManager_->AddCollider(enemy.get());
-		}
+	// ここで StageManager に一括登録させる
+	if (stageManager_) {
+		stageManager_->RegisterCollisions(collisionManager_.get(), player_.get());
 	}
 
-	// プレイヤーの弾（生存中のみ登録）
-	for (const auto& bullet : player_->GetBullets()) {
-		if (!bullet) {
-			continue;
-		}
-		if (bullet->GetIsAlive()) {
-			collisionManager_->AddCollider(bullet.get());
-		}
-	}
-
-	// 衝突判定と応答
 	collisionManager_->CheckAllCollisions();
 }

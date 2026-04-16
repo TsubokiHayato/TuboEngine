@@ -10,11 +10,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #ifdef _DEBUG
 	// リソースリークチェッカーのインスタンスを生成
-	D3DResourceLeakChecker leakChecker;
+	TuboEngine::D3DResourceLeakChecker leakChecker;
 #endif
 
 	// フレームワークのインスタンスを生成（生 new/delete を使わない）
-	auto framework = std::make_unique<Order>();
+	std::unique_ptr<TuboEngine::Framework> framework = std::make_unique<TuboEngine::Order>();
 
 	// フレームワークを実行
 	framework->Run();

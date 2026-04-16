@@ -7,12 +7,12 @@
 ///----------------------------------------------------
 /// シングルトンインスタンス初期化
 ///----------------------------------------------------
-LineManager* LineManager::instance_ = nullptr;
+TuboEngine::LineManager* TuboEngine::LineManager::instance_ = nullptr;
 
 ///----------------------------------------------------
 /// LineManagerインスタンス取得
 ///----------------------------------------------------
-LineManager* LineManager::GetInstance() {
+TuboEngine::LineManager* TuboEngine::LineManager::GetInstance() {
 	if (instance_ == nullptr) {
 		instance_ = new LineManager();
 	}
@@ -22,19 +22,19 @@ LineManager* LineManager::GetInstance() {
 ///----------------------------------------------------
 /// LineManager初期化処理
 ///----------------------------------------------------
-void LineManager::Initialize() {
+void TuboEngine::LineManager::Initialize() {
 	// Line描画共通処理クラス生成・初期化
-	lineCommon_ = std::make_unique<LineCommon>();
+	lineCommon_ = std::make_unique<TuboEngine::LineCommon>();
 	lineCommon_->Initialize();
 	// Line描画クラス生成・初期化
-	line_ = std::make_unique<Line>();
+	line_ = std::make_unique<TuboEngine::Line>();
 	line_->Initialize(lineCommon_.get());
 }
 
 ///----------------------------------------------------
 /// LineManager終了処理
 ///----------------------------------------------------
-void LineManager::Finalize() {
+void TuboEngine::LineManager::Finalize() {
 	delete instance_;
 	instance_ = nullptr;
 }
@@ -42,7 +42,7 @@ void LineManager::Finalize() {
 ///----------------------------------------------------
 /// LineManager更新処理
 ///----------------------------------------------------
-void LineManager::Update() {
+void TuboEngine::LineManager::Update() {
 
 	// Line描画クラス更新
 	line_->Update();
@@ -51,7 +51,11 @@ void LineManager::Update() {
 ///----------------------------------------------------
 /// LineManager描画処理
 ///----------------------------------------------------
-void LineManager::Draw() {
+void TuboEngine::LineManager::Draw() {
+   if (disableAll_) {
+		line_->ClearLines();
+		return;
+	}
 	// Line描画共通設定
 	lineCommon_->DrawSettingsCommon();
 	// Line描画
@@ -63,10 +67,12 @@ void LineManager::Draw() {
 ///----------------------------------------------------
 /// ImGui描画処理
 ///----------------------------------------------------
-void LineManager::DrawImGui() {
+void TuboEngine::LineManager::DrawImGui() {
 
 #ifdef USE_IMGUI
 	ImGui::Begin("LineManager");
+  ImGui::Checkbox("Disable All", &disableAll_);
+	ImGui::Separator();
 	ImGui::Checkbox("Line", &isDrawLine_);
 	ImGui::Separator();
 	ImGui::Checkbox("Grid", &isDrawGrid_);
@@ -81,13 +87,13 @@ void LineManager::DrawImGui() {
 ///----------------------------------------------------
 /// ライン頂点情報クリア
 ///----------------------------------------------------
-void LineManager::ClearLines() { line_->ClearLines(); }
+void TuboEngine::LineManager::ClearLines() { line_->ClearLines(); }
 
 ///----------------------------------------------------
 /// ライン描画用頂点追加
 ///----------------------------------------------------
-void LineManager::DrawLine(const TuboEngine::Math::Vector3& start, const TuboEngine::Math::Vector3& end, const TuboEngine::Math::Vector4& color) {
-	if (!isDrawLine_) {
+void TuboEngine::LineManager::DrawLine(const TuboEngine::Math::Vector3& start, const TuboEngine::Math::Vector3& end, const TuboEngine::Math::Vector4& color) {
+ if (disableAll_ || !isDrawLine_) {
 		return;
 	}
 	line_->DrawLine(start, end, color);
@@ -96,12 +102,15 @@ void LineManager::DrawLine(const TuboEngine::Math::Vector3& start, const TuboEng
 ///----------------------------------------------------
 /// グリッド描画
 ///----------------------------------------------------
-void LineManager::DrawGrid(float size, int split, const TuboEngine::Math::Vector3& rotation, const TuboEngine::Math::Vector4& color) {
+void TuboEngine::LineManager::DrawGrid(float size, int split, const TuboEngine::Math::Vector3& rotation, const TuboEngine::Math::Vector4& color) {
+    if (disableAll_ || !isDrawGrid_) {
+		return;
+	}
 	// グリッドの中心座標
 	TuboEngine::Math::Vector3 center = {0.0f, 0.0f, 0.0f};
 
 	// 回転行列を生成
-	TuboEngine::Math::Matrix4x4 rotMat = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotation, {0.0f, 0.0f, 0.0f});
+	TuboEngine::Math::Matrix4x4 rotMat = TuboEngine::Math::MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotation, {0.0f, 0.0f, 0.0f});
 
 	float half = size / 2.0f;
 	float step = size / split;
@@ -112,15 +121,15 @@ void LineManager::DrawGrid(float size, int split, const TuboEngine::Math::Vector
 		// X軸方向の線
 		TuboEngine::Math::Vector3 startX = {pos, 0.0f, -half};
 		TuboEngine::Math::Vector3 endX = {pos, 0.0f, half};
-		startX = TransformCoord(startX, rotMat);
-		endX = TransformCoord(endX, rotMat);
+		startX = TuboEngine::Math::TransformCoord(startX, rotMat);
+		endX = TuboEngine::Math::TransformCoord(endX, rotMat);
 		DrawLine(startX, endX, color);
 
 		// Z軸方向の線
 		TuboEngine::Math::Vector3 startZ = {-half, 0.0f, pos};
 		TuboEngine::Math::Vector3 endZ = {half, 0.0f, pos};
-		startZ = TransformCoord(startZ, rotMat);
-		endZ = TransformCoord(endZ, rotMat);
+		startZ = TuboEngine::Math::TransformCoord(startZ, rotMat);
+		endZ = TuboEngine::Math::TransformCoord(endZ, rotMat);
 		DrawLine(startZ, endZ, color);
 	}
 }
@@ -128,8 +137,8 @@ void LineManager::DrawGrid(float size, int split, const TuboEngine::Math::Vector
 ///----------------------------------------------------
 /// 球描画
 ///----------------------------------------------------
-void LineManager::DrawSphere(const TuboEngine::Math::Vector3& center, float radius, const TuboEngine::Math::Vector4& color, int divisions) {
-	if (!isDrawSphere_ || divisions <= 0) {
+void TuboEngine::LineManager::DrawSphere(const TuboEngine::Math::Vector3& center, float radius, const TuboEngine::Math::Vector4& color, int divisions) {
+ if (disableAll_ || !isDrawSphere_ || divisions <= 0) {
 		return;
 	}
 	float angleStep = 2.0f * static_cast<float>(M_PI) / divisions;

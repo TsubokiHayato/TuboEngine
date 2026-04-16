@@ -38,7 +38,7 @@ public:
 	}
 
 	// カメラ設定
-	void SetCamera(Camera* camera) { object3d_->SetCamera(camera); }
+	void SetCamera(TuboEngine::Camera* camera) { object3d_->SetCamera(camera); }
 
 private:
 	TuboEngine::Math::Vector3 position_;

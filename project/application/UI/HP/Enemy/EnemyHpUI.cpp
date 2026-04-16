@@ -6,10 +6,10 @@
 #include <algorithm>
 #include <cmath>
 
-static TuboEngine::Math::Vector2 WorldToScreen(const TuboEngine::Math::Vector3& world, const Camera* cam) {
+static TuboEngine::Math::Vector2 WorldToScreen(const TuboEngine::Math::Vector3& world, const TuboEngine::Camera* cam) {
     if (!cam) return {0,0};
 	const TuboEngine::Math::Matrix4x4& vp = cam->GetViewProjectionMatrix();
-	TuboEngine::Math::Vector3 v = TransformCoord(world, vp);
+	TuboEngine::Math::Vector3 v = TuboEngine::Math::TransformCoord(world, vp);
 	int sw = (int)TuboEngine::WinApp::GetInstance()->GetClientWidth();
 	int sh = (int)TuboEngine::WinApp::GetInstance()->GetClientHeight();
 	TuboEngine::Math::Vector2 screen = {};
@@ -28,10 +28,10 @@ void EnemyHpUI::Initialize(const std::string& frameTexturePath, const std::strin
     frameTex_ = frameTexturePath; fillTex_ = fillTexturePath;
 }
 
-void EnemyHpUI::Update(const std::vector<std::unique_ptr<Enemy>>& enemies, Camera* cam) {
+void EnemyHpUI::Update(const std::vector<Enemy*>& enemies, TuboEngine::Camera* cam) {
     bars_.resize(enemies.size());
     for (size_t i = 0; i < enemies.size(); ++i) {
-        auto* e = enemies[i].get();
+        Enemy* e = enemies[i];
         if (!e || !e->GetIsAlive()) { bars_[i].visible = false; continue; }
         int maxHp = e->GetMaxHP(); if (maxHp <= 0) { bars_[i].visible = false; continue; }
         int currentHp = std::clamp(e->GetHP(), 0, maxHp);
@@ -41,16 +41,16 @@ void EnemyHpUI::Update(const std::vector<std::unique_ptr<Enemy>>& enemies, Camer
             bar.frames.clear(); bar.fills.clear();
             bar.frames.reserve(maxHp); bar.fills.reserve(maxHp);
             for (int h = 0; h < maxHp; ++h) {
-				auto fr = std::make_unique<TuboEngine::Sprite>();
-				fr->Initialize(frameTex_);
-				fr->AdjustTextureSize();
-				fr->SetAnchorPoint({0.0f, 0.0f});
-				bar.frames.push_back(std::move(fr));
-				auto fi = std::make_unique<TuboEngine::Sprite>();
-				fi->Initialize(fillTex_);
-				fi->AdjustTextureSize();
-				fi->SetAnchorPoint({0.0f, 0.0f});
-				bar.fills.push_back(std::move(fi));
+                auto fr = std::make_unique<TuboEngine::Sprite>();
+                fr->Initialize(frameTex_);
+                fr->AdjustTextureSize();
+                fr->SetAnchorPoint({0.0f, 0.0f});
+                bar.frames.push_back(std::move(fr));
+                auto fi = std::make_unique<TuboEngine::Sprite>();
+                fi->Initialize(fillTex_);
+                fi->AdjustTextureSize();
+                fi->SetAnchorPoint({0.0f, 0.0f});
+                bar.fills.push_back(std::move(fi));
             }
             bar.animatedHp = (float)currentHp; // init animated to current
         }
@@ -62,22 +62,22 @@ void EnemyHpUI::Update(const std::vector<std::unique_ptr<Enemy>>& enemies, Camer
             bar.animatedHp = (float)currentHp;
         }
         // position above enemy head
-		TuboEngine::Math::Vector3 pos = e->GetPosition();
-		pos.y += 2.5f;
-		TuboEngine::Math::Vector2 screen = WorldToScreen(pos, cam);
+        TuboEngine::Math::Vector3 pos = e->GetPosition();
+        pos.y += 2.5f;
+        TuboEngine::Math::Vector2 screen = WorldToScreen(pos, cam);
         screen.x = std::round(screen.x); screen.y = std::round(screen.y);
         float iconSize = 32.0f * scale_;
         float totalWidth = iconSize * maxHp + spacing_ * (maxHp - 1);
-		TuboEngine::Math::Vector2 base = {screen.x - totalWidth / 2.0f, screen.y + yOffset_};
+        TuboEngine::Math::Vector2 base = {screen.x - totalWidth / 2.0f, screen.y + yOffset_};
         bar.basePos = base;
         float ratio = maxHp > 0 ? bar.animatedHp / (float)maxHp : 0.0f;
-		TuboEngine::Math::Vector4 fillCol = RatioColor(ratio);
+        TuboEngine::Math::Vector4 fillCol = RatioColor(ratio);
         int fullIcons = (int)std::floor(bar.animatedHp);
         float partial = bar.animatedHp - (float)fullIcons;
         float innerW = (32.0f - 4.0f) * scale_;
         float innerH = (32.0f - 4.0f) * scale_;
         for (int h = 0; h < maxHp; ++h) {
-			TuboEngine::Math::Vector2 p = {base.x + h * (iconSize + spacing_), base.y};
+            TuboEngine::Math::Vector2 p = {base.x + h * (iconSize + spacing_), base.y};
             auto& fr = bar.frames[h]; fr->SetPosition(p); fr->SetSize({iconSize, iconSize}); fr->Update();
             auto& fi = bar.fills[h]; fi->SetPosition({ p.x + 2.0f * scale_, p.y + 2.0f * scale_ });
             if (h < fullIcons) {

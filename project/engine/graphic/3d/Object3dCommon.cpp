@@ -1,6 +1,6 @@
 #include "Object3dCommon.h"
-Object3dCommon* Object3dCommon::instance = nullptr; // シングルトンインスタンス
-void Object3dCommon::Initialize() {
+TuboEngine::Object3dCommon* TuboEngine::Object3dCommon::instance = nullptr; // シングルトンインスタンス
+void TuboEngine::Object3dCommon::Initialize() {
 	// 引数がnullptrでないことを確認
 
 	
@@ -14,14 +14,14 @@ void Object3dCommon::Initialize() {
 	blendPso_->Initialize(kBlendModeNormal);
 }
 
-void Object3dCommon::Finalize() {
+void TuboEngine::Object3dCommon::Finalize() {
 
 	delete instance;
 	instance = nullptr;
 
 }
 
-void Object3dCommon::DrawSettingsCommon(int blendMode) {
+void TuboEngine::Object3dCommon::DrawSettingsCommon(int blendMode) {
 	// PSOの共通描画設定
 	switch (blendMode) {
 	case 0:

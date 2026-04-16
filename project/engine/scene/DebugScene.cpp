@@ -11,7 +11,7 @@
 #include "TextureManager.h"
 #include "Input.h"
 #include "LineManager.h"
-#include "project/engine/graphic/2d/TextManager.h"
+#include "TextManager.h"
 
 void DebugScene::Initialize() {
 
@@ -23,11 +23,11 @@ void DebugScene::Initialize() {
     audio->Initialize(audioFileName);
 
     // SkyBox
-    skyBox = std::make_unique<SkyBox>();
+	skyBox = std::make_unique<TuboEngine::SkyBox>();
     skyBox->Initialize(testDDSTextureHandle);
 
     // Camera
-    camera = std::make_unique<Camera>();
+	camera = std::make_unique<TuboEngine::Camera>();
     camera->SetTranslate(cameraPosition);
     camera->setRotation(cameraRotation);
     camera->setScale(cameraScale);
@@ -143,7 +143,7 @@ void DebugScene::Update() {
 
     // Particles
     pm->Update(1.0f / 60.0f, camera.get());
-    LineManager::GetInstance()->SetDefaultCamera(camera.get());
+	TuboEngine::LineManager::GetInstance()->SetDefaultCamera(camera.get());
 
     // TextManager Update
     TuboEngine::TextManager::GetInstance()->UpdateAll();
@@ -159,7 +159,7 @@ void DebugScene::Finalize() {
 void DebugScene::Object3DDraw() {
     // 必要に応じて
     // skyBox->Draw();
-    LineManager::GetInstance()->DrawGrid(16.0f, 8, TuboEngine::Math::Vector3{}, TuboEngine::Math::Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+	TuboEngine::LineManager::GetInstance()->DrawGrid(16.0f, 8, TuboEngine::Math::Vector3{}, TuboEngine::Math::Vector4{1.0f, 1.0f, 1.0f, 1.0f});
 }
 
 void DebugScene::SpriteDraw() {

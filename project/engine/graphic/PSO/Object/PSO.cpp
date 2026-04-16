@@ -87,7 +87,13 @@ void PSO::CreateRootSignature() {
 	rootParameters[8].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderでつかう
 	rootParameters[8].Descriptor.ShaderRegister = 5; // レジスタ番号5とバインド
 
+	rootParameters[9].ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV; // StructuredBuffer
+	rootParameters[9].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[9].Descriptor.ShaderRegister = 0; // t0
 
+	rootParameters[10].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // ConstantBuffer
+	rootParameters[10].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[10].Descriptor.ShaderRegister = 1; // b1
 
 	descriptionRootSignature.pParameters = rootParameters; // ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters); // 配列の長さ

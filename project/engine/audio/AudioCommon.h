@@ -12,6 +12,7 @@
 #include <vector>
 #include <iostream>
 #pragma comment(lib,"xaudio2.lib")
+
 class AudioCommon
 {
 private:

@@ -1,6 +1,7 @@
 #pragma once
 #include"Vector3.h"
-struct CameraForGPU
-{
+namespace TuboEngine {
+struct CameraForGPU {
 	TuboEngine::Math::Vector3 worldPosition;
 };
+} // namespace TuboEngine

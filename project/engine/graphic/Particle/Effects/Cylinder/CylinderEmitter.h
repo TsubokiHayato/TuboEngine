@@ -5,7 +5,7 @@
 
 class CylinderEmitter : public IParticleEmitter {
 protected:
-	void BuildGeometry(std::vector<VertexData>& out) override {
+	void BuildGeometry(std::vector<TuboEngine::VertexData>& out) override {
 		// 円柱側面のみ（レガシーの簡易版）
 		const uint32_t kDiv = 32;
 		const float topR = 1.0f;

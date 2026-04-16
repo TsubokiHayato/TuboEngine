@@ -68,9 +68,9 @@ void Particle::Initialize( ParticleType particleType) {
 	// 書き込むためのアドレスを取得
 	vertexBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 	// 頂点データをリソースにコピー
-	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
+	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(TuboEngine::VertexData) * modelData_.vertices.size());
 
-	camera_ = new Camera;
+	camera_ = new TuboEngine::Camera;
 	camera_->SetTranslate({ 0.0f,0.0f,-5.0f });
 	camera_->setRotation({ 0.0f,0.0f,0.0f });
 	camera_->setScale({ 1.0f,1.0f,1.0f });
@@ -86,15 +86,15 @@ void Particle::Update() {
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(camera_->GetScale(),
 		camera_->GetRotation(), camera_->GetTranslate());
 	// ビュー行列の取得
-	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	Matrix4x4 viewMatrix = TuboEngine::Math::Inverse(cameraMatrix);
 	// プロジェクション行列の取得
 	Matrix4x4 projectionMatrix =
-	    MakePerspectiveMatrix(0.45f, float(TuboEngine::WinApp::GetInstance()->GetClientWidth()) / float(TuboEngine::WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
+	    TuboEngine::Math::MakePerspectiveMatrix(0.45f, float(TuboEngine::WinApp::GetInstance()->GetClientWidth()) / float(TuboEngine::WinApp::GetInstance()->GetClientHeight()), 0.1f, 100.0f);
 	// ビュープロジェクション行列の取得
 	Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 
 	// ビルボード行列の取得
-	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
+	Matrix4x4 backToFrontMatrix = TuboEngine::Math::MakeRotateYMatrix(std::numbers::pi_v<float>);
 	Matrix4x4 billboardMatrix{};
 	if (isBillBoard) {
 		billboardMatrix = Multiply(backToFrontMatrix, cameraMatrix);
@@ -103,7 +103,7 @@ void Particle::Update() {
 		billboardMatrix.m[3][1] = 0.0f;
 		billboardMatrix.m[3][2] = 0.0f;
 	} else {
-		billboardMatrix = MakeIdentity4x4();
+		billboardMatrix = TuboEngine::Math::MakeIdentity4x4();
 	}
 
 	// スケール調整用の倍率を設定
@@ -174,10 +174,10 @@ void Particle::Draw() {
 		commandList->SetGraphicsRootConstantBufferView(0, materialBuffer_->GetGPUVirtualAddress());
 
 		// テクスチャのSRVのDescriptorTableを設定
-		commandList->SetGraphicsRootDescriptorTable(2, SrvManager::GetInstance()->GetGPUDescriptorHandle(group.second.srvIndex));
+		commandList->SetGraphicsRootDescriptorTable(2, TuboEngine::SrvManager::GetInstance()->GetGPUDescriptorHandle(group.second.srvIndex));
 
 		// インスタンシングデータのSRVのDescriptorTableを設定
-		commandList->SetGraphicsRootDescriptorTable(1, SrvManager::GetInstance()->GetGPUDescriptorHandle(group.second.instancingSrvIndex));
+		commandList->SetGraphicsRootDescriptorTable(1, TuboEngine::SrvManager::GetInstance()->GetGPUDescriptorHandle(group.second.instancingSrvIndex));
 
 		// Draw Call (インスタンシング描画)
 		commandList->DrawInstanced((UINT)modelData_.vertices.size(), group.second.instanceCount, 0, 0);
@@ -193,7 +193,8 @@ void Particle::Draw() {
 /// <param name="name">パーティクル名</param>
 /// <param name="position">生成位置</param>
 /// <param name="count">生成数</param>
-void Particle::Emit(const std::string name, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime, uint32_t count) {
+void Particle::Emit(
+    const std::string name, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime, uint32_t count) {
 	if (particleGroups.find(name) == particleGroups.end()) {
 		// パーティクルグループが存在しない場合はエラーを出力して終了
 		assert("Specified particle group does not exist!");
@@ -274,14 +275,14 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 
 	newGroup.instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&newGroup.instancingDataPtr));
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
-		newGroup.instancingDataPtr[index].WVP = MakeIdentity4x4();
-		newGroup.instancingDataPtr[index].World = MakeIdentity4x4();
+		newGroup.instancingDataPtr[index].WVP = TuboEngine::Math::MakeIdentity4x4();
+		newGroup.instancingDataPtr[index].World = TuboEngine::Math::MakeIdentity4x4();
 	}
 
 	// インスタンシング用SRVを確保してSRVインデックスを記録
-	newGroup.instancingSrvIndex = SrvManager::GetInstance()->Allocate() + 1;
+	newGroup.instancingSrvIndex = TuboEngine::SrvManager::GetInstance()->Allocate() + 1;
 	// 作成したSRVをインスタンシング用リソースに設定
-	SrvManager::GetInstance()->CreateSRVForStructuredBuffer(newGroup.instancingSrvIndex, newGroup.instancingResource.Get(), kNumMaxInstance, sizeof(ParticleForGPU));
+	TuboEngine::SrvManager::GetInstance()->CreateSRVForStructuredBuffer(newGroup.instancingSrvIndex, newGroup.instancingResource.Get(), kNumMaxInstance, sizeof(ParticleForGPU));
 
 	// パーティクルグループをリストに追加
 	particleGroups.emplace(name, newGroup);
@@ -296,12 +297,42 @@ void Particle::CreateParticleGroup(const std::string& name, const std::string& t
 void Particle::CreateVertexData() {
 
 	//Texture
-	modelData_.vertices.push_back(VertexData{ .position = {1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f} });
-	modelData_.vertices.push_back(VertexData{ .position = {-1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f} });
-	modelData_.vertices.push_back(VertexData{ .position = {1.0f, -1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 1.0f}, .normal = {0.0f, 0.0f, 1.0f} });
-	modelData_.vertices.push_back(VertexData{ .position = {1.0f, -1.0f, 0.0f, 1.0f}, .texcoord = {0.0f, 1.0f}, .normal = {0.0f, 0.0f, 1.0f} });
-	modelData_.vertices.push_back(VertexData{ .position = {-1.0f, 1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 0.0f}, .normal = {0.0f, 0.0f, 1.0f} });
-	modelData_.vertices.push_back(VertexData{ .position = {-1.0f, -1.0f, 0.0f, 1.0f}, .texcoord = {1.0f, 1.0f}, .normal = {0.0f, 0.0f, 1.0f} });
+	modelData_.vertices.push_back(
+	    TuboEngine::VertexData{
+	        .position = {1.0f, 1.0f, 0.0f, 1.0f},
+              .texcoord = {0.0f, 0.0f},
+              .normal = {0.0f, 0.0f, 1.0f}
+    });
+	modelData_.vertices.push_back(
+	    TuboEngine::VertexData{
+	        .position = {-1.0f, 1.0f, 0.0f, 1.0f},
+              .texcoord = {1.0f, 0.0f},
+              .normal = {0.0f, 0.0f, 1.0f}
+    });
+	modelData_.vertices.push_back(
+	    TuboEngine::VertexData{
+	        .position = {1.0f, -1.0f, 0.0f, 1.0f},
+              .texcoord = {0.0f, 1.0f},
+              .normal = {0.0f, 0.0f, 1.0f}
+    });
+	modelData_.vertices.push_back(
+	    TuboEngine::VertexData{
+	        .position = {1.0f, -1.0f, 0.0f, 1.0f},
+              .texcoord = {0.0f, 1.0f},
+              .normal = {0.0f, 0.0f, 1.0f}
+    });
+	modelData_.vertices.push_back(
+	    TuboEngine::VertexData{
+	        .position = {-1.0f, 1.0f, 0.0f, 1.0f},
+              .texcoord = {1.0f, 0.0f},
+              .normal = {0.0f, 0.0f, 1.0f}
+    });
+	modelData_.vertices.push_back(
+	    TuboEngine::VertexData{
+	        .position = {-1.0f, -1.0f, 0.0f, 1.0f},
+              .texcoord = {1.0f, 1.0f},
+              .normal = {0.0f, 0.0f, 1.0f}
+    });
 
 
 }
@@ -372,19 +403,67 @@ void Particle::CreateVertexDataForCylinder() {
 
 
 		// position, texcoord, normal
-		modelData_.vertices.push_back(VertexData{ { -sin * kTopRadius, kHeight, cos * kTopRadius, 1.0f }, texcoordTop, { -sin, 0.0f, cos } });
-		modelData_.vertices.push_back(VertexData{ { -sinNext * kTopRadius, kHeight, cosNext * kTopRadius, 1.0f }, texcoordTopNext, { -sinNext, 0.0f, cosNext } });
-		modelData_.vertices.push_back(VertexData{ { -sinNext * kBottomRadius, 0.0f, cosNext * kBottomRadius, 1.0f }, texcoordBottomNext, { -sinNext, 0.0f, cosNext } });
-		modelData_.vertices.push_back(VertexData{ { -sin * kBottomRadius, 0.0f, cos * kBottomRadius, 1.0f },  texcoordBottom , { -sin, 0.0f, cos } });
-		modelData_.vertices.push_back(VertexData{ { -sin * kBottomRadius, 0.0f, cos * kBottomRadius, 1.0f },  texcoordBottom , { -sin, 0.0f, cos } });
-		modelData_.vertices.push_back(VertexData{ { -sinNext * kTopRadius, kHeight, cosNext * kTopRadius, 1.0f }, texcoordTopNext, { -sinNext, 0.0f, cosNext } });
+		modelData_.vertices.push_back(
+		    TuboEngine::VertexData{
+		        {-sin * kTopRadius, kHeight, cos * kTopRadius, 1.0f},
+                texcoordTop, {-sin, 0.0f, cos}
+        });
+		modelData_.vertices.push_back(
+		    TuboEngine::VertexData{
+		        {-sinNext * kTopRadius, kHeight, cosNext * kTopRadius, 1.0f},
+                texcoordTopNext, {-sinNext, 0.0f, cosNext}
+        });
+		modelData_.vertices.push_back(
+		    TuboEngine::VertexData{
+		        {-sinNext * kBottomRadius, 0.0f, cosNext * kBottomRadius, 1.0f},
+                texcoordBottomNext, {-sinNext, 0.0f, cosNext}
+        });
+		modelData_.vertices.push_back(
+		    TuboEngine::VertexData{
+		        {-sin * kBottomRadius, 0.0f, cos * kBottomRadius, 1.0f},
+                texcoordBottom, {-sin, 0.0f, cos}
+        });
+		modelData_.vertices.push_back(
+		    TuboEngine::VertexData{
+		        {-sin * kBottomRadius, 0.0f, cos * kBottomRadius, 1.0f},
+                texcoordBottom, {-sin, 0.0f, cos}
+        });
+		modelData_.vertices.push_back(
+		    TuboEngine::VertexData{
+		        {-sinNext * kTopRadius, kHeight, cosNext * kTopRadius, 1.0f},
+                texcoordTopNext, {-sinNext, 0.0f, cosNext}
+        });
 
-		modelData_.vertices.push_back(VertexData{ { -sin * kTopRadius, kHeight, cos * kTopRadius, 1.0f }, texcoordTop, { -sin, 0.0f, cos } });
-		modelData_.vertices.push_back(VertexData{ { -sinNext * kBottomRadius, 0.0f, cosNext * kBottomRadius, 1.0f }, texcoordBottomNext, { -sinNext, 0.0f, cosNext } });
-		modelData_.vertices.push_back(VertexData{ { -sin * kBottomRadius, 0.0f, cos * kBottomRadius, 1.0f }, texcoordBottom, { -sin, 0.0f, cos } });
-		modelData_.vertices.push_back(VertexData{ { -sinNext * kTopRadius, kHeight, cosNext * kTopRadius, 1.0f }, texcoordTopNext, { -sinNext, 0.0f, cosNext } });
-		modelData_.vertices.push_back(VertexData{ { -sin * kTopRadius, kHeight, cos * kTopRadius, 1.0f }, texcoordTop, { -sin, 0.0f, cos } });
-		modelData_.vertices.push_back(VertexData{ { -sinNext * kBottomRadius, 0.0f, cosNext * kBottomRadius, 1.0f }, texcoordBottomNext, { -sinNext, 0.0f, cosNext } });
+		modelData_.vertices.push_back(
+		    TuboEngine::VertexData{
+		        {-sin * kTopRadius, kHeight, cos * kTopRadius, 1.0f},
+                texcoordTop, {-sin, 0.0f, cos}
+        });
+		modelData_.vertices.push_back(
+		    TuboEngine::VertexData{
+		        {-sinNext * kBottomRadius, 0.0f, cosNext * kBottomRadius, 1.0f},
+                texcoordBottomNext, {-sinNext, 0.0f, cosNext}
+        });
+		modelData_.vertices.push_back(
+		    TuboEngine::VertexData{
+		        {-sin * kBottomRadius, 0.0f, cos * kBottomRadius, 1.0f},
+                texcoordBottom, {-sin, 0.0f, cos}
+        });
+		modelData_.vertices.push_back(
+		    TuboEngine::VertexData{
+		        {-sinNext * kTopRadius, kHeight, cosNext * kTopRadius, 1.0f},
+                texcoordTopNext, {-sinNext, 0.0f, cosNext}
+        });
+		modelData_.vertices.push_back(
+		    TuboEngine::VertexData{
+		        {-sin * kTopRadius, kHeight, cos * kTopRadius, 1.0f},
+                texcoordTop, {-sin, 0.0f, cos}
+        });
+		modelData_.vertices.push_back(
+		    TuboEngine::VertexData{
+		        {-sinNext * kBottomRadius, 0.0f, cosNext * kBottomRadius, 1.0f},
+                texcoordBottomNext, {-sinNext, 0.0f, cosNext}
+        });
 
 
 
@@ -413,15 +492,15 @@ void Particle::CreateVertexDataForOriginal() {
 /// </summary>
 void Particle::CreateVertexBufferView() {
 	// 頂点バッファの作成
-	vertexBuffer_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
+	vertexBuffer_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TuboEngine::VertexData) * modelData_.vertices.size());
 
 	// 頂点バッファビューの作成
 	// リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
 	// 使用するリソースのサイズは頂点のサイズ
-	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
+	vertexBufferView_.SizeInBytes = UINT(sizeof(TuboEngine::VertexData) * modelData_.vertices.size());
 	// 1頂点あたりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(VertexData);
+	vertexBufferView_.StrideInBytes = sizeof(TuboEngine::VertexData);
 }
 
 /// <summary>
@@ -429,14 +508,14 @@ void Particle::CreateVertexBufferView() {
 /// </summary>
 void Particle::CreateMaterialData() {
 	// マテリアル用のリソースを作成
-	materialBuffer_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(Material));
+	materialBuffer_ = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TuboEngine::Material));
 
 	// 書き込むためのアドレスを取得
 	materialBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	materialData_->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	// SpriteはLightingしないのfalseを設定する
 	materialData_->enableLighting = false;
-	materialData_->uvTransform = MakeIdentity4x4();
+	materialData_->uvTransform = TuboEngine::Math::MakeIdentity4x4();
 }
 
 /// <summary>
@@ -451,7 +530,7 @@ void Particle::CreateMaterialData() {
 /// <returns>新しいパーティクル情報</returns>
 /// 
 ParticleInfo
-    Particle::CreateNewParticle(std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
+    Particle::CreateNewParticle(std::mt19937& randomEngine, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
@@ -472,7 +551,7 @@ ParticleInfo
 }
 
 ParticleInfo Particle::CreateNewParticleForPrimitive(
-    std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
+    std::mt19937& randomEngine, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
@@ -500,7 +579,7 @@ ParticleInfo Particle::CreateNewParticleForPrimitive(
 }
 
 ParticleInfo
-    Particle::CreateNewParticleForRing(std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
+    Particle::CreateNewParticleForRing(std::mt19937& randomEngine, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
@@ -521,7 +600,7 @@ ParticleInfo
 }
 
 ParticleInfo Particle::CreateNewParticleForCylinder(
-    std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
+    std::mt19937& randomEngine, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 	// 新たなパーティクルの生成
 	ParticleInfo particle = {};
 
@@ -542,7 +621,7 @@ ParticleInfo Particle::CreateNewParticleForCylinder(
 }
 
 ParticleInfo Particle::CreateNewParticleForOriginal(
-    std::mt19937& randomEngine, const Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
+    std::mt19937& randomEngine, const TuboEngine::Transform& transform, TuboEngine::Math::Vector3 velocity, TuboEngine::Math::Vector4 color, float lifeTime, float currentTime) {
 	return ParticleInfo();
 }
 

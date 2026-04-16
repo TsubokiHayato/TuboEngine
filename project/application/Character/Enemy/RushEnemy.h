@@ -39,12 +39,12 @@ public:
 
 private:
     // --- Parameters ---
-    float baseMoveSpeed_ = 0.08f;      // 通常追跡速度 (少し遅く)
-    float rushSpeed_ = 0.30f;          // 突進速度 (やや抑制)
-    float rushTriggerDistance_ = 5.0f; // 突進開始距離
-    float rushDuration_ = 0.8f;        // 突進持続秒 (少し延長)
+    float baseMoveSpeed_ = 0.4f;      // 通常追跡速度 (少し遅く)
+    float rushSpeed_ = 0.70f;          // 突進速度 (やや抑制)
+    float rushTriggerDistance_ = 15.0f; // 突進開始距離 (少し広げる)
+    float rushDuration_ = 0.8f;        // 突進持続秒
     bool  isPreparing_ = false;        // 突進前ため状態
-    float prepareDuration_ = 0.9f;     // ため秒数 (延長)
+    float prepareDuration_ = 0.45f;     // ため秒数 (延長)
     float prepareTimer_ = 0.0f;        // 残りため時間
     float prepareMoveSpeed_ = 0.03f;   // ため中の前進速度 (遅く)
     bool  isRushing_ = false;          // 突進中フラグ
@@ -86,11 +86,21 @@ private:
     // プレビュー表示
     bool  showDashPreview_ = true;     // チャージ中に突進到達予測を表示
 
+    // ドリル用モデル
+    std::unique_ptr<TuboEngine::Object3d> drillObject_;
+    float drillRotation_ = 0.0f; // ドリル自転角度
+
+    // 新規演出用パーティクルエミッタ
+    IParticleEmitter* chargingEmitter_ = nullptr; // チャージ中
+    IParticleEmitter* trailEmitter_ = nullptr;    // 突進中トレイル
+
+
     TuboEngine::Math::Vector3 rushDir_{1.0f, 0.0f, 0.0f}; // 突進の固定進行方向
 
     // --- Helpers ---
     static float NormalizeAngle(float angle);
-	static void MoveWithCollision(TuboEngine::Math::Vector3& positionRef, const TuboEngine::Math::Vector3& desiredMove, MapChipField* field);
+    static void MoveWithCollision(TuboEngine::Math::Vector3& positionRef, const TuboEngine::Math::Vector3& desiredMove, MapChipField* field);
+    void UpdateDrillTransform();
 
     // Update helpers (readability)
     void UpdatePerceptionAndTimers(float dt, bool& canSeePlayer, float& distanceToPlayer);
