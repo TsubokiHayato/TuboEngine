@@ -1,18 +1,22 @@
 #pragma once
 #include "DirectXcommon.h"
+#include "WinApp.h"
 
 #include "Animation.h"
+#include "BlendMode.h"
 #include "CameraForGPU.h"
+#include "Material.h"
+#include "ModelData.h"
 #include "SkyBox.h"
 #include "Transform.h"
 #include "TransformationMatrix.h"
-#include "Model.h"
+#include "VertexData.h"
 // 前方宣言
 class Object3dCommon;
 class ModelCommon;
+class Model;
 class Camera;
 
-namespace TuboEngine {
 class Animator {
 public:
 	// 平行光源
@@ -121,11 +125,11 @@ public:
 		lightTypeData->type = type;
 	}
 
-	void SetModel(TuboEngine::Model* model);
+	void SetModel(Model* model);
 	void SetModel(const std::string& filePath);
 
-	void SetCamera(TuboEngine::Camera* camera) { this->camera = camera; }
-	TuboEngine::Camera* GetCamera() const { return camera; }
+	void SetCamera(Camera* camera) { this->camera = camera; }
+	Camera* GetCamera() const { return camera; }
 
 	void SetModelColor(const TuboEngine::Math::Vector4& color);
 
@@ -169,9 +173,9 @@ private:
 	// モデル共通部分
 	ModelCommon* modelCommon_ = nullptr;
 	// モデルデータ
-	TuboEngine::Model* model_ = nullptr;
+	Model* model_ = nullptr;
 	// カメラ
-	TuboEngine::Camera* camera = nullptr;
+	Camera* camera = nullptr;
 
 	// 座標のバッファリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformMatrixResource;
@@ -217,9 +221,8 @@ private:
 
 	// アニメーション
 
-	TuboEngine::Animation animation_; // アニメーションデータ
+	Animation animation_;           // アニメーションデータ
 	std::string animationNodeName_; // 再生するノード名
 	float animationTime_ = 0.0f;    // 再生時間
 	bool animationLoop_ = true;     // ループ再生
 };
-} // namespace TuboEngine

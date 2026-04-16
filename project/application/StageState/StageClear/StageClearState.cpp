@@ -48,11 +48,9 @@ void StageClearState::Enter(StageScene* scene) {
 	started_ = true;
 	timer_ = 0.0f;
 	lastFrameTime_ = std::chrono::steady_clock::now();
-	(void)scene; // 現状 Enter では scene を直接は使っていないため警告抑制
 }
 
 void StageClearState::Update(StageScene* scene) {
-	if (!scene) return;
 
 	// 経過時間計測（スローに関係なく実時間で進行）
 	{
@@ -72,12 +70,7 @@ void StageClearState::Update(StageScene* scene) {
 
 	// シーンチェンジアニメーション進行完了後、実際の遷移
 	if (scene->GetIsRequestSceneChange() && scene->GetSceneChangeAnimation()->IsFinished()) {
-		if (StageScene::isDemoMode) {
-			StageScene::isDemoMode = false;
-			SceneManager::GetInstance()->ChangeScene(TITLE);
-		} else {
-			SceneManager::GetInstance()->ChangeScene(SCENE::CLEAR);
-		}
+		SceneManager::GetInstance()->ChangeScene(SCENE::CLEAR);
 		scene->SetIsRequestSceneChange(false);
 	}
 
@@ -88,54 +81,62 @@ void StageClearState::Update(StageScene* scene) {
 	}
 
 	// 以降ワールド更新
-	if (auto* follow = scene->GetFollowCamera()) {
-		follow->Update();
-	}
+	scene->GetFollowCamera()->Update();
 
-	// SkyDome
-	if (auto* sky = scene->GetSkyDome().get()) {
-		if (auto* follow = scene->GetFollowCamera()) {
-			sky->SetCamera(follow->GetCamera());
-		}
-		sky->Update();
-	}
+	// スカイドーム
+	scene->GetSkyDome()->SetCamera(scene->GetFollowCamera()->GetCamera());
+	scene->GetSkyDome()->Update();
 
-	// ステージ（Tile/Block/Enemy）は StageManager 管理に統合
-	if (auto* stageMgr = scene->GetStageManager()) {
-		Player* player = scene->GetPlayer();
-		FollowTopDownCamera* follow = scene->GetFollowCamera();
-		stageMgr->Update(player, follow);
+	// タイル
+	std::unique_ptr<Tile>& tile_ = scene->GetTile();
+	tile_->SetCamera(scene->GetFollowCamera()->GetCamera());
+	tile_->Update();
+
+	// ブロック
+	std::vector<std::unique_ptr<Block>>& blocks_ = scene->GetBlocks();
+	for (auto& block : blocks_) {
+		block->SetCamera(scene->GetFollowCamera()->GetCamera());
+		block->Update();
 	}
 
 	// プレイヤー
-	if (auto* player = scene->GetPlayer()) {
-		player->Update();
+	scene->GetPlayer()->Update();
+
+	// 敵
+	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
+	for (auto& enemy : enemies) {
+		enemy->SetCamera(scene->GetFollowCamera()->GetCamera());
+		enemy->Update();
 	}
 }
 
 void StageClearState::Exit(StageScene* scene) {
-	(void)scene;
 	// State を抜けたらスロー解除
 	gSlowActive = false;
 }
 
 void StageClearState::Object3DDraw(StageScene* scene) {
-	if (!scene) return;
-
 	// 3Dオブジェクトの描画
-	if (auto* stageMgr = scene->GetStageManager()) {
-		stageMgr->Draw3D();
+	scene->GetSkyDome()->Draw();
+
+	std::unique_ptr<Tile>& tile_ = scene->GetTile();
+	tile_->Draw();
+
+	std::vector<std::unique_ptr<Block>>& blocks_ = scene->GetBlocks();
+	for (auto& block : blocks_) {
+		block->Draw();
 	}
-	if (auto* sky = scene->GetSkyDome().get()) {
-		sky->Draw();
-	}
-	if (auto* player = scene->GetPlayer()) {
-		player->Draw();
+
+	scene->GetPlayer()->Draw();
+
+	std::vector<std::unique_ptr<Enemy>>& enemies = scene->GetEnemies();
+	for (auto& enemy : enemies) {
+		enemy->Draw();
 	}
 }
 
-void StageClearState::SpriteDraw(StageScene* scene) { (void)scene; }
+void StageClearState::SpriteDraw(StageScene* scene) {}
 
-void StageClearState::ImGuiDraw(StageScene* scene) { (void)scene; }
+void StageClearState::ImGuiDraw(StageScene* scene) {}
 
-void StageClearState::ParticleDraw(StageScene* scene) { (void)scene; }
+void StageClearState::ParticleDraw(StageScene* scene) {}

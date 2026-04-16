@@ -1,9 +1,8 @@
 #include "Player.h"
-#include "PlayerAutoController.h" // 追加
 #include "Collider/CollisionTypeId.h"
 #include "ImGuiManager.h"
 #include "Input.h"
-#include "Effects/OrbitTrail/OrbitTrailEmitter.h"
+#include"Effects/OrbitTrail/OrbitTrailEmitter.h"
 #include "TextureManager.h"
 #include "engine/graphic/Particle/ParticleManager.h"
 #include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
@@ -14,9 +13,7 @@
 //--------------------------------------------------
 Player::Player()
     : cooldownTime(0.2f), damageCooldownTimer(0.0f), damageCooldownTime(1.0f), isDodging(false), dodgeTimer(0.0f), dodgeCooldownTimer(0.0f), dodgeDuration(0.2f), dodgeCooldown(1.0f), dodgeSpeed(0.5f),
-      dodgeDirection(0.0f, 0.0f, 0.0f) {
-    autoController_.Initialize(this);
-}
+      dodgeDirection(0.0f, 0.0f, 0.0f) {}
 
 //--------------------------------------------------
 // デストラクタ
@@ -134,26 +131,11 @@ void Player::Update() {
 	const bool wantCaptureMouse = false;
 #endif
 
-	// デモ用自動操作フラグがONのときは AI で移動・射撃を制御する
-    autoController_.Update(1.0f / 60.0f);
-
-	// 回転処理
-	if (!isMovementLocked) {
-		if (IsAutoControlEnabled()) {
-			// オート操作中: autoAimDir_ から回転を計算
-			TuboEngine::Math::Vector3 dir = autoAimDir_;
-			float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-			if (len > 0.0001f) {
-				dir.x /= len;
-				dir.y /= len;
-				// Rotate() と同じ式: atan2(aimDir.x, -aimDir.y)
-				float angle = std::atan2(dir.x, -dir.y);
-				rotation.z = 3.12f + angle;
-			}
-		} else if (!wantCaptureMouse) {
-			// 手動時は従来通りマウス方向
-			Rotate();
-		}
+	// Clear/Over等の演出シーンでは isMovementLocked=true で入力無効化される。
+	// そのときマウス位置参照の Rotate() を走らせると、意図しない方向を向いたり
+	// レティクルが更新されてしまうため、回転はシーン側が制御する。
+	if (!wantCaptureMouse && !isMovementLocked) {
+		Rotate();
 	}
 
 	if (!isMovementLocked) {
@@ -248,30 +230,36 @@ void Player::Update() {
 		}
 	}
 
+	// 低HP演出: HP割合が下がるほどビネットを強くする（常時）
+	// ※最大HPが固定(=5)ならこれでOK。将来可変なら getter を追加して置き換える。
+	constexpr float kMaxHpAssumed = 5.0f;
+	float hpRatio = (kMaxHpAssumed > 0.0f) ? (static_cast<float>(HP) / kMaxHpAssumed) : 1.0f;
+	hpRatio = std::clamp(hpRatio, 0.0f, 1.0f);
 
-}
-
-//--------------------------------------------------
-// 見た目だけ更新（ゲームロジックなし。Transition用）
-//--------------------------------------------------
-void Player::UpdateVisualOnly() {
-	object3d->SetPosition(position);
-	object3d->SetRotation(rotation);
-	object3d->SetScale(scale);
-	object3d->Update();
-
-	// Transition 等で Update() を回さない場合でも、移動に追従した演出を出す
-	if (trailEmitter_) {
-		trailEmitter_->GetPreset().center = position;
+	// 低HP開始ライン以下で 0→1 に正規化（HPが低いほど1に近い）
+	float t = 0.0f;
+	if (hpRatio < lowHpVignetteStartRatio_) {
+		float denom = std::max(0.0001f, lowHpVignetteStartRatio_);
+		t = (lowHpVignetteStartRatio_ - hpRatio) / denom;
 	}
-	if (dashRingEmitter_) {
-		TuboEngine::Math::Vector3 center = GetPosition();
-		if (camera_) {
-			TuboEngine::Math::Vector3 camRot = camera_->GetRotation();
-			TuboEngine::Math::Vector3 forward{std::cos(camRot.z), std::sin(camRot.z), 0.0f};
-			center = center + forward * dashRingOffsetForward_;
-		}
-		dashRingEmitter_->GetPreset().center = center;
+	t = std::clamp(t, 0.0f, 1.0f);
+	// 強めのカーブ（HP少ない時ほど急激に濃く）
+	float eased = t * t;
+	float targetPower = 0.8f + (lowHpVignetteMaxPower_ - 0.8f) * eased;
+
+	// なめらかに追従
+	if (lowHpVignetteSmoothing_ <= 0.0f) {
+		lowHpVignetteCurrentPower_ = targetPower;
+	} else {
+		float a = std::clamp(lowHpVignetteSmoothing_, 0.0f, 1.0f);
+		lowHpVignetteCurrentPower_ = lowHpVignetteCurrentPower_ + (targetPower - lowHpVignetteCurrentPower_) * a;
+	}
+
+	if (lowHpVignetteCurrentPower_ > 0.81f) {
+		OffScreenRendering::GetInstance()->SetLowHpVignetteEnabled(true);
+		OffScreenRendering::GetInstance()->SetLowHpVignettePower(lowHpVignetteCurrentPower_);
+	} else {
+		OffScreenRendering::GetInstance()->SetLowHpVignetteEnabled(false);
 	}
 }
 
@@ -279,23 +267,18 @@ void Player::UpdateVisualOnly() {
 // 弾を撃つ処理
 //--------------------------------------------------	
 void Player::Shoot() {
-	bool trigger = false;
-	if (IsAutoControlEnabled()) {
-		trigger = autoShoot_;
-	} else {
-		trigger = TuboEngine::Input::GetInstance()->IsPressMouse(0);
-	}
-
-	if (trigger && bulletTimer <= 0.0f) {
+	if (TuboEngine::Input::GetInstance()->IsPressMouse(0) && bulletTimer <= 0.0f) {
+		// プレイヤーの現在の回転(Z)から発射方向を作る（Rotateと一貫性を保つ）
+		float ang = rotation.z;
+		TuboEngine::Math::Vector3 dir{std::sin(ang), std::cos(ang), 0.0f};
 		// 発射
 		auto bullet = std::make_unique<PlayerBullet>();
+		bullet->Initialize(position);
 		bullet->SetPlayerRotation(rotation);
 		bullet->SetPlayerPosition(position);
 		bullet->SetMapChipField(mapChipField);
-		
-		// フィールドや回転を設定した後に初期化（Initialize内で速度が決まる）
-		bullet->Initialize(position);
-		
+		// 弾の速度をプレイヤー向きに設定
+		bullet->SetVelocity({dir.x * PlayerBullet::s_bulletSpeed, dir.y * PlayerBullet::s_bulletSpeed, dir.z * PlayerBullet::s_bulletSpeed});
 		bullets.push_back(std::move(bullet));
 		bulletTimer = cooldownTime;
 	}
@@ -324,76 +307,29 @@ void Player::Move() {
 				position = tryPosition;
 			}
 		}
-		// 回避中は速度を更新しておく（回避終了後の慣性のために）
-		velocity = dodgeDirection * dodgeSpeed;
 		return;
 	}
-
-	TuboEngine::Math::Vector3 moveInput = {0.0f, 0.0f, 0.0f};
-	// 入力取得
-	if (IsAutoControlEnabled()) {
-		moveInput = autoMoveDir_;
-	} else {
-		if (TuboEngine::Input::GetInstance()->PushKey(DIK_W)) moveInput.y -= 1.0f;
-		if (TuboEngine::Input::GetInstance()->PushKey(DIK_S)) moveInput.y += 1.0f;
-		if (TuboEngine::Input::GetInstance()->PushKey(DIK_A)) moveInput.x -= 1.0f;
-		if (TuboEngine::Input::GetInstance()->PushKey(DIK_D)) moveInput.x += 1.0f;
+	TuboEngine::Math::Vector3 prevPosition = position;
+	TuboEngine::Math::Vector3 moveDelta = {0.0f, 0.0f, 0.0f};
+	if (TuboEngine::Input::GetInstance()->PushKey(DIK_W)) {
+		moveDelta.y -= 0.1f;
 	}
-
-	// 入力の正規化
-	float inputLen = std::sqrt(moveInput.x * moveInput.x + moveInput.y * moveInput.y);
-	if (inputLen > 0.0f) {
-		moveInput.x /= inputLen;
-		moveInput.y /= inputLen;
+	if (TuboEngine::Input::GetInstance()->PushKey(DIK_S)) {
+		moveDelta.y += 0.1f;
 	}
-
-	// 戦車物理パラメータ
-	float acceleration = 0.015f; // 加速度
-	float friction = 0.92f;      // 摩擦（減衰率）
-	float maxSpeed = 0.15f;      // 最大速度
-
-	// 加速
-	velocity.x += moveInput.x * acceleration;
-	velocity.y += moveInput.y * acceleration;
-
-	// 摩擦（入力がない時にゆっくり止まる）
-	if (inputLen == 0.0f) {
-		velocity.x *= friction;
-		velocity.y *= friction;
+	if (TuboEngine::Input::GetInstance()->PushKey(DIK_A)) {
+		moveDelta.x -= 0.1f;
 	}
-
-	// 速度制限
-	float speed = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
-	if (speed > maxSpeed) {
-		velocity.x = (velocity.x / speed) * maxSpeed;
-		velocity.y = (velocity.y / speed) * maxSpeed;
+	if (TuboEngine::Input::GetInstance()->PushKey(DIK_D)) {
+		moveDelta.x += 0.1f;
 	}
-
-	// 衝突判定付きの位置更新
-	TuboEngine::Math::Vector3 tryPosition = position + velocity;
+	TuboEngine::Math::Vector3 tryPosition = position + moveDelta;
 	if (mapChipField) {
 		float playerWidth = scale.x * MapChipField::GetBlockWidth() - 0.1f;
 		float playerHeight = scale.y * MapChipField::GetBlockHeight() - 0.1f;
-		
-		// X方向の移動チェック
-		TuboEngine::Math::Vector3 tryX = position;
-		tryX.x += velocity.x;
-		if (!mapChipField->IsRectBlocked(tryX, playerWidth, playerHeight)) {
-			position.x = tryX.x;
-		} else {
-			velocity.x = 0.0f; // 壁に当たったら速度を殺す
+		if (!mapChipField->IsRectBlocked(tryPosition, playerWidth, playerHeight)) {
+			position = tryPosition;
 		}
-
-		// Y方向の移動チェック
-		TuboEngine::Math::Vector3 tryY = position;
-		tryY.y += velocity.y;
-		if (!mapChipField->IsRectBlocked(tryY, playerWidth, playerHeight)) {
-			position.y = tryY.y;
-		} else {
-			velocity.y = 0.0f; // 壁に当たったら速度を殺す
-		}
-	} else {
-		position = tryPosition;
 	}
 }
 
@@ -413,16 +349,6 @@ void Player::Rotate() {
 	int mouseY = static_cast<int>(TuboEngine::Input::GetInstance()->GetMousePosition().y);
 	reticlePosition = TuboEngine::Math::Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
 
-	if (IsAutoControlEnabled()) {
-		// 自動操作中は移動方向（あるいは敵方向）を向く
-		// autoMoveDir_ が 0 でなければ更新
-		if (autoMoveDir_.x != 0.0f || autoMoveDir_.y != 0.0f) {
-			float angle = std::atan2(autoMoveDir_.x, -autoMoveDir_.y);
-			rotation.z = 3.12f + angle;
-		}
-		return;
-	}
-
 	// レイキャストで算出した地面上ターゲット方向で回転を更新（斜め視点対応）
 	TuboEngine::Math::Vector3 aimDir = GetAimDirectionFromReticle();
 	// 反転補正を削除し、レティクル方向と一致させる
@@ -430,12 +356,9 @@ void Player::Rotate() {
 	rotation.z = 3.12f+angle;
 }
 
-void Player::ReticleDraw() {
-	if (reticleSprite) {
-		reticleSprite->Draw();
-	}
-}
- 
+
+void Player::ReticleDraw() { reticleSprite->Draw(); }
+
 //--------------------------------------------------
 // 当たり判定の中心座標を取得
 //--------------------------------------------------
@@ -575,6 +498,9 @@ void Player::UpdateDodge() {
 		}
 	}
 }
+
+// --- 回避可能か ---
+bool Player::CanDodge() const { return !isDodging && dodgeCooldownTimer <= 0.0f; }
 
 // --- 回避入力方向取得 ---
 TuboEngine::Math::Vector3 Player::GetDodgeInputDirection() const {
