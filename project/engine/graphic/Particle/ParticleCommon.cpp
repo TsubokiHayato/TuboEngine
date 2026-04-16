@@ -1,8 +1,7 @@
 #include "ParticleCommon.h"
 
-ParticleCommon* ParticleCommon::instance = nullptr; // シングルトンインスタンス
-void ParticleCommon::Initialize()
-{
+TuboEngine::ParticleCommon* TuboEngine::ParticleCommon::instance = nullptr; // シングルトンインスタンス
+void TuboEngine::ParticleCommon::Initialize() {
 	
 	// PSOの初期化
 	pso = std::make_unique<ParticlePSO>();
@@ -11,14 +10,13 @@ void ParticleCommon::Initialize()
 	
 
 }
-void ParticleCommon::Finalize() {
+void TuboEngine::ParticleCommon::Finalize() {
 	
 	delete instance;
 	instance = nullptr;
 	
 }
-void ParticleCommon::DrawSettingsCommon()
-{
+void TuboEngine::ParticleCommon::DrawSettingsCommon() {
 	// PSOの共通描画設定
 	pso->DrawSettingsCommon();
 
