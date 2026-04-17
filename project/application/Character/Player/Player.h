@@ -181,6 +181,7 @@ private:
 	int HP;           // プレイヤーのHP
 	bool isHit;       // プレイヤーがヒットしたかどうか
 	bool isAlive;      // プレイヤーの死亡状態
+	bool isInvincible_ = false; // 無敵状態フラグ
 
 	//Reticle
 
