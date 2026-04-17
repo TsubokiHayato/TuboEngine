@@ -17,6 +17,10 @@ public:
     void SetCamera(TuboEngine::Camera* camera);
     void SetInitialVelocity(const TuboEngine::Math::Vector3& vel) { velocity = vel; }
     void SetTargetOffset(const TuboEngine::Math::Vector3& offset) { targetOffset_ = offset; }
+    void SetSpeed(float speed) { speed_ = speed; }
+    void SetTurnSpeed(float turnSpeed) { turnSpeed_ = turnSpeed; }
+    void SetChaosAmplitude(float amp) { chaosAmplitude_ = amp; }
+    void SetChaosFrequency(float freq) { chaosFrequency_ = freq; }
 
     bool GetIsAlive() const { return isAlive; }
 
