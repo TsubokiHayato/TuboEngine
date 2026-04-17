@@ -6,9 +6,11 @@
 
 void CircusEnemy::Initialize() {
     Enemy::Initialize();
-    HP = 400; 
-    fireInterval_ = 6.0f;
-    missileCount_ = 32; 
+    HP = 800; // ボス的な扱いであればHP多めに
+    fireInterval_ = 4.0f;
+    missileCount_ = 32;
+    currentAttack_ = AttackType::Burst;
+    autoCycle_ = true;
     
     if (object3d) {
         object3d->SetModelColor({1.0f, 0.0f, 0.7f, 1.0f});
@@ -43,7 +45,10 @@ void CircusEnemy::Update() {
         }
     }
 
-    // 板野サーカス：一斉射撃（爆発的拡散）
+    // 攻撃サイクルの更新
+    UpdateAttackCycle(dt);
+
+    // 板野サーカス：各種攻撃実行
     TryFireMissiles(canSeePlayer, dt);
 
     // 基底クラス(Enemy)の更新
@@ -56,6 +61,22 @@ void CircusEnemy::Update() {
     bulletTimer_ = 0.0f;
 }
 
+void CircusEnemy::UpdateAttackCycle(float dt) {
+    if (!autoCycle_) return;
+
+    cycleTimer_ += dt;
+    if (cycleTimer_ >= kCycleInterval) {
+        cycleTimer_ = 0.0f;
+        
+        // 次の攻撃へ
+        int next = static_cast<int>(currentAttack_) + 1;
+        if (next > static_cast<int>(AttackType::Targeted)) {
+            next = 0;
+        }
+        currentAttack_ = static_cast<AttackType>(next);
+    }
+}
+
 void CircusEnemy::TryFireMissiles(bool canSeePlayer, float dt) {
     if (!player_) return;
 
@@ -64,18 +85,75 @@ void CircusEnemy::TryFireMissiles(bool canSeePlayer, float dt) {
         if (fireTimer_ >= fireInterval_) {
             fireTimer_ = 0.0f;
             ShowExclamation(2.0f);
-            
-            // 一気に全弾発射して爆発的な広がりを作る
-            for (int i = 0; i < missileCount_; ++i) {
-                FireSingleMissile();
-            }
+            ExecuteAttack(currentAttack_);
         }
     } else {
         fireTimer_ = std::max(0.0f, fireTimer_ - dt);
     }
 }
 
-void CircusEnemy::FireSingleMissile() {
+void CircusEnemy::ExecuteAttack(AttackType type) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
+
+    switch (type) {
+    case AttackType::Burst:
+        for (int i = 0; i < missileCount_; ++i) {
+            TuboEngine::Math::Vector3 dir;
+            dir.x = dist(gen) * 2.5f;
+            dir.y = dist(gen) * 2.5f;
+            dir.z = dist(gen) * 0.5f + 2.0f;
+            dir.Normalize();
+            FireSingleMissile(dir, 35.0f + dist(gen) * 15.0f);
+        }
+        break;
+
+    case AttackType::Spiral:
+        for (int i = 0; i < missileCount_; ++i) {
+            float angle = (2.0f * 3.14159f / missileCount_) * i + spiralAngle_;
+            TuboEngine::Math::Vector3 dir;
+            dir.x = std::cos(angle);
+            dir.y = std::sin(angle);
+            dir.z = 0.5f;
+            dir.Normalize();
+            FireSingleMissile(dir, 30.0f);
+        }
+        spiralAngle_ += 0.5f; // 次回用に角度をずらす
+        break;
+
+    case AttackType::Cross:
+        for (int i = 0; i < 4; ++i) {
+            float baseAngle = (3.14159f / 2.0f) * i;
+            for (int j = 0; j < missileCount_ / 4; ++j) {
+                float angle = baseAngle + dist(gen) * 0.2f;
+                TuboEngine::Math::Vector3 dir;
+                dir.x = std::cos(angle);
+                dir.y = std::sin(angle);
+                dir.z = 0.2f;
+                dir.Normalize();
+                FireSingleMissile(dir, 20.0f + j * 5.0f);
+            }
+        }
+        break;
+
+    case AttackType::Targeted: {
+        TuboEngine::Math::Vector3 toPlayer = player_->GetPosition() - position;
+        toPlayer.Normalize();
+        for (int i = 0; i < missileCount_; ++i) {
+            TuboEngine::Math::Vector3 dir = toPlayer;
+            dir.x += dist(gen) * 0.3f;
+            dir.y += dist(gen) * 0.3f;
+            dir.z += dist(gen) * 0.3f;
+            dir.Normalize();
+            FireSingleMissile(dir, 40.0f + dist(gen) * 10.0f);
+        }
+        break;
+    }
+    }
+}
+
+void CircusEnemy::FireSingleMissile(const TuboEngine::Math::Vector3& launchDir, float speed) {
     TuboEngine::Math::Vector3 startPos = position;
     startPos.z += 2.5f;
 
@@ -88,6 +166,12 @@ void CircusEnemy::FireSingleMissile() {
     bullet->SetCamera(camera_);
     bullet->Initialize(startPos);
     
+    // ImGuiからの調整値を反映
+    bullet->SetSpeed(bulletSpeed_);
+    bullet->SetTurnSpeed(bulletTurnSpeed_);
+    bullet->SetChaosAmplitude(bulletChaosAmp_);
+    bullet->SetChaosFrequency(bulletChaosFreq_);
+
     // Aroundモードならプレイヤーの周囲に目標地点をオフセット
     if (bulletMode_ == 1 && player_) {
         TuboEngine::Math::Vector3 offset;
@@ -97,15 +181,7 @@ void CircusEnemy::FireSingleMissile() {
         bullet->SetTargetOffset(offset);
     }
     
-    // 拡散方向をより劇的に
-    TuboEngine::Math::Vector3 initDir;
-    initDir.x = dist(gen) * 2.5f; 
-    initDir.y = dist(gen) * 2.5f; 
-    initDir.z = dist(gen) * 0.5f + 2.0f; 
-    
-    initDir.Normalize();
-    float launchSpeed = 35.0f + dist(gen) * 15.0f; // さらに爆発的な初速
-    bullet->SetInitialVelocity(initDir * launchSpeed);
+    bullet->SetInitialVelocity(launchDir * speed);
     
     bullets_.push_back(std::move(bullet));
 }
@@ -120,14 +196,35 @@ void CircusEnemy::Draw() {
 void CircusEnemy::DrawImGui() {
 #ifdef USE_IMGUI
     ImGui::Begin("CircusEnemy");
-    ImGui::Text("Remaining Missiles: %d", remainingMissiles_);
     
-    // 挙動モードの切り替え
-    const char* modes[] = { "Homing", "Around Player" };
-    ImGui::Combo("Bullet Mode", &bulletMode_, modes, IM_ARRAYSIZE(modes));
-    
-    ImGui::DragFloat("Fire Interval", &fireInterval_, 0.1f, 1.0f, 15.0f);
-    ImGui::DragInt("Missile Count", &missileCount_, 1, 1, 128);
+    if (ImGui::CollapsingHeader("Attack Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
+        const char* attackNames[] = { "Burst", "Spiral", "Cross", "Targeted" };
+        int currentType = static_cast<int>(currentAttack_);
+        if (ImGui::Combo("Attack Type", &currentType, attackNames, IM_ARRAYSIZE(attackNames))) {
+            currentAttack_ = static_cast<AttackType>(currentType);
+        }
+        ImGui::Checkbox("Auto Cycle Attacks", &autoCycle_);
+        ImGui::ProgressBar(cycleTimer_ / kCycleInterval, ImVec2(0.0f, 0.0f), "Cycle Timer");
+        
+        ImGui::Separator();
+        ImGui::DragFloat("Fire Interval", &fireInterval_, 0.1f, 0.5f, 15.0f);
+        ImGui::DragInt("Missile Count", &missileCount_, 1, 1, 128);
+        
+        const char* modes[] = { "Homing", "Around Player" };
+        ImGui::Combo("Bullet Mode", &bulletMode_, modes, IM_ARRAYSIZE(modes));
+    }
+
+    if (ImGui::CollapsingHeader("Bullet Tuning", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::DragFloat("Base Speed", &bulletSpeed_, 0.01f, 0.1f, 2.0f);
+        ImGui::DragFloat("Turn Speed", &bulletTurnSpeed_, 0.001f, 0.01f, 0.5f);
+        ImGui::DragFloat("Chaos Amplitude", &bulletChaosAmp_, 0.01f, 0.0f, 2.0f);
+        ImGui::DragFloat("Chaos Frequency", &bulletChaosFreq_, 0.1f, 0.0f, 20.0f);
+    }
+
+    if (ImGui::Button("Force Fire Now")) {
+        ExecuteAttack(currentAttack_);
+    }
+
     ImGui::End();
 #endif
 }
