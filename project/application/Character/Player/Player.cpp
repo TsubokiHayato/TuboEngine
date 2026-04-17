@@ -453,7 +453,7 @@ void Player::OnCollision(Collider* other) {
 		return;
 	}
 	uint32_t typeID = other->GetTypeID();
-	if (damageCooldownTimer <= 0.0f) {
+	if (damageCooldownTimer <= 0.0f && !isInvincible_) {
 		if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy)) {
 			HP -= 1;
 			isHit = true;
@@ -463,7 +463,7 @@ void Player::OnCollision(Collider* other) {
 			damageCooldownTimer = damageCooldownTime;
 		}
 	}
-	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
+	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon) && !isInvincible_) {
 		HP -= 1;
 		isHit = true;
 	}
@@ -480,6 +480,7 @@ void Player::DrawImGui() {
 	ImGui::Begin("Player");
 	ImGui::Text("HP: %d", HP);
 	ImGui::Text("IsHit: %s", isHit ? "Yes" : "No");
+	ImGui::Checkbox("Invincible", &isInvincible_);
 	ImGui::Separator();
 	ImGui::Text("Cooldown: %.2f / %.2f", bulletTimer, cooldownTime);
 	ImGui::Text("%s", (bulletTimer > 0.0f ? "Cooling Down" : "Ready"));
