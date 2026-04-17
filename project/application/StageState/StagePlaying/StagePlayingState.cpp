@@ -4,6 +4,7 @@
 #include "Input.h"
 #include "TextureManager.h"
 #include "WinApp.h"
+#include"Character/Enemy/CircusEnemy.h"
 #include <cmath>
 
 namespace {
@@ -249,6 +250,18 @@ void StagePlayingState::ImGuiDraw(StageScene* scene) {
 		scene->GetPlayer()->DrawImGui();
 	}
 #endif
+	StageManager* stageMgr = scene->GetStageManager();
+	// CircusEnemy の ImGui 
+	if (stageMgr) {
+		const auto& insts = stageMgr->GetStageInstances();
+		for (const auto& inst : insts) {
+			for (const auto& e : inst.enemies) {
+				if (auto* circus = dynamic_cast<CircusEnemy*>(e.get())) {
+					circus->DrawImGui();
+				}
+			}
+		}
+	}
 
 	// Enemy/Block ImGui は StageManager 側のインスタンスを対象にする
 	if (auto* stageMgr = scene->GetStageManager()) {
