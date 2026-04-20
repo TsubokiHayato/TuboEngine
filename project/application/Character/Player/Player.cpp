@@ -123,6 +123,7 @@ void Player::Update() {
 		object3d->SetPosition(position);
 		object3d->SetRotation(rotation);
 		object3d->SetScale(scale);
+     SetModelAlpha(1.0f);
 		object3d->Update();
 		return;
 	} // 死亡状態なら更新しない
@@ -193,6 +194,19 @@ void Player::Update() {
 
 	// 被弾フラグは既存仕様通りこのタイミングで落とす
 	isHit = false;
+
+ // 被弾クールダウン中は点滅（アルファ変化）
+	if (damageCooldownTimer > 0.0f) {
+       damageBlinkTime_ += 1.0f / 60.0f;
+		// 0.08秒周期で点滅（分かりやすめ）
+		constexpr float kBlinkPeriod = 0.08f;
+		float phase = std::fmod(damageBlinkTime_, kBlinkPeriod) / kBlinkPeriod;
+		float alpha = (phase < 0.5f) ? 0.15f : 1.0f;
+		SetModelAlpha(alpha);
+	} else {
+        damageBlinkTime_ = 0.0f;
+		SetModelAlpha(1.0f);
+	}
 
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
@@ -452,20 +466,24 @@ void Player::OnCollision(Collider* other) {
 	if (isDodging) {
 		return;
 	}
-	uint32_t typeID = other->GetTypeID();
-	if (damageCooldownTimer <= 0.0f && !isInvincible_) {
-		if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy)) {
-			HP -= 1;
-			isHit = true;
-			damageCooldownTimer = damageCooldownTime;
-		} else if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
-			isHit = true;
-			damageCooldownTimer = damageCooldownTime;
-		}
+   if (!other) {
+		return;
 	}
-	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon) && !isInvincible_) {
+	uint32_t typeID = other->GetTypeID();
+    if (isInvincible_) {
+		return;
+	}
+
+	// ダメージはクールダウン中に重ね掛けしない（多段ヒット対策）
+	if (damageCooldownTimer > 0.0f) {
+		return;
+	}
+
+	if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy) ||
+		typeID == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
 		HP -= 1;
 		isHit = true;
+		damageCooldownTimer = damageCooldownTime;
 	}
 }
 
