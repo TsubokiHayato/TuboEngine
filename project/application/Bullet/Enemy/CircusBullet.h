@@ -21,6 +21,7 @@ public:
     void SetTurnSpeed(float turnSpeed) { turnSpeed_ = turnSpeed; }
     void SetChaosAmplitude(float amp) { chaosAmplitude_ = amp; }
     void SetChaosFrequency(float freq) { chaosFrequency_ = freq; }
+    void SetPhase1Duration(float duration) { phase1Duration_ = duration; }
 
     bool GetIsAlive() const { return isAlive; }
 
@@ -38,4 +39,5 @@ private:
     TuboEngine::Math::Vector3 swerveOffset_{0, 0, 0};
     TuboEngine::Math::Vector3 targetOffset_{0, 0, 0};
     class IParticleEmitter* trailEmitter_ = nullptr;
+    class IParticleEmitter* explosionEmitter_ = nullptr;
 };
