@@ -46,6 +46,7 @@ private:
     float bulletTurnSpeed_ = 0.08f;
     float bulletChaosAmp_ = 0.4f;
     float bulletChaosFreq_ = 5.0f;
+    float bulletPhase1Duration_ = 0.4f;
 
     // スパイラル攻撃用
     float spiralAngle_ = 0.0f;
