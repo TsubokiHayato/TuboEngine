@@ -40,4 +40,5 @@ private:
     TuboEngine::Math::Vector3 targetOffset_{0, 0, 0};
     class IParticleEmitter* trailEmitter_ = nullptr;
     class IParticleEmitter* explosionEmitter_ = nullptr;
+    class IParticleEmitter* burnerEmitter_ = nullptr;
 };
