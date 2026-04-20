@@ -3,6 +3,7 @@
 #include "ImguiManager.h"
 #include <cmath>
 #include <random>
+#include "engine/graphic/Particle/ParticleManager.h"
 
 void CircusEnemy::Initialize() {
     Enemy::Initialize();
@@ -15,10 +16,67 @@ void CircusEnemy::Initialize() {
     if (object3d) {
         object3d->SetModelColor({1.0f, 0.0f, 0.7f, 1.0f});
     }
+
+    chargeEmitter_ = TuboEngine::ParticleManager::GetInstance()->Find("CircusCharge");
+    if (!chargeEmitter_) {
+        ParticlePreset p{};
+        p.name = "CircusCharge";
+        p.texture = "gradationLine.png"; 
+        p.maxInstances = 20;
+        p.autoEmit = false;
+        p.lifeMin = 0.5f;
+        p.lifeMax = 0.8f;
+        p.scaleStart = {4.0f, 4.0f, 1.0f}; // 大きなリング
+        p.scaleEnd = {0.0f, 0.0f, 1.0f};   // 小さく収縮する
+        p.colorStart = {1.0f, 0.2f, 0.8f, 0.0f};
+        p.colorEnd = {1.0f, 0.5f, 1.0f, 0.8f};
+        chargeEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitterByType("Ring", p);
+    }
+
+    muzzleFlashEmitter_ = TuboEngine::ParticleManager::GetInstance()->Find("CircusMuzzleFlash");
+    if (!muzzleFlashEmitter_) {
+        ParticlePreset p{};
+        p.name = "CircusMuzzleFlash";
+        p.texture = "circle.png"; 
+        p.maxInstances = 400;
+        p.autoEmit = false;
+        p.lifeMin = 0.2f;
+        p.lifeMax = 0.5f;
+        p.scaleStart = {2.0f, 2.0f, 2.0f};
+        p.scaleEnd = {0.0f, 0.0f, 0.0f};
+        p.colorStart = {1.0f, 1.0f, 1.0f, 1.0f}; // 白い煙
+        p.colorEnd = {0.8f, 0.8f, 0.8f, 0.0f};
+        p.velMin = {-3.0f, -3.0f, -0.5f};
+        p.velMax = {3.0f, 3.0f, 4.0f};
+        muzzleFlashEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitterByType("Primitive", p);
+    }
+
+    // ボス用巨大HPバーのスプライト初期化
+    bossHpFrameSprite_ = std::make_unique<TuboEngine::Sprite>();
+    bossHpFrameSprite_->Initialize("HpBarFrame.png");
+    bossHpFrameSprite_->SetSize({600.0f, 32.0f});
+    bossHpFrameSprite_->SetPosition({640.0f, 60.0f});   // 画面上部中央 (1280x720前提)
+    bossHpFrameSprite_->SetAnchorPoint({0.5f, 0.5f});
+    
+    bossHpBarSprite_ = std::make_unique<TuboEngine::Sprite>();
+    bossHpBarSprite_->Initialize("Hp.png");
+    bossHpBarSprite_->SetAnchorPoint({0.0f, 0.5f});     // 左から伸縮するように左端アンカー
+    bossHpBarSprite_->SetPosition({640.0f - 300.0f, 60.0f}); // 中央から半幅引いた位置
+    bossHpBarSprite_->SetSize({600.0f, 32.0f});
+    bossHpBarSprite_->SetColor({1.0f, 0.0f, 0.2f, 1.0f}); // ボスらしく赤紫系に
 }
 
 void CircusEnemy::Update() {
     const float dt = 1.0f / 60.0f;
+
+    // ボスHPバーの更新
+    if (bossHpFrameSprite_) bossHpFrameSprite_->Update();
+    if (bossHpBarSprite_) {
+        float hpRatio = static_cast<float>(HP) / 800.0f; // InitializeでHP=800としているため
+        hpRatio = std::max(0.0f, hpRatio);
+        bossHpBarSprite_->SetSize({600.0f * hpRatio, 32.0f});
+        bossHpBarSprite_->Update();
+    }
 
     if (isDying_) {
         for (auto& b : bullets_) {
@@ -82,13 +140,34 @@ void CircusEnemy::TryFireMissiles(bool canSeePlayer, float dt) {
 
     if (canSeePlayer) {
         fireTimer_ += dt;
+        
+        // 発射の1秒前にチャージエフェクトを出す
+        if (fireTimer_ >= fireInterval_ - 1.0f && !isCharging_) {
+            isCharging_ = true;
+            if (chargeEmitter_) {
+                chargeEmitter_->GetPreset().center = position + TuboEngine::Math::Vector3{0.0f, 0.0f, 2.5f};
+                chargeEmitter_->Emit(3); // リングを数個重ねて吸い込み感を出す
+            }
+        }
+
         if (fireTimer_ >= fireInterval_) {
             fireTimer_ = 0.0f;
+            isCharging_ = false; // チャージ状態リセット
             ShowExclamation(2.0f);
+            
+            // マズルフラッシュ（激しい排煙）エフェクト
+            if (muzzleFlashEmitter_) {
+                muzzleFlashEmitter_->GetPreset().center = position + TuboEngine::Math::Vector3{0.0f, 0.0f, 2.5f};
+                muzzleFlashEmitter_->Emit(60);
+            }
+            
             ExecuteAttack(currentAttack_);
         }
     } else {
         fireTimer_ = std::max(0.0f, fireTimer_ - dt);
+        if (fireTimer_ < fireInterval_ - 1.0f) {
+            isCharging_ = false; // 見失ってチャージがキャンセルされたらリセット
+        }
     }
 }
 
@@ -192,6 +271,13 @@ void CircusEnemy::Draw() {
     for (auto& b : bullets_) {
         if (b) b->Draw();
     }
+}
+
+void CircusEnemy::DrawSprite() {
+    if (!isAlive) return;
+    
+    if (bossHpFrameSprite_) bossHpFrameSprite_->Draw();
+    if (bossHpBarSprite_) bossHpBarSprite_->Draw();
 }
 
 void CircusEnemy::DrawImGui() {
