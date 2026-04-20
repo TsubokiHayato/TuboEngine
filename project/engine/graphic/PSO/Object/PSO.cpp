@@ -160,7 +160,8 @@ void PSO::CreateGraphicPipeline() {
 	//すべての色要素を書き込む
 	blendDesc.RenderTarget[0].RenderTargetWriteMask =
 		D3D12_COLOR_WRITE_ENABLE_ALL;
-	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+   // デフォルトは不透明描画（ブレンド無効）
+	blendDesc.RenderTarget[0].BlendEnable = FALSE;
 	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
 	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
