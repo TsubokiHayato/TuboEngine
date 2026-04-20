@@ -444,7 +444,7 @@ void StageManager::Draw3D() {
             data.WVP = matrixData->WVP;
             data.World = matrixData->World;
 
-            // --- Radial Synthwave Wave ---
+          
             TuboEngine::Math::Vector3 center = {
                 (inst.boundsWorld.left + inst.boundsWorld.right) * 0.5f,
                 (inst.boundsWorld.bottom + inst.boundsWorld.top) * 0.5f,
