@@ -209,6 +209,9 @@ private:
 	float dashPostEffectDuration_ = 0.25f;
 	float dashRadialBlurPower_ = 0.06f; // 0.02がデフォルトなので少し強め
 
+	// 被弾点滅用
+	float damageBlinkTime_ = 0.0f;
+
 	PlayerAutoController autoController_; // 自動操作用
 
 private:
