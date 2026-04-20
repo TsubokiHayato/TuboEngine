@@ -12,11 +12,19 @@ public:
     void Initialize() override;
     void Update() override;
     void Draw() override;
+    void DrawSprite();
     void DrawImGui();
 
 private:
     void TryFireMissiles(bool canSeePlayer, float dt);
     void FireSingleMissile(const TuboEngine::Math::Vector3& launchDir, float speed);
+
+    bool isCharging_ = false;
+    class IParticleEmitter* chargeEmitter_ = nullptr;
+    class IParticleEmitter* muzzleFlashEmitter_ = nullptr;
+
+    std::unique_ptr<TuboEngine::Sprite> bossHpFrameSprite_;
+    std::unique_ptr<TuboEngine::Sprite> bossHpBarSprite_;
 
 private:
     enum class AttackType {
