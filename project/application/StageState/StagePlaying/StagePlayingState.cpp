@@ -218,13 +218,16 @@ void StagePlayingState::SpriteDraw(StageScene* scene) {
 		player->ReticleDraw();
 	}
 
-	// ラッシュエネミーのスプライト (Stage Manager 管理分)
+	// ラッシュエネミー等のスプライト (Stage Manager 管理分)
 	if (stageMgr) {
 		const auto& insts = stageMgr->GetStageInstances();
 		for (const auto& inst : insts) {
 			for (const auto& e : inst.enemies) {
 				if (auto* rush = dynamic_cast<RushEnemy*>(e.get())) {
 					rush->DrawSprite();
+				}
+				if (auto* circus = dynamic_cast<CircusEnemy*>(e.get())) {
+					circus->DrawSprite();
 				}
 			}
 		}

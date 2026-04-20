@@ -64,6 +64,24 @@ void CircusBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
         explosionEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitterByType("Primitive", p);
     }
 
+    burnerEmitter_ = TuboEngine::ParticleManager::GetInstance()->Find("CircusSharedBurner");
+    if (!burnerEmitter_) {
+        ParticlePreset p{};
+        p.name = "CircusSharedBurner";
+        p.texture = "circle.png"; 
+        p.maxInstances = 2000;
+        p.autoEmit = false;
+        p.lifeMin = 0.05f;
+        p.lifeMax = 0.12f; // 短命な炎
+        p.scaleStart = {0.4f, 0.4f, 0.4f};
+        p.scaleEnd = {0.0f, 0.0f, 0.0f};
+        p.colorStart = {1.0f, 0.8f, 0.2f, 1.0f}; // 強烈な黄色～オレンジ
+        p.colorEnd = {1.0f, 0.2f, 0.0f, 0.0f};   // 赤くなって消える
+        p.velMin = {-0.1f, -0.1f, -0.1f};
+        p.velMax = {0.1f, 0.1f, 0.1f};
+        burnerEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitterByType("Default", p);
+    }
+
     object3d = std::make_unique<TuboEngine::Object3d>();
     object3d->Initialize("block/block.obj");
     object3d->SetPosition(position);
@@ -120,10 +138,18 @@ void CircusBullet::Update() {
     }
     position += velocity * kFixedDeltaTime;
 
-    // トレイル（煙）の発生
-    if (trailEmitter_ && isAlive) {
-        trailEmitter_->GetPreset().center = position;
-        trailEmitter_->Emit(1);
+    // トレイル（煙）とバーナー（推進器の炎）の発生
+    if (isAlive) {
+        if (trailEmitter_) {
+            trailEmitter_->GetPreset().center = position;
+            trailEmitter_->Emit(1);
+        }
+        if (burnerEmitter_ && velocity.LengthSquared() > 0.001f) {
+            // ミサイルの進行方向の逆側に少しずらして炎を吹かせる
+            TuboEngine::Math::Vector3 backDir = TuboEngine::Math::Vector3::Normalize(velocity) * -0.5f; 
+            burnerEmitter_->GetPreset().center = position + backDir;
+            burnerEmitter_->Emit(1);
+        }
     }
 
     // プレイヤー直撃判定
