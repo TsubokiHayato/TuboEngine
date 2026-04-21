@@ -22,6 +22,7 @@ public:
     void SetChaosAmplitude(float amp) { chaosAmplitude_ = amp; }
     void SetChaosFrequency(float freq) { chaosFrequency_ = freq; }
     void SetPhase1Duration(float duration) { phase1Duration_ = duration; }
+    void SetTargetDelayFrames(int delayFrames) { targetDelayFrames_ = delayFrames; }
 
     bool GetIsAlive() const { return isAlive; }
 
@@ -35,6 +36,7 @@ private:
     float chaosFrequency_ = 5.0f;
     float phase1Duration_ = 0.5f;
     float elapsedTime_ = 0.0f;
+    int targetDelayFrames_ = 25;
 
     TuboEngine::Math::Vector3 swerveOffset_{0, 0, 0};
     TuboEngine::Math::Vector3 targetOffset_{0, 0, 0};
