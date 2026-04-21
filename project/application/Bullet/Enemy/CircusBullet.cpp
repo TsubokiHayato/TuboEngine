@@ -113,7 +113,7 @@ void CircusBullet::Update() {
         velocity.z *= 0.94f;
     } else if (player_) {
         // タメが終わったら一気に加速＆ホーミングを開始
-        TuboEngine::Math::Vector3 targetPos = player_->GetCenterPosition() + targetOffset_;
+        TuboEngine::Math::Vector3 targetPos = player_->GetPastCenterPosition(targetDelayFrames_) + targetOffset_;
         TuboEngine::Math::Vector3 toTarget = targetPos - position;
         
         TuboEngine::Math::Vector3 targetDir = TuboEngine::Math::Vector3::Normalize(toTarget);
