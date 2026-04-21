@@ -262,7 +262,12 @@ void Player::Update() {
 		}
 	}
 
-
+	// 履歴追加
+	positionHistory_.push_back(GetCenterPosition());
+	const size_t maxHistoryCount = 180;
+	if (positionHistory_.size() > maxHistoryCount) {
+		positionHistory_.pop_front();
+	}
 }
 
 //--------------------------------------------------
@@ -287,6 +292,20 @@ void Player::UpdateVisualOnly() {
 		}
 		dashRingEmitter_->GetPreset().center = center;
 	}
+}
+
+TuboEngine::Math::Vector3 Player::GetPastCenterPosition(int delayFrames) const {
+	if (positionHistory_.empty()) {
+		return GetCenterPosition(); // 履歴がない場合は現在位置
+	}
+	if (delayFrames < 0) {
+		delayFrames = 0;
+	}
+	int index = static_cast<int>(positionHistory_.size()) - 1 - delayFrames;
+	if (index < 0) {
+		index = 0; // 足りない場合は一番古いものを返す
+	}
+	return positionHistory_[index];
 }
 
 //--------------------------------------------------

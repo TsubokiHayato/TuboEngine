@@ -55,6 +55,7 @@ private:
     float bulletChaosAmp_ = 0.4f;
     float bulletChaosFreq_ = 5.0f;
     float bulletPhase1Duration_ = 0.4f;
+    int bulletTargetDelayFrames_ = 25; // ターゲットの遅延フレーム数
 
     // スパイラル攻撃用
     float spiralAngle_ = 0.0f;
