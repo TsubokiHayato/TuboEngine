@@ -11,6 +11,8 @@
 // 前方宣言（ヘッダ依存軽減）
 class IParticleEmitter;
 
+#include <deque>
+
 ///--------------------------------------------------
 // プレイヤークラス
 ///--------------------------------------------------
@@ -37,6 +39,9 @@ public:
 	void OnCollision(Collider* other) override;
 	// 当たり判定の中心座標を取得のオーバーライド
 	TuboEngine::Math::Vector3 GetCenterPosition() const override;
+
+	// 過去の中心座標を取得
+	TuboEngine::Math::Vector3 GetPastCenterPosition(int delayFrames) const;
 
 	// ImGuiの描画処理
 	void DrawImGui();
@@ -195,6 +200,7 @@ private:
 	IParticleEmitter* trailEmitter_ = nullptr; // ParticleManager生成管理。解放はマネージャに委譲
 	TuboEngine::Math::Vector3 prevPositionTrail_{};              // 前フレーム位置
 	IParticleEmitter* dashRingEmitter_ = nullptr;
+	std::deque<TuboEngine::Math::Vector3> positionHistory_; // 中心の位置履歴
 	bool wasDashingPrev_ = false;
 	bool isDashing_ = false; // 既存のダッシュ状態に置き換え可
 	TuboEngine::Camera* camera_ = nullptr; // 位置/方向参照用
