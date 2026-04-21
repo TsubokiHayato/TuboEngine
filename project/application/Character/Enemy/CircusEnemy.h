@@ -25,6 +25,31 @@ private:
 
     std::unique_ptr<TuboEngine::Sprite> bossHpFrameSprite_;
     std::unique_ptr<TuboEngine::Sprite> bossHpBarSprite_;
+    std::unique_ptr<TuboEngine::Sprite> bossHpBarBgSprite_; // 遅延用の背景バー
+
+    // HPのUIパーティクル
+    struct SimpleUIParticle {
+        std::unique_ptr<TuboEngine::Sprite> sprite;
+        TuboEngine::Math::Vector2 position;
+        TuboEngine::Math::Vector2 velocity;
+        float life = 0.0f;
+        float maxLife = 1.0f;
+        TuboEngine::Math::Vector4 color;
+        bool active = false;
+    };
+    std::vector<SimpleUIParticle> hpParticles_;
+    void EmitHpParticle(const TuboEngine::Math::Vector2& pos);
+    void UpdateHpParticles(float dt);
+    void DrawHpParticles();
+
+    float animatedHp_ = 350.0f; // Initialize()で上書きされるが念のため
+    float hpParticleTimer_ = 0.0f;
+
+    // ImGuiでの微調整用パラメータ
+    TuboEngine::Math::Vector2 hpFrameOffset_ = {0.0f, 0.0f};
+    TuboEngine::Math::Vector2 hpBarOffset_ = {0.0f, 0.0f};
+    TuboEngine::Math::Vector2 hpBarSizeBase_ = {600.0f, 32.0f};
+    TuboEngine::Math::Vector2 hpFrameSizeBase_ = {600.0f, 32.0f};
 
 private:
     enum class AttackType {
@@ -56,6 +81,8 @@ private:
     float bulletChaosFreq_ = 5.0f;
     float bulletPhase1Duration_ = 0.4f;
     int bulletTargetDelayFrames_ = 25; // ターゲットの遅延フレーム数
+
+    int maxHp_ = 100; // ボスの最大HP
 
     // スパイラル攻撃用
     float spiralAngle_ = 0.0f;
