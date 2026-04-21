@@ -7,7 +7,10 @@
 
 void CircusEnemy::Initialize() {
     Enemy::Initialize();
-    HP = 800; // ボス的な扱いであればHP多めに
+    maxHp_ = 100; // HPを800から350程度に低下（調整可能）
+    HP = maxHp_;
+    animatedHp_ = static_cast<float>(maxHp_);
+
     fireInterval_ = 4.0f;
     missileCount_ = 32;
     currentAttack_ = AttackType::Burst;
@@ -54,29 +57,97 @@ void CircusEnemy::Initialize() {
     // ボス用巨大HPバーのスプライト初期化
     bossHpFrameSprite_ = std::make_unique<TuboEngine::Sprite>();
     bossHpFrameSprite_->Initialize("HpBarFrame.png");
-    bossHpFrameSprite_->SetSize({600.0f, 32.0f});
+    bossHpFrameSprite_->SetSize(hpFrameSizeBase_);
     bossHpFrameSprite_->SetPosition({640.0f, 60.0f});   // 画面上部中央 (1280x720前提)
     bossHpFrameSprite_->SetAnchorPoint({0.5f, 0.5f});
-    
+
+    // 背景の遅延用バー（被弾時に現れる）
+    bossHpBarBgSprite_ = std::make_unique<TuboEngine::Sprite>();
+    bossHpBarBgSprite_->Initialize("Hp.png");
+    bossHpBarBgSprite_->SetAnchorPoint({0.0f, 0.5f});
+    bossHpBarBgSprite_->SetPosition({640.0f - 300.0f, 60.0f});
+    bossHpBarBgSprite_->SetSize({600.0f, 32.0f});
+    bossHpBarBgSprite_->SetColor({1.0f, 0.8f, 0.0f, 1.0f}); // 黄色など
+
     bossHpBarSprite_ = std::make_unique<TuboEngine::Sprite>();
     bossHpBarSprite_->Initialize("Hp.png");
     bossHpBarSprite_->SetAnchorPoint({0.0f, 0.5f});     // 左から伸縮するように左端アンカー
     bossHpBarSprite_->SetPosition({640.0f - 300.0f, 60.0f}); // 中央から半幅引いた位置
     bossHpBarSprite_->SetSize({600.0f, 32.0f});
     bossHpBarSprite_->SetColor({1.0f, 0.0f, 0.2f, 1.0f}); // ボスらしく赤紫系に
+
+    // UIパーティクルプールの初期化
+    hpParticles_.clear();
+    for (int i = 0; i < 40; ++i) {
+        SimpleUIParticle p;
+        p.sprite = std::make_unique<TuboEngine::Sprite>();
+        p.sprite->Initialize("circle.png");
+        p.sprite->SetSize({8.0f, 8.0f});
+        p.sprite->SetAnchorPoint({0.5f, 0.5f});
+        p.active = false;
+        hpParticles_.push_back(std::move(p));
+    }
 }
 
 void CircusEnemy::Update() {
     const float dt = 1.0f / 60.0f;
 
     // ボスHPバーの更新
-    if (bossHpFrameSprite_) bossHpFrameSprite_->Update();
+    // 基準位置
+    float baseX = 640.0f;
+    float baseY = 60.0f;
+
+    // Frameの位置とサイズ
+    if (bossHpFrameSprite_) {
+        bossHpFrameSprite_->SetPosition({baseX + hpFrameOffset_.x, baseY + hpFrameOffset_.y});
+        bossHpFrameSprite_->SetSize(hpFrameSizeBase_);
+        bossHpFrameSprite_->Update();
+    }
+
+    // Barの基準（左端座標）
+    float barLeftX = baseX - hpBarSizeBase_.x * 0.5f + hpBarOffset_.x;
+    float barY = baseY + hpBarOffset_.y;
+
+    float hpRatio = static_cast<float>(HP) / static_cast<float>(maxHp_); 
+    hpRatio = std::clamp(hpRatio, 0.0f, 1.0f);
+
+    // HP減少時のアニメーション＆パーティクル処理
+    if (animatedHp_ > static_cast<float>(HP)) {
+        animatedHp_ -= static_cast<float>(maxHp_) * 0.5f * dt; // 1秒で最大値の50%分減る
+        if (animatedHp_ < static_cast<float>(HP)) animatedHp_ = static_cast<float>(HP);
+
+        // パーティクルの発生
+        hpParticleTimer_ += dt;
+        if (hpParticleTimer_ > 0.03f) { // 細かく放出
+            hpParticleTimer_ = 0.0f;
+            float animRatio = animatedHp_ / static_cast<float>(maxHp_);
+            TuboEngine::Math::Vector2 emitPos = {barLeftX + hpBarSizeBase_.x * animRatio, barY};
+            EmitHpParticle(emitPos); // 右端から出す
+            EmitHpParticle(emitPos); // 追加で出す
+        }
+    } else {
+        animatedHp_ = static_cast<float>(HP); // 回復した場合などはぱっと合わせる
+    }
+
+    float animatedHpRatio = animatedHp_ / static_cast<float>(maxHp_);
+    animatedHpRatio = std::clamp(animatedHpRatio, 0.0f, 1.0f);
+
+    if (bossHpBarBgSprite_) {
+        // 背景（遅延バー）は animatedHp_ を反映
+        bossHpBarBgSprite_->SetPosition({barLeftX, barY});
+        bossHpBarBgSprite_->SetSize({hpBarSizeBase_.x * animatedHpRatio, hpBarSizeBase_.y});
+        bossHpBarBgSprite_->Update();
+    }
+
     if (bossHpBarSprite_) {
-        float hpRatio = static_cast<float>(HP) / 800.0f; // InitializeでHP=800としているため
-        hpRatio = std::max(0.0f, hpRatio);
-        bossHpBarSprite_->SetSize({600.0f * hpRatio, 32.0f});
+        // 赤バー（本体）は現在の HP を反映
+        bossHpBarSprite_->SetPosition({barLeftX, barY});
+        bossHpBarSprite_->SetSize({hpBarSizeBase_.x * hpRatio, hpBarSizeBase_.y});
         bossHpBarSprite_->Update();
     }
+
+    // UIパーティクル更新
+    UpdateHpParticles(dt);
 
     if (isDying_) {
         for (auto& b : bullets_) {
@@ -117,6 +188,63 @@ void CircusEnemy::Update() {
         bullet->SetIsAlive(false); 
     }
     bulletTimer_ = 0.0f;
+}
+
+void CircusEnemy::EmitHpParticle(const TuboEngine::Math::Vector2& pos) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
+    std::uniform_real_distribution<float> angleDist(0.0f, 3.14159f * 2.0f);
+
+    for (auto& p : hpParticles_) {
+        if (!p.active) {
+            p.active = true;
+            // 右端から出るのでランダムに少し上下に散らす
+            p.position = {pos.x, pos.y + dist(gen) * 16.0f}; 
+            float angle = angleDist(gen);
+            // 速度（飛び散る早さ）
+            float speed = 50.0f + std::abs(dist(gen)) * 100.0f;
+            // UI上の座標系は下が+Yなので、上方向への重力成分や拡散
+            p.velocity = {std::cos(angle) * speed, std::sin(angle) * speed - 50.0f}; 
+            p.life = 0.3f + std::abs(dist(gen)) * 0.3f;
+            p.maxLife = p.life;
+            // キラキラした黄色〜赤色
+            p.color = {1.0f, 0.4f + std::abs(dist(gen)) * 0.6f, 0.0f, 1.0f};
+            p.sprite->SetColor(p.color);
+            break;
+        }
+    }
+}
+
+void CircusEnemy::UpdateHpParticles(float dt) {
+    for (auto& p : hpParticles_) {
+        if (p.active) {
+            p.life -= dt;
+            if (p.life <= 0.0f) {
+                p.active = false;
+            } else {
+                p.position.x += p.velocity.x * dt;
+                p.position.y += p.velocity.y * dt;
+                // アルファフェード
+                float alpha = p.life / p.maxLife;
+                TuboEngine::Math::Vector4 c = p.color;
+                c.w = alpha;
+                // 重力（下方向＝Y+に少し落ちる）
+                p.velocity.y += 150.0f * dt; 
+                p.sprite->SetColor(c);
+                p.sprite->SetPosition(p.position);
+                p.sprite->Update();
+            }
+        }
+    }
+}
+
+void CircusEnemy::DrawHpParticles() {
+    for (auto& p : hpParticles_) {
+        if (p.active) {
+            p.sprite->Draw();
+        }
+    }
 }
 
 void CircusEnemy::UpdateAttackCycle(float dt) {
@@ -276,9 +404,11 @@ void CircusEnemy::Draw() {
 
 void CircusEnemy::DrawSprite() {
     if (!isAlive) return;
-    
+
     if (bossHpFrameSprite_) bossHpFrameSprite_->Draw();
+    if (bossHpBarBgSprite_) bossHpBarBgSprite_->Draw(); // 遅れて減るバーを追加
     if (bossHpBarSprite_) bossHpBarSprite_->Draw();
+    DrawHpParticles();
 }
 
 void CircusEnemy::DrawImGui() {
@@ -309,6 +439,19 @@ void CircusEnemy::DrawImGui() {
         ImGui::DragFloat("Chaos Frequency", &bulletChaosFreq_, 0.1f, 0.0f, 20.0f);
         ImGui::DragFloat("Delay (Phase1)", &bulletPhase1Duration_, 0.05f, 0.0f, 2.0f);
         ImGui::DragInt("Target Delay Frames", &bulletTargetDelayFrames_, 1, 0, 180, "%d frames");
+    }
+
+    if (ImGui::CollapsingHeader("HP UI Tuning", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::DragFloat2("Frame Offset", &hpFrameOffset_.x, 1.0f);
+        ImGui::DragFloat2("Frame Size", &hpFrameSizeBase_.x, 1.0f);
+        ImGui::DragFloat2("Bar Offset", &hpBarOffset_.x, 1.0f);
+        ImGui::DragFloat2("Bar Size", &hpBarSizeBase_.x, 1.0f);
+
+        if (ImGui::Button("Test Damage (-50 HP)")) {
+            HP -= 50;
+            if (HP < 0) HP = 0;
+            bulletTimer_ = 0.0f; // 更新のため
+        }
     }
 
     if (ImGui::Button("Force Fire Now")) {
