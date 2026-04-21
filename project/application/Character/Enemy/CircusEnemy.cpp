@@ -251,6 +251,7 @@ void CircusEnemy::FireSingleMissile(const TuboEngine::Math::Vector3& launchDir, 
     bullet->SetChaosAmplitude(bulletChaosAmp_);
     bullet->SetChaosFrequency(bulletChaosFreq_);
     bullet->SetPhase1Duration(bulletPhase1Duration_);
+    bullet->SetTargetDelayFrames(bulletTargetDelayFrames_); // ★追加
 
     // Aroundモードならプレイヤーの周囲に目標地点をオフセット
     if (bulletMode_ == 1 && player_) {
@@ -307,6 +308,7 @@ void CircusEnemy::DrawImGui() {
         ImGui::DragFloat("Chaos Amplitude", &bulletChaosAmp_, 0.01f, 0.0f, 2.0f);
         ImGui::DragFloat("Chaos Frequency", &bulletChaosFreq_, 0.1f, 0.0f, 20.0f);
         ImGui::DragFloat("Delay (Phase1)", &bulletPhase1Duration_, 0.05f, 0.0f, 2.0f);
+        ImGui::DragInt("Target Delay Frames", &bulletTargetDelayFrames_, 1, 0, 180, "%d frames");
     }
 
     if (ImGui::Button("Force Fire Now")) {
