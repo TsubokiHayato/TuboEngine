@@ -22,6 +22,13 @@ private:
     bool isCharging_ = false;
     class IParticleEmitter* chargeEmitter_ = nullptr;
     class IParticleEmitter* muzzleFlashEmitter_ = nullptr;
+    class IParticleEmitter* auraEmitter_ = nullptr;
+    class IParticleEmitter* explosionEmitter_ = nullptr; // 死亡時の連鎖大爆発用
+
+    // 死亡演出用
+    float deathTimer_ = 0.0f;
+    float nextExplosionTime_ = 0.0f;
+    bool isDying_ = false; 
 
     std::unique_ptr<TuboEngine::Sprite> bossHpFrameSprite_;
     std::unique_ptr<TuboEngine::Sprite> bossHpBarSprite_;
