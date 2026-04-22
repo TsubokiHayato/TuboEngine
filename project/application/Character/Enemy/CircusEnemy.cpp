@@ -94,21 +94,19 @@ void CircusEnemy::Initialize() {
     bossHpFrameSprite_ = std::make_unique<TuboEngine::Sprite>();
     bossHpFrameSprite_->Initialize("HpBarFrame.png");
     bossHpFrameSprite_->SetSize(hpFrameSizeBase_);
-    bossHpFrameSprite_->SetPosition({640.0f, 60.0f});   // 画面上部中央 (1280x720前提)
-    bossHpFrameSprite_->SetAnchorPoint({0.5f, 0.5f});
+    // Frame用のアンカーを左端(0.0)に統一する（ズレる原因を排除）
+    bossHpFrameSprite_->SetAnchorPoint({0.0f, 0.5f});
 
     // 背景の遅延用バー（被弾時に現れる）
     bossHpBarBgSprite_ = std::make_unique<TuboEngine::Sprite>();
     bossHpBarBgSprite_->Initialize("Hp.png");
     bossHpBarBgSprite_->SetAnchorPoint({0.0f, 0.5f});
-    bossHpBarBgSprite_->SetPosition({640.0f - 300.0f, 60.0f});
     bossHpBarBgSprite_->SetSize({600.0f, 32.0f});
     bossHpBarBgSprite_->SetColor({1.0f, 0.8f, 0.0f, 1.0f}); // 黄色など
 
     bossHpBarSprite_ = std::make_unique<TuboEngine::Sprite>();
     bossHpBarSprite_->Initialize("Hp.png");
-    bossHpBarSprite_->SetAnchorPoint({0.0f, 0.5f});     // 左から伸縮するように左端アンカー
-    bossHpBarSprite_->SetPosition({640.0f - 300.0f, 60.0f}); // 中央から半幅引いた位置
+    bossHpBarSprite_->SetAnchorPoint({0.0f, 0.5f});     // 左端アンカー
     bossHpBarSprite_->SetSize({600.0f, 32.0f});
     bossHpBarSprite_->SetColor({1.0f, 0.0f, 0.2f, 1.0f}); // ボスらしく赤紫系に
 
@@ -129,19 +127,23 @@ void CircusEnemy::Update() {
     const float dt = 1.0f / 60.0f;
 
     // ボスHPバーの更新
-    // 基準位置
+    // 基準位置 (1280x720の画面中央ベース)
     float baseX = 640.0f;
     float baseY = 60.0f;
 
-    // Frameの位置とサイズ
+    // サイズに基づいて左端(LeftX)を揃える
+    float frameLeftX = baseX - hpFrameSizeBase_.x * 0.5f + hpFrameOffset_.x;
+    float barLeftX = baseX - hpBarSizeBase_.x * 0.5f + hpBarOffset_.x;
+
+    // Frameの位置とサイズ (Anchorが0.0, 0.5になったのでLeftXを指定)
     if (bossHpFrameSprite_) {
-        bossHpFrameSprite_->SetPosition({baseX + hpFrameOffset_.x, baseY + hpFrameOffset_.y});
+        bossHpFrameSprite_->SetPosition({frameLeftX, baseY + hpFrameOffset_.y});
         bossHpFrameSprite_->SetSize(hpFrameSizeBase_);
         bossHpFrameSprite_->Update();
     }
 
-    // Barの基準（左端座標）
-    float barLeftX = baseX - hpBarSizeBase_.x * 0.5f + hpBarOffset_.x;
+    // Barの基準（左端座標は同じく計算済み）
+    // float barLeftX = baseX - hpBarSizeBase_.x * 0.5f + hpBarOffset_.x; // (上で計算)
     float barY = baseY + hpBarOffset_.y;
 
     float hpRatio = static_cast<float>(HP) / static_cast<float>(maxHp_); 
@@ -263,6 +265,7 @@ void CircusEnemy::Update() {
             (*it)->Update();
             ++it;
         } else {
+
             it = bullets_.erase(it);
         }
     }
@@ -270,6 +273,7 @@ void CircusEnemy::Update() {
     // 攻撃サイクルの更新
     UpdateAttackCycle(dt);
 
+    // 板野サーカス：各種攻撃実行
     // 板野サーカス：各種攻撃実行
     TryFireMissiles(canSeePlayer, dt);
 
@@ -359,11 +363,15 @@ void CircusEnemy::UpdateAttackCycle(float dt) {
 void CircusEnemy::TryFireMissiles(bool canSeePlayer, float dt) {
     if (!player_) return;
 
+    bool isEnraged = (HP <= maxHp_ / 2);
+    // 怒り時は発射間隔（クールダウン）が短くなる
+    float actualFireInterval = isEnraged ? fireInterval_ * 0.7f : fireInterval_;
+
     if (canSeePlayer) {
         fireTimer_ += dt;
-        
+
         // 発射の1秒前にチャージエフェクトを出す
-        if (fireTimer_ >= fireInterval_ - 1.0f && !isCharging_) {
+        if (fireTimer_ >= actualFireInterval - 1.0f && !isCharging_) {
             isCharging_ = true;
             if (chargeEmitter_) {
                 chargeEmitter_->GetPreset().center = position + TuboEngine::Math::Vector3{0.0f, 0.0f, 2.5f};
@@ -371,22 +379,22 @@ void CircusEnemy::TryFireMissiles(bool canSeePlayer, float dt) {
             }
         }
 
-        if (fireTimer_ >= fireInterval_) {
+        if (fireTimer_ >= actualFireInterval) {
             fireTimer_ = 0.0f;
             isCharging_ = false; // チャージ状態リセット
             ShowExclamation(2.0f);
-            
+
             // マズルフラッシュ（激しい排煙）エフェクト
             if (muzzleFlashEmitter_) {
                 muzzleFlashEmitter_->GetPreset().center = position + TuboEngine::Math::Vector3{0.0f, 0.0f, 2.5f};
                 muzzleFlashEmitter_->Emit(60);
             }
-            
+
             ExecuteAttack(currentAttack_);
         }
     } else {
         fireTimer_ = std::max(0.0f, fireTimer_ - dt);
-        if (fireTimer_ < fireInterval_ - 1.0f) {
+        if (fireTimer_ < actualFireInterval - 1.0f) {
             isCharging_ = false; // 見失ってチャージがキャンセルされたらリセット
         }
     }
@@ -397,9 +405,13 @@ void CircusEnemy::ExecuteAttack(AttackType type) {
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
 
+    bool isEnraged = (HP <= maxHp_ / 2);
+    // 怒り時は発射弾数が1.5倍に増える
+    int actualMissileCount = isEnraged ? static_cast<int>(missileCount_ * 1.5f) : missileCount_;
+
     switch (type) {
     case AttackType::Burst:
-        for (int i = 0; i < missileCount_; ++i) {
+        for (int i = 0; i < actualMissileCount; ++i) {
             TuboEngine::Math::Vector3 dir;
             dir.x = dist(gen) * 2.5f;
             dir.y = dist(gen) * 2.5f;
@@ -410,8 +422,8 @@ void CircusEnemy::ExecuteAttack(AttackType type) {
         break;
 
     case AttackType::Spiral:
-        for (int i = 0; i < missileCount_; ++i) {
-            float angle = (2.0f * 3.14159f / missileCount_) * i + spiralAngle_;
+        for (int i = 0; i < actualMissileCount; ++i) {
+            float angle = (2.0f * 3.14159f / actualMissileCount) * i + spiralAngle_;
             TuboEngine::Math::Vector3 dir;
             dir.x = std::cos(angle);
             dir.y = std::sin(angle);
@@ -425,7 +437,7 @@ void CircusEnemy::ExecuteAttack(AttackType type) {
     case AttackType::Cross:
         for (int i = 0; i < 4; ++i) {
             float baseAngle = (3.14159f / 2.0f) * i;
-            for (int j = 0; j < missileCount_ / 4; ++j) {
+            for (int j = 0; j < actualMissileCount / 4; ++j) {
                 float angle = baseAngle + dist(gen) * 0.2f;
                 TuboEngine::Math::Vector3 dir;
                 dir.x = std::cos(angle);
@@ -440,7 +452,7 @@ void CircusEnemy::ExecuteAttack(AttackType type) {
     case AttackType::Targeted: {
         TuboEngine::Math::Vector3 toPlayer = player_->GetPosition() - position;
         toPlayer.Normalize();
-        for (int i = 0; i < missileCount_; ++i) {
+        for (int i = 0; i < actualMissileCount; ++i) {
             TuboEngine::Math::Vector3 dir = toPlayer;
             dir.x += dist(gen) * 0.3f;
             dir.y += dist(gen) * 0.3f;
@@ -465,10 +477,15 @@ void CircusEnemy::FireSingleMissile(const TuboEngine::Math::Vector3& launchDir, 
     bullet->SetPlayer(player_);
     bullet->SetCamera(camera_);
     bullet->Initialize(startPos);
-    
+
+    // 怒り時は弾のスピードなどが上がる
+    bool isEnraged = (HP <= maxHp_ / 2);
+    float actualSpeed = isEnraged ? bulletSpeed_ * 1.3f : bulletSpeed_;
+    float actualTurnSpeed = isEnraged ? bulletTurnSpeed_ * 1.3f : bulletTurnSpeed_;
+
     // ImGuiからの調整値を反映
-    bullet->SetSpeed(bulletSpeed_);
-    bullet->SetTurnSpeed(bulletTurnSpeed_);
+    bullet->SetSpeed(actualSpeed);
+    bullet->SetTurnSpeed(actualTurnSpeed);
     bullet->SetChaosAmplitude(bulletChaosAmp_);
     bullet->SetChaosFrequency(bulletChaosFreq_);
     bullet->SetPhase1Duration(bulletPhase1Duration_);

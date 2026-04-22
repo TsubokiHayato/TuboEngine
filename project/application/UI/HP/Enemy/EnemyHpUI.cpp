@@ -32,7 +32,20 @@ void EnemyHpUI::Update(const std::vector<Enemy*>& enemies, TuboEngine::Camera* c
     bars_.resize(enemies.size());
     for (size_t i = 0; i < enemies.size(); ++i) {
         Enemy* e = enemies[i];
-        if (!e || !e->GetIsAlive()) { bars_[i].visible = false; continue; }
+
+        // --- 変更箇所 ---
+        // CircusEnemy (ボス) の場合は専用の巨大UIがあるため、
+        // 敵の頭上の小さな連なるHPUIは表示しないようにスキップする
+        bool isBoss = false;
+        if (e->GetMaxHP() >= 300) { // CircusEnemyはMaxHP350など大きいと想定
+            isBoss = true;
+        }
+        if (!e || !e->GetIsAlive() || isBoss) { 
+            bars_[i].visible = false; 
+            continue; 
+        }
+        // ----------------
+
         int maxHp = e->GetMaxHP(); if (maxHp <= 0) { bars_[i].visible = false; continue; }
         int currentHp = std::clamp(e->GetHP(), 0, maxHp);
         EnemyBar& bar = bars_[i];
