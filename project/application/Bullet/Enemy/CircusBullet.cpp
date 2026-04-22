@@ -82,6 +82,25 @@ void CircusBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
         burnerEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitterByType("Default", p);
     }
 
+    sparkEmitter_ = TuboEngine::ParticleManager::GetInstance()->Find("CircusSharedSpark");
+    if (!sparkEmitter_) {
+        ParticlePreset p{};
+        p.name = "CircusSharedSpark";
+        p.texture = "circle.png"; 
+        p.maxInstances = 4000;
+        p.autoEmit = false;
+        p.lifeMin = 0.3f;
+        p.lifeMax = 0.6f;
+        p.scaleStart = {0.2f, 0.2f, 0.2f};
+        p.scaleEnd = {0.0f, 0.0f, 0.0f};
+        p.colorStart = {1.0f, 0.9f, 0.5f, 1.0f}; // キラキラした黄色
+        p.colorEnd = {1.0f, 0.2f, 0.0f, 0.0f};
+        // 重力がないかもあるのでベロシティで下へ散らす
+        p.velMin = {-1.0f, -1.0f, -4.0f}; 
+        p.velMax = {1.0f, 1.0f, -1.0f};
+        sparkEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitterByType("Default", p);
+    }
+
     object3d = std::make_unique<TuboEngine::Object3d>();
     object3d->Initialize("block/block.obj");
     object3d->SetPosition(position);
@@ -149,6 +168,10 @@ void CircusBullet::Update() {
             TuboEngine::Math::Vector3 backDir = TuboEngine::Math::Vector3::Normalize(velocity) * -0.5f; 
             burnerEmitter_->GetPreset().center = position + backDir;
             burnerEmitter_->Emit(1);
+        }
+        if (sparkEmitter_ && velocity.LengthSquared() > 10.0f) {
+            sparkEmitter_->GetPreset().center = position;
+            sparkEmitter_->Emit(1);
         }
     }
 
