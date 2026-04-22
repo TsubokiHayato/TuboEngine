@@ -66,6 +66,9 @@ public:
     );
     void RemoveText(TextObject* text);
 
+    // 全てのテキストを削除（シーン遷移時などに呼ぶ）
+    void ClearAllTexts();
+
     // JSON レイアウトのロード/セーブ
     bool LoadTextLayout(const std::string& filePath);
     bool SaveTextLayout(const std::string& filePath) const;
