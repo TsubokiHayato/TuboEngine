@@ -60,7 +60,7 @@ private:
 
 private:
     enum class AttackType {
-        Burst,      // 既存の一斉射撃
+        Burst,      // 一斉射撃
         Spiral,     // 回転しながら発射
         Cross,      // 十字方向に発射
         Targeted    // プレイヤーを狙って発射
@@ -73,7 +73,7 @@ private:
     std::vector<std::unique_ptr<CircusBullet>> bullets_;
     float fireTimer_ = 0.0f;
     float fireInterval_ = 5.0f;
-    int missileCount_ = 32;
+    int missileCount_ = 24;
     int bulletMode_ = 0; // 0: Homing, 1: Around Player
     
     AttackType currentAttack_ = AttackType::Burst;
