@@ -74,7 +74,23 @@ void OverScene::Initialize() {
 
 	//TextManager
 	TuboEngine::TextManager::GetInstance()->Initialize();
-	TuboEngine::TextManager::GetInstance()->LoadTextLayout("GameOver.json");
+	if (!TuboEngine::TextManager::GetInstance()->LoadTextLayout("Resources/Text/GameOver.json")) {
+		// もしファイルが無ければデフォルトで作成する
+		auto* font = TuboEngine::TextManager::GetInstance()->GetOrCreateFontSized(TuboEngine::TextManager::PresetFontNames::Best10, 48.0f);
+		if (font) {
+			auto* textObj = TuboEngine::TextManager::GetInstance()->CreateText(
+				TuboEngine::TextManager::PresetFontNames::Best10 + "_48",
+				"Push SPACE to Return Stage",
+				{ 640.0f, 550.0f },
+				{ 1.0f, 1.0f, 1.0f, 1.0f },
+				1.0f
+			);
+			if (textObj) {
+				textObj->SetHorizontalAlign(1); // 1 = Center
+				textObj->SetVerticalAlign(1);   // 1 = Middle
+			}
+		}
+	}
 }
 void OverScene::Update() {
 
@@ -141,6 +157,8 @@ void OverScene::Finalize() {
 	// ポストエフェクト設定
 	OffScreenRendering::GetInstance()->SetVHSEffect(false);
 
+	// 次のシーンへ行く前に、テキストをすべてリセット（クリア）して持ち越さないようにする
+	TuboEngine::TextManager::GetInstance()->ClearAllTexts();
 }
 
 void OverScene::Object3DDraw() { player->Draw(); }
