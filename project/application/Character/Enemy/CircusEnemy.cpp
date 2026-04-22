@@ -54,6 +54,42 @@ void CircusEnemy::Initialize() {
         muzzleFlashEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitterByType("Primitive", p);
     }
 
+    auraEmitter_ = TuboEngine::ParticleManager::GetInstance()->Find("CircusEnemyAura");
+    if (!auraEmitter_) {
+        ParticlePreset p{};
+        p.name = "CircusEnemyAura";
+        p.texture = "circle.png";
+        p.maxInstances = 500;
+        p.autoEmit = false;
+        p.lifeMin = 0.4f;
+        p.lifeMax = 0.8f;
+        p.scaleStart = {0.8f, 0.8f, 0.8f};
+        p.scaleEnd = {0.1f, 0.1f, 0.1f};
+        p.colorStart = {1.0f, 0.0f, 0.0f, 0.8f};
+        p.colorEnd = {0.5f, 0.0f, 1.0f, 0.0f};
+        p.velMin = {-1.5f, -1.5f, 1.0f};
+        p.velMax = {1.5f, 1.5f, 4.0f};
+        auraEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitterByType("Default", p);
+    }
+
+    explosionEmitter_ = TuboEngine::ParticleManager::GetInstance()->Find("CircusEnemyExplosion");
+    if (!explosionEmitter_) {
+        ParticlePreset p{};
+        p.name = "CircusEnemyExplosion";
+        p.texture = "circle.png";
+        p.maxInstances = 400;
+        p.autoEmit = false;
+        p.lifeMin = 0.5f;
+        p.lifeMax = 1.0f;
+        p.scaleStart = {3.0f, 3.0f, 3.0f};
+        p.scaleEnd = {0.0f, 0.0f, 0.0f};
+        p.colorStart = {1.0f, 0.5f, 0.0f, 1.0f};
+        p.colorEnd = {1.0f, 0.0f, 0.0f, 0.0f};
+        p.velMin = {-3.0f, -3.0f, -3.0f};
+        p.velMax = {3.0f, 3.0f, 3.0f};
+        explosionEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitterByType("Primitive", p);
+    }
+
     // ボス用巨大HPバーのスプライト初期化
     bossHpFrameSprite_ = std::make_unique<TuboEngine::Sprite>();
     bossHpFrameSprite_->Initialize("HpBarFrame.png");
@@ -149,17 +185,74 @@ void CircusEnemy::Update() {
     // UIパーティクル更新
     UpdateHpParticles(dt);
 
+    // デスフラグのトリガー
+    if (HP <= 0 && !isDying_) {
+        isDying_ = true;
+        deathTimer_ = 3.0f; // 3秒かけて爆発
+        nextExplosionTime_ = 0.0f;
+    }
+
     if (isDying_) {
         for (auto& b : bullets_) {
-            if (b) b->Update();
+            if (b && b->GetIsAlive()) b->Update();
         }
+
+        deathTimer_ -= dt;
+        nextExplosionTime_ -= dt;
+
+        // 連鎖小爆発
+        if (nextExplosionTime_ <= 0.0f) {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_real_distribution<float> dist(-2.0f, 2.0f);
+
+            if (explosionEmitter_) {
+                TuboEngine::Math::Vector3 expPos = position;
+                expPos.x += dist(gen);
+                expPos.y += dist(gen);
+                expPos.z += dist(gen) + 2.0f; // 腰から頭あたり
+                explosionEmitter_->GetPreset().center = expPos;
+                explosionEmitter_->Emit(10);
+            }
+            std::uniform_real_distribution<float> timeDist(0.05f, 0.25f);
+            nextExplosionTime_ = timeDist(gen);
+        }
+
+        // 最後に大爆発して消える
+        if (deathTimer_ <= 0.0f) {
+            if (explosionEmitter_) {
+                explosionEmitter_->GetPreset().center = position;
+                explosionEmitter_->GetPreset().scaleStart = {12.0f, 12.0f, 12.0f};
+                explosionEmitter_->Emit(80);
+                explosionEmitter_->GetPreset().scaleStart = {3.0f, 3.0f, 3.0f}; // 元に戻す
+            }
+            isAlive = false;
+        }
+
         Enemy::Update();
         return;
     }
 
-    if (!isAlive || HP <= 0) {
+    if (!isAlive) {
         Enemy::Update();
         return;
+    }
+
+    // 激怒オーラ (HPが半分以下になったら常時発生)
+    if (HP <= maxHp_ / 2) {
+        if (auraEmitter_) {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_real_distribution<float> dist(-1.5f, 1.5f);
+
+            TuboEngine::Math::Vector3 auraPos = position;
+            auraPos.x += dist(gen);
+            auraPos.y += dist(gen);
+            auraPos.z += std::abs(dist(gen)) * 1.5f + 1.0f;
+
+            auraEmitter_->GetPreset().center = auraPos;
+            auraEmitter_->Emit(2); // 毎フレーム少しずつ
+        }
     }
 
     bool canSeePlayer = CanSeePlayer();
