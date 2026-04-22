@@ -43,4 +43,5 @@ private:
     class IParticleEmitter* trailEmitter_ = nullptr;
     class IParticleEmitter* explosionEmitter_ = nullptr;
     class IParticleEmitter* burnerEmitter_ = nullptr;
+    class IParticleEmitter* sparkEmitter_ = nullptr; // 追加：火花エミッター
 };
