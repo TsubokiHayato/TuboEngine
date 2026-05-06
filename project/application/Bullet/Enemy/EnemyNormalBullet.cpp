@@ -40,6 +40,7 @@ void EnemyNormalBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
 
     object3d = std::make_unique<TuboEngine::Object3d>();
     object3d->Initialize("star.obj");
+    object3d->SetLightType(5);
     object3d->SetPosition(position);
     object3d->SetRotation(rotation);
     object3d->SetScale(scale);
