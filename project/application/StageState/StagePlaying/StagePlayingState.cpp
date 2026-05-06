@@ -220,12 +220,19 @@ void StagePlayingState::SpriteDraw(StageScene* scene) {
 
 	// ラッシュエネミー等のスプライト (Stage Manager 管理分)
 	if (stageMgr) {
-		const auto& insts = stageMgr->GetStageInstances();
+      const auto& insts = stageMgr->GetStageInstances();
 		for (const auto& inst : insts) {
 			for (const auto& e : inst.enemies) {
 				if (auto* rush = dynamic_cast<RushEnemy*>(e.get())) {
 					rush->DrawSprite();
 				}
+			}
+		}
+
+		int mainIndex = stageMgr->GetMainChunkIndex();
+		if (mainIndex >= 0 && mainIndex < static_cast<int>(insts.size())) {
+			const auto& mainInst = insts[mainIndex];
+			for (const auto& e : mainInst.enemies) {
 				if (auto* circus = dynamic_cast<CircusEnemy*>(e.get())) {
 					circus->DrawSprite();
 				}
