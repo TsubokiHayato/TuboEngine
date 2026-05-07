@@ -2,6 +2,7 @@
 #include"WinApp.h"
 #include <dxcapi.h>
 #include "TextManager.h"
+#include "Object3d.h"
 
 void TuboEngine::Framework::Initialize() {
 
@@ -109,6 +110,7 @@ void TuboEngine::Framework::Finalize() {
 
 	ParticleCommon::GetInstance()->Finalize();
 	SpriteCommon::GetInstance()->Finalize();
+  TuboEngine::SharedLightResourcesRelease();
 	Object3dCommon::GetInstance()->Finalize();
 	TuboEngine::SkyBoxCommon::GetInstance()->Finalize();
 	LineManager::GetInstance()->Finalize();
