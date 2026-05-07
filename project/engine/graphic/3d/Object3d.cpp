@@ -6,10 +6,126 @@
 #include "Object3dCommon.h"
 #include "TextureManager.h"
 #include "numbers"
+#include <array>
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
+
+namespace {
+struct SharedLightResources {
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource;
+	DirectionalLight* directionalLightData = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource;
+	PointLight* pointLightData = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource;
+	SpotLight* spotLightData = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraForGPUResource;
+   TuboEngine::CameraForGPU* cameraForGPUData = nullptr;
+    std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 6> lightTypeResources{};
+	std::array<LightType*, 6> lightTypeData{};
+	bool initialized = false;
+
+	void Initialize() {
+		if (initialized) {
+			return;
+		}
+
+		directionalLightResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(DirectionalLight));
+		directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+		directionalLightData->color = {1.0f, 1.0f, 1.0f, 1.0f};
+		directionalLightData->direction = {0.0f, -1.0f, 0.0f};
+		directionalLightData->intensity = 1.0f;
+
+		pointLightResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(PointLight));
+		pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
+		pointLightData->color = {1.0f, 1.0f, 1.0f, 1.0f};
+		pointLightData->position = {0.0f, 1.0f, 0.0f};
+		pointLightData->intensity = 1.0f;
+
+		spotLightResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(SpotLight));
+		spotLightResource->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData));
+		spotLightData->color = {1.0f, 1.0f, 1.0f, 1.0f};
+		spotLightData->position = {2.0f, 1.25f, 0.0f};
+		spotLightData->direction = TuboEngine::Math::Vector3::Normalize({-1.0f, -1.0f, 0.0f});
+		spotLightData->intensity = 4.0f;
+		spotLightData->distance = 7.0f;
+		spotLightData->decay = 2.0f;
+		spotLightData->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
+
+        cameraForGPUResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(TuboEngine::CameraForGPU));
+		cameraForGPUResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraForGPUData));
+		cameraForGPUData->worldPosition = {};
+
+		for (int i = 0; i < static_cast<int>(lightTypeResources.size()); ++i) {
+			lightTypeResources[i] = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(LightType));
+			lightTypeResources[i]->Map(0, nullptr, reinterpret_cast<void**>(&lightTypeData[i]));
+			lightTypeData[i]->type = i;
+		}
+
+		initialized = true;
+	}
+
+	ID3D12Resource* GetLightTypeResource(int type) {
+		if (type < 0 || type >= static_cast<int>(lightTypeResources.size())) {
+			type = 0;
+		}
+		return lightTypeResources[type].Get();
+	}
+
+	void Release() {
+		if (!initialized) {
+			return;
+		}
+
+		if (directionalLightResource) {
+			directionalLightResource->Unmap(0, nullptr);
+		}
+		directionalLightData = nullptr;
+		directionalLightResource.Reset();
+
+		if (pointLightResource) {
+			pointLightResource->Unmap(0, nullptr);
+		}
+		pointLightData = nullptr;
+		pointLightResource.Reset();
+
+		if (spotLightResource) {
+			spotLightResource->Unmap(0, nullptr);
+		}
+		spotLightData = nullptr;
+		spotLightResource.Reset();
+
+		if (cameraForGPUResource) {
+			cameraForGPUResource->Unmap(0, nullptr);
+		}
+		cameraForGPUData = nullptr;
+		cameraForGPUResource.Reset();
+
+		for (size_t i = 0; i < lightTypeResources.size(); ++i) {
+			if (lightTypeResources[i]) {
+				lightTypeResources[i]->Unmap(0, nullptr);
+			}
+			lightTypeData[i] = nullptr;
+			lightTypeResources[i].Reset();
+		}
+
+		initialized = false;
+	}
+};
+
+SharedLightResources& GetSharedLightResources() {
+	static SharedLightResources resources;
+	resources.Initialize();
+	return resources;
+}
+} // namespace
+
+namespace TuboEngine {
+void SharedLightResourcesRelease() {
+	GetSharedLightResources().Release();
+}
+} // namespace TuboEngine
 
 void TuboEngine::Object3d::Initialize(std::string modelFileNamePath) {
 	
@@ -32,78 +148,16 @@ void TuboEngine::Object3d::Initialize(std::string modelFileNamePath) {
 
 #pragma endregion TransformMatrixResource
 
-#pragma region DirectionalLightData
-	// 平行光源用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	directionalLightResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(DirectionalLight));
-	// 平行光源用にデータを書き込む
-	directionalLightData = nullptr;
-	// 書き込むためのアドレスを取得
-	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
-
-	// デフォルト値
-	directionalLightData->color = {1.0f, 1.0f, 1.0f, 1.0f};
-	directionalLightData->direction = {0.0f, -1.0f, 0.0f};
-	directionalLightData->intensity = 1.0f;
-
-#pragma endregion
-
-#pragma region PointLight
-
-	// ポイントライト用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	pointLightResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(PointLight));
-	// 平行光源用にデータを書き込む
-	pointLightData = nullptr;
-	// 書き込むためのアドレスを取得
-	pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
-	// デフォルト値
-	pointLightData->color = {1.0f, 1.0f, 1.0f, 1.0f};
-	pointLightData->position = {0.0f, 1.0f, 0.0f};
-	pointLightData->intensity = 1.0f;
-
-#pragma endregion
-
-#pragma region SpotLight
-
-	// スポットライト用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	spotLightResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(SpotLight));
-	// 平行光源用にデータを書き込む
-	spotLightData = nullptr;
-	// 書き込むためのアドレスを取得
-	spotLightResource->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData));
-	// デフォルト値
-	spotLightData->color = {1.0f, 1.0f, 1.0f, 1.0f};
-	spotLightData->position = {2.0f, 1.25f, 0.0f};
-	spotLightData->direction = TuboEngine::Math::Vector3::Normalize({-1.0f, -1.0f, 0.0f});
-	spotLightData->intensity = 4.0f;
-	spotLightData->distance = 7.0f;
-	spotLightData->decay = 2.0f;
-	spotLightData->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-
-#pragma endregion
-
-#pragma region cameraWorldPos
-	// 平行光源用用のリソースを作る。今回はColor1つ分のサイズを用意する
-	cameraForGPUResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(CameraForGPU));
-	// 平行光源用にデータを書き込む
-	cameraForGPUData = nullptr;
-	// 書き込むためのアドレスを取得
-	cameraForGPUResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraForGPUData));
-
-	cameraForGPUData->worldPosition = {};
-#pragma endregion
-
-#pragma region LightType
-	// ライトの種類
-	lightTypeResource = TuboEngine::DirectXCommon::GetInstance()->CreateBufferResource(sizeof(LightType));
-	// 平行光源用にデータを書き込む
-	lightTypeData = nullptr;
-	// 書き込むためのアドレスを取得
-	lightTypeResource->Map(0, nullptr, reinterpret_cast<void**>(&lightTypeData));
-
-	// デフォルト値
-	lightTypeData->type = 0;
-
-#pragma endregion
+	auto& shared = GetSharedLightResources();
+	directionalLightResource = shared.directionalLightResource;
+	directionalLightData = shared.directionalLightData;
+	pointLightResource = shared.pointLightResource;
+	pointLightData = shared.pointLightData;
+	spotLightResource = shared.spotLightResource;
+	spotLightData = shared.spotLightData;
+	cameraForGPUResource = shared.cameraForGPUResource;
+	cameraForGPUData = shared.cameraForGPUData;
+   lightTypeResource = shared.GetLightTypeResource(lightType_);
 
 
 
@@ -161,6 +215,8 @@ void TuboEngine::Object3d::Draw() {
 	// Camera (b2, PixelShader)
 	commandList->SetGraphicsRootConstantBufferView(5, cameraForGPUResource->GetGPUVirtualAddress());
 	// LightType (b3, PixelShader)
+   auto& shared = GetSharedLightResources();
+	lightTypeResource = shared.GetLightTypeResource(lightType_);
 	commandList->SetGraphicsRootConstantBufferView(6, lightTypeResource->GetGPUVirtualAddress());
 	// PointLight (b4, PixelShader)
 	commandList->SetGraphicsRootConstantBufferView(7, pointLightResource->GetGPUVirtualAddress());

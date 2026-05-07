@@ -17,6 +17,12 @@ public:
     void SetCamera(TuboEngine::Camera* camera);
     void SetInitialVelocity(const TuboEngine::Math::Vector3& vel) { velocity = vel; }
     void SetTargetOffset(const TuboEngine::Math::Vector3& offset) { targetOffset_ = offset; }
+    void SetSpeed(float speed) { speed_ = speed; }
+    void SetTurnSpeed(float turnSpeed) { turnSpeed_ = turnSpeed; }
+    void SetChaosAmplitude(float amp) { chaosAmplitude_ = amp; }
+    void SetChaosFrequency(float freq) { chaosFrequency_ = freq; }
+    void SetPhase1Duration(float duration) { phase1Duration_ = duration; }
+    void SetTargetDelayFrames(int delayFrames) { targetDelayFrames_ = delayFrames; }
 
     bool GetIsAlive() const { return isAlive; }
 
@@ -30,8 +36,12 @@ private:
     float chaosFrequency_ = 5.0f;
     float phase1Duration_ = 0.5f;
     float elapsedTime_ = 0.0f;
+    int targetDelayFrames_ = 25;
 
     TuboEngine::Math::Vector3 swerveOffset_{0, 0, 0};
     TuboEngine::Math::Vector3 targetOffset_{0, 0, 0};
     class IParticleEmitter* trailEmitter_ = nullptr;
+    class IParticleEmitter* explosionEmitter_ = nullptr;
+    class IParticleEmitter* burnerEmitter_ = nullptr;
+    class IParticleEmitter* sparkEmitter_ = nullptr; // 火花エミッター
 };
