@@ -72,6 +72,46 @@ struct SharedLightResources {
 		}
 		return lightTypeResources[type].Get();
 	}
+
+	void Release() {
+		if (!initialized) {
+			return;
+		}
+
+		if (directionalLightResource) {
+			directionalLightResource->Unmap(0, nullptr);
+		}
+		directionalLightData = nullptr;
+		directionalLightResource.Reset();
+
+		if (pointLightResource) {
+			pointLightResource->Unmap(0, nullptr);
+		}
+		pointLightData = nullptr;
+		pointLightResource.Reset();
+
+		if (spotLightResource) {
+			spotLightResource->Unmap(0, nullptr);
+		}
+		spotLightData = nullptr;
+		spotLightResource.Reset();
+
+		if (cameraForGPUResource) {
+			cameraForGPUResource->Unmap(0, nullptr);
+		}
+		cameraForGPUData = nullptr;
+		cameraForGPUResource.Reset();
+
+		for (size_t i = 0; i < lightTypeResources.size(); ++i) {
+			if (lightTypeResources[i]) {
+				lightTypeResources[i]->Unmap(0, nullptr);
+			}
+			lightTypeData[i] = nullptr;
+			lightTypeResources[i].Reset();
+		}
+
+		initialized = false;
+	}
 };
 
 SharedLightResources& GetSharedLightResources() {
@@ -80,6 +120,12 @@ SharedLightResources& GetSharedLightResources() {
 	return resources;
 }
 } // namespace
+
+namespace TuboEngine {
+void SharedLightResourcesRelease() {
+	GetSharedLightResources().Release();
+}
+} // namespace TuboEngine
 
 void TuboEngine::Object3d::Initialize(std::string modelFileNamePath) {
 	
