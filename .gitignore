@@ -342,3 +342,7 @@ DirectXGame/imgui.ini
 
 # DirectXTex Compiled Shaders
 **/DirectXTex/Shaders/Compiled/
+
+# Allow 3D model .obj files
+!**/Resources/Models/**/*.obj
+

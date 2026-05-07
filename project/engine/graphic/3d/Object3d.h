@@ -66,6 +66,9 @@ struct LightType {
 
 namespace TuboEngine {
 
+// Object3d.cpp内で保持している共有ライト用GPUリソースを明示解放する（終了時リークチェック対策）
+void SharedLightResourcesRelease();
+
 class Object3d {
 public:
 	/// <summary>
@@ -115,11 +118,11 @@ public:
 	void SetSpotLightDecay(float decay) { spotLightData->decay = decay; }
 	void SetSpotLightCosAngle(float cosAngle) { spotLightData->cosAngle = cosAngle; }
 
-	void SetLightType(int type) {
+   void SetLightType(int type) {
 		if (type < 0 || type > 5) {
 			type = 0;
 		}
-		lightTypeData->type = type;
+		lightType_ = type;
 	}
 
 	void SetModel(TuboEngine::Model* model) {
@@ -159,7 +162,7 @@ public:
 	TuboEngine::Math::Vector4 GetLightColor() { return directionalLightData->color; }
 	TuboEngine::Math::Vector3 GetLightDirection() { return directionalLightData->direction; }
 	float GetLightIntensity() { return directionalLightData->intensity; }
-	int GetLightType() { return lightTypeData->type; }
+  int GetLightType() { return lightType_; }
 	float GetLightShininess();
 	// ポイントライト
 	TuboEngine::Math::Vector3 GetPointLightPosition() { return pointLightData->position; }
@@ -215,10 +218,11 @@ private:
 	// カメラ座標のバッファリソース内のデータを指すポインタ
 	CameraForGPU* cameraForGPUData = nullptr;
 
-	// ライトの種類
+   // ライトの種類
 	Microsoft::WRL::ComPtr<ID3D12Resource> lightTypeResource = nullptr;
 	// ライトの種類のバッファリソース内のデータを指すポインタ
 	LightType* lightTypeData = nullptr;
+	int lightType_ = 1;
 
 	// 3Dオブジェクトの座標
 	Transform transform;
