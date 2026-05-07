@@ -1,4 +1,4 @@
-{
+﻿{
   "texts": [
     {
       "color": [
@@ -8,15 +8,15 @@
         1.0
       ],
       "font": "Best10",
-      "fontSize": 62.0,
+      "fontSize": 48.0,
       "horizontalAlign": 1,
-      "name": "Text0",
+      "name": "ReturnText",
       "position": [
-        629.0,
-        678.0
+        640.0,
+        550.0
       ],
       "scale": 1.0,
-      "text": "スペースでリスタート",
+      "text": "Push SPACE to Return Stage",
       "verticalAlign": 1
     }
   ]

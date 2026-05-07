@@ -123,6 +123,7 @@ void Player::Update() {
 		object3d->SetPosition(position);
 		object3d->SetRotation(rotation);
 		object3d->SetScale(scale);
+     SetModelAlpha(1.0f);
 		object3d->Update();
 		return;
 	} // 死亡状態なら更新しない
@@ -194,6 +195,19 @@ void Player::Update() {
 	// 被弾フラグは既存仕様通りこのタイミングで落とす
 	isHit = false;
 
+ // 被弾クールダウン中は点滅（アルファ変化）
+	if (damageCooldownTimer > 0.0f) {
+       damageBlinkTime_ += 1.0f / 60.0f;
+		// 0.08秒周期で点滅（分かりやすめ）
+		constexpr float kBlinkPeriod = 0.08f;
+		float phase = std::fmod(damageBlinkTime_, kBlinkPeriod) / kBlinkPeriod;
+		float alpha = (phase < 0.5f) ? 0.15f : 1.0f;
+		SetModelAlpha(alpha);
+	} else {
+        damageBlinkTime_ = 0.0f;
+		SetModelAlpha(1.0f);
+	}
+
 	object3d->SetPosition(position);
 	object3d->SetRotation(rotation);
 	object3d->SetScale(scale);
@@ -248,7 +262,12 @@ void Player::Update() {
 		}
 	}
 
-
+	// 履歴追加
+	positionHistory_.push_back(GetCenterPosition());
+	const size_t maxHistoryCount = 180;
+	if (positionHistory_.size() > maxHistoryCount) {
+		positionHistory_.pop_front();
+	}
 }
 
 //--------------------------------------------------
@@ -273,6 +292,20 @@ void Player::UpdateVisualOnly() {
 		}
 		dashRingEmitter_->GetPreset().center = center;
 	}
+}
+
+TuboEngine::Math::Vector3 Player::GetPastCenterPosition(int delayFrames) const {
+	if (positionHistory_.empty()) {
+		return GetCenterPosition(); // 履歴がない場合は現在位置
+	}
+	if (delayFrames < 0) {
+		delayFrames = 0;
+	}
+	int index = static_cast<int>(positionHistory_.size()) - 1 - delayFrames;
+	if (index < 0) {
+		index = 0; // 足りない場合は一番古いものを返す
+	}
+	return positionHistory_[index];
 }
 
 //--------------------------------------------------
@@ -452,20 +485,24 @@ void Player::OnCollision(Collider* other) {
 	if (isDodging) {
 		return;
 	}
-	uint32_t typeID = other->GetTypeID();
-	if (damageCooldownTimer <= 0.0f) {
-		if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy)) {
-			HP -= 1;
-			isHit = true;
-			damageCooldownTimer = damageCooldownTime;
-		} else if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
-			isHit = true;
-			damageCooldownTimer = damageCooldownTime;
-		}
+   if (!other) {
+		return;
 	}
-	if (other->GetTypeID() == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
+	uint32_t typeID = other->GetTypeID();
+    if (isInvincible_) {
+		return;
+	}
+
+	// ダメージはクールダウン中に重ね掛けしない（多段ヒット対策）
+	if (damageCooldownTimer > 0.0f) {
+		return;
+	}
+
+	if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy) ||
+		typeID == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
 		HP -= 1;
 		isHit = true;
+		damageCooldownTimer = damageCooldownTime;
 	}
 }
 
@@ -480,6 +517,7 @@ void Player::DrawImGui() {
 	ImGui::Begin("Player");
 	ImGui::Text("HP: %d", HP);
 	ImGui::Text("IsHit: %s", isHit ? "Yes" : "No");
+	ImGui::Checkbox("Invincible", &isInvincible_);
 	ImGui::Separator();
 	ImGui::Text("Cooldown: %.2f / %.2f", bulletTimer, cooldownTime);
 	ImGui::Text("%s", (bulletTimer > 0.0f ? "Cooling Down" : "Ready"));
