@@ -66,6 +66,9 @@ struct LightType {
 
 namespace TuboEngine {
 
+// Object3d.cpp内で保持している共有ライト用GPUリソースを明示解放する（終了時リークチェック対策）
+void SharedLightResourcesRelease();
+
 class Object3d {
 public:
 	/// <summary>
