@@ -13,6 +13,9 @@ void TitleScene::Initialize() {
 
 
 	
+	// セーブデータ（チェックポイント）のリセット
+	StageManager::ResetCheckpoint();
+
     // カメラ（3D向けに調整）
 	camera = std::make_unique<TuboEngine::Camera>();
 	camera->SetTranslate(cameraPosition);
