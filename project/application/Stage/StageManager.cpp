@@ -383,7 +383,8 @@ void StageManager::UpdateEntranceExitEffects() {
 	for (size_t i = 0; i < exitPos.size() && i < exitEmitters_.size(); ++i) {
 		if (!exitEmitters_[i]) continue;
 		auto& preset = exitEmitters_[i]->GetPreset();
-		preset.autoEmit = true;
+		// チャンクがクリアされている時のみ表示する
+		preset.autoEmit = inst.isCleared;
 		preset.center = exitPos[i] + TuboEngine::Math::Vector3{0.0f, 0.0f, 0.05f};
 	}
 }
