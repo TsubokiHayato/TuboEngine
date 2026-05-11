@@ -68,6 +68,15 @@ void TuboEngine::Framework::Update() {
 	if (TuboEngine::WinApp::GetInstance()->ProcessMessage()) {
 		endRequest = true;
 	}
+
+	// マウスカーソルの制限（ウィンドウがアクティブな時のみ）
+	bool isForeground = (GetForegroundWindow() == TuboEngine::WinApp::GetInstance()->GetHWND());
+	bool wantCaptureMouse = false;
+#ifdef USE_IMGUI
+	wantCaptureMouse = ImGui::GetIO().WantCaptureMouse;
+#endif
+	// ウィンドウが前面にあり、かつ ImGui 操作中でない場合にのみ閉じ込める
+	TuboEngine::WinApp::GetInstance()->ToggleCursorClip(isForeground && !wantCaptureMouse);
 	// 入力の更新
 	TuboEngine::Input::GetInstance()->Update();
 

@@ -85,6 +85,8 @@ void StageTransitionState::Enter(StageScene* scene) {
 
 	// プレイヤー操作ロック
 	player->SetMovementLocked(true);
+	// チャンク移動時に弾が残らないように全消去する
+	player->ClearBullets();
 
 	startTime_ = std::chrono::steady_clock::now();
 	initialized_ = true;
