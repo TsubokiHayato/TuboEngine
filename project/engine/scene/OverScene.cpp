@@ -4,6 +4,7 @@
 #include "WinApp.h"
 #include"Input.h"
 #include"SceneManager.h"
+#include "application/Stage/StageManager.h"
 
 namespace {
 	// Smoothstep
@@ -144,8 +145,9 @@ void OverScene::Update() {
 		l.sprite->Update();
 	}
 	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		// リスタートメッセージを表示するように予約
+		StageManager::SetShowRestartMessage(true);
 		SceneManager::GetInstance()->ChangeScene(STAGE);
-
 	}
 
 

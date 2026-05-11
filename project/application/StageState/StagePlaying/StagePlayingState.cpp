@@ -68,30 +68,19 @@ void StagePlayingState::Update(StageScene* scene) {
 	}
 
 	// --- ゲームクリア判定 / チャンククリア判定 ---
-	bool allEnemiesInCurrentChunkDefeated = true;
-	bool hasAnyEnemyInCurrentChunk = false;
+	bool isCurrentChunkCleared = false;
 	bool allChunksCleared = false;
 	if (stageMgr) {
 		int mainIndex = stageMgr->GetMainChunkIndex();
 		const auto& insts = stageMgr->GetStageInstances();
 		if (mainIndex >= 0 && mainIndex < static_cast<int>(insts.size())) {
-			const auto& cur = insts[mainIndex];
-			if (cur.visible) {
-				for (const auto& e : cur.enemies) {
-					if (!e) continue;
-					hasAnyEnemyInCurrentChunk = true;
-					if (e->GetIsAlive()) {
-						allEnemiesInCurrentChunkDefeated = false;
-						break;
-					}
-				}
-			}
+			isCurrentChunkCleared = insts[mainIndex].isCleared;
 		}
 		// 全チャンクの敵が全滅しているか（GameClear 用）
 		allChunksCleared = stageMgr->AreAllEnemiesDefeated();
 	}
 
-	if (allEnemiesInCurrentChunkDefeated && hasAnyEnemyInCurrentChunk) {
+	if (isCurrentChunkCleared) {
 		// DEMOモード時はシーンチェンジ演出を挟んでタイトルへ戻る
 		if (StageScene::isDemoMode) {
 			// 既に遷移リクエスト中なら待つ

@@ -16,6 +16,10 @@ class Tile;
 class MapChipField;
 class FollowTopDownCamera;
 
+namespace TuboEngine {
+    class TextObject;
+}
+
 // StageScene の StageBounds 相当をここでも定義
 struct StageBounds {
     float left{};
@@ -63,6 +67,13 @@ public:
 
     void Update(Player* player, FollowTopDownCamera* followCamera);
 
+    // チェックポイント（最後にクリアしたチャンク）をリセット
+    static void ResetCheckpoint();
+    static int GetLastClearedChunkIndex() { return sLastClearedChunkIndex; }
+
+    // リスタートメッセージの表示予約
+    static void SetShowRestartMessage(bool show) { sShouldShowRestartMessage = show; }
+
     // 現在メインとなっているチャンクのインデックスを取得
     int GetMainChunkIndex() const { return mainChunkIndex_; }
     // 次のチャンクに進める（単純に mainChunkIndex_ を +1 する）
@@ -100,7 +111,8 @@ private:
 
     void BuildObjectsForChunk(StageInstance& inst,
                               Player* player,
-                              FollowTopDownCamera* followCamera);
+                              FollowTopDownCamera* followCamera,
+                              int instanceIndex);
 
 	// Entrance/Exit 表示用のパーティクルを更新
 	void UpdateEntranceExitEffects();
@@ -132,4 +144,13 @@ private:
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> temporaryBuffers_;
 
     float globalTimer_ = 0.0f;
+
+    // セーブメッセージ用
+    TuboEngine::TextObject* saveMessageText_ = nullptr;
+    float saveMessageTimer_ = 0.0f;
+
+    // 最後にクリアしたチャンクのインデックス（静的変数でシーンを跨いで保持）
+    static int sLastClearedChunkIndex;
+    // リスタート時にメッセージを表示するかどうかのフラグ
+    static bool sShouldShowRestartMessage;
 };
