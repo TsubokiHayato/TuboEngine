@@ -51,6 +51,9 @@ public:
     // メッセージ処理
     bool ProcessMessage();
 
+	// マウスカーソルをウィンドウ内に制限する
+	void ToggleCursorClip(bool clip);
+
 
 public:
 	///------------------------------------------------
