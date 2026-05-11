@@ -48,6 +48,8 @@ public:
 
 	// 弾を撃つ処理
 	void Shoot();
+	// 弾を全消去する
+	void ClearBullets();
 
 	// 移動処理
 	void Move();
