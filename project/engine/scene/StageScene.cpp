@@ -4,6 +4,7 @@
 #include "LineManager.h"
 #include "ParticleManager.h" // 追加: パーティクル描画/更新
 #include"SceneType.h"
+#include "engine/graphic/2d/TextManager.h"
 
 #include "engine/input/Input.h" // 追加
 
@@ -188,6 +189,9 @@ void StageScene::Update() {
 	// Scene change animation update
 	sceneChangeAnimation_->Update(1.0f / 60.0f);
 
+	// テキストマネージャーの更新
+	TuboEngine::TextManager::GetInstance()->UpdateAll();
+
 	// ★ StageManager の更新は各ステート（Playing/Ready/Tutorial など）に委譲する
 	// if (stageManager_) {
 	// 	stageManager_->Update(player_.get(), followCamera.get());
@@ -292,7 +296,9 @@ void StageScene::Update() {
 	}
 }
 
-void StageScene::Finalize() {}
+void StageScene::Finalize() {
+	TuboEngine::TextManager::GetInstance()->ClearAllTexts();
+}
 
 void StageScene::Object3DDraw() {
 
@@ -322,6 +328,9 @@ void StageScene::SpriteDraw() {
 	if (enemyHpUI_ && !isDemoMode) { enemyHpUI_->Draw(); }
 	// Guide UI 描画
 	if (guideUI_ && !isDemoMode) { guideUI_->Draw(); }
+
+	// テキストマネージャーの描画
+	TuboEngine::TextManager::GetInstance()->DrawAll();
 
 	// Demo sprites
 	if (isDemoMode) {
