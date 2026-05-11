@@ -18,8 +18,12 @@
 #include "ImGuiManager.h" 
 #include "engine/scene/StageScene.h" 
 #include "engine/graphic/data/InstanceData.h"
-#include <map>
 #include <unordered_map>
+#include "engine/graphic/2d/TextManager.h"
+#include "engine/graphic/2d/TextObject.h"
+
+int StageManager::sLastClearedChunkIndex = -1;
+bool StageManager::sShouldShowRestartMessage = false;
 
 void StageManager::Configure(uint32_t chunkWidth, uint32_t chunkHeight, float tileScale) {
     chunkWidth_  = chunkWidth;
@@ -104,8 +108,34 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
     }
 
     if (player) {
+        // セーブデータがある場合は、その次のチャンクから開始
+        if (sLastClearedChunkIndex >= 0) {
+            mainChunkIndex_ = std::min<int>(sLastClearedChunkIndex + 1, static_cast<int>(stageInstances_.size()) - 1);
+            
+            // ゲームオーバーからの復帰ならメッセージを表示
+            if (sShouldShowRestartMessage) {
+                auto* tm = TuboEngine::TextManager::GetInstance();
+                if (!saveMessageText_) {
+                    saveMessageText_ = tm->CreateText(TuboEngine::TextManager::PresetFontNames::YasashisaGothicBold, "RESTART FROM CHECKPOINT", { 640.0f, 200.0f });
+                    if (saveMessageText_) {
+                        saveMessageText_->SetHorizontalAlign(1);
+                        saveMessageText_->SetVerticalAlign(1);
+                        saveMessageText_->SetScale(1.0f);
+                        saveMessageText_->SetColor({ 1.0f, 1.0f, 0.5f, 1.0f }); // 少し黄色っぽくして区別
+                    }
+                }
+                saveMessageTimer_ = 2.0f;
+                sShouldShowRestartMessage = false; // フラグをリセット
+            }
+        }
+
         player->SetPosition(GetPlayerStartPosition());
+        player->SetMapChipField(GetPlayerStartField());
     }
+}
+
+void StageManager::ResetCheckpoint() {
+    sLastClearedChunkIndex = -1;
 }
 
 TuboEngine::Math::Vector3 StageManager::ComputeOriginForChunk(int row, int col) const {
@@ -138,8 +168,10 @@ void StageManager::CreateChunkFromId(int id, int row, int col,
     inst.field = std::make_unique<MapChipField>();
     inst.field->LoadMapChipCsv(inst.csvPath);
     inst.field->SetOrigin(inst.origin);
-
-    BuildObjectsForChunk(inst, player, followCamera);
+    
+    // このチャンクが何番目のインスタンスか
+    int instanceIndex = static_cast<int>(stageInstances_.size());
+    BuildObjectsForChunk(inst, player, followCamera, instanceIndex);
 
     if (inst.field) {
         inst.boundsWorld.left   = inst.origin.x;
@@ -153,7 +185,8 @@ void StageManager::CreateChunkFromId(int id, int row, int col,
 
 void StageManager::BuildObjectsForChunk(StageInstance& inst,
                                         Player* player,
-                                        FollowTopDownCamera* followCamera) {
+                                        FollowTopDownCamera* followCamera,
+                                        int instanceIndex) {
     if (!inst.field) return;
     MapChipField* field = inst.field.get();
 	TuboEngine::Camera* cam = followCamera ? followCamera->GetCamera() : nullptr;
@@ -208,7 +241,10 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                 enemy->SetMapChipField(field);
                 enemy->SetPosition(pos);
                 enemy->Update();
-                inst.enemies.push_back(std::move(enemy));
+                // クリア済みチャンクなら敵を出さない
+                if (instanceIndex > sLastClearedChunkIndex) {
+                    inst.enemies.push_back(std::move(enemy));
+                }
             } else if (type == MapChipType::EnemyShoot) {
                 auto enemy = std::make_unique<Enemy>();
                 enemy->Initialize();
@@ -219,7 +255,10 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                 enemy->SetMapChipField(field);
                 enemy->SetPosition(pos);
                 enemy->Update();
-                inst.enemies.push_back(std::move(enemy));
+                // クリア済みチャンクなら敵を出さない
+                if (instanceIndex > sLastClearedChunkIndex) {
+                    inst.enemies.push_back(std::move(enemy));
+                }
             } else if (type == MapChipType::EnemyMortar) {
                 auto enemy = std::make_unique<MortarEnemy>();
                 enemy->Initialize();
@@ -230,7 +269,10 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                 enemy->SetMapChipField(field);
                 enemy->SetPosition(pos);
                 enemy->Update();
-                inst.enemies.push_back(std::move(enemy));
+                // クリア済みチャンクなら敵を出さない
+                if (instanceIndex > sLastClearedChunkIndex) {
+                    inst.enemies.push_back(std::move(enemy));
+                }
             } else if (type == MapChipType::EnemyCircus) {
                 auto enemy = std::make_unique<CircusEnemy>();
                 enemy->Initialize();
@@ -241,15 +283,40 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                 enemy->SetMapChipField(field);
                 enemy->SetPosition(pos);
                 enemy->Update();
-                inst.enemies.push_back(std::move(enemy));
+                // クリア済みチャンクなら敵を出さない
+                if (instanceIndex > sLastClearedChunkIndex) {
+                    inst.enemies.push_back(std::move(enemy));
+                }
             } 
         }
+    }
+
+    // セーブデータによってクリア済み、または敵が最初からいない場合はクリア済みとする
+    if (instanceIndex <= sLastClearedChunkIndex || inst.enemies.empty()) {
+        inst.isCleared = true;
     }
 }
 
 void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
 	TuboEngine::Camera* cam = followCamera ? followCamera->GetCamera() : nullptr;
-    globalTimer_ += 0.016f;
+    const float dt = 0.016f;
+    globalTimer_ += dt;
+
+    // セーブメッセージの更新
+    if (saveMessageTimer_ > 0.0f) {
+        saveMessageTimer_ -= dt;
+        if (saveMessageText_) {
+            // 残り1秒からフェードアウト
+            float alpha = std::clamp(saveMessageTimer_, 0.0f, 1.0f);
+            saveMessageText_->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
+        }
+        if (saveMessageTimer_ <= 0.0f) {
+            if (saveMessageText_) {
+                TuboEngine::TextManager::GetInstance()->RemoveText(saveMessageText_);
+                saveMessageText_ = nullptr;
+            }
+        }
+    }
 
     for (auto& inst : stageInstances_) {
         if (!inst.visible) continue;
@@ -282,6 +349,26 @@ void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
             }
             if (hasEnemy && !anyAlive) {
                 inst.isCleared = true;
+                // セーブポイント: このチャンクがクリアされたことを保存
+                int instIndex = static_cast<int>(&inst - &stageInstances_[0]);
+                if (instIndex > sLastClearedChunkIndex) {
+                    sLastClearedChunkIndex = instIndex;
+
+                    // セーブメッセージを表示
+                    auto* tm = TuboEngine::TextManager::GetInstance();
+                    if (!saveMessageText_) {
+                        saveMessageText_ = tm->CreateText(TuboEngine::TextManager::PresetFontNames::YasashisaGothicBold, "CHECKPOINT SAVED", { 640.0f, 100.0f });
+                        if (saveMessageText_) {
+                            saveMessageText_->SetHorizontalAlign(1); // Center
+                            saveMessageText_->SetVerticalAlign(1);   // Middle
+                            saveMessageText_->SetScale(1.2f);
+                        }
+                    }
+                    if (saveMessageText_) {
+                        saveMessageText_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+                    }
+                    saveMessageTimer_ = 2.0f; // 2秒間表示
+                }
             }
         }
 
@@ -536,6 +623,25 @@ void StageManager::Draw3D() {
 }
 
 TuboEngine::Math::Vector3 StageManager::GetPlayerStartPosition() const {
+    // 現在のメインチャンクを優先的に探す
+    if (mainChunkIndex_ >= 0 && mainChunkIndex_ < static_cast<int>(stageInstances_.size())) {
+        const auto& inst = stageInstances_[mainChunkIndex_];
+        if (inst.field) {
+            // まず Entrance を探す
+            auto entrancePos = inst.field->GetChipPositions(MapChipType::kEntrance);
+            if (!entrancePos.empty()) {
+                return entrancePos.front();
+            }
+            // 無ければ MapChipType::Player の場所
+            if (inst.playerMapX >= 0 && inst.playerMapY >= 0) {
+                return inst.field->GetMapChipPositionByIndex(
+                    static_cast<uint32_t>(inst.playerMapX),
+                    static_cast<uint32_t>(inst.playerMapY));
+            }
+        }
+    }
+
+    // 全チャンクから探す（フォールバック）
     for (const auto& inst : stageInstances_) {
         if (!inst.field) continue;
         if (inst.playerMapX >= 0 && inst.playerMapY >= 0) {
@@ -548,6 +654,18 @@ TuboEngine::Math::Vector3 StageManager::GetPlayerStartPosition() const {
 }
 
 MapChipField* StageManager::GetPlayerStartField() const {
+    // 現在のメインチャンクを優先的に探す
+    if (mainChunkIndex_ >= 0 && mainChunkIndex_ < static_cast<int>(stageInstances_.size())) {
+        const auto& inst = stageInstances_[mainChunkIndex_];
+        if (inst.field) {
+            // Entrance があるか、または Player スタート地点があるか
+            auto entrancePos = inst.field->GetChipPositions(MapChipType::kEntrance);
+            if (!entrancePos.empty() || (inst.playerMapX >= 0 && inst.playerMapY >= 0)) {
+                return inst.field.get();
+            }
+        }
+    }
+
     for (const auto& inst : stageInstances_) {
         if (!inst.field) continue;
         if (inst.playerMapX >= 0 && inst.playerMapY >= 0) {
