@@ -15,14 +15,17 @@ void PlayerEvasion::Update() {
         }
     }
 
-    if (justEvasionTimer_ > 0.0f) {
-        justEvasionTimer_ -= kFixedDeltaTime;
+    // 回避開始からの経過時間をカウントアップ（回避中のみ）
+    if (isDodging_) {
+        justEvasionTimer_ += kFixedDeltaTime;
     }
 
     if (isDodging_) {
         dodgeTimer_ -= kFixedDeltaTime;
         if (dodgeTimer_ <= 0.0f) {
-            isDodging_ = false;
+         isDodging_ = false;
+            justEvasionTimer_ = 0.0f;
+            hasJustEvaded_ = false;
         }
     }
 }
@@ -35,8 +38,9 @@ void PlayerEvasion::StartDodge(const TuboEngine::Math::Vector3& inputDir) {
     isDodging_ = true;
     dodgeTimer_ = dodgeDuration_;
     dodgeCooldownTimer_ = dodgeCooldown_;
-    
-    justEvasionTimer_ = justEvasionWindow_;
+
+    // 回避開始からの経過時間を 0 にリセット（ここからカウントアップ）
+    justEvasionTimer_ = 0.0f;
     hasJustEvaded_ = false;
 
     dodgeDirection_ = inputDir;
@@ -49,9 +53,26 @@ void PlayerEvasion::StartDodge(const TuboEngine::Math::Vector3& inputDir) {
 }
 
 bool PlayerEvasion::TryTriggerJustEvasion() {
-    if (isDodging_ && justEvasionTimer_ > 0.0f && !hasJustEvaded_) {
+    // 回避開始からの経過時間がウィンドウ内（＝回避し始めのタイミング）かつ未発動
+    if (isDodging_ && justEvasionTimer_ <= justEvasionWindow_ && !hasJustEvaded_) {
         hasJustEvaded_ = true;
         return true;
     }
     return false;
+}
+
+void PlayerEvasion::SetJustEvasionWindow(float seconds) {
+    justEvasionWindow_ = std::max(0.0f, seconds);
+}
+
+void PlayerEvasion::SetDodgeDuration(float seconds) {
+    dodgeDuration_ = std::max(0.01f, seconds);
+}
+
+void PlayerEvasion::SetDodgeCooldown(float seconds) {
+    dodgeCooldown_ = std::max(0.0f, seconds);
+}
+
+void PlayerEvasion::SetDodgeSpeed(float speed) {
+    dodgeSpeed_ = std::max(0.0f, speed);
 }
