@@ -149,7 +149,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\Animation\Animation.cpp" />
     <ClCompile Include="engine\graphic\Animation\Animator.cpp" />
     <ClCompile Include="application\Character\Player\Player.cpp" />
+    <ClCompile Include="application\Character\Player\PlayerEvasion.cpp" />
     <ClCompile Include="application\Bullet\Player\PlayerBullet.cpp" />
+    <ClCompile Include="application\Bullet\Player\PlayerCircusBullet.cpp" />
     <ClCompile Include="application\Bullet\Enemy\EnemyNormalBullet.cpp" />
     <ClCompile Include="application\Block\Block.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\Effects\Dissolve\DissolveEffect.cpp" />
@@ -264,7 +266,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Character\Enemy\CircusEnemy.h" />
     <ClInclude Include="application\Character\Enemy\RushEnemy.h" />
     <ClInclude Include="application\Character\Player\Player.h" />
+    <ClInclude Include="application\Character\Player\PlayerEvasion.h" />
     <ClInclude Include="application\Bullet\Player\PlayerBullet.h" />
+    <ClInclude Include="application\Bullet\Player\PlayerCircusBullet.h" />
     <ClInclude Include="application\Character\Player\PlayerAutoController.h" />
     <ClInclude Include="application\StageState\Pause\PauseState.h" />
     <ClInclude Include="application\StageState\Tutorial\TutorialState.h" />

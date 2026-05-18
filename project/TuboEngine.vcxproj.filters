@@ -51,6 +51,9 @@
     <ClCompile Include="application\Bullet\Player\PlayerBullet.cpp">
       <Filter>projects\application\Bullet\Player</Filter>
     </ClCompile>
+    <ClCompile Include="application\Bullet\Player\PlayerCircusBullet.cpp">
+      <Filter>projects\application\Bullet\Player</Filter>
+    </ClCompile>
     <ClCompile Include="application\Bullet\Enemy\EnemyNormalBullet.cpp">
       <Filter>projects\application\Bullet\Enemy</Filter>
     </ClCompile>
@@ -64,6 +67,9 @@
       <Filter>projects\application\Character\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="application\Character\Player\Player.cpp">
+      <Filter>projects\application\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Character\Player\PlayerEvasion.cpp">
       <Filter>projects\application\Character\Player</Filter>
     </ClCompile>
     <ClCompile Include="application\Block\Block.cpp">
@@ -443,6 +449,9 @@
     <ClInclude Include="application\Bullet\Player\PlayerBullet.h">
       <Filter>projects\application\Bullet\Player</Filter>
     </ClInclude>
+    <ClInclude Include="application\Bullet\Player\PlayerCircusBullet.h">
+      <Filter>projects\application\Bullet\Player</Filter>
+    </ClInclude>
     <ClInclude Include="application\Bullet\Enemy\EnemyNormalBullet.h">
       <Filter>projects\application\Bullet\Enemy</Filter>
     </ClInclude>
@@ -462,6 +471,9 @@
       <Filter>projects\application\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="application\Character\Player\Player.h">
+      <Filter>projects\application\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Character\Player\PlayerEvasion.h">
       <Filter>projects\application\Character\Player</Filter>
     </ClInclude>
     <ClInclude Include="application\Block\Block.h">

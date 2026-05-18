@@ -47,6 +47,8 @@ public:
 
 	// 生存判定
 	bool GetIsAlive() const { return isAlive; }
+	// 生存フラグ設定
+	void SetIsAlive(bool alive) { isAlive = alive; }
 
 	// 位置取得
 	const TuboEngine::Math::Vector3& GetPosition() const { return position; }
