@@ -307,6 +307,19 @@ void CircusEnemy::ClearBulletsNear(const TuboEngine::Math::Vector3& center, floa
     }
 }
 
+void CircusEnemy::ClearAllBullets() {
+    for (auto& b : bullets_) {
+        if (b && b->GetIsAlive()) {
+            TuboEngine::Math::Vector3 p = b->GetPosition();
+            b->SetIsAlive(false);
+            if (explosionEmitter_) {
+                explosionEmitter_->GetPreset().center = p;
+                explosionEmitter_->Emit(5);
+            }
+        }
+    }
+}
+
 void CircusEnemy::EmitHpParticle(const TuboEngine::Math::Vector2& pos) {
     std::random_device rd;
     std::mt19937 gen(rd());
