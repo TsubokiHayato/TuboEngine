@@ -105,9 +105,6 @@
     <ClCompile Include="application\UI\Title\TitleUI.cpp">
       <Filter>projects\application\UI</Filter>
     </ClCompile>
-    <ClCompile Include="application\StageState\Boss\BossState.cpp">
-      <Filter>projects\application\StageState\Boss</Filter>
-    </ClCompile>
     <ClCompile Include="application\StageState\GameClear\GameClearState.cpp">
       <Filter>projects\application\StageState\GameClear</Filter>
     </ClCompile>
@@ -520,9 +517,6 @@
     </ClInclude>
     <ClInclude Include="application\UI\Title\TitleUIButton.h">
       <Filter>projects\application\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="application\StageState\Boss\BossState.h">
-      <Filter>projects\application\StageState\Boss</Filter>
     </ClInclude>
     <ClInclude Include="application\StageState\GameClear\GameClearState.h">
       <Filter>projects\application\StageState\GameClear</Filter>
