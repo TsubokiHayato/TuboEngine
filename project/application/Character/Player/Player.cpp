@@ -585,6 +585,23 @@ void Player::DrawImGui() {
 	ImGui::Text("Dodge Cooldown: %.3f sec", evasionManager_->GetDodgeCooldownTimer());
 	ImGui::Text("Just Evasion Timer: %.3f sec", evasionManager_->GetJustEvasionTimer());
 	ImGui::Text("Has Just Evaded: %s", evasionManager_->HasJustEvaded() ? "Yes" : "No");
+ ImGui::SeparatorText("Evasion Tuning");
+	float justWindow = evasionManager_->GetJustEvasionWindow();
+	if (ImGui::DragFloat("Just Window (sec)", &justWindow, 0.01f, 0.0f, 5.0f)) {
+		evasionManager_->SetJustEvasionWindow(justWindow);
+	}
+	float dodgeDuration = evasionManager_->GetDodgeDuration();
+	if (ImGui::DragFloat("Dodge Duration (sec)", &dodgeDuration, 0.01f, 0.01f, 2.0f)) {
+		evasionManager_->SetDodgeDuration(dodgeDuration);
+	}
+	float dodgeCooldown = evasionManager_->GetDodgeCooldown();
+	if (ImGui::DragFloat("Dodge Cooldown (sec)", &dodgeCooldown, 0.01f, 0.0f, 5.0f)) {
+		evasionManager_->SetDodgeCooldown(dodgeCooldown);
+	}
+	float dodgeSpeed = evasionManager_->GetDodgeSpeed();
+	if (ImGui::DragFloat("Dodge Speed", &dodgeSpeed, 0.01f, 0.0f, 5.0f)) {
+		evasionManager_->SetDodgeSpeed(dodgeSpeed);
+	}
 	ImGui::Separator();
 	TuboEngine::Math::Vector3 dDir = evasionManager_->GetDodgeDirection();
 	ImGui::Text("Dodge Direction: (%.2f, %.2f)", dDir.x, dDir.y);
