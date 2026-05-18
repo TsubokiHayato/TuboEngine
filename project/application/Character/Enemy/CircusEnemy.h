@@ -23,6 +23,7 @@ public:
     float GetBulletPhase1Duration() const { return bulletPhase1Duration_; }
     
     void ClearBulletsNear(const TuboEngine::Math::Vector3& center, float radius);
+    void ClearAllBullets(); // ジャスト回避時に画面上の全弾を消去する
 
 private:
     void TryFireMissiles(bool canSeePlayer, float dt);
