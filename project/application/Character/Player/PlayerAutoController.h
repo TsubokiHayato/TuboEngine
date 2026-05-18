@@ -18,6 +18,7 @@ public:
 
 	// 外部（Stateなど）から「このフレームで見える敵リスト」を渡す
 	void SetEnemyList(const std::vector<Enemy*>& enemies) { enemies_ = enemies; }
+	const std::vector<Enemy*>& GetEnemyList() const { return enemies_; }
 
 private:
 	Player* owner_ = nullptr;
