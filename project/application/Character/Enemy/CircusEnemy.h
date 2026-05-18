@@ -15,6 +15,15 @@ public:
     void DrawSprite();
     void DrawImGui();
 
+    // ジャスト回避時の同期・消去用
+    float GetBulletSpeed() const { return bulletSpeed_; }
+    float GetBulletTurnSpeed() const { return bulletTurnSpeed_; }
+    float GetBulletChaosAmp() const { return bulletChaosAmp_; }
+    float GetBulletChaosFreq() const { return bulletChaosFreq_; }
+    float GetBulletPhase1Duration() const { return bulletPhase1Duration_; }
+    
+    void ClearBulletsNear(const TuboEngine::Math::Vector3& center, float radius);
+
 private:
     void TryFireMissiles(bool canSeePlayer, float dt);
     void FireSingleMissile(const TuboEngine::Math::Vector3& launchDir, float speed);
