@@ -799,8 +799,8 @@ void Player::OnJustEvasion(Collider* other) {
         if (auto* ce = dynamic_cast<CircusEnemy*>(enemy)) {
             boss = ce;
             isCircus = true;
-            // プレイヤー周囲(半径15.0f程度)の弾を一掃
-            boss->ClearBulletsNear(position, 15.0f);
+            // ジャスト回避の恩恵として画面上のサーカス弾を全滅させる
+            boss->ClearAllBullets();
         }
     }
 
