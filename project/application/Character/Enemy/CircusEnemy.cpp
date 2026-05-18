@@ -287,6 +287,26 @@ void CircusEnemy::Update() {
     bulletTimer_ = 0.0f;
 }
 
+void CircusEnemy::ClearBulletsNear(const TuboEngine::Math::Vector3& center, float radius) {
+    float r2 = radius * radius;
+    for (auto& b : bullets_) {
+        if (b && b->GetIsAlive()) {
+            TuboEngine::Math::Vector3 p = b->GetPosition();
+            float dist2 = (p.x - center.x) * (p.x - center.x) + 
+                          (p.y - center.y) * (p.y - center.y) + 
+                          (p.z - center.z) * (p.z - center.z);
+            if (dist2 <= r2) {
+                b->SetIsAlive(false);
+                // 消去時にエフェクトを出すことも可能
+                if (explosionEmitter_) {
+                    explosionEmitter_->GetPreset().center = p;
+                    explosionEmitter_->Emit(3);
+                }
+            }
+        }
+    }
+}
+
 void CircusEnemy::EmitHpParticle(const TuboEngine::Math::Vector2& pos) {
     std::random_device rd;
     std::mt19937 gen(rd());
