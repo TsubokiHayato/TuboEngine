@@ -8,20 +8,31 @@
 #include "engine/graphic/Particle/ParticleManager.h"
 #include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 #include "engine/graphic/PostEffect/OffScreenRendering.h"
+#include "Bullet/Player/PlayerCircusBullet.h"
+#include "Character/Enemy/CircusEnemy.h"
+#include "Bullet/Enemy/CircusBullet.h"
+#include "PlayerEvasion.h"
+#include "engine/graphic/2d/TextManager.h"
+#include <random>
 
 //--------------------------------------------------
 // コンストラクタ
 //--------------------------------------------------
 Player::Player()
-    : cooldownTime(0.2f), damageCooldownTimer(0.0f), damageCooldownTime(1.0f), isDodging(false), dodgeTimer(0.0f), dodgeCooldownTimer(0.0f), dodgeDuration(0.2f), dodgeCooldown(1.0f), dodgeSpeed(0.5f),
-      dodgeDirection(0.0f, 0.0f, 0.0f) {
+    : cooldownTime(0.2f), damageCooldownTimer(0.0f), damageCooldownTime(1.0f) {
     autoController_.Initialize(this);
+    evasionManager_ = std::make_unique<PlayerEvasion>();
 }
 
 //--------------------------------------------------
 // デストラクタ
 //--------------------------------------------------
-Player::~Player() {}
+Player::~Player() {
+    if (justEvasionText_) {
+        TuboEngine::TextManager::GetInstance()->RemoveText(justEvasionText_);
+        justEvasionText_ = nullptr;
+    }
+}
 
 //--------------------------------------------------
 // 初期化処理
@@ -63,13 +74,23 @@ void Player::Initialize() {
 
 	bulletTimer = 0.0f;
 	damageCooldownTimer = 0.0f;
-	isDodging = false;
-	dodgeTimer = 0.0f;
-	dodgeCooldownTimer = 0.0f;
-	dodgeDuration = 0.2f;
-	dodgeCooldown = 1.0f;
-	dodgeSpeed = 0.5f;
-	dodgeDirection = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
+
+	// ジャスト回避やダッシュのUI/ポストエフェクト状態のリセット
+	if (justEvasionText_) {
+		TuboEngine::TextManager::GetInstance()->RemoveText(justEvasionText_);
+	}
+	justEvasionText_ = nullptr;
+	justEvasionTextTimer_ = 0.0f;
+	
+	dashPostEffectTimer_ = 0.0f;
+	OffScreenRendering::GetInstance()->SetDashPostEffectEnabled(false);
+	OffScreenRendering::GetInstance()->SetDashRadialBlurPower(0.02f);
+	
+	// 回避ステートの完全リセット
+	evasionManager_ = std::make_unique<PlayerEvasion>();
+	
+	// 弾のクリア
+	bullets.clear();
 
 	// --- 追加: 軌道トレイル用パーティクルエミッター生成 ---
 	if (!trailEmitter_) {
@@ -235,30 +256,43 @@ void Player::Update() {
 		dashRingEmitter_->GetPreset().center = center;
 	}
 
-	// 回避開始タイミングでEmit（立ち上がり検出）
-	static bool wasDodgingPrevLocal = false; // 関数スコープの前フレーム値
-	bool dodgingNow = isDodging;             // 既存の回避フラグを使用
-	if (dashRingEmitter_ && dodgingNow && !wasDodgingPrevLocal) {
-		TriggerDashRing();
-		// Dash演出: ポストエフェクトを一時的にRadialBlurへ
-		dashPostEffectTimer_ = dashPostEffectDuration_;
-		OffScreenRendering::GetInstance()->SetDashPostEffectEnabled(true);
-	}
-	wasDodgingPrevLocal = dodgingNow;
+	// 回避開始時のエフェクト処理は UpdateDodge や StartDodge に移動済み
 
 	// Dashポストエフェクトの時間経過で自動復帰
 	if (dashPostEffectTimer_ > 0.0f) {
 		dashPostEffectTimer_ -= 1.0f / 60.0f;
 		// 0→1 の進行度（開始直後=1、終了直前=0）
-		float t = dashPostEffectTimer_ / std::max(0.0001f, dashPostEffectDuration_);
+		float t = dashPostEffectTimer_ / std::max(0.0001f, dashPostEffectDurationCurrent_);
 		t = std::clamp(t, 0.0f, 1.0f);
 		// 立ち上がりで強く、徐々に弱まる（イージング）
 		float eased = t * t; // ease-out
-		OffScreenRendering::GetInstance()->SetDashRadialBlurPower(dashRadialBlurPower_ * eased);
+		OffScreenRendering::GetInstance()->SetDashRadialBlurPower(dashRadialBlurPowerCurrentMax_ * eased);
 		if (dashPostEffectTimer_ <= 0.0f) {
 			dashPostEffectTimer_ = 0.0f;
 			OffScreenRendering::GetInstance()->SetDashRadialBlurPower(0.02f); // RadialBlurのデフォルトへ戻す
 			OffScreenRendering::GetInstance()->SetDashPostEffectEnabled(false);
+		}
+	}
+
+	// ジャスト回避テキストの更新とフェードアウト
+	if (justEvasionTextTimer_ > 0.0f) {
+		justEvasionTextTimer_ -= 1.0f / 60.0f;
+		if (justEvasionTextTimer_ <= 0.0f) {
+			if (justEvasionText_) {
+				TuboEngine::TextManager::GetInstance()->RemoveText(justEvasionText_);
+				justEvasionText_ = nullptr;
+			}
+		} else if (justEvasionText_) {
+			// 徐々に上にスクロールしながらフェードアウト
+			float progress = 1.0f - (justEvasionTextTimer_ / 1.0f);
+			float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
+			float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
+			
+			TuboEngine::Math::Vector2 textPos = { screenW * 0.5f, screenH * 0.32f - progress * 90.0f };
+			justEvasionText_->SetPosition(textPos);
+			
+			TuboEngine::Math::Vector4 color = { 0.0f, 0.9f, 1.0f, justEvasionTextTimer_ / 1.0f };
+			justEvasionText_->SetColor(color);
 		}
 	}
 
@@ -355,17 +389,19 @@ void Player::Draw() {
 // 移動処理
 //--------------------------------------------------
 void Player::Move() {
-	if (isDodging) {
-		TuboEngine::Math::Vector3 tryPosition = position + dodgeDirection * dodgeSpeed;
+	if (evasionManager_->IsDodging()) {
+		TuboEngine::Math::Vector3 dDir = evasionManager_->GetDodgeDirection();
+		position.x += dDir.x * evasionManager_->GetDodgeSpeed();
+		position.y += dDir.y * evasionManager_->GetDodgeSpeed();
 		if (mapChipField) {
 			float playerWidth = scale.x * MapChipField::GetBlockWidth() - 0.1f;
 			float playerHeight = scale.y * MapChipField::GetBlockHeight() - 0.1f;
-			if (!mapChipField->IsRectBlocked(tryPosition, playerWidth, playerHeight)) {
-				position = tryPosition;
+			if (!mapChipField->IsRectBlocked(position, playerWidth, playerHeight)) {
+				// OK
 			}
 		}
 		// 回避中は速度を更新しておく（回避終了後の慣性のために）
-		velocity = dodgeDirection * dodgeSpeed;
+		velocity = dDir * evasionManager_->GetDodgeSpeed();
 		return;
 	}
 
@@ -489,15 +525,25 @@ TuboEngine::Math::Vector3 Player::GetCenterPosition() const {
 // 衝突時の処理
 //--------------------------------------------------
 void Player::OnCollision(Collider* other) {
-	if (isDodging) {
-		return;
-	}
    if (!other) {
 		return;
 	}
 	uint32_t typeID = other->GetTypeID();
     if (isInvincible_) {
 		return;
+	}
+
+	// 回避中（通常回避無敵・ジャスト回避）の判定を優先。
+	// 被弾後のダメージクールダウン中であっても、能動的な回避アクションに対するジャスト判定は有効にします。
+	if (typeID == static_cast<uint32_t>(CollisionTypeId::kEnemy) ||
+		typeID == static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon)) {
+        if (evasionManager_->IsDodging()) {
+            if (evasionManager_->TryTriggerJustEvasion()) {
+                OnJustEvasion(other);
+                return; // ジャスト回避成功でダメージ無効
+            }
+            return; // 通常の回避中（無敵）
+        }
 	}
 
 	// ダメージはクールダウン中に重ね掛けしない（多段ヒット対策）
@@ -534,14 +580,14 @@ void Player::DrawImGui() {
 	ImGui::Text("%s", (damageCooldownTimer > 0.0f ? "Invincible" : "Vulnerable"));
 	ImGui::SliderFloat("Damage Cooldown Time", &damageCooldownTime, 0.1f, 3.0f, "%.2f sec");
 	ImGui::Separator();
-	ImGui::Text("Dodge: %s", isDodging ? "Dodging" : (dodgeCooldownTimer > 0.0f ? "Cooldown" : "Ready"));
-	ImGui::Text("Dodge Timer: %.2f / %.2f", dodgeTimer, dodgeDuration);
-	ImGui::Text("Dodge Cooldown: %.2f / %.2f", dodgeCooldownTimer, dodgeCooldown);
-	ImGui::SliderFloat("Dodge Duration", &dodgeDuration, 0.05f, 0.5f, "%.2f sec");
-	ImGui::SliderFloat("Dodge Cooldown", &dodgeCooldown, 0.2f, 3.0f, "%.2f sec");
-	ImGui::SliderFloat("Dodge Speed", &dodgeSpeed, 0.2f, 2.0f, "%.2f");
+	ImGui::Text("Dodge: %s", evasionManager_->IsDodging() ? "Dodging" : "Ready");
+	ImGui::Text("Dodge Timer: %.3f sec", evasionManager_->GetDodgeTimer());
+	ImGui::Text("Dodge Cooldown: %.3f sec", evasionManager_->GetDodgeCooldownTimer());
+	ImGui::Text("Just Evasion Timer: %.3f sec", evasionManager_->GetJustEvasionTimer());
+	ImGui::Text("Has Just Evaded: %s", evasionManager_->HasJustEvaded() ? "Yes" : "No");
 	ImGui::Separator();
-	ImGui::Text("Dodge Direction: (%.2f, %.2f)", dodgeDirection.x, dodgeDirection.y);
+	TuboEngine::Math::Vector3 dDir = evasionManager_->GetDodgeDirection();
+	ImGui::Text("Dodge Direction: (%.2f, %.2f)", dDir.x, dDir.y);
 	if (mapChipField) {
 		MapChipField::IndexSet index = mapChipField->GetMapChipIndexSetByPosition(position);
 		MapChipType type = mapChipField->GetMapChipTypeByIndex(index.xIndex, index.yIndex);
@@ -587,38 +633,42 @@ void Player::DrawImGui() {
 
 // --- 回避開始 ---
 void Player::StartDodge() {
-	isDodging = true;
-	dodgeTimer = dodgeDuration;
 	TuboEngine::Math::Vector3 inputDir = GetDodgeInputDirection();
-	if (inputDir.x != 0.0f || inputDir.y != 0.0f) {
-		float len = std::sqrt(inputDir.x * inputDir.x + inputDir.y * inputDir.y);
-		if (len > 0.0f) {
-			inputDir.x /= len;
-			inputDir.y /= len;
-		}
-		dodgeDirection = inputDir;
-	} else {
-		float angle = rotation.z;
-		dodgeDirection.x = std::sin(angle);
-		dodgeDirection.y = -std::cos(angle);
-		dodgeDirection.z = 0.0f;
+	evasionManager_->StartDodge(inputDir);
+	
+	// エフェクト発火
+	if (evasionManager_->IsDodging()) {
+		TriggerDashRing();
+		// Dash演出: ポストエフェクトを一時的にRadialBlurへ
+		dashPostEffectTimer_ = dashPostEffectDuration_;
+		dashPostEffectDurationCurrent_ = dashPostEffectDuration_;
+		dashRadialBlurPowerCurrentMax_ = dashRadialBlurPower_;
+		OffScreenRendering::GetInstance()->SetDashPostEffectEnabled(true);
 	}
 }
 
 // --- 回避状態更新 ---
 void Player::UpdateDodge() {
-	if (dodgeCooldownTimer > 0.0f) {
-		dodgeCooldownTimer -= 1.0f / 60.0f;
-		if (dodgeCooldownTimer < 0.0f)
-			dodgeCooldownTimer = 0.0f;
+    bool wasDodgingPrevLocal = evasionManager_->IsDodging();
+
+    evasionManager_->Update();
+
+    bool dodgingNow = evasionManager_->IsDodging();
+
+	// 回避エフェクト管理（残像などが必要ならここに）
+	if (dashRingEmitter_ && dodgingNow && !wasDodgingPrevLocal) {
+		TriggerDashRing();
+		// Dash演出: ポストエフェクトを一時的にRadialBlurへ
+		dashPostEffectTimer_ = dashPostEffectDuration_;
+		dashPostEffectDurationCurrent_ = dashPostEffectDuration_;
+		dashRadialBlurPowerCurrentMax_ = dashRadialBlurPower_;
+		OffScreenRendering::GetInstance()->SetDashPostEffectEnabled(true);
 	}
-	if (isDodging) {
-		dodgeTimer -= 1.0f / 60.0f;
-		if (dodgeTimer <= 0.0f) {
-			isDodging = false;
-			dodgeCooldownTimer = dodgeCooldown;
-		}
-	}
+}
+
+bool Player::CanDodge() const {
+    // 自身が死亡状態などでなければ、EvasionManagerの状態で判定
+    return (HP > 0 && !evasionManager_->IsDodging());
 }
 
 // --- 回避入力方向取得 ---
@@ -691,3 +741,101 @@ TuboEngine::Math::Vector3 Player::GetAimDirectionFromReticle() const {
 	if (ilen > 0.0f) { aim.x /= ilen; aim.y /= ilen; aim.z /= ilen; }
 	return aim;
 }
+
+// --- ジャスト回避成功処理 ---
+void Player::OnJustEvasion(Collider* other) {
+    if (dashRingEmitter_) {
+        dashRingEmitter_->Emit(45); // エフェクト増し増し
+    }
+    
+    // ド派手な画面エフェクト（RadialBlurを強く長くかける）
+    OffScreenRendering::GetInstance()->SetDashPostEffectEnabled(true);
+    dashPostEffectTimer_ = 0.6f;
+    dashPostEffectDurationCurrent_ = 0.6f;
+    dashRadialBlurPowerCurrentMax_ = 0.6f; // 強烈にする
+
+    // 既存のジャスト回避テキストがあれば一旦消す
+    if (justEvasionText_) {
+        TuboEngine::TextManager::GetInstance()->RemoveText(justEvasionText_);
+        justEvasionText_ = nullptr;
+    }
+
+    // スクリーン中央の少し上に "JUST EVASION!" と表示
+    float screenW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
+    float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
+    
+    // 爽快感のあるシアンカラーで表示
+    TuboEngine::Math::Vector2 textPos = { screenW * 0.5f, screenH * 0.32f };
+    TuboEngine::Math::Vector4 textColor = { 0.0f, 0.9f, 1.0f, 1.0f }; // シアンブルー
+    
+    std::string fontName = TuboEngine::TextManager::PresetFontNames::YasashisaGothicBold;
+    
+    justEvasionText_ = TuboEngine::TextManager::GetInstance()->CreateText(
+        fontName,
+        "JUST EVASION!",
+        textPos,
+        textColor,
+        1.6f // 大きめに表示
+    );
+    
+    if (justEvasionText_) {
+        justEvasionText_->SetHorizontalAlign(1); // Center
+        justEvasionText_->SetVerticalAlign(1);   // Middle
+    }
+    
+    justEvasionTextTimer_ = 1.0f; // 1秒間表示
+
+    bool isCircus = false;
+    CircusEnemy* boss = nullptr;
+    
+    if (dynamic_cast<CircusEnemy*>(other) != nullptr) {
+        isCircus = true;
+    } else if (dynamic_cast<CircusBullet*>(other) != nullptr) {
+        isCircus = true;
+    }
+    
+    // 現在の敵リストからサーカスエネミーを探して弾を消去する
+    for (auto* enemy : autoController_.GetEnemyList()) {
+        if (auto* ce = dynamic_cast<CircusEnemy*>(enemy)) {
+            boss = ce;
+            isCircus = true;
+            // ジャスト回避の恩恵として画面上のサーカス弾を全滅させる
+            boss->ClearAllBullets();
+        }
+    }
+
+    if (isCircus) {
+        // サーカス弾を撃ち返すカウンター
+        int counterCount = 12; // 12発の一斉射撃
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<float> distAngle(0.0f, 6.283185f);
+        std::uniform_real_distribution<float> distSpeed(0.5f, 1.2f);
+        
+        for (int i = 0; i < counterCount; ++i) {
+            auto bullet = std::make_unique<PlayerCircusBullet>();
+            bullet->SetPlayerRotation(rotation);
+            
+            TuboEngine::Math::Vector3 spawnPos = position;
+            spawnPos.z += 1.5f; // ちょっと上から出す
+            
+            bullet->SetPlayerPosition(spawnPos);
+            bullet->SetMapChipField(mapChipField);
+            
+            // 敵リストを渡す
+            bullet->SetTargetEnemyList(autoController_.GetEnemyList());
+            
+            // PlayerCircusBullet専用の初期化（カメラも渡して内部でUpdateさせる）
+            bullet->InitializeCircus(spawnPos, object3d->GetCamera(), boss);
+            
+            // 放射状にランダムな初速を与える
+            float angle = distAngle(gen);
+            float speed = distSpeed(gen);
+            TuboEngine::Math::Vector3 vel = { std::cos(angle) * speed * 5.0f, std::sin(angle) * speed * 5.0f, speed * 6.0f };
+            bullet->SetInitialVelocity(vel);
+            
+            bullets.push_back(std::move(bullet));
+        }
+    }
+}
+

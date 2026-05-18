@@ -25,6 +25,8 @@ public:
     void SetTargetDelayFrames(int delayFrames) { targetDelayFrames_ = delayFrames; }
 
     bool GetIsAlive() const { return isAlive; }
+    void SetIsAlive(bool alive) { isAlive = alive; }
+    TuboEngine::Math::Vector3 GetPosition() const { return position; }
 
 private:
     Player* player_ = nullptr;
