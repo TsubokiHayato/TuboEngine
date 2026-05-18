@@ -212,21 +212,28 @@ void StageScene::Update() {
 	// 追加: プレイヤーが存在すればパーティクル更新 (Trail 用)
 	TuboEngine::ParticleManager::GetInstance()->Update(1.0f / 60.0f, followCamera->GetCamera());
 
-	// HP UI 更新
-	if (hpUI_) { hpUI_->Update(player_.get()); }
-	// Enemy HP UI 更新（エネミーに追従）"
-	if (enemyHpUI_ && stageManager_ && followCamera) {
-		std::vector<Enemy*> enemyPtrs;
+	// 敵リストの取得とプレイヤーへの設定（ジャスト回避のホーミングやデモ操作に共有）
+	std::vector<Enemy*> activeEnemies;
+	if (stageManager_) {
 		const auto& insts = stageManager_->GetStageInstances();
 		for (const auto& inst : insts) {
 			if (!inst.visible) continue;
 			for (const auto& e : inst.enemies) {
 				if (e && e->GetIsAlive()) {
-					enemyPtrs.push_back(e.get());
+					activeEnemies.push_back(e.get());
 				}
 			}
 		}
-		enemyHpUI_->Update(enemyPtrs, followCamera->GetCamera());
+	}
+	if (player_) {
+		player_->SetEnemyList(activeEnemies);
+	}
+
+	// HP UI 更新
+	if (hpUI_) { hpUI_->Update(player_.get()); }
+	// Enemy HP UI 更新（エネミーに追従）"
+	if (enemyHpUI_ && stageManager_ && followCamera) {
+		enemyHpUI_->Update(activeEnemies, followCamera->GetCamera());
 	}
 	// Guide UI 更新
 	if (guideUI_) { guideUI_->Update(); }
@@ -236,23 +243,6 @@ void StageScene::Update() {
 		// Demo中は常に自動操作ONを維持する
 		if (player_ && !player_->IsAutoControlEnabled()) {
 			player_->SetAutoControlEnabled(true);
-		}
-
-		// 敵リストをプレイヤー(AutoController)に渡す
-		if (player_ && player_->IsAutoControlEnabled()) {
-			std::vector<Enemy*> enemyPtrs;
-			if (stageManager_) {
-				const auto& insts = stageManager_->GetStageInstances();
-				for (const auto& inst : insts) {
-					if (!inst.visible) continue;
-					for (const auto& e : inst.enemies) {
-						if (e && e->GetIsAlive()) {
-							enemyPtrs.push_back(e.get());
-						}
-					}
-				}
-			}
-			player_->SetEnemyList(enemyPtrs);
 		}
 
 		// 入力があればタイトルへ戻る
