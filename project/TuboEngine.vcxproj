@@ -118,7 +118,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\Character\Enemy\CircusEnemy.cpp" />
     <ClCompile Include="application\Character\Enemy\RushEnemy.cpp" />
     <ClCompile Include="application\Character\Player\PlayerAutoController.cpp" />
-    <ClCompile Include="application\StageState\Boss\BossState.cpp" />
     <ClCompile Include="application\StageState\GameClear\GameClearState.cpp" />
     <ClCompile Include="application\StageState\GameOver\GameOverState.cpp" />
     <ClCompile Include="application\StageState\IStageState.cpp" />
@@ -279,7 +278,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.h" />
     <ClInclude Include="engine\scene\SceneType.h" />
     <ClInclude Include="application\scene\StageState\ClearState.h" />
-    <ClInclude Include="application\StageState\Boss\BossState.h" />
     <ClInclude Include="application\StageState\GameClear\GameClearState.h" />
     <ClInclude Include="application\StageState\GameOver\GameOverState.h" />
     <ClInclude Include="application\StageState\IStageState.h" />

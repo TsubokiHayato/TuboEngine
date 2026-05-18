@@ -116,7 +116,7 @@ void PlayerCircusBullet::InitializeCircus(const TuboEngine::Math::Vector3& start
     }
 
     // Object3dの見た目を上書き
-    object3d->Initialize("block/block.obj");
+    object3d->Initialize("playerBullet/playerBullet.obj");
     object3d->SetPosition(GetPosition());
     object3d->SetScale({0.5f, 0.5f, 0.5f}); 
     object3d->SetModelColor({0.0f, 0.6f, 1.0f, 1.0f}); // プレイヤー用シアン色
