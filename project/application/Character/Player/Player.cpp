@@ -209,7 +209,8 @@ void Player::Update() {
 		// isAlive==false のバレットを削除
 		bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const std::unique_ptr<PlayerBullet>& bullet) { return !bullet->GetIsAlive(); }), bullets.end());
 		if (HP <= 0) {
-			isAlive = false; // HPが0以下なら死亡状態にする
+		isAlive = false; // HPが0以下なら死亡状態にする
+		ClearBullets();
 		}
 	}
 
@@ -391,14 +392,20 @@ void Player::Draw() {
 void Player::Move() {
 	if (evasionManager_->IsDodging()) {
 		TuboEngine::Math::Vector3 dDir = evasionManager_->GetDodgeDirection();
-		position.x += dDir.x * evasionManager_->GetDodgeSpeed();
-		position.y += dDir.y * evasionManager_->GetDodgeSpeed();
+		TuboEngine::Math::Vector3 nextPos = position;
+		nextPos.x += dDir.x * evasionManager_->GetDodgeSpeed();
+		nextPos.y += dDir.y * evasionManager_->GetDodgeSpeed();
 		if (mapChipField) {
 			float playerWidth = scale.x * MapChipField::GetBlockWidth() - 0.1f;
 			float playerHeight = scale.y * MapChipField::GetBlockHeight() - 0.1f;
-			if (!mapChipField->IsRectBlocked(position, playerWidth, playerHeight)) {
-				// OK
+			if (!mapChipField->IsRectBlocked(nextPos, playerWidth, playerHeight)) {
+				position = nextPos;
+			} else {
+				velocity = {0.0f, 0.0f, 0.0f};
+				return;
 			}
+		} else {
+			position = nextPos;
 		}
 		// 回避中は速度を更新しておく（回避終了後の慣性のために）
 		velocity = dDir * evasionManager_->GetDodgeSpeed();
