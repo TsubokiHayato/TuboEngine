@@ -94,6 +94,9 @@ void TextObject::SetPosition(const Math::Vector2& pos) {
 void TextObject::SetColor(const Math::Vector4& color) {
     if (color_.x != color.x || color_.y != color.y || color_.z != color.z || color_.w != color.w) {
         color_ = color;
+        if (materialData_) {
+            materialData_->color = color_;
+        }
         dirty_ = true;
     }
 }
