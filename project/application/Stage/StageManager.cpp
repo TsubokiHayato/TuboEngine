@@ -112,21 +112,8 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
         if (sLastClearedChunkIndex >= 0) {
             mainChunkIndex_ = std::min<int>(sLastClearedChunkIndex + 1, static_cast<int>(stageInstances_.size()) - 1);
             
-            // ゲームオーバーからの復帰ならメッセージを表示
-            if (sShouldShowRestartMessage) {
-                auto* tm = TuboEngine::TextManager::GetInstance();
-                if (!saveMessageText_) {
-                    saveMessageText_ = tm->CreateText(TuboEngine::TextManager::PresetFontNames::YasashisaGothicBold, "RESTART FROM CHECKPOINT", { 640.0f, 200.0f });
-                    if (saveMessageText_) {
-                        saveMessageText_->SetHorizontalAlign(1);
-                        saveMessageText_->SetVerticalAlign(1);
-                        saveMessageText_->SetScale(1.0f);
-                        saveMessageText_->SetColor({ 1.0f, 1.0f, 0.5f, 1.0f }); // 少し黄色っぽくして区別
-                    }
-                }
-                saveMessageTimer_ = 2.0f;
-                sShouldShowRestartMessage = false; // フラグをリセット
-            }
+            // ゲームオーバーからの復帰メッセージは表示しない
+            sShouldShowRestartMessage = false; // フラグをリセット
         }
 
         player->SetPosition(GetPlayerStartPosition());
@@ -304,11 +291,13 @@ void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
 
     // セーブメッセージの更新
     if (saveMessageTimer_ > 0.0f) {
+        const float kMessageDuration = 2.0f;
         saveMessageTimer_ -= dt;
         if (saveMessageText_) {
-            // 残り1秒からフェードアウト
-            float alpha = std::clamp(saveMessageTimer_, 0.0f, 1.0f);
-            saveMessageText_->SetColor({ 1.0f, 1.0f, 1.0f, alpha });
+            auto color = saveMessageText_->GetColor();
+            float alpha = std::clamp(saveMessageTimer_ / kMessageDuration, 0.0f, 1.0f);
+            color.w = alpha;
+            saveMessageText_->SetColor(color);
         }
         if (saveMessageTimer_ <= 0.0f) {
             if (saveMessageText_) {
