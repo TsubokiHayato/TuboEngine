@@ -2,6 +2,7 @@
 #include "Bullet/BaseBullet.h"
 #include "Object3d.h"
 #include "Vector3.h"
+#include <random>
 
 class Player;
 
@@ -46,4 +47,6 @@ private:
     class IParticleEmitter* explosionEmitter_ = nullptr;
     class IParticleEmitter* burnerEmitter_ = nullptr;
     class IParticleEmitter* sparkEmitter_ = nullptr; // 火花エミッター
+
+    std::mt19937 rng_{std::random_device{}()};
 };

@@ -245,6 +245,7 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                     enemy->SetCamera(cam);
                 }
                 enemy->SetPlayer(player);
+                enemy->SetFollowCamera(followCamera);
                 enemy->SetMapChipField(field);
                 enemy->SetPosition(pos);
                 enemy->Update();
@@ -259,6 +260,7 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                     enemy->SetCamera(cam);
                 }
                 enemy->SetPlayer(player);
+                enemy->SetFollowCamera(followCamera);
                 enemy->SetMapChipField(field);
                 enemy->SetPosition(pos);
                 enemy->Update();
@@ -273,6 +275,7 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                     enemy->SetCamera(cam);
                 }
                 enemy->SetPlayer(player);
+                enemy->SetFollowCamera(followCamera);
                 enemy->SetMapChipField(field);
                 enemy->SetPosition(pos);
                 enemy->Update();
@@ -287,6 +290,7 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                     enemy->SetCamera(cam);
                 }
                 enemy->SetPlayer(player);
+                enemy->SetFollowCamera(followCamera);
                 enemy->SetMapChipField(field);
                 enemy->SetPosition(pos);
                 enemy->Update();
