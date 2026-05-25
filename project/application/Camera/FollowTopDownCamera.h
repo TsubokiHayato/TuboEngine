@@ -79,7 +79,7 @@ private:
 
 	// ズーム制限・速度
 	float zoomMin_ = 0.5f;
-	float zoomMax_ = 1.0f;
+	float zoomMax_ = 5.0f;
 	float zoomSpeed_ = 0.05f; // ホイール1単位あたり?ズーム変化
 
 	// 開始時ズームアニメーション（イージング）
@@ -96,6 +96,8 @@ private:
 	float impulseZoomElapsedSec_ = 0.0f;
 	float impulseZoomStart_ = 1.0f;
 	float impulseZoomTarget_ = 1.0f;
+	float impulseZoomReturnDelaySec_ = 1.0f;
+	float impulseZoomReturnZoom_ = 1.0f;
 
 	// 障害物回避（雛形）
 	void AvoidObstacles(TuboEngine::Math::Vector3& desiredPos);
