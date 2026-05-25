@@ -79,9 +79,6 @@ void SceneManager::Update() {
 			currentScene = std::make_unique<OverScene>();
 			currentScene->Initialize();
 		}
-
-		//初期化
-		currentScene->Initialize();
 	}
 	//現在のシーンがnullptrでない場合
 	if (currentScene) {
