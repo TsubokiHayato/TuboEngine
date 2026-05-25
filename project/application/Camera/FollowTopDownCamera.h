@@ -22,6 +22,9 @@ public:
 	void SetFollowSpeed(float speed);
 	void SetLookAtOffset(const TuboEngine::Math::Vector3& offset);
 	void SetZoom(float zoom);
+	// 一時ズーム（発射演出など）
+	void StartImpulseZoom(float targetZoom, float durationSec);
+	bool IsImpulseZoomActive() const { return impulseZoomActive_; }
 	void SetBounds(const TuboEngine::Math::Vector3& min, const TuboEngine::Math::Vector3& max);
 	void Shake(float intensity, float duration);
 	void SetZoomLimits(float minZoom, float maxZoom) {
@@ -86,6 +89,13 @@ private:
 	float introZoomDurationSec_ = 0.0f;
 	float introZoomElapsedSec_ = 0.0f;
 	float introZoomCurve_ = 1.0f;
+
+	// 一時ズーム演出
+	bool impulseZoomActive_ = false;
+	float impulseZoomDurationSec_ = 0.0f;
+	float impulseZoomElapsedSec_ = 0.0f;
+	float impulseZoomStart_ = 1.0f;
+	float impulseZoomTarget_ = 1.0f;
 
 	// 障害物回避（雛形）
 	void AvoidObstacles(TuboEngine::Math::Vector3& desiredPos);
