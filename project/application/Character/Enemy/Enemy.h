@@ -6,6 +6,7 @@
 #include "Particle.h"
 #include "ParticleEmitter.h"
 #include"Sprite.h"
+#include "Camera/FollowTopDownCamera.h"
 // 演出用: 前方宣言のみで十分
 class IParticleEmitter;
 
@@ -41,6 +42,7 @@ public:
     void SetIsAlive(bool alive) { isAlive = alive; }
     void SetPlayer(Player* player) { player_ = player; }
     void SetMapChipField(MapChipField* field) { mapChipField = field; }
+    void SetFollowCamera(FollowTopDownCamera* camera) { followCamera_ = camera; }
     int GetHP() const { return HP; }
     int GetMaxHP() const { return 10; }
 
@@ -118,6 +120,10 @@ protected:
     float deathTimer_ = 0.0f;                      // 死亡演出のタイマー
     static constexpr float kDeathDuration = 0.6f;  // 演出の長さ
     bool deathEffectPlayed_ = false;
+
+    FollowTopDownCamera* followCamera_ = nullptr;
+
+    virtual bool UseNormalBullet() const { return true; }
 
 	TuboEngine::Camera* camera_ = nullptr;
     MapChipField* mapChipField = nullptr;
