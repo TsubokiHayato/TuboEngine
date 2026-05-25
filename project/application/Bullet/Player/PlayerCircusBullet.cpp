@@ -39,10 +39,8 @@ void PlayerCircusBullet::InitializeCircus(const TuboEngine::Math::Vector3& start
         phase1Duration_ = 0.4f;
     }
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
     std::uniform_real_distribution<float> dist(0.0f, 6.283185f);
-    swerveOffset_ = {dist(gen), dist(gen), dist(gen)};
+    swerveOffset_ = {dist(rng_), dist(rng_), dist(rng_)};
 
     // エフェクト生成
     trailEmitter_ = TuboEngine::ParticleManager::GetInstance()->Find("PlayerCircusTrail");
@@ -197,23 +195,31 @@ void PlayerCircusBullet::Update() {
     SetVelocity(vel);
 
     if (trailEmitter_) {
-        trailEmitter_->GetPreset().center = pos;
+        ParticlePreset preset = trailEmitter_->GetPreset();
+        preset.center = pos;
+        trailEmitter_->GetPreset() = preset;
         trailEmitter_->Emit(1);
     }
     if (burnerEmitter_ && vel.LengthSquared() > 0.001f) {
         TuboEngine::Math::Vector3 backDir = TuboEngine::Math::Vector3::Normalize(vel) * -0.5f; 
-        burnerEmitter_->GetPreset().center = pos + backDir;
+        ParticlePreset preset = burnerEmitter_->GetPreset();
+        preset.center = pos + backDir;
+        burnerEmitter_->GetPreset() = preset;
         burnerEmitter_->Emit(1);
     }
     if (sparkEmitter_ && vel.LengthSquared() > 10.0f) {
-        sparkEmitter_->GetPreset().center = pos;
+        ParticlePreset preset = sparkEmitter_->GetPreset();
+        preset.center = pos;
+        sparkEmitter_->GetPreset() = preset;
         sparkEmitter_->Emit(1);
     }
 
     // 地面衝突判定 (プレイヤーのカウンター弾はボスに当たるまで粘らせるため判定を甘くする)
     if (pos.z <= -2.0f) {
         if (explosionEmitter_) {
-            explosionEmitter_->GetPreset().center = pos;
+            ParticlePreset preset = explosionEmitter_->GetPreset();
+            preset.center = pos;
+            explosionEmitter_->GetPreset() = preset;
             explosionEmitter_->Emit(15);
         }
         SetIsAlive(false);
