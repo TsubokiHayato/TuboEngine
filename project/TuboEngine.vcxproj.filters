@@ -51,6 +51,9 @@
     <ClCompile Include="application\Bullet\Player\PlayerBullet.cpp">
       <Filter>projects\application\Bullet\Player</Filter>
     </ClCompile>
+    <ClCompile Include="application\Bullet\Player\PlayerCircusBullet.cpp">
+      <Filter>projects\application\Bullet\Player</Filter>
+    </ClCompile>
     <ClCompile Include="application\Bullet\Enemy\EnemyNormalBullet.cpp">
       <Filter>projects\application\Bullet\Enemy</Filter>
     </ClCompile>
@@ -64,6 +67,9 @@
       <Filter>projects\application\Character\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="application\Character\Player\Player.cpp">
+      <Filter>projects\application\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Character\Player\PlayerEvasion.cpp">
       <Filter>projects\application\Character\Player</Filter>
     </ClCompile>
     <ClCompile Include="application\Block\Block.cpp">
@@ -98,9 +104,6 @@
     </ClCompile>
     <ClCompile Include="application\UI\Title\TitleUI.cpp">
       <Filter>projects\application\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="application\StageState\Boss\BossState.cpp">
-      <Filter>projects\application\StageState\Boss</Filter>
     </ClCompile>
     <ClCompile Include="application\StageState\GameClear\GameClearState.cpp">
       <Filter>projects\application\StageState\GameClear</Filter>
@@ -443,6 +446,9 @@
     <ClInclude Include="application\Bullet\Player\PlayerBullet.h">
       <Filter>projects\application\Bullet\Player</Filter>
     </ClInclude>
+    <ClInclude Include="application\Bullet\Player\PlayerCircusBullet.h">
+      <Filter>projects\application\Bullet\Player</Filter>
+    </ClInclude>
     <ClInclude Include="application\Bullet\Enemy\EnemyNormalBullet.h">
       <Filter>projects\application\Bullet\Enemy</Filter>
     </ClInclude>
@@ -462,6 +468,9 @@
       <Filter>projects\application\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="application\Character\Player\Player.h">
+      <Filter>projects\application\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Character\Player\PlayerEvasion.h">
       <Filter>projects\application\Character\Player</Filter>
     </ClInclude>
     <ClInclude Include="application\Block\Block.h">
@@ -508,9 +517,6 @@
     </ClInclude>
     <ClInclude Include="application\UI\Title\TitleUIButton.h">
       <Filter>projects\application\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="application\StageState\Boss\BossState.h">
-      <Filter>projects\application\StageState\Boss</Filter>
     </ClInclude>
     <ClInclude Include="application\StageState\GameClear\GameClearState.h">
       <Filter>projects\application\StageState\GameClear</Filter>

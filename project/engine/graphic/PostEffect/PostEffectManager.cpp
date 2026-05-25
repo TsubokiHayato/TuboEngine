@@ -23,8 +23,6 @@ void PostEffectManager::SetCurrentEffect(size_t index) {
             // 切り替え禁止
             return;
         }
-        // 新しいエフェクトをInitialize
-        effects_[index]->Initialize();
         currentIndex_ = index;
     }
 }

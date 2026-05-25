@@ -93,4 +93,20 @@ bool WinApp::ProcessMessage()
 	return false;
 }
 
+void WinApp::ToggleCursorClip(bool clip) {
+	if (clip) {
+		RECT clientRect;
+		::GetClientRect(hwnd, &clientRect);
+		POINT topLeft = {clientRect.left, clientRect.top};
+		POINT bottomRight = {clientRect.right, clientRect.bottom};
+		::ClientToScreen(hwnd, &topLeft);
+		::ClientToScreen(hwnd, &bottomRight);
+		
+		RECT clipRect = {topLeft.x, topLeft.y, bottomRight.x, bottomRight.y};
+		::ClipCursor(&clipRect);
+	} else {
+		::ClipCursor(nullptr);
+	}
+}
+
 } // namespace TuboEngine
