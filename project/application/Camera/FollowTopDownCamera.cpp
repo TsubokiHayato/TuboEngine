@@ -34,6 +34,14 @@ void FollowTopDownCamera::StartIntroZoom(float startZoom, float endZoom, float d
 	zoom_ = std::max(zoomMin_, std::min(zoomMax_, introZoomStart_));
 }
 
+void FollowTopDownCamera::StartImpulseZoom(float targetZoom, float durationSec) {
+	impulseZoomActive_ = true;
+	impulseZoomDurationSec_ = std::max(0.001f, durationSec);
+	impulseZoomElapsedSec_ = 0.0f;
+	impulseZoomStart_ = zoom_;
+	impulseZoomTarget_ = std::max(zoomMin_, std::min(zoomMax_, targetZoom));
+}
+
 void FollowTopDownCamera::Initialize(Player* target, const TuboEngine::Math::Vector3& offset, float followSpeed) {
 	target_ = target;
 	offset_ = offset;
@@ -107,6 +115,15 @@ void FollowTopDownCamera::Update() {
 			introZoomPlaying_ = false;
 			zoom_ = std::max(zoomMin_, std::min(zoomMax_, introZoomEnd_));
 		}
+	} else if (impulseZoomActive_) {
+		impulseZoomElapsedSec_ += kAssumedDeltaTimeSec;
+		float t = std::clamp(impulseZoomElapsedSec_ / impulseZoomDurationSec_, 0.0f, 1.0f);
+		float e = EaseInOutCubic(t);
+		zoom_ = impulseZoomStart_ + (impulseZoomTarget_ - impulseZoomStart_) * e;
+		zoom_ = std::max(zoomMin_, std::min(zoomMax_, zoom_));
+		if (t >= 1.0f) {
+			impulseZoomActive_ = false;
+		}
 	} else {
 		// ホイールズーム更新（下限・上限を保持）
 		int wheel = TuboEngine::Input::GetInstance()->GetWheel();
@@ -169,6 +186,11 @@ void FollowTopDownCamera::Update() {
 	camera_->SetTranslate(newPos);
 	camera_->setRotation(rotation_);
 	camera_->setScale({1.0f, 1.0f, 1.0f});
+	// ズーム距離に応じてファークリップを伸ばす
+	const float baseFarClip = 100.0f;
+	const float minFarClip = 150.0f;
+	float zoomFarClip = std::max(minFarClip, baseFarClip * std::max(1.0f, zoom_ * 1.25f));
+	camera_->setFarClip(zoomFarClip);
 	camera_->Update();
 }
 
