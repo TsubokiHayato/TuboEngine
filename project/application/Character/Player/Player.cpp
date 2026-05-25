@@ -162,16 +162,23 @@ void Player::Update() {
 	// 回転処理
 	if (!isMovementLocked) {
 		if (IsAutoControlEnabled()) {
-			// オート操作中: autoAimDir_ から回転を計算
-			TuboEngine::Math::Vector3 dir = autoAimDir_;
-			float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-			if (len > 0.0001f) {
-				dir.x /= len;
-				dir.y /= len;
-				// Rotate() と同じ式: atan2(aimDir.x, -aimDir.y)
-				float angle = std::atan2(dir.x, -dir.y);
-				rotation.z = 3.12f + angle;
+			// オート操作中: autoAimTarget_ → autoAimDir_ をスムーズ補間
+			// autoAimDir_ は AutoController が毎フレーム SetAutoAimDirection で更新した値を
+			// ターゲットとして内部補間する
+			constexpr float kAimLerpSpeed = 8.0f; // 大きいほど素早く追従
+			float dt = 1.0f / 60.0f;
+			// autoAimDir_ をそのまま表示用に使うため、実際の目標は autoAimTarget_
+			// (SetAutoAimDirection を autoAimTarget_ への書き込みに変更済み)
+			// lerp: current + (target - current) * speed * dt
+			float lx = autoAimDir_.x + (autoAimTarget_.x - autoAimDir_.x) * kAimLerpSpeed * dt;
+			float ly = autoAimDir_.y + (autoAimTarget_.y - autoAimDir_.y) * kAimLerpSpeed * dt;
+			float len = std::sqrt(lx * lx + ly * ly);
+			if (len > 0.001f) {
+				autoAimDir_.x = lx / len;
+				autoAimDir_.y = ly / len;
 			}
+			float angle = std::atan2(autoAimDir_.x, -autoAimDir_.y);
+			rotation.z = 3.12f + angle;
 		} else if (!wantCaptureMouse) {
 			// 手動時は従来通りマウス方向
 			Rotate();
@@ -693,6 +700,19 @@ void Player::UpdateDodge() {
 bool Player::CanDodge() const {
     // 自身が死亡状態などでなければ、EvasionManagerの状態で判定
     return (HP > 0 && !evasionManager_->IsDodging());
+}
+
+// --- AI方向指定ダッシュ ---
+void Player::AutoStartDodgeDir(const TuboEngine::Math::Vector3& dir) {
+	evasionManager_->StartDodge(dir);
+	// エフェクト発火
+	if (evasionManager_->IsDodging()) {
+		TriggerDashRing();
+		dashPostEffectTimer_ = dashPostEffectDuration_;
+		dashPostEffectDurationCurrent_ = dashPostEffectDuration_;
+		dashRadialBlurPowerCurrentMax_ = dashRadialBlurPower_;
+		OffScreenRendering::GetInstance()->SetDashPostEffectEnabled(true);
+	}
 }
 
 // --- 回避入力方向取得 ---
