@@ -40,6 +40,8 @@ void FollowTopDownCamera::StartImpulseZoom(float targetZoom, float durationSec) 
 	impulseZoomElapsedSec_ = 0.0f;
 	impulseZoomStart_ = zoom_;
 	impulseZoomTarget_ = std::max(zoomMin_, std::min(zoomMax_, targetZoom));
+	impulseZoomReturnDelaySec_ = 1.0f;
+	impulseZoomReturnZoom_ = 1.0f;
 }
 
 void FollowTopDownCamera::Initialize(Player* target, const TuboEngine::Math::Vector3& offset, float followSpeed) {
@@ -123,6 +125,7 @@ void FollowTopDownCamera::Update() {
 		zoom_ = std::max(zoomMin_, std::min(zoomMax_, zoom_));
 		if (t >= 1.0f) {
 			impulseZoomActive_ = false;
+			StartIntroZoom(zoom_, impulseZoomReturnZoom_, impulseZoomReturnDelaySec_);
 		}
 	} else {
 		// ホイールズーム更新（下限・上限を保持）
