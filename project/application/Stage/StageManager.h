@@ -51,6 +51,7 @@ public:
 
 public:
     StageManager() = default;
+    ~StageManager();
 
     void Configure(uint32_t chunkWidth, uint32_t chunkHeight, float tileScale);
 
