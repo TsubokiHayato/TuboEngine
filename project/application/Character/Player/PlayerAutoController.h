@@ -6,6 +6,12 @@ class Player;
 class Enemy;
 
 // プレイヤーの自動操作を行う簡易AIコントローラ
+// より自然な立ち回りを実現するため以下を実装:
+//  - エイムは補間済み (Player::Update内で lerp)
+//  - 移動はストラフ（横移動）を交えた距離キープ
+//  - 回避は「敵から逃げる方向」を計算してから発動
+//  - 敵なし時はゆっくり巡回
+//  - 適度なランダム性で機械的に見えないよう配慮
 class PlayerAutoController {
 public:
 	void Initialize(Player* owner) { owner_ = owner; }
@@ -24,15 +30,22 @@ private:
 	Player* owner_ = nullptr;
 	bool enabled_ = false;
 
-	// 簡易パターン用のタイマー
-	float moveTimer_ = 0.0f;
-	float shootTimer_ = 0.0f;
-
+	// 敵リスト
 	std::vector<Enemy*> enemies_;
 
-	// ★ ブリンク用パラメータ
-	float blinkCooldown_ = 2.0f;     // ブリンクのクールダウン(秒)
-	float blinkCooldownTimer_ = 0.0f;
-	float blinkDistance_ = 8.0f;     // 一回のブリンク距離
-	float blinkDangerDist_ = 5.0f;   // この距離より近いと「危険」とみなす
+	// ─── 回避関連 ───
+	float dodgeCooldownTimer_ = 0.0f;     // 回避再使用クールダウン
+	static constexpr float kDodgeCooldown = 1.5f; // 回避インターバル（秒）
+
+	// ─── 射撃関連 ───
+	float shootTimer_ = 0.0f;
+	float shootInterval_ = 0.4f;           // 次弾発射まで（ランダム変動）
+
+	// ─── ストラフ（横移動）関連 ───
+	float strafeDirSign_ = 1.0f;           // +1 or -1 (どちらに横移動するか)
+	float strafeChangeTimer_ = 0.0f;       // ストラフ方向転換タイマー
+
+	// ─── 巡回（敵なし時）関連 ───
+	float wanderAngle_ = 0.0f;             // 巡回方向角度
+	float wanderChangeTimer_ = 0.0f;       // 巡回方向変化タイマー
 };
