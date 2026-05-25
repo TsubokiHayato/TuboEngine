@@ -25,6 +25,13 @@
 int StageManager::sLastClearedChunkIndex = -1;
 bool StageManager::sShouldShowRestartMessage = false;
 
+StageManager::~StageManager() {
+    if (saveMessageText_) {
+        TuboEngine::TextManager::GetInstance()->RemoveText(saveMessageText_);
+        saveMessageText_ = nullptr;
+    }
+}
+
 void StageManager::Configure(uint32_t chunkWidth, uint32_t chunkHeight, float tileScale) {
     chunkWidth_  = chunkWidth;
     chunkHeight_ = chunkHeight;
@@ -112,8 +119,21 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
         if (sLastClearedChunkIndex >= 0) {
             mainChunkIndex_ = std::min<int>(sLastClearedChunkIndex + 1, static_cast<int>(stageInstances_.size()) - 1);
             
-            // ゲームオーバーからの復帰メッセージは表示しない
-            sShouldShowRestartMessage = false; // フラグをリセット
+            // ゲームオーバーからの復帰ならメッセージを表示
+            if (sShouldShowRestartMessage) {
+                auto* tm = TuboEngine::TextManager::GetInstance();
+                if (!saveMessageText_) {
+                    saveMessageText_ = tm->CreateText(TuboEngine::TextManager::PresetFontNames::YasashisaGothicBold, "RESTART FROM CHECKPOINT", { 640.0f, 200.0f });
+                    if (saveMessageText_) {
+                        saveMessageText_->SetHorizontalAlign(1);
+                        saveMessageText_->SetVerticalAlign(1);
+                        saveMessageText_->SetScale(1.0f);
+                        saveMessageText_->SetColor({ 1.0f, 1.0f, 0.5f, 1.0f }); // 少し黄色っぽくして区別
+                    }
+                }
+                saveMessageTimer_ = 2.0f;
+                sShouldShowRestartMessage = false; // フラグをリセット
+            }
         }
 
         player->SetPosition(GetPlayerStartPosition());
