@@ -297,9 +297,6 @@ void MortarEnemy::TryFireMissile(bool canSeePlayer, float dt) {
     missile_->SetCamera(camera_);
     missile_->Initialize(startPos);
 
-    if (followCamera_) {
-        followCamera_->StartImpulseZoom(0.82f, 0.2f);
-    }
 
     // --- 演出：発射エフェクト ---
     if (fireEmitter_) {
