@@ -15,6 +15,14 @@ void CircusEnemy::Initialize() {
     missileCount_ = 32;
     currentAttack_ = AttackType::Burst;
     autoCycle_ = true;
+
+    // 移動の基準位置は最初のUpdateで記録（SetPosition後を確実に捕捉）
+    moveTime_ = 0.0f;
+    phaseDashTriggered_ = false;
+    isDashing_ = false;
+    isOrbiting_ = false;
+    orbitAngle_ = 0.0f;
+    basePositionInitialized_ = false; // 次のUpdateで初期化する
     
     if (object3d) {
         object3d->SetModelColor({1.0f, 0.0f, 0.7f, 1.0f});
@@ -274,8 +282,10 @@ void CircusEnemy::Update() {
     UpdateAttackCycle(dt);
 
     // 板野サーカス：各種攻撃実行
-    // 板野サーカス：各種攻撃実行
     TryFireMissiles(canSeePlayer, dt);
+
+    // ボス本体の移動
+    UpdateBossMovement(dt);
 
     // 基底クラス(Enemy)の更新
     Enemy::Update();
@@ -285,6 +295,39 @@ void CircusEnemy::Update() {
         bullet->SetIsAlive(false); 
     }
     bulletTimer_ = 0.0f;
+}
+
+void CircusEnemy::ClearBulletsNear(const TuboEngine::Math::Vector3& center, float radius) {
+    float r2 = radius * radius;
+    for (auto& b : bullets_) {
+        if (b && b->GetIsAlive()) {
+            TuboEngine::Math::Vector3 p = b->GetPosition();
+            float dist2 = (p.x - center.x) * (p.x - center.x) + 
+                          (p.y - center.y) * (p.y - center.y) + 
+                          (p.z - center.z) * (p.z - center.z);
+            if (dist2 <= r2) {
+                b->SetIsAlive(false);
+                // 消去時にエフェクトを出すことも可能
+                if (explosionEmitter_) {
+                    explosionEmitter_->GetPreset().center = p;
+                    explosionEmitter_->Emit(3);
+                }
+            }
+        }
+    }
+}
+
+void CircusEnemy::ClearAllBullets() {
+    for (auto& b : bullets_) {
+        if (b && b->GetIsAlive()) {
+            TuboEngine::Math::Vector3 p = b->GetPosition();
+            b->SetIsAlive(false);
+            if (explosionEmitter_) {
+                explosionEmitter_->GetPreset().center = p;
+                explosionEmitter_->Emit(5);
+            }
+        }
+    }
 }
 
 void CircusEnemy::EmitHpParticle(const TuboEngine::Math::Vector2& pos) {
@@ -342,6 +385,103 @@ void CircusEnemy::DrawHpParticles() {
             p.sprite->Draw();
         }
     }
+}
+
+void CircusEnemy::UpdateBossMovement(float dt) {
+    if (!player_) return;
+
+    // SetPosition()後に初回呼び出されたタイミングで基準位置を確定する
+    if (!basePositionInitialized_) {
+        basePosition_ = position;
+        basePositionInitialized_ = true;
+    }
+
+    moveTime_ += dt;
+
+    const float kPi = 3.14159265f;
+    bool isEnraged = (HP <= maxHp_ / 2);
+
+    // ===== (4) フェーズダッシュ（激怒突入時に一度だけ） =====
+    if (isEnraged && !phaseDashTriggered_) {
+        phaseDashTriggered_ = true;
+        isDashing_ = true;
+        dashTimer_ = 0.0f;
+        dashStart_ = position;
+
+        // プレイヤーとは逆の斜め方向へ移動
+        TuboEngine::Math::Vector3 toPlayer = player_->GetPosition() - position;
+        toPlayer.y = 0.0f;
+        toPlayer.Normalize();
+        // 横に45度ずらして距離15の場所へ
+        TuboEngine::Math::Vector3 side = {-toPlayer.y, toPlayer.x, 0.0f};
+        dashTarget_ = basePosition_ + side * 8.0f + TuboEngine::Math::Vector3{0.0f, 0.0f, 0.0f};
+        dashShakeTimer_ = 0.0f;
+
+        // ダッシュ開始エフェクト（チャージEmitterを流用）
+        if (chargeEmitter_) {
+            chargeEmitter_->GetPreset().center = position;
+            chargeEmitter_->Emit(8);
+        }
+
+        // 激怒後はオービット開始
+        isOrbiting_ = true;
+        orbitAngle_ = std::atan2(position.y - player_->GetPosition().y,
+                                 position.x - player_->GetPosition().x);
+    }
+
+    // ダッシュ中はほかの移動を上書き
+    if (isDashing_) {
+        dashTimer_ += dt;
+        float t = dashTimer_ / kDashDuration;
+        // イーズアウト補間（快速→減速）
+        float ease = 1.0f - (1.0f - t) * (1.0f - t);
+        if (t >= 1.0f) {
+            ease = 1.0f;
+            isDashing_ = false;
+            dashShakeTimer_ = 0.2f;
+            // ベース位置を新しい場所に更新
+            basePosition_ = dashTarget_;
+            moveTime_ = 0.0f; // sin波をリセットして自然な再開
+        }
+        position.x = dashStart_.x + (dashTarget_.x - dashStart_.x) * ease;
+        position.y = dashStart_.y + (dashTarget_.y - dashStart_.y) * ease;
+        position.z = dashStart_.z + (dashTarget_.z - dashStart_.z) * ease;
+        return;
+    }
+
+    // 到着後の小揺れ
+    if (dashShakeTimer_ > 0.0f) {
+        dashShakeTimer_ -= dt;
+        float shakeAmp = dashShakeTimer_ / 0.2f * 0.4f;
+        position.x += std::sin(moveTime_ * 80.0f) * shakeAmp;
+        position.z += std::cos(moveTime_ * 80.0f) * shakeAmp;
+    }
+
+    // ===== (3) オービット（激怒後はプレイヤー周囲を周回） =====
+    if (isOrbiting_) {
+        float actualOrbitSpeed = isEnraged ? orbitSpeed_ * 1.4f : orbitSpeed_;
+        orbitAngle_ += actualOrbitSpeed * dt;
+
+        TuboEngine::Math::Vector3 playerPos = player_->GetPosition();
+        float cx = playerPos.x + std::cos(orbitAngle_) * orbitRadius_;
+        float cy = playerPos.y + std::sin(orbitAngle_) * orbitRadius_;
+
+        // ベース位置をオービット軌跡に追従させる
+        basePosition_.x = cx;
+        basePosition_.y = cy;
+        // Z は元のベース高さを維持
+    }
+
+    // ===== (2) ストレイフ（左右ゆっくりスライド） ===== ※オービット中は不使用
+    float strafeOffset = 0.0f;
+    if (!isOrbiting_) {
+        strafeOffset = std::sin(moveTime_ * strafeFreq_ * 2.0f * kPi) * strafeAmp_;
+    }
+
+    // 最終位置の組み立て
+    position.x = basePosition_.x + strafeOffset;
+    position.y = basePosition_.y;
+    position.z = basePosition_.z;
 }
 
 void CircusEnemy::UpdateAttackCycle(float dt) {
