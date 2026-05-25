@@ -15,6 +15,16 @@ public:
     void DrawSprite();
     void DrawImGui();
 
+    // ジャスト回避時の同期・消去用
+    float GetBulletSpeed() const { return bulletSpeed_; }
+    float GetBulletTurnSpeed() const { return bulletTurnSpeed_; }
+    float GetBulletChaosAmp() const { return bulletChaosAmp_; }
+    float GetBulletChaosFreq() const { return bulletChaosFreq_; }
+    float GetBulletPhase1Duration() const { return bulletPhase1Duration_; }
+    
+    void ClearBulletsNear(const TuboEngine::Math::Vector3& center, float radius);
+    void ClearAllBullets(); // ジャスト回避時に画面上の全弾を消去する
+
 private:
     void TryFireMissiles(bool canSeePlayer, float dt);
     void FireSingleMissile(const TuboEngine::Math::Vector3& launchDir, float speed);
@@ -98,4 +108,31 @@ private:
     int remainingMissiles_ = 0;
     float burstTimer_ = 0.0f;
     const float kBurstDelay = 0.03f; // 1発ごとの間隔
+
+    // ===== ボス本体の移動 =====
+    void UpdateBossMovement(float dt);
+
+    // 共通
+    float moveTime_ = 0.0f;          // 移動用の累積時間
+    TuboEngine::Math::Vector3 basePosition_; // 初回Update時に確定する基準座標
+    bool basePositionInitialized_ = false;   // 基準位置が確定済みか
+
+    // (2) ストレイフ（左右ゆっくりスライド）
+    float strafeAmp_  = 3.5f;   // 振幅
+    float strafeFreq_ = 0.2f;   // 周波数(Hz)
+
+    // (3) オービット（プレイヤー周囲を回る）
+    float orbitAngle_    = 0.0f;  // 現在の角度
+    float orbitRadius_   = 12.0f; // プレイヤーからの距離
+    float orbitSpeed_    = 0.3f;  // 角速度(rad/s)
+    bool  isOrbiting_    = false; // オービット中か
+
+    // (4) フェーズダッシュ（HP半分で一度だけ発動）
+    bool  phaseDashTriggered_ = false; // 発動済みか
+    bool  isDashing_          = false; // ダッシュ中か
+    float dashTimer_          = 0.0f;
+    const float kDashDuration = 0.35f; // ダッシュにかかる秒数
+    TuboEngine::Math::Vector3 dashStart_;
+    TuboEngine::Math::Vector3 dashTarget_;
+    float dashShakeTimer_     = 0.0f;  // 到着後の小揺れ用
 };

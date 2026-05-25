@@ -10,6 +10,10 @@
 #include "PlayerAutoController.h" // 追加
 // 前方宣言（ヘッダ依存軽減）
 class IParticleEmitter;
+class PlayerEvasion;
+namespace TuboEngine {
+	class TextObject;
+}
 
 #include <deque>
 
@@ -48,6 +52,8 @@ public:
 
 	// 弾を撃つ処理
 	void Shoot();
+	// 弾を全消去する
+	void ClearBullets();
 
 	// 移動処理
 	void Move();
@@ -67,6 +73,9 @@ private:
 	void StartDodge();
 	void UpdateDodge();
 	TuboEngine::Math::Vector3 GetDodgeInputDirection() const;
+
+	// --- ジャスト回避関連 ---
+	void OnJustEvasion(Collider* other);
 
 public:
 	///-----------------------------------
@@ -147,7 +156,7 @@ public:
 	void AutoStartDodge() { StartDodge(); }
 
 	// --- 回避可能か ---
-	bool CanDodge() const { return !isDodging && dodgeCooldownTimer <= 0.0f; }
+	bool CanDodge() const;
 
 private:
 	///--------------------------------------------------
@@ -168,15 +177,8 @@ private:
 	float damageCooldownTimer = 0.0f;                   // ダメージクールダウンタイマー
 	float damageCooldownTime = 1.0f;                    // ダメージクールダウン時間（秒）
 
-	// 回避行動
-	bool isDodging = false;                             // 回避中フラグ
-	float dodgeTimer = 0.0f;                            // 回避残り時間
-	float dodgeCooldownTimer = 0.0f;                    // 回避クールダウンタイマー
-	float dodgeDuration = 0.2f;                         // 回避時間（秒）
-	float dodgeCooldown = 1.0f;                         // 回避クールダウン（秒）
-	float dodgeSpeed = 0.5f;                            // 回避速度
-
-	TuboEngine::Math::Vector3 dodgeDirection = {0.0f, 0.0f, 0.0f};        // 回避方向
+	// --- 回避関連（別クラスへ分離） ---
+	std::unique_ptr<PlayerEvasion> evasionManager_;
 
 	TuboEngine::Math::Vector3 position; // プレイヤーの位置
 	TuboEngine::Math::Vector3 rotation; // プレイヤーの回転
@@ -214,6 +216,12 @@ private:
 	float dashPostEffectTimer_ = 0.0f;
 	float dashPostEffectDuration_ = 0.25f;
 	float dashRadialBlurPower_ = 0.06f; // 0.02がデフォルトなので少し強め
+	float dashRadialBlurPowerCurrentMax_ = 0.06f;
+	float dashPostEffectDurationCurrent_ = 0.25f;
+
+	// ジャスト回避テキスト演出
+	TuboEngine::TextObject* justEvasionText_ = nullptr;
+	float justEvasionTextTimer_ = 0.0f;
 
 	// 被弾点滅用
 	float damageBlinkTime_ = 0.0f;
