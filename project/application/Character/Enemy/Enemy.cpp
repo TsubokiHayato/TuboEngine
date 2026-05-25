@@ -521,9 +521,6 @@ void Enemy::Update() {
 		bullet->SetPlayer(player_);
 		bullet->SetCamera(camera_);
 		bullet->SetMapChipField(mapChipField);
-		if (followCamera_) {
-			followCamera_->StartImpulseZoom(0.85f, 0.18f);
-		}
 	};
 
 	// 状態ごとの行動（ノックバック中も自律移動は行うが、速度が小さくなる）
