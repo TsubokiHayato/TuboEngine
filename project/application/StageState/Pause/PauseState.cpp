@@ -114,7 +114,7 @@ void PauseState::Enter(StageScene* /*scene*/) {
 void PauseState::Update(StageScene* scene) {
 	auto* input = TuboEngine::Input::GetInstance();
 
-	// 既にシーンチェンジ演出中なら、完了待ち
+	// 譌｢縺ｫ繧ｷ繝ｼ繝ｳ繝√ぉ繝ｳ繧ｸ貍泌・荳ｭ縺ｪ繧峨∝ｮ御ｺ・ｾ・■
 	if (scene && scene->GetIsRequestSceneChange()) {
 		if (scene->GetSceneChangeAnimation() && scene->GetSceneChangeAnimation()->IsFinished()) {
 			// 演出完了でタイトルへ
