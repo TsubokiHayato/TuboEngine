@@ -45,8 +45,8 @@ void SceneManager::Update() {
 	//現在のシーン番号を取得
 	currentSceneNo = currentScene->GetSceneNo();
 
-	//前のシーン番号と現在のシーン番号が異なる場合
-	if (prevSceneNo != currentSceneNo) {
+    //前のシーン番号と現在のシーン番号が異なる場合
+	if (prevSceneNo != currentSceneNo || forceReload_) {
 		//現在のシーンがnullptrでない場合
 		if (currentScene != nullptr) {
 			//終了処理
@@ -74,11 +74,12 @@ void SceneManager::Update() {
 			//クリアシーンを設定
 			currentScene = std::make_unique<ClearScene>();
 			currentScene->Initialize();
-		} else if (currentSceneNo == OVER) {
+        } else if (currentSceneNo == OVER) {
 			//クリアシーンを設定
 			currentScene = std::make_unique<OverScene>();
 			currentScene->Initialize();
 		}
+       forceReload_ = false;
 	}
 	//現在のシーンがnullptrでない場合
 	if (currentScene) {
@@ -151,8 +152,12 @@ void SceneManager::ImGuiDraw() {
 void SceneManager::ChangeScene(int sceneNo) {
 	//現在のシーンがnullptrでない場合
 	if (currentScene) {
-		//シーン番号を設定
-		currentScene->SetSceneNo(sceneNo);
+      //シーン番号を設定
+		if (currentScene->GetSceneNo() == sceneNo) {
+			forceReload_ = true;
+		} else {
+			currentScene->SetSceneNo(sceneNo);
+		}
 	}
 }
 
