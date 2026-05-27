@@ -179,8 +179,9 @@ void StageReadyState::Object3DDraw(StageScene* scene) {
 		sky->Draw();
 	}
 
-	Player* player = scene->GetPlayer();
-	player->Draw();
+    if (auto* player = scene->GetPlayer()) {
+		player->Draw();
+	}
 }
 
 void StageReadyState::SpriteDraw(StageScene* scene) {
