@@ -191,8 +191,9 @@ void StagePlayingState::Object3DDraw(StageScene* scene) {
 	if (auto* sky = scene->GetSkyDome().get()) {
 		sky->Draw();
 	}
-	Player* player = scene->GetPlayer();
-	player->Draw();
+    if (auto* player = scene->GetPlayer()) {
+		player->Draw();
+	}
 
 
 }
