@@ -3,47 +3,48 @@
 #include "ImGuiManager.h"
 #include "Input.h"
 #include "StageScene.h"
+#include "Stage/StageManager.h"
 #include "TextureManager.h"
 #include <cmath>
 
 namespace {
-constexpr float kScreenW = 1280.0f;
-constexpr float kScreenH = 720.0f;
-constexpr float kItemX = 1280.0f / 3;
-constexpr float kResumeY = 300.0f;
-constexpr float kRestartY = 390.0f;
-constexpr float kTitleY = 480.0f;
+	constexpr float kScreenW = 1280.0f;
+	constexpr float kScreenH = 720.0f;
+	constexpr float kItemX = 1280.0f / 3;
+	constexpr float kResumeY = 300.0f;
+	constexpr float kRestartY = 390.0f;
+	constexpr float kTitleY = 480.0f;
 
-// ---- ImGui調整用（実行中に変更可能） ----
-float gItemX = 1280.0f / 3.0f;
-float gResumeY = 300.0f;
-float gRestartY = 390.0f;
-float gTitleY = 480.0f;
-float gCursorOffsetX = 16.0f; // X方向オフセット
-float gCursorOffsetY = 40.0f; // 追加: Y方向オフセット
-float gCursorSize = 26.0f;
+	// ---- ImGui調整用（実行中に変更可能） ----
+	float gItemX = 1280.0f / 3.0f;
+	float gResumeY = 300.0f;
+	float gRestartY = 390.0f;
+	float gTitleY = 480.0f;
+	float gCursorOffsetX = 16.0f; // X方向オフセット
+	float gCursorOffsetY = 40.0f; // 追加: Y方向オフセット
+	float gCursorSize = 26.0f;
 
-// 追加: 背景（画面全体の半透明グレー）
-float gBackgroundAlpha = 0.55f;
+	// 追加: 背景（画面全体の半透明グレー）
+	float gBackgroundAlpha = 0.55f;
 
-// PoseUI/Pose.png はサイズ固定（調整しない）。位置だけImGui対応。
-float gPoseX = kScreenW * 0.5f; // X軸：真ん中
-float gPoseY = 100.0f;          // Y軸：上側（上からのマージン）
+	// PoseUI/Pose.png はサイズ固定（調整しない）。位置だけImGui対応。
+	float gPoseX = kScreenW * 0.5f; // X軸：真ん中
+	float gPoseY = 100.0f;          // Y軸：上側（上からのマージン）
 
-// ---- Poseアニメ（位置/アルファのみ。サイズは触らない） ----
-bool gPoseAnimEnabled = true;
-float gPoseAnimTime = 0.0f;
-float gPoseFloatAmp = 40.0f;  // 上下振幅(px)
-float gPoseFloatSpeed = 1.6f; // ふわふわ速度
-float gPoseFadeSpeed = 6.0f;  // フェードイン速度
-float gPoseAlpha = 0.0f;      // 現在アルファ（0..1）
-// 追加: 回転・カラー
-float gPoseRotDegAmp = 3.0f;                  // 回転振幅(度)
-float gPoseRotSpeed = 1.2f;                   // 回転速度
-float gPoseBaseColor[3] = {1.0f, 1.0f, 1.0f}; // RGB
-bool gPoseColorPulse = false;
-float gPoseColorPulseAmp = 0.15f;
-float gPoseColorPulseSpeed = 2.0f;
+	// ---- Poseアニメ（位置/アルファのみ。サイズは触らない） ----
+	bool gPoseAnimEnabled = true;
+	float gPoseAnimTime = 0.0f;
+	float gPoseFloatAmp = 40.0f;  // 上下振幅(px)
+	float gPoseFloatSpeed = 1.6f; // ふわふわ速度
+	float gPoseFadeSpeed = 6.0f;  // フェードイン速度
+	float gPoseAlpha = 0.0f;      // 現在アルファ（0..1）
+	// 追加: 回転・カラー
+	float gPoseRotDegAmp = 3.0f;                  // 回転振幅(度)
+	float gPoseRotSpeed = 1.2f;                   // 回転速度
+	float gPoseBaseColor[3] = { 1.0f, 1.0f, 1.0f }; // RGB
+	bool gPoseColorPulse = false;
+	float gPoseColorPulseAmp = 0.15f;
+	float gPoseColorPulseSpeed = 2.0f;
 } // namespace
 
 void PauseState::Enter(StageScene* /*scene*/) {
@@ -65,48 +66,48 @@ void PauseState::Enter(StageScene* /*scene*/) {
 	// 追加: 背景（半透明グレー）
 	background_ = std::make_unique<TuboEngine::Sprite>();
 	background_->Initialize("barrier.png");
-	background_->SetAnchorPoint({0.0f, 0.0f});
-	background_->SetSize({kScreenW, kScreenH});
-	background_->SetPosition({0.0f, 0.0f});
-	background_->SetColor({0.0f, 0.0f, 0.0f, gBackgroundAlpha});
+	background_->SetAnchorPoint({ 0.0f, 0.0f });
+	background_->SetSize({ kScreenW, kScreenH });
+	background_->SetPosition({ 0.0f, 0.0f });
+	background_->SetColor({ 0.0f, 0.0f, 0.0f, gBackgroundAlpha });
 	background_->Update();
 
 	blackout_ = std::make_unique<TuboEngine::Sprite>();
 	blackout_->Initialize("PoseUI/Pose.png");
-	blackout_->SetAnchorPoint({0.5f, 0.0f});    // Xは中央、Yは上揃え
+	blackout_->SetAnchorPoint({ 0.5f, 0.0f });    // Xは中央、Yは上揃え
 	blackout_->SetGetIsAdjustTextureSize(true); // テクスチャ実サイズ（サイズ調整しない）
-	blackout_->SetPosition({gPoseX, gPoseY});
-	blackout_->SetColor({1.0f, 1.0f, 1.0f, gPoseAlpha});
+	blackout_->SetPosition({ gPoseX, gPoseY });
+	blackout_->SetColor({ 1.0f, 1.0f, 1.0f, gPoseAlpha });
 	blackout_->Update();
 
 	// Menu labels
 	resumeText_ = std::make_unique<TuboEngine::Sprite>();
 	resumeText_->Initialize("PoseUI/ReturnGame.png");
-	resumeText_->SetAnchorPoint({0.0f, 0.5f});
+	resumeText_->SetAnchorPoint({ 0.0f, 0.5f });
 	resumeText_->SetGetIsAdjustTextureSize(true);
-	resumeText_->SetPosition({gItemX, gResumeY});
+	resumeText_->SetPosition({ gItemX, gResumeY });
 	resumeText_->Update();
 
 	restartText_ = std::make_unique<TuboEngine::Sprite>();
 	restartText_->Initialize("PoseUI/ReStart.png");
-	restartText_->SetAnchorPoint({0.0f, 0.5f});
+	restartText_->SetAnchorPoint({ 0.0f, 0.5f });
 	restartText_->SetGetIsAdjustTextureSize(true);
-	restartText_->SetPosition({gItemX, gRestartY});
+	restartText_->SetPosition({ gItemX, gRestartY });
 	restartText_->Update();
 
 	titleText_ = std::make_unique<TuboEngine::Sprite>();
 	titleText_->Initialize("PoseUI/ReturnTitle.png");
-	titleText_->SetAnchorPoint({0.0f, 0.5f});
+	titleText_->SetAnchorPoint({ 0.0f, 0.5f });
 	titleText_->SetGetIsAdjustTextureSize(true);
-	titleText_->SetPosition({gItemX, gTitleY});
+	titleText_->SetPosition({ gItemX, gTitleY });
 	titleText_->Update();
 
 	// Cursor: small white rectangle
 	cursor_ = std::make_unique<TuboEngine::Sprite>();
 	cursor_->Initialize("barrier.png");
-	cursor_->SetAnchorPoint({1.0f, 0.5f});
-	cursor_->SetSize({gCursorSize, gCursorSize});
-	cursor_->SetColor({1.0f, 1.0f, 1.0f, 0.9f});
+	cursor_->SetAnchorPoint({ 1.0f, 0.5f });
+	cursor_->SetSize({ gCursorSize, gCursorSize });
+	cursor_->SetColor({ 1.0f, 1.0f, 1.0f, 0.9f });
 	UpdateCursor();
 	cursor_->Update();
 }
@@ -114,7 +115,7 @@ void PauseState::Enter(StageScene* /*scene*/) {
 void PauseState::Update(StageScene* scene) {
 	auto* input = TuboEngine::Input::GetInstance();
 
-	// 譌｢縺ｫ繧ｷ繝ｼ繝ｳ繝√ぉ繝ｳ繧ｸ貍泌・荳ｭ縺ｪ繧峨∝ｮ御ｺ・ｾ・■
+
 	if (scene && scene->GetIsRequestSceneChange()) {
 		if (scene->GetSceneChangeAnimation() && scene->GetSceneChangeAnimation()->IsFinished()) {
 			// 演出完了でタイトルへ
@@ -151,8 +152,10 @@ void PauseState::Update(StageScene* scene) {
 			return;
 		}
 		if (selected_ == 1) {
-			if (scene && scene->GetStageStateManager()) {
-				scene->GetStageStateManager()->ChangeState(StageType::Ready, scene);
+			StageManager::ResetCheckpoint();
+			StageManager::SetShowRestartMessage(false);
+			if (scene) {
+				scene->ChangeNextScene(STAGE);
 			}
 			return;
 		}
@@ -182,7 +185,8 @@ void PauseState::Update(StageScene* scene) {
 		gPoseAlpha += gPoseFadeSpeed * dt;
 		if (gPoseAlpha > 1.0f)
 			gPoseAlpha = 1.0f;
-	} else {
+	}
+	else {
 		gPoseAlpha = 1.0f;
 	}
 	const float floatY = gPoseAnimEnabled ? (std::sinf(gPoseAnimTime * gPoseFloatSpeed) * gPoseFloatAmp) : 0.0f;
@@ -193,17 +197,17 @@ void PauseState::Update(StageScene* scene) {
 		pulse = std::sinf(gPoseAnimTime * gPoseColorPulseSpeed) * gPoseColorPulseAmp;
 	}
 
-	// 背景（半透明グレー）
+	// 閭梧勹・亥濠騾乗・繧ｰ繝ｬ繝ｼ・・
 	if (background_) {
-		background_->SetSize({kScreenW, kScreenH});
-		background_->SetPosition({0.0f, 0.0f});
-		background_->SetColor({0.0f, 0.0f, 0.0f, gBackgroundAlpha});
+		background_->SetSize({ kScreenW, kScreenH });
+		background_->SetPosition({ 0.0f, 0.0f });
+		background_->SetColor({ 0.0f, 0.0f, 0.0f, gBackgroundAlpha });
 		background_->Update();
 	}
 
-	// ImGui調整内容を反映
+	// ImGui隱ｿ謨ｴ蜀・ｮｹ繧貞渚譏
 	if (blackout_) {
-		blackout_->SetPosition({gPoseX, gPoseY + floatY});
+		blackout_->SetPosition({ gPoseX, gPoseY + floatY });
 		blackout_->SetRotation(rotRad);
 		Vector4 col = blackout_->GetColor();
 		col.x = gPoseBaseColor[0] + pulse;
@@ -213,13 +217,13 @@ void PauseState::Update(StageScene* scene) {
 		blackout_->SetColor(col);
 	}
 	if (resumeText_)
-		resumeText_->SetPosition({gItemX, gResumeY});
+		resumeText_->SetPosition({ gItemX, gResumeY });
 	if (restartText_)
-		restartText_->SetPosition({gItemX, gRestartY});
+		restartText_->SetPosition({ gItemX, gRestartY });
 	if (titleText_)
-		titleText_->SetPosition({gItemX, gTitleY});
+		titleText_->SetPosition({ gItemX, gTitleY });
 	if (cursor_)
-		cursor_->SetSize({gCursorSize, gCursorSize});
+		cursor_->SetSize({ gCursorSize, gCursorSize });
 	UpdateCursor();
 
 	if (blackout_)
@@ -263,7 +267,7 @@ void PauseState::SpriteDraw(StageScene* scene) {
 		scene->GetPlayer()->ReticleDraw();
 	}
 
-	// 追加: 背景→UIの順で描画
+	// 閭梧勹竊旦I縺ｮ鬆・〒謠冗判
 	if (background_)
 		background_->Draw();
 	if (blackout_)
@@ -322,6 +326,11 @@ void PauseState::UpdateCursor() {
 		y = gRestartY;
 	else if (selected_ == 2)
 		y = gTitleY;
-	// X/Y方向のオフセットを適用
-	cursor_->SetPosition({gItemX - gCursorOffsetX, y + gCursorOffsetY});
+	// X/Y隴・ｽｹ陷ｷ莉｣繝ｻ郢ｧ・ｪ郢晁ｼ斐◎郢昴・繝ｨ郢ｧ蟶昶・騾包ｽｨ
+	cursor_->SetPosition({ gItemX - gCursorOffsetX, y + gCursorOffsetY });
 }
+
+
+
+
+
