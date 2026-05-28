@@ -16,6 +16,7 @@ public:
 	}
 
 private:
+ bool forceReload_ = false;
 	// コンストラクタ・デストラクタ・コピー禁止
 	static SceneManager* instance ;
 	SceneManager() = default;
