@@ -497,7 +497,7 @@ void Enemy::Update() {
 
 	// --- 射撃条件評価 ---
 	// 見えている限り、距離に関係なく射撃を試行する（射撃エネミーの遠距離攻撃）
-	wantShoot_ = (canSeePlayer && (state_ == State::Chase || state_ == State::Attack));
+	wantShoot_ = (canSeePlayer && (state_ == State::Chase || state_ == State::Attack) && UseNormalBullet());
 
 	// クールダウンタイマー更新
 	if (wantShoot_)
