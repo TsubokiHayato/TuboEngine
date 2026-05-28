@@ -1,10 +1,10 @@
 #include "DirectXcommon.h"
-#include<cassert>
+#include <SrvManager.h>
+#include <cassert>
 #include <thread>
-#include<SrvManager.h>
 
-#pragma comment(lib,"d3d12.lib")
-#pragma comment(lib,"dxgi.lib")
+#pragma comment(lib, "d3d12.lib")
+#pragma comment(lib, "dxgi.lib")
 
 namespace TuboEngine {
 using namespace Microsoft::WRL;
