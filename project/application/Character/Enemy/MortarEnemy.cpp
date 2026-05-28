@@ -297,6 +297,7 @@ void MortarEnemy::TryFireMissile(bool canSeePlayer, float dt) {
     missile_->SetCamera(camera_);
     missile_->Initialize(startPos);
 
+
     // --- 演出：発射エフェクト ---
     if (fireEmitter_) {
         fireEmitter_->GetPreset().center = startPos + artilleryOffset_;
