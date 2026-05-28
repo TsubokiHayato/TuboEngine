@@ -119,7 +119,7 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
         // セーブデータがある場合は、その次のチャンクから開始
         if (sLastClearedChunkIndex >= 0) {
             mainChunkIndex_ = std::min<int>(sLastClearedChunkIndex + 1, static_cast<int>(stageInstances_.size()) - 1);
-            
+
             // ゲームオーバーからの復帰ならメッセージを表示
             if (sShouldShowRestartMessage) {
                 auto* tm = TuboEngine::TextManager::GetInstance();
@@ -135,6 +135,8 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
                 saveMessageTimer_ = 2.0f;
                 sShouldShowRestartMessage = false; // フラグをリセット
             }
+        } else {
+            mainChunkIndex_ = 0;
         }
 
         player->SetPosition(GetPlayerStartPosition());
@@ -144,6 +146,7 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
 
 void StageManager::ResetCheckpoint() {
     sLastClearedChunkIndex = -1;
+    sShouldShowRestartMessage = false;
 }
 
 TuboEngine::Math::Vector3 StageManager::ComputeOriginForChunk(int row, int col) const {

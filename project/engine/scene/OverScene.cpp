@@ -145,8 +145,8 @@ void OverScene::Update() {
 		l.sprite->Update();
 	}
 	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		// リスタートメッセージを表示するように予約
-		StageManager::SetShowRestartMessage(true);
+     StageManager::ResetCheckpoint();
+		StageManager::SetShowRestartMessage(false);
 		SceneManager::GetInstance()->ChangeScene(STAGE);
 	}
 
