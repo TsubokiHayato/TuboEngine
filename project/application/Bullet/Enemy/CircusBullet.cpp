@@ -24,10 +24,8 @@ void CircusBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
     chaosFrequency_ = 10.0f; // 振動数
     phase1Duration_ = 0.4f;  // 発射後0.4秒間のタメを作る
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
     std::uniform_real_distribution<float> dist(0.0f, 6.283185f); // 0 ~ 2PI
-    swerveOffset_ = {dist(gen), dist(gen), dist(gen)};
+    swerveOffset_ = {dist(rng_), dist(rng_), dist(rng_)};
 
     // トレイルエミッターの取得・生成（全ミサイルで共有し、大量生成による負荷とリークを防ぐ）
     trailEmitter_ = TuboEngine::ParticleManager::GetInstance()->Find("CircusSharedTrail");
@@ -160,17 +158,23 @@ void CircusBullet::Update() {
     // トレイル（煙）とバーナー（推進器の炎）の発生
     if (isAlive) {
         if (trailEmitter_) {
-            trailEmitter_->GetPreset().center = position;
+            ParticlePreset preset = trailEmitter_->GetPreset();
+            preset.center = position;
+            trailEmitter_->GetPreset() = preset;
             trailEmitter_->Emit(1);
         }
         if (burnerEmitter_ && velocity.LengthSquared() > 0.001f) {
             // ミサイルの進行方向の逆側に少しずらして炎を吹かせる
             TuboEngine::Math::Vector3 backDir = TuboEngine::Math::Vector3::Normalize(velocity) * -0.5f; 
-            burnerEmitter_->GetPreset().center = position + backDir;
+            ParticlePreset preset = burnerEmitter_->GetPreset();
+            preset.center = position + backDir;
+            burnerEmitter_->GetPreset() = preset;
             burnerEmitter_->Emit(1);
         }
         if (sparkEmitter_ && velocity.LengthSquared() > 10.0f) {
-            sparkEmitter_->GetPreset().center = position;
+            ParticlePreset preset = sparkEmitter_->GetPreset();
+            preset.center = position;
+            sparkEmitter_->GetPreset() = preset;
             sparkEmitter_->Emit(1);
         }
     }
@@ -179,7 +183,8 @@ void CircusBullet::Update() {
     bool hit = false;
     if (player_) {
         TuboEngine::Math::Vector3 pc = player_->GetCenterPosition();
-        if (TuboEngine::Math::Vector3::Distance(position, pc) < 1.5f) {
+        float hitRadius = Collider::GetRadius();
+        if (TuboEngine::Math::Vector3::Distance(position, pc) < hitRadius + 0.7f) {
             player_->OnCollision(this);
             isAlive = false;
             hit = true;

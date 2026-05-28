@@ -212,20 +212,18 @@ void CircusEnemy::Update() {
 
         // 連鎖小爆発
         if (nextExplosionTime_ <= 0.0f) {
-            std::random_device rd;
-            std::mt19937 gen(rd());
             std::uniform_real_distribution<float> dist(-2.0f, 2.0f);
 
             if (explosionEmitter_) {
                 TuboEngine::Math::Vector3 expPos = position;
-                expPos.x += dist(gen);
-                expPos.y += dist(gen);
-                expPos.z += dist(gen) + 2.0f; // 腰から頭あたり
+                expPos.x += dist(rng_);
+                expPos.y += dist(rng_);
+                expPos.z += dist(rng_) + 2.0f; // 腰から頭あたり
                 explosionEmitter_->GetPreset().center = expPos;
                 explosionEmitter_->Emit(10);
             }
             std::uniform_real_distribution<float> timeDist(0.05f, 0.25f);
-            nextExplosionTime_ = timeDist(gen);
+            nextExplosionTime_ = timeDist(rng_);
         }
 
         // 最後に大爆発して消える
@@ -251,14 +249,12 @@ void CircusEnemy::Update() {
     // 激怒オーラ (HPが半分以下になったら常時発生)
     if (HP <= maxHp_ / 2) {
         if (auraEmitter_) {
-            std::random_device rd;
-            std::mt19937 gen(rd());
             std::uniform_real_distribution<float> dist(-1.5f, 1.5f);
 
             TuboEngine::Math::Vector3 auraPos = position;
-            auraPos.x += dist(gen);
-            auraPos.y += dist(gen);
-            auraPos.z += std::abs(dist(gen)) * 1.5f + 1.0f;
+            auraPos.x += dist(rng_);
+            auraPos.y += dist(rng_);
+            auraPos.z += std::abs(dist(rng_)) * 1.5f + 1.0f;
 
             auraEmitter_->GetPreset().center = auraPos;
             auraEmitter_->Emit(2); // 毎フレーム少しずつ
@@ -291,10 +287,13 @@ void CircusEnemy::Update() {
     Enemy::Update();
 
     // 基底クラスの単発弾を無効化
-    if (bullet) {
-        bullet->SetIsAlive(false); 
+    if (!disabledBaseBullet_) {
+        if (bullet) {
+            bullet->SetIsAlive(false); 
+        }
+        bulletTimer_ = 0.0f;
+        disabledBaseBullet_ = true;
     }
-    bulletTimer_ = 0.0f;
 }
 
 void CircusEnemy::ClearBulletsNear(const TuboEngine::Math::Vector3& center, float radius) {
@@ -331,8 +330,6 @@ void CircusEnemy::ClearAllBullets() {
 }
 
 void CircusEnemy::EmitHpParticle(const TuboEngine::Math::Vector2& pos) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
     std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
     std::uniform_real_distribution<float> angleDist(0.0f, 3.14159f * 2.0f);
 
@@ -340,16 +337,16 @@ void CircusEnemy::EmitHpParticle(const TuboEngine::Math::Vector2& pos) {
         if (!p.active) {
             p.active = true;
             // 右端から出るのでランダムに少し上下に散らす
-            p.position = {pos.x, pos.y + dist(gen) * 16.0f}; 
-            float angle = angleDist(gen);
+            p.position = {pos.x, pos.y + dist(rng_) * 16.0f}; 
+            float angle = angleDist(rng_);
             // 速度（飛び散る早さ）
-            float speed = 50.0f + std::abs(dist(gen)) * 100.0f;
+            float speed = 50.0f + std::abs(dist(rng_)) * 100.0f;
             // UI上の座標系は下が+Yなので、上方向への重力成分や拡散
             p.velocity = {std::cos(angle) * speed, std::sin(angle) * speed - 50.0f}; 
-            p.life = 0.3f + std::abs(dist(gen)) * 0.3f;
+            p.life = 0.3f + std::abs(dist(rng_)) * 0.3f;
             p.maxLife = p.life;
             // キラキラした黄色〜赤色
-            p.color = {1.0f, 0.4f + std::abs(dist(gen)) * 0.6f, 0.0f, 1.0f};
+            p.color = {1.0f, 0.4f + std::abs(dist(rng_)) * 0.6f, 0.0f, 1.0f};
             p.sprite->SetColor(p.color);
             break;
         }
@@ -528,6 +525,10 @@ void CircusEnemy::TryFireMissiles(bool canSeePlayer, float dt) {
             if (muzzleFlashEmitter_) {
                 muzzleFlashEmitter_->GetPreset().center = position + TuboEngine::Math::Vector3{0.0f, 0.0f, 2.5f};
                 muzzleFlashEmitter_->Emit(60);
+            }
+
+            if (followCamera_) {
+                followCamera_->StartImpulseZoom(1.2f, 0.22f);
             }
 
             ExecuteAttack(currentAttack_);
