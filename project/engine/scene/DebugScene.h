@@ -50,7 +50,7 @@ public:
 	TuboEngine::Camera* GetMainCamera() const { return camera.get(); }
 
 private:
-	std::unique_ptr<Audio> audio = nullptr;
+	std::unique_ptr<TuboEngine::Audio> audio = nullptr;
 
 	std::unique_ptr<TuboEngine::Camera> camera = nullptr;
 	TuboEngine::Math::Vector3 cameraPosition = {0.0f, 1.0f, -15.0f};
