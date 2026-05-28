@@ -3,8 +3,8 @@
 #include "AudioCommon.h"
 #include <thread>
 
-class Audio
-{
+namespace TuboEngine {
+class Audio {
 public:
 	/// <summary>
 	/// デストラクタ
@@ -57,11 +57,10 @@ public:
 	void SetPlaybackSpeed(float speed);
 
 	/// <summary>
-		/// 再生位置取得
-		/// </summary>
-		/// <returns></returns>
+	/// 再生位置取得
+	/// </summary>
+	/// <returns></returns>
 	float GetPlaybackPosition();
-
 
 	/// <summary>
 	/// サウンドの長さ取得
@@ -70,40 +69,39 @@ public:
 	float GetSoundDuration() const;
 
 	/*---------------
-		スクラッチ
+	    スクラッチ
 	---------------*/
 	///// <summary>
 	///// スクラッチ開始
 	///// </summary>
-	//void StartScratch();
+	// void StartScratch();
 
 	///// <summary>
 	///// スクラッチ更新
 	///// </summary>
 	///// <param name="position">再生位置</param>
-	//void UpdateScratch(float position);
+	// void UpdateScratch(float position);
 
 	///// <summary>
 	///// スクラッチ停止
 	///// </summary>
-	//void StopScratch();
+	// void StopScratch();
 
+private:                            // メンバ変数
+	std::string directoryPath_;     // ディレクトリパス
+	uint32_t soundDataHandle_ = 0u; // サウンドデータハンドル
+	uint32_t voiceDataHandle_ = 0u; // ボイスデータハンドル
 
-
-private: // メンバ変数
-	std::string directoryPath_;  // ディレクトリパス
-	uint32_t soundDataHandle_ = 0u;  // サウンドデータハンドル
-	uint32_t voiceDataHandle_ = 0u;  // ボイスデータハンドル
-
-	float playbackPosition_ = 0.0f;// 再生位置
-	float playbackSpeed_ = 1.0f;// 再生速度
+	float playbackPosition_ = 0.0f; // 再生位置
+	float playbackSpeed_ = 1.0f;    // 再生速度
 
 	//// スクラッチ関連
-	//std::thread scratchThread_;
-	//std::atomic<bool> isScratching_;
-	//std::atomic<float> scratchPosition_;
+	// std::thread scratchThread_;
+	// std::atomic<bool> isScratching_;
+	// std::atomic<float> scratchPosition_;
 	///// <summary>
 	///// スクラッチループ
 	///// </summary>
 	////void ScratchLoop();
 };
+} // namespace TuboEngine

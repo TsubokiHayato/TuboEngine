@@ -19,7 +19,7 @@ void DebugScene::Initialize() {
 
     // Audio
     const std::string audioFileName = "fanfare.wav";
-    audio = std::make_unique<Audio>();
+    audio = std::make_unique<TuboEngine::Audio>();
     audio->Initialize(audioFileName);
 
     // SkyBox
