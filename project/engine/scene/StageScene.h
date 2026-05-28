@@ -138,7 +138,7 @@ private:
 	///			メンバ変数
 	///----------------------------------------------------------------------------------------
 
-	std::unique_ptr<Audio> audio = nullptr;
+	std::unique_ptr<TuboEngine::Audio> audio = nullptr;
 
 	std::unique_ptr<CollisionManager> collisionManager_;
 
@@ -149,7 +149,7 @@ private:
 	TuboEngine::Math::Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
 
 	std::unique_ptr<Player> player_ = nullptr;
-	std::unique_ptr<Enemy> enemy_ = nullptr; // TODO: 旧世代の単体 Enemy。必要なければ将来削除。
+	std::unique_ptr<Enemy> enemy_ = nullptr; 
 
 	std::unique_ptr<TuboEngine::SkyBox> skyBox_ = nullptr;
 
