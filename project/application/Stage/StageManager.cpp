@@ -71,6 +71,7 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
     if (player) {
         player_ = player;
     }
+    followCamera_ = followCamera;
     stageInstances_.clear();
 
     // Demoモード時は Stage.csv を使わず、中央に 1 チャンクだけ Demo.csv を配置する
@@ -245,6 +246,7 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                     enemy->SetCamera(cam);
                 }
                 enemy->SetPlayer(player);
+                enemy->SetFollowCamera(followCamera);
                 enemy->SetMapChipField(field);
                 enemy->SetPosition(pos);
                 enemy->Update();
@@ -259,6 +261,7 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                     enemy->SetCamera(cam);
                 }
                 enemy->SetPlayer(player);
+                enemy->SetFollowCamera(followCamera);
                 enemy->SetMapChipField(field);
                 enemy->SetPosition(pos);
                 enemy->Update();
@@ -273,6 +276,7 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                     enemy->SetCamera(cam);
                 }
                 enemy->SetPlayer(player);
+                enemy->SetFollowCamera(followCamera);
                 enemy->SetMapChipField(field);
                 enemy->SetPosition(pos);
                 enemy->Update();
@@ -287,6 +291,7 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
                     enemy->SetCamera(cam);
                 }
                 enemy->SetPlayer(player);
+                enemy->SetFollowCamera(followCamera);
                 enemy->SetMapChipField(field);
                 enemy->SetPosition(pos);
                 enemy->Update();
@@ -306,6 +311,7 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
 
 void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
 	TuboEngine::Camera* cam = followCamera ? followCamera->GetCamera() : nullptr;
+    followCamera_ = followCamera;
     const float dt = 0.016f;
     globalTimer_ += dt;
 
@@ -521,7 +527,14 @@ void StageManager::Draw3D() {
     std::unordered_map<TuboEngine::Model*, BatchInfo> instancedDataMap;
     
     TuboEngine::Math::Vector3 camPos = player_ ? player_->GetPosition() : TuboEngine::Math::Vector3{0, 0, 0};
-    const float kCullingRadiusSq = 150.0f * 150.0f; 
+    
+    // カメラのズーム値に応じてカリング半径を拡張
+    float zoom = 1.0f;
+    if (followCamera_) {
+        zoom = followCamera_->GetZoom();
+    }
+    float cullingRadius = 600.0f * std::max(1.0f, zoom);
+    const float kCullingRadiusSq = cullingRadius * cullingRadius;
 
     auto collectData = [&](StageInstance& inst, auto& list) {
         for (auto& item : list) {
