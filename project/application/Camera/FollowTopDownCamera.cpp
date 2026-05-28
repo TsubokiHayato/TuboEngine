@@ -127,14 +127,7 @@ void FollowTopDownCamera::Update() {
 			impulseZoomActive_ = false;
 			StartIntroZoom(zoom_, impulseZoomReturnZoom_, impulseZoomReturnDelaySec_);
 		}
-	} else {
-		// ホイールズーム更新（下限・上限を保持）
-		int wheel = TuboEngine::Input::GetInstance()->GetWheel();
-		if (wheel != 0) {
-			float delta = (wheel > 0 ? -1.0f : 1.0f) * zoomSpeed_;
-			zoom_ = std::max(zoomMin_, std::min(zoomMax_, zoom_ + delta));
-		}
-	}
+	} 
 
 	// プレイヤーの位置を取得
 	TuboEngine::Math::Vector3 targetPos = target_->GetPosition();
