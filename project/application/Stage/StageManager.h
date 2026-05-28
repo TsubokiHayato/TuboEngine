@@ -135,6 +135,8 @@ private:
 
     // StageScene から借りるだけのプレイヤー参照（所有しない）
     Player* player_ = nullptr;
+    // フォローカメラへの参照
+    FollowTopDownCamera* followCamera_ = nullptr;
 
 	// Entrance / Exit 演出
 	std::vector<IParticleEmitter*> entranceEmitters_;
