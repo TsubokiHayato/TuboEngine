@@ -145,8 +145,7 @@ void OverScene::Update() {
 		l.sprite->Update();
 	}
 	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-     StageManager::ResetCheckpoint();
-		StageManager::SetShowRestartMessage(false);
+		StageManager::SetShowRestartMessage(true);
 		SceneManager::GetInstance()->ChangeScene(STAGE);
 	}
 
