@@ -152,8 +152,7 @@ void PauseState::Update(StageScene* scene) {
 			return;
 		}
 		if (selected_ == 1) {
-			StageManager::ResetCheckpoint();
-			StageManager::SetShowRestartMessage(false);
+			StageManager::SetShowRestartMessage(true);
 			if (scene) {
 				scene->ChangeNextScene(STAGE);
 			}
