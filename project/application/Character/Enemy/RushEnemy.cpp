@@ -131,6 +131,255 @@ void RushEnemy::Initialize() {
 	}
 }
 
+// =============================================================================
+// RushEnemy::BuildBehaviorTree
+// 突進エネミー専用ビヘイビアツリーを構築する。
+//
+// ツリー構造:
+//
+//  Selector [ルート]
+//  ├─ Sequence [壁/プレイヤー衝突リアクション中]
+//  │   ├─ Condition: isReacting_
+//  │   └─ Action: HandleReacting
+//  ├─ Sequence [突進中]
+//  │   ├─ Condition: isRushing_
+//  │   └─ Action: HandleRushing
+//  ├─ Sequence [突進ため（チャージ）中]
+//  │   ├─ Condition: isPreparing_
+//  │   └─ Action: HandlePrepare
+//  ├─ Sequence [突進後停止中]
+//  │   ├─ Condition: isStopping_
+//  │   └─ Action: HandleStop
+//  ├─ Sequence [突進後スキャン中]
+//  │   ├─ Condition: isScanning_
+//  │   └─ Action: DoScan（UpdatePerceptionAndTimers が管理）
+//  ├─ Sequence [プレイヤー視認 && 突進射程内 && 突進可能]
+//  │   ├─ Condition: btCanSee_ && dist <= rushTrigger && cooldown==0 && !requireExit
+//  │   └─ Action: StartRush（突進準備開始）
+//  ├─ Sequence [プレイヤー視認 && 突進射程内だがクールダウン中]
+//  │   ├─ Condition: btCanSee_ && dist <= rushTrigger
+//  │   └─ Action: Idle（その場待機）
+//  ├─ Sequence [プレイヤー追跡]
+//  │   ├─ Condition: (btCanSee_ || lastSeenTimer>0) && dist <= moveStartDistance_
+//  │   └─ Action: Chase（向く + 移動）
+//  ├─ Sequence [警戒]
+//  │   ├─ Condition: lastSeenTimer > 0
+//  │   └─ Action: Alert（最終目撃位置を向く）
+//  └─ Action: Idle
+// =============================================================================
+void RushEnemy::BuildBehaviorTree() {
+	using namespace BT;
+
+	constexpr float kDt = 1.0f / 60.0f;
+
+	// ---- 向き補間ヘルパー ----
+	auto FaceToward = [this](const TuboEngine::Math::Vector3& target) {
+		TuboEngine::Math::Vector3 toTarget = target - position;
+		float angleZ = std::atan2(toTarget.y, toTarget.x);
+		float diff   = NormalizeAngle(angleZ - rotation.z);
+		if (std::fabs(diff) < turnSpeed_) {
+			rotation.z = angleZ;
+		} else {
+			rotation.z += (diff > 0.0f ? 1.0f : -1.0f) * turnSpeed_;
+			rotation.z = NormalizeAngle(rotation.z);
+		}
+	};
+
+	// ---- リーフアクション ----
+
+	// [DoReacting] 壁/プレイヤー衝突後のノックバック処理
+	auto doReacting = Action([this]() -> NodeStatus {
+		state_ = State::Attack;
+		HandleReacting(1.0f / 60.0f);
+		return NodeStatus::Running;
+	});
+
+	// [DoRushing] 突進中：前方に高速移動
+	auto doRushing = Action([this]() -> NodeStatus {
+		state_ = State::Attack;
+		HandleRushing(1.0f / 60.0f);
+		return NodeStatus::Running;
+	});
+
+	// [DoPreparing] 突進ため中：ゆっくり前進しながらチャージ
+	auto doPreparing = Action([this]() -> NodeStatus {
+		state_ = State::Attack;
+		HandlePrepare(1.0f / 60.0f);
+		// ため中は prepareMoveSpeed_ でゆっくり前進
+		TuboEngine::Math::Vector3 move{rushDir_.x * prepareMoveSpeed_, rushDir_.y * prepareMoveSpeed_, 0.0f};
+		MoveWithCollision(position, move, mapChipField);
+		return NodeStatus::Running;
+	});
+
+	// [DoStopping] 突進後の硬直停止
+	auto doStopping = Action([this]() -> NodeStatus {
+		state_ = State::Attack;
+		stopTimer_ -= 1.0f / 60.0f;
+		if (stopTimer_ <= 0.0f) {
+			isStopping_ = false;
+			state_       = State::Idle;
+			return NodeStatus::Success;
+		}
+		return NodeStatus::Running;
+	});
+
+	// [DoScanning] 突進後の見回し（UpdatePerceptionAndTimers が動かす）
+	auto doScanning = Act([this]() {
+		state_ = State::LookAround;
+		// 実際のスキャンアニメは UpdatePerceptionAndTimers 内で処理済み
+	});
+
+	// [StartRush] 突進準備を即開始
+	auto startRush = Act([this]() {
+		if (!player_) return;
+		TuboEngine::Math::Vector3 toP = player_->GetPosition() - position;
+		toP.z = 0.0f;
+		float len = std::sqrt(toP.x * toP.x + toP.y * toP.y);
+		if (len > 0.001f) {
+			TuboEngine::Math::Vector3 dir{toP.x / len, toP.y / len, 0.0f};
+			rushDir_       = dir;
+			rotation.z     = std::atan2(dir.y, dir.x);
+			state_         = State::Attack;
+			isPreparing_   = true;
+			prepareTimer_  = prepareDuration_;
+			endedRushWithoutWall_ = false;
+		}
+	});
+
+	// [DoChase] プレイヤーを向いて追跡
+	auto doChase = Act([this, FaceToward]() {
+		state_         = State::Chase;
+		isPreparing_   = false;
+		isRushing_     = false;
+		isStopping_    = false;
+		if (player_) {
+			TuboEngine::Math::Vector3 target =
+				btCanSee_ ? player_->GetPosition() : lastSeenPlayerPos;
+			FaceToward(target);
+			TuboEngine::Math::Vector3 dir = target - position;
+			dir.z = 0.0f;
+			float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+			if (len > 0.1f) {
+				dir.x /= len; dir.y /= len;
+				MoveWithCollision(position, {dir.x * moveSpeed_, dir.y * moveSpeed_, 0.0f}, mapChipField);
+			}
+		}
+	});
+
+	// [DoAlert] 最終目撃位置を向いて警戒
+	auto doAlert = Act([this, FaceToward]() {
+		state_         = State::Alert;
+		isPreparing_   = false;
+		isRushing_     = false;
+		isStopping_    = false;
+		FaceToward(lastSeenPlayerPos);
+	});
+
+	// [DoIdle] 待機
+	auto doIdle = Act([this]() {
+		if (!isScanning_) {
+			isPreparing_ = false;
+			isRushing_   = false;
+			isStopping_  = false;
+		}
+		state_ = State::Idle;
+	});
+
+	// =========================================================
+	// ツリー構築
+	// =========================================================
+
+	auto root = Selector();
+
+	// 優先順位高：アクティブな戦闘フェーズ
+	{
+		auto seq = Sequence();
+		seq->AddChild(Condition([this]() { return isReacting_; }));
+		seq->AddChild(std::move(doReacting));
+		root->AddChild(std::move(seq));
+	}
+	{
+		auto seq = Sequence();
+		seq->AddChild(Condition([this]() { return isRushing_; }));
+		seq->AddChild(std::move(doRushing));
+		root->AddChild(std::move(seq));
+	}
+	{
+		auto seq = Sequence();
+		seq->AddChild(Condition([this]() { return isPreparing_; }));
+		seq->AddChild(std::move(doPreparing));
+		root->AddChild(std::move(seq));
+	}
+	{
+		auto seq = Sequence();
+		seq->AddChild(Condition([this]() { return isStopping_; }));
+		seq->AddChild(std::move(doStopping));
+		root->AddChild(std::move(seq));
+	}
+	{
+		auto seq = Sequence();
+		seq->AddChild(Condition([this]() { return isScanning_; }));
+		seq->AddChild(std::move(doScanning));
+		root->AddChild(std::move(seq));
+	}
+
+	// 突進射程内 && 突進可能 → 即突進
+	{
+		auto seq = Sequence();
+		seq->AddChild(Condition([this]() {
+			return btCanSee_
+				&& btDist_ <= rushTriggerDistance_
+				&& btDist_ > 0.001f
+				&& rushCooldownTimer_ <= 0.0f
+				&& !requireExitBeforeNextRush_;
+		}));
+		seq->AddChild(std::move(startRush));
+		root->AddChild(std::move(seq));
+	}
+
+	// 突進射程内 && クールダウン中 → その場で待機
+	{
+		auto seq = Sequence();
+		seq->AddChild(Condition([this]() {
+			return btCanSee_ && btDist_ <= rushTriggerDistance_;
+		}));
+		seq->AddChild(std::move(doIdle));
+		root->AddChild(std::move(seq));
+	}
+
+	// 追跡射程内 → Chase
+	{
+		auto seq = Sequence();
+		seq->AddChild(Condition([this]() {
+			return (btCanSee_ || lastSeenTimer > 0.0f)
+				&& btDist_ <= moveStartDistance_;
+		}));
+		seq->AddChild(std::move(doChase));
+		root->AddChild(std::move(seq));
+	}
+
+	// 警戒（タイマー残り）→ Alert
+	{
+		auto seq = Sequence();
+		seq->AddChild(Condition([this]() { return lastSeenTimer > 0.0f; }));
+		seq->AddChild(std::move(doAlert));
+		root->AddChild(std::move(seq));
+	}
+
+	// デフォルト：Idle
+	// doIdle は既に move されているので新規作成
+	root->AddChild(Act([this]() {
+		if (!isScanning_) {
+			isPreparing_ = false;
+			isRushing_   = false;
+			isStopping_  = false;
+		}
+		state_ = State::Idle;
+	}));
+
+	bt_ = std::move(root);
+}
+
 // -------------------------------------------------
 // Update helper: Perception and timers
 // -------------------------------------------------
@@ -689,65 +938,13 @@ void RushEnemy::Update() {
 		return;
 	}
 
-	// クールダウン/スタンが終了した直後に、突進可能範囲内なら即座に突進準備へ移行
-	if (!isStunned_ && !isPreparing_ && !isRushing_ && !isReacting_ && !isStopping_) {
-		if (rushCooldownTimer_ <= 0.0f && !requireExitBeforeNextRush_ && player_ && canSeePlayer) {
-			TuboEngine::Math::Vector3 toP = player_->GetPosition() - position;
-			toP.z = 0.0f;
-			float len = std::sqrt(toP.x * toP.x + toP.y * toP.y);
-			if (len <= rushTriggerDistance_ && len > 0.001f) {
-				TuboEngine::Math::Vector3 dir{toP.x / len, toP.y / len, 0.0f};
-				rushDir_ = dir;
-				rotation.z = std::atan2(dir.y, dir.x);
-				state_ = State::Attack;
-				isPreparing_ = true;
-				prepareTimer_ = prepareDuration_;
-			}
-		}
-	}
+	// ---- BT フレームデータ更新 ----
+	btCanSee_ = canSeePlayer;
+	btDist_   = distanceToPlayer;
 
-	UpdateStateByVision(canSeePlayer, distanceToPlayer);
-
-	if (state_ != State::Attack && !isScanning_) {
-		isPreparing_ = false;
-		if (isRushing_)
-			isRushing_ = false;
-		if (isStopping_)
-			isStopping_ = false;
-	}
-
-	UpdateFacingWhenNeeded(canSeePlayer);
-
-	switch (state_) {
-	case State::Idle:
-		break;
-	case State::Alert:
-		break;
-	case State::LookAround:
-		state_ = State::Idle;
-		break;
-	case State::Patrol:
-		state_ = State::Idle;
-		break;
-	case State::Chase: {
-		if (player_) {
-			TuboEngine::Math::Vector3 dir = player_->GetPosition() - position;
-			dir.z = 0.0f;
-			float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-			if (len > 0.1f) {
-				dir.x /= len;
-				dir.y /= len;
-				TuboEngine::Math::Vector3 move{dir.x * moveSpeed_, dir.y * moveSpeed_, 0};
-				MoveWithCollision(position, move, mapChipField);
-			}
-		}
-		break;
-	}
-	case State::Attack: {
-		UpdateAttackState(dt);
-		break;
-	}
-	}
+	// ---- ビヘイビアツリー実行 ----
+	// （即時突進チェック / UpdateStateByVision / UpdateFacingWhenNeeded / switch を BT で統合）
+	if (bt_) bt_->Tick();
 
 	// モデル・パーティクル・デバッグ描画
 	ApplyChargeAndVisuals(dt);
