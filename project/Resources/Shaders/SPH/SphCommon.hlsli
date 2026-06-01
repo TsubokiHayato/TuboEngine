@@ -35,7 +35,9 @@ cbuffer SphParams : register(b0) {
     float  g_SpeedMax;         // 色補間最大速度
     float4 g_ColorLow;         // colorLow
     float4 g_ColorHigh;        // colorHigh
-    float4x4 g_ViewProj;       // view-projection matrix
+    float  g_ParticleRadius;   // 粒子描画半径
+    float  _cbPad0, _cbPad1, _cbPad2;
+    float4x4 g_ViewProj;       // view-projection matrix (16-byte aligned)
 };
 
 // ---- SPH カーネル ----

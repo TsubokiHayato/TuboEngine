@@ -73,11 +73,12 @@ void SphSimulator::Update(float dt, TuboEngine::Camera* camera) {
     gp.boundMaxX = params_.boundMax.x;
     gp.boundMaxY = params_.boundMax.y;
     gp.boundMaxZ = params_.boundMax.z;
-    gp.speedMax  = 5.0f;
+    gp.speedMax       = params_.speedMax;
     gp.colorLow[0]  = params_.colorLow.x;  gp.colorLow[1]  = params_.colorLow.y;
     gp.colorLow[2]  = params_.colorLow.z;  gp.colorLow[3]  = params_.colorLow.w;
     gp.colorHigh[0] = params_.colorHigh.x; gp.colorHigh[1] = params_.colorHigh.y;
     gp.colorHigh[2] = params_.colorHigh.z; gp.colorHigh[3] = params_.colorHigh.w;
+    gp.particleRadius = params_.particleRadius;
     gp.viewProj = viewProj_;
 
     // GPU 上で全計算 (Density → Force → Integrate) × substeps + PrepareInstances
@@ -98,29 +99,30 @@ void SphSimulator::Draw() {
 // ============================================================
 void SphSimulator::DrawImGui() {
 #ifdef USE_IMGUI
-    ImGui::Begin("SPH Simulator (GPU)");
-    ImGui::Text("Particles : %d  [GPU Compute]", params_.particleCount);
+    ImGui::Begin("SPH シミュレーター (GPU)");
+    ImGui::Text("粒子数 : %d  [GPU Compute]", params_.particleCount);
     ImGui::Separator();
-    ImGui::Text("[Simulation]");
-    ImGui::DragFloat("Smoothing Radius", &params_.smoothingRadius, 0.01f,  0.1f,  5.0f);
-    ImGui::DragFloat("Rest Density",     &params_.restDensity,     0.5f,   1.0f, 200.0f);
-    ImGui::DragFloat("Stiffness",        &params_.stiffness,       1.0f,   1.0f, 500.0f);
-    ImGui::DragFloat("Viscosity",        &params_.viscosity,       0.1f,   0.0f,  50.0f);
-    ImGui::DragFloat("Particle Mass",    &params_.particleMass,    0.05f,  0.01f, 10.0f);
-    ImGui::DragFloat("Gravity",          &params_.gravity,         0.1f, -30.0f,   0.0f);
-    ImGui::DragFloat("Restitution",      &params_.restitution,     0.01f,  0.0f,   1.0f);
-    ImGui::SliderInt("Substeps",         &params_.substeps,        1, 5);
+    ImGui::Text("[シミュレーション]");
+    ImGui::DragFloat("影響半径",     &params_.smoothingRadius, 0.01f,  0.1f,  5.0f);
+    ImGui::DragFloat("静止密度",     &params_.restDensity,     0.5f,   1.0f, 200.0f);
+    ImGui::DragFloat("圧力剛性",     &params_.stiffness,       1.0f,   1.0f, 500.0f);
+    ImGui::DragFloat("粘性係数",     &params_.viscosity,       0.1f,   0.0f,  50.0f);
+    ImGui::DragFloat("粒子質量",     &params_.particleMass,    0.05f,  0.01f, 10.0f);
+    ImGui::DragFloat("重力",         &params_.gravity,         0.1f, -30.0f,   0.0f);
+    ImGui::DragFloat("壁反発係数",   &params_.restitution,     0.01f,  0.0f,   1.0f);
+    ImGui::SliderInt("サブステップ", &params_.substeps,        1, 5);
     ImGui::Separator();
-    ImGui::Text("[Rendering]");
-    ImGui::DragFloat("Particle Radius",  &params_.particleRadius,  0.01f, 0.02f, 2.0f);
-    ImGui::ColorEdit4("Color Low",  &params_.colorLow.x);
-    ImGui::ColorEdit4("Color High", &params_.colorHigh.x);
+    ImGui::Text("[レンダリング]");
+    ImGui::DragFloat("粒子半径",         &params_.particleRadius, 0.01f,  0.02f, 2.0f);
+    ImGui::DragFloat("最大速度（色）",   &params_.speedMax,       0.1f,   0.1f, 50.0f);
+    ImGui::ColorEdit4("低速カラー",      &params_.colorLow.x);
+    ImGui::ColorEdit4("高速カラー",      &params_.colorHigh.x);
     ImGui::Separator();
-    ImGui::Text("[Boundary]");
-    ImGui::DragFloat3("Bound Min", &params_.boundMin.x, 0.1f);
-    ImGui::DragFloat3("Bound Max", &params_.boundMax.x, 0.1f);
+    ImGui::Text("[境界ボックス]");
+    ImGui::DragFloat3("最小座標", &params_.boundMin.x, 0.1f);
+    ImGui::DragFloat3("最大座標", &params_.boundMax.x, 0.1f);
     ImGui::Separator();
-    if (ImGui::Button("Reset")) Reset();
+    if (ImGui::Button("リセット")) Reset();
     ImGui::End();
 #endif
 }

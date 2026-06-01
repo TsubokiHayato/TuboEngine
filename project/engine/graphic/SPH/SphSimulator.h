@@ -35,6 +35,7 @@ public:
         float gravity         = -3.0f;
         float restitution     = 0.2f;
         float particleRadius  = 0.18f;
+        float speedMax        = 5.0f;   // 色補間の最大速度
         TuboEngine::Math::Vector3 boundMin = {-5.0f, 0.0f, -5.0f};
         TuboEngine::Math::Vector3 boundMax = { 5.0f, 8.0f,  5.0f};
         TuboEngine::Math::Vector4 colorLow  = {0.4f, 0.7f, 1.0f, 1.0f};
