@@ -1,11 +1,13 @@
 #pragma once
 #include "Vector3.h"
 
-/// @brief SPH シミュレーション用パーティクル (CPU 側データ)
+/// @brief SPH 粒子データ (CPU & GPU 共通レイアウト)
+/// HLSL struct SphParticle と完全一致させること (48 bytes, 16-byte aligned)
 struct SphParticle {
-    TuboEngine::Math::Vector3 position  = {0.0f, 0.0f, 0.0f};
-    TuboEngine::Math::Vector3 velocity  = {0.0f, 0.0f, 0.0f};
-    TuboEngine::Math::Vector3 force     = {0.0f, 0.0f, 0.0f};
-    float density  = 0.0f;   // ρ
-    float pressure = 0.0f;   // p
+    TuboEngine::Math::Vector3 position;  // float3 : 12 bytes
+    float density  = 0.0f;               // float  :  4 bytes  → 16
+    TuboEngine::Math::Vector3 velocity;  // float3 : 12 bytes
+    float pressure = 0.0f;               // float  :  4 bytes  → 32
+    TuboEngine::Math::Vector3 force;     // float3 : 12 bytes
+    float _pad     = 0.0f;               // float  :  4 bytes  → 48
 };
