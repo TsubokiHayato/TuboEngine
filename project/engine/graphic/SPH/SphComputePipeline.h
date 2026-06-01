@@ -17,7 +17,7 @@ struct SphGPUInstance {
     TuboEngine::Math::Vector4   color;
 };
 
-/// @brief SPH シミュレーションパラメーター (GPU 定数バッファ / 112 bytes)
+/// @brief SPH シミュレーションパラメーター (GPU 定数バッファ / 176 bytes)
 struct alignas(16) SphGpuParams {
     int    particleCount;
     float  h;
@@ -35,9 +35,11 @@ struct alignas(16) SphGpuParams {
     float  boundMaxX, boundMaxY, boundMaxZ;
     float  speedMax;
     // 64 bytes
-    float  colorLow[4];   // 80
-    float  colorHigh[4];  // 96
-    TuboEngine::Math::Matrix4x4 viewProj; // 160 bytes total
+    float  colorLow[4];        // 80 bytes
+    float  colorHigh[4];       // 96 bytes
+    float  particleRadius;     // 粒子描画半径
+    float  _pad0, _pad1, _pad2;// 112 bytes (Matrix4x4 の 16-byte アライメント確保)
+    TuboEngine::Math::Matrix4x4 viewProj; // 176 bytes total
 };
 
 /// @brief SPH GPU コンピュートパイプライン
@@ -98,6 +100,7 @@ private:
     int instancingSrvIndex_ = -1;  // SRV  : VS が読む
 
     int particleCount_ = 0;
-    bool initialized_        = false;
-    bool instanceBufInSRV_  = false;  // true = NON_PIXEL_SHADER_RESOURCE, false = UAV/COMMON
+    bool initialized_          = false;
+    bool instanceBufInSRV_     = false;  // true = NON_PIXEL_SHADER_RESOURCE, false = UAV/COMMON
+    bool particleBufUploaded_  = false;  // true = 初回アップロード済み (UAV状態), false = COMMON状態
 };
