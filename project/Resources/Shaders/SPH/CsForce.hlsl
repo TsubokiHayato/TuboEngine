@@ -16,6 +16,7 @@ void main(uint3 tid : SV_DispatchThreadID)
 
     float3 fPressure  = float3(0, 0, 0);
     float3 fViscosity = float3(0, 0, 0);
+    float3 xsphSum    = float3(0, 0, 0);
 
     for (int j = 0; j < g_ParticleCount; ++j) {
         if (j == (int)i) continue;
@@ -33,7 +34,12 @@ void main(uint3 tid : SV_DispatchThreadID)
                       (-g_Mass * (pri + prj) / (2.0f * rhoj));
         // 粘性項
         fViscosity += (vj - vi) * (g_Viscosity * g_Mass / rhoj * KernelViscLap(r, g_H));
+        // XSPH 速度補正: 近傍との速度差を Poly6 で重み付け平均
+        xsphSum    += (vj - vi) * (g_Mass / rhoj * KernelPoly6(r * r, g_H));
     }
+
+    // XSPH 補正速度を保存 (Integrate で位置更新に使用)
+    g_Particles[i].xsph = g_XsphCoeff * xsphSum;
 
     float3 fGravity = float3(0.0f, g_Gravity * rho, 0.0f);
 
