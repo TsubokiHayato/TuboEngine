@@ -52,6 +52,10 @@ public:
 	/// <param name="numElements">要素数</param>
 	/// <param name="strideInBytes">バイト数</param>
 	void CreateSRVForStructuredBuffer(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> pResource, UINT enelemtQuantity, UINT structureByteStride);
+
+	/// @brief UAV (Unordered Access View) 作成 — Compute Shader が RW アクセスするバッファ用
+	void CreateUAVForStructuredBuffer(uint32_t index, ID3D12Resource* pResource,
+	                                   UINT elementCount, UINT structureByteStride);
 	/// <summary>
 	/// 描画前処理
 	/// </summary>
