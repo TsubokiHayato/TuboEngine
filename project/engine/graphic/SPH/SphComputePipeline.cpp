@@ -1,6 +1,8 @@
 #include "SphComputePipeline.h"
 #include <cassert>
 #include <cstring>
+#include <cmath>
+#include <algorithm>
 #undef min
 #undef max
 
@@ -9,19 +11,32 @@ using namespace Microsoft::WRL;
 // ============================================================
 //  Initialize
 // ============================================================
-void SphComputePipeline::Initialize(int particleCount) {
+void SphComputePipeline::Initialize(int particleCount,
+                                     const TuboEngine::Math::Vector3& boundMin,
+                                     const TuboEngine::Math::Vector3& boundMax,
+                                     float cellSize, int maxPerCell) {
     particleCount_ = particleCount;
-    auto* dx     = TuboEngine::DirectXCommon::GetInstance();
-    auto* device = dx->GetDevice().Get();
+    auto* dx = TuboEngine::DirectXCommon::GetInstance();
+
+    // ---- 空間ハッシュ次元を確定 (初期ボックスから算出、以後固定) ----
+    cellSize_   = cellSize;
+    gridMin_    = boundMin;
+    maxPerCell_ = maxPerCell;
+    gridDimX_ = std::max(1, (int)std::ceil((boundMax.x - boundMin.x) / cellSize));
+    gridDimY_ = std::max(1, (int)std::ceil((boundMax.y - boundMin.y) / cellSize));
+    gridDimZ_ = std::max(1, (int)std::ceil((boundMax.z - boundMin.z) / cellSize));
+    numCells_ = gridDimX_ * gridDimY_ * gridDimZ_;
 
     // ---- 1. ルートシグネイチャ作成 ----
     CreateRootSignature();
 
-    // ---- 2. Compute PSO x4 ----
+    // ---- 2. Compute PSO ----
     CreateComputePSO(L"Resources/Shaders/SPH/CsDensity.hlsl",   psoDensity_);
     CreateComputePSO(L"Resources/Shaders/SPH/CsForce.hlsl",     psoForce_);
     CreateComputePSO(L"Resources/Shaders/SPH/CsIntegrate.hlsl", psoIntegrate_);
     CreateComputePSO(L"Resources/Shaders/SPH/CsPrepareInstances.hlsl", psoPrepare_);
+    CreateComputePSO(L"Resources/Shaders/SPH/CsClearGrid.hlsl", psoClearGrid_);
+    CreateComputePSO(L"Resources/Shaders/SPH/CsBuildGrid.hlsl", psoBuildGrid_);
 
     // ---- 3. 粒子バッファ (DEFAULT heap, UAV) ----
     CreateDefaultBuffer(sizeof(SphParticle) * particleCount, particleBuf_);
@@ -29,7 +44,11 @@ void SphComputePipeline::Initialize(int particleCount) {
     // ---- 4. インスタンシングバッファ (DEFAULT heap, UAV + SRV) ----
     CreateDefaultBuffer(sizeof(SphGPUInstance) * particleCount, instanceBuf_);
 
-    // ---- 5. ディスクリプタ割り当て ----
+    // ---- 5. 空間ハッシュバッファ ----
+    CreateDefaultBuffer(sizeof(int) * (UINT64)numCells_, gridCountsBuf_);
+    CreateDefaultBuffer(sizeof(int) * (UINT64)numCells_ * maxPerCell_, gridCellsBuf_);
+
+    // ---- 6. ディスクリプタ割り当て ----
     auto* srv = TuboEngine::SrvManager::GetInstance();
 
     particleUavIndex_ = srv->Allocate();
@@ -47,7 +66,17 @@ void SphComputePipeline::Initialize(int particleCount) {
         instancingSrvIndex_, instanceBuf_.Get(),
         particleCount, sizeof(SphGPUInstance));
 
-    // ---- 6. パラメーター定数バッファ (UPLOAD) ----
+    gridCountsUav_ = srv->Allocate();
+    srv->CreateUAVForStructuredBuffer(
+        gridCountsUav_, gridCountsBuf_.Get(),
+        numCells_, sizeof(int));
+
+    gridCellsUav_ = srv->Allocate();
+    srv->CreateUAVForStructuredBuffer(
+        gridCellsUav_, gridCellsBuf_.Get(),
+        numCells_ * maxPerCell_, sizeof(int));
+
+    // ---- 7. パラメーター定数バッファ (UPLOAD) ----
     CreateParamsBuffer();
 
     initialized_ = true;
@@ -63,7 +92,9 @@ void SphComputePipeline::Finalize() {
     }
     psoDensity_.Reset(); psoForce_.Reset();
     psoIntegrate_.Reset(); psoPrepare_.Reset();
+    psoClearGrid_.Reset(); psoBuildGrid_.Reset();
     particleBuf_.Reset(); instanceBuf_.Reset(); paramsCbuf_.Reset();
+    gridCountsBuf_.Reset(); gridCellsBuf_.Reset();
     rootSig_.Reset();
     initialized_ = false;
 }
@@ -150,49 +181,64 @@ void SphComputePipeline::Dispatch(const SphGpuParams& params, int substeps) {
         instanceBufInSRV_ = false;
     }
 
-    // パラメーターを定数バッファに書き込む
-    std::memcpy(paramsMapped_, &params, sizeof(SphGpuParams));
+    // パラメーターを定数バッファに書き込む (グリッド次元を埋める)
+    SphGpuParams p = params;
+    p.gridDimX   = gridDimX_;
+    p.gridDimY   = gridDimY_;
+    p.gridDimZ   = gridDimZ_;
+    p.cellSize   = cellSize_;
+    p.gridMinX   = gridMin_.x;
+    p.gridMinY   = gridMin_.y;
+    p.gridMinZ   = gridMin_.z;
+    p.maxPerCell = maxPerCell_;
+    std::memcpy(paramsMapped_, &p, sizeof(SphGpuParams));
 
     // ディスクリプタヒープをセット
     ID3D12DescriptorHeap* heaps[] = { srv->GetDescriptorHeap() };
     cmd->SetDescriptorHeaps(1, heaps);
 
-    // Compute ルートシグネイチャをセット
+    // Compute ルートシグネイチャ + リソースをセット
     cmd->SetComputeRootSignature(rootSig_.Get());
-
-    // b0: params CBV
     cmd->SetComputeRootConstantBufferView(0, paramsCbuf_->GetGPUVirtualAddress());
+    cmd->SetComputeRootDescriptorTable(1, srv->GetGPUDescriptorHandle(particleUavIndex_));
+    cmd->SetComputeRootDescriptorTable(2, srv->GetGPUDescriptorHandle(instanceUavIndex_));
+    cmd->SetComputeRootDescriptorTable(3, srv->GetGPUDescriptorHandle(gridCountsUav_));
+    cmd->SetComputeRootDescriptorTable(4, srv->GetGPUDescriptorHandle(gridCellsUav_));
 
-    // u0: particle UAV
-    cmd->SetComputeRootDescriptorTable(
-        1, srv->GetGPUDescriptorHandle(particleUavIndex_));
-
-    // u1: instance UAV (PrepareInstances のみ使用、他は無視)
-    cmd->SetComputeRootDescriptorTable(
-        2, srv->GetGPUDescriptorHandle(instanceUavIndex_));
-
-    const UINT groups = (particleCount_ + 255) / 256;
+    const UINT pGroups = (particleCount_ + 255) / 256;  // 粒子数ベース
+    const UINT cGroups = (numCells_     + 255) / 256;    // セル数ベース
 
     for (int s = 0; s < substeps; ++s) {
+        // ---- 空間ハッシュ構築: カウンタクリア → 粒子登録 ----
+        // substep 毎に位置が変わるため毎回再構築する
+        cmd->SetPipelineState(psoClearGrid_.Get());
+        cmd->Dispatch(cGroups, 1, 1);
+        UAVBarrier(cmd, gridCountsBuf_.Get());
+
+        cmd->SetPipelineState(psoBuildGrid_.Get());
+        cmd->Dispatch(pGroups, 1, 1);
+        UAVBarrier(cmd, gridCountsBuf_.Get());
+        UAVBarrier(cmd, gridCellsBuf_.Get());
+
         // ---- Density pass ----
         cmd->SetPipelineState(psoDensity_.Get());
-        cmd->Dispatch(groups, 1, 1);
+        cmd->Dispatch(pGroups, 1, 1);
         UAVBarrier(cmd, particleBuf_.Get());
 
         // ---- Force pass ----
         cmd->SetPipelineState(psoForce_.Get());
-        cmd->Dispatch(groups, 1, 1);
+        cmd->Dispatch(pGroups, 1, 1);
         UAVBarrier(cmd, particleBuf_.Get());
 
         // ---- Integrate pass ----
         cmd->SetPipelineState(psoIntegrate_.Get());
-        cmd->Dispatch(groups, 1, 1);
+        cmd->Dispatch(pGroups, 1, 1);
         UAVBarrier(cmd, particleBuf_.Get());
     }
 
     // ---- PrepareInstances: WVP を GPU 上で計算 ----
     cmd->SetPipelineState(psoPrepare_.Get());
-    cmd->Dispatch(groups, 1, 1);
+    cmd->Dispatch(pGroups, 1, 1);
     UAVBarrier(cmd, instanceBuf_.Get());
 
     // instanceBuf_ を UAV → NON_PIXEL_SHADER_RESOURCE に遷移
@@ -224,7 +270,19 @@ void SphComputePipeline::CreateRootSignature() {
     uavRange1.BaseShaderRegister = 1;  // u1
     uavRange1.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-    D3D12_ROOT_PARAMETER params[3]{};
+    D3D12_DESCRIPTOR_RANGE uavRange2{};
+    uavRange2.RangeType          = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+    uavRange2.NumDescriptors     = 1;
+    uavRange2.BaseShaderRegister = 2;  // u2 (grid counts)
+    uavRange2.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+    D3D12_DESCRIPTOR_RANGE uavRange3{};
+    uavRange3.RangeType          = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+    uavRange3.NumDescriptors     = 1;
+    uavRange3.BaseShaderRegister = 3;  // u3 (grid cells)
+    uavRange3.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+    D3D12_ROOT_PARAMETER params[5]{};
     // [0] CBV b0
     params[0].ParameterType             = D3D12_ROOT_PARAMETER_TYPE_CBV;
     params[0].Descriptor.ShaderRegister = 0;
@@ -239,9 +297,19 @@ void SphComputePipeline::CreateRootSignature() {
     params[2].DescriptorTable.NumDescriptorRanges = 1;
     params[2].DescriptorTable.pDescriptorRanges   = &uavRange1;
     params[2].ShaderVisibility                    = D3D12_SHADER_VISIBILITY_ALL;
+    // [3] UAV u2 (grid counts)
+    params[3].ParameterType                       = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+    params[3].DescriptorTable.NumDescriptorRanges = 1;
+    params[3].DescriptorTable.pDescriptorRanges   = &uavRange2;
+    params[3].ShaderVisibility                    = D3D12_SHADER_VISIBILITY_ALL;
+    // [4] UAV u3 (grid cells)
+    params[4].ParameterType                       = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+    params[4].DescriptorTable.NumDescriptorRanges = 1;
+    params[4].DescriptorTable.pDescriptorRanges   = &uavRange3;
+    params[4].ShaderVisibility                    = D3D12_SHADER_VISIBILITY_ALL;
 
     D3D12_ROOT_SIGNATURE_DESC rsDesc{};
-    rsDesc.NumParameters = 3;
+    rsDesc.NumParameters = 5;
     rsDesc.pParameters   = params;
     rsDesc.Flags         = D3D12_ROOT_SIGNATURE_FLAG_NONE;  // Compute は IA 不要
 
