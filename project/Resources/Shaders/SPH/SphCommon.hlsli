@@ -46,6 +46,12 @@ cbuffer SphParams : register(b0) {
     float  g_CellSize;         // セルサイズ (= 初期 smoothingRadius)
     float3 g_GridMin;          // グリッド原点 (= 初期 boundMin)
     int    g_MaxPerCell;       // セルあたり最大粒子数
+    // ---- 外力 (力点から放射状) ----
+    float3 g_ExtForcePos;      // 力点中心
+    float  g_ExtForceRadius;   // 影響半径
+    float  g_ExtForceStrength; // 強さ (正=押し出し, 負=引き寄せ)
+    int    g_ExtForceActive;   // 有効フラグ
+    float  _extPad0, _extPad1;
 };
 
 // ---- SPH カーネル ----
