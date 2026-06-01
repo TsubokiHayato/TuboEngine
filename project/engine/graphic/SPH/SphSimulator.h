@@ -26,16 +26,16 @@
 class SphSimulator {
 public:
     struct Params {
-        int   particleCount   = 1000;
-        float smoothingRadius = 1.0f;
-        float restDensity     = 14.0f;
-        float stiffness       = 50.0f;
-        float viscosity       = 8.0f;
-        float particleMass    = 1.0f;
-        float gravity         = -3.0f;
-        float restitution     = 0.2f;
-        float particleRadius  = 0.18f;
-        float speedMax        = 5.0f;   // 色補間の最大速度
+        int   particleCount   = 10000;          // 粒子数
+        float smoothingRadius = 1.0f;           // 影響半径 h
+        float restDensity     = 6.0f;           // 静止密度 (カーネル積分から計算した実際の値)
+        float stiffness       = 200.0f;         // 圧力剛性 (Tait方程式用)
+        float viscosity       = 0.3f;           // 粘性係数 (水は低粘性)
+        float particleMass    = 1.0f;           // 粒子質量
+        float gravity         = -3.0f;          // 重力
+        float restitution     = 0.02f;          // 壁反発係数 (液体は跳ねない)
+        float particleRadius  = 0.12f;          // 描画半径 (粒子数増加に合わせて小さく)
+        float speedMax        = 5.0f;           // 色補間の最大速度
         TuboEngine::Math::Vector3 boundMin = {-5.0f, 0.0f, -5.0f};
         TuboEngine::Math::Vector3 boundMax = { 5.0f, 8.0f,  5.0f};
         TuboEngine::Math::Vector4 colorLow  = {0.4f, 0.7f, 1.0f, 1.0f};
