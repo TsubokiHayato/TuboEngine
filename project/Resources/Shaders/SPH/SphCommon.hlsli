@@ -2,14 +2,16 @@
 
 static const float SPH_PI = 3.14159265359f;
 
-// ---- GPU 上の粒子データ (SphParticle.h と完全一致) ----
+// ---- GPU 上の粒子データ (SphParticle.h と完全一致, 64 bytes) ----
 struct SphParticle {
     float3 position;
     float  density;
     float3 velocity;
     float  pressure;
     float3 force;
-    float  _pad;
+    float  _pad0;
+    float3 xsph;       // XSPH 速度補正
+    float  _pad1;
 };
 
 // ---- GPU 上のインスタンスデータ (SphGPUInstance と一致) ----
@@ -36,7 +38,8 @@ cbuffer SphParams : register(b0) {
     float4 g_ColorLow;         // colorLow
     float4 g_ColorHigh;        // colorHigh
     float  g_ParticleRadius;   // 粒子描画半径
-    float  _cbPad0, _cbPad1, _cbPad2;
+    float  g_XsphCoeff;        // XSPH 速度補正係数 ε
+    float  _cbPad1, _cbPad2;
     float4x4 g_ViewProj;       // view-projection matrix (16-byte aligned)
 };
 
