@@ -17,7 +17,18 @@ struct SphGPUInstance {
     TuboEngine::Math::Vector4   color;
 };
 
-/// @brief SPH シミュレーションパラメーター (GPU 定数バッファ / 176 bytes)
+static constexpr int kMaxSdfShapes = 16;
+
+/// @brief SDF 障害物形状 (SphCommon.hlsli の SdfShape と完全一致, 32 bytes)
+struct alignas(16) SdfShapeGpu {
+    float center[3];       // 0-11   中心座標
+    int   type;            // 12-15  0=sphere, 1=box
+    float halfExtents[3];  // 16-27  sphere:[0]=radius; box:各軸の半辺長
+    float _pad;            // 28-31
+};
+static_assert(sizeof(SdfShapeGpu) == 32, "SdfShapeGpu layout mismatch");
+
+/// @brief SPH シミュレーションパラメーター (GPU 定数バッファ)
 struct alignas(16) SphGpuParams {
     int    particleCount;
     float  h;
@@ -51,8 +62,10 @@ struct alignas(16) SphGpuParams {
     float  extForceRadius;                 // 224
     float  extForceStrength;               // 228
     int    extForceActive;                 // 232
-    float  surfaceTension;                 // 236  表面張力係数 σ
-    float  _pad4;                          // 240 bytes total
+    float  surfaceTension;                 // 232  表面張力係数 σ
+    int    sdfCount;                       // 236  SDF 障害物数 (0..kMaxSdfShapes)
+    // ここまで 240 bytes (16-byte aligned) ─ 以下に配列を続ける
+    SdfShapeGpu sdfShapes[kMaxSdfShapes]; // 240  16×32 = 512 bytes → 合計 752 bytes
 };
 
 /// @brief SPH GPU コンピュートパイプライン
