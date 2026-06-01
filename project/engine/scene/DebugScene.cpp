@@ -102,23 +102,9 @@ void DebugScene::Initialize() {
     // SPH シミュレーター初期化
     if (!sphSimulator_) {
         sphSimulator_ = std::make_unique<SphSimulator>();
-        SphSimulator::Params sphParams{};
-        // ---- 物理整合パラメーター ----
-        // smoothingRadius=1.0, spacing≈0.55 のとき
-        // 近傍粒子数≈26, W_poly6≈0.532 → 密度≈mass×13.8
-        // restDensity を実密度に合わせることで爆発を防ぐ
-        sphParams.particleCount   = 1000;
-        sphParams.smoothingRadius = 1.0f;
-        sphParams.particleMass    = 1.0f;    // mass×13.8 ≈ 13.8
-        sphParams.restDensity     = 14.0f;   // 実密度≈13.8 に近い値
-        sphParams.stiffness       = 50.0f;   // 穏やかな圧力
-        sphParams.viscosity       = 8.0f;    // 高粘性で安定
-        sphParams.gravity         = -3.0f;   // 緩やかな落下
-        sphParams.restitution     = 0.2f;
-        sphParams.particleRadius  = 0.18f;   // 1000個なので少し小さく
-        sphParams.boundMin = {-5.0f, 0.0f, -5.0f};
-        sphParams.boundMax = { 5.0f, 8.0f,  5.0f};
-        sphSimulator_->Initialize(sphParams, camera.get(),
+        // SphSimulator::Params のデフォルト値をそのまま使用
+        // パラメータ調整は SphSimulator.h か ImGui で行う
+        sphSimulator_->Initialize({}, camera.get(),
                                    "sphere/sphere.obj");
     }
 }
