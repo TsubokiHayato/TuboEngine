@@ -17,6 +17,14 @@
 #undef min
 #undef max
 
+/// @brief SDF 障害物の記述 (CPU 側インターフェース)
+struct SdfObstacle {
+    enum class Type { Sphere, Box } type;
+    TuboEngine::Math::Vector3 center;
+    TuboEngine::Math::Vector3 halfExtents;  // sphere: x=radius; box: 各軸の半辺長
+    std::string label;
+};
+
 /// @brief SPH 流体シミュレーター (GPU Compute 版)
 ///
 /// - 物理計算: 4 本の Compute Shader が全て GPU 上で実行
@@ -65,6 +73,14 @@ public:
     void Reset();
     void Finalize();
 
+    // ---- SDF 障害物管理 ----
+    void AddSphere(const TuboEngine::Math::Vector3& center, float radius,
+                   const std::string& label = "");
+    void AddBox(const TuboEngine::Math::Vector3& center,
+                const TuboEngine::Math::Vector3& halfExtents,
+                const std::string& label = "");
+    void ClearObstacles();
+
     Params& GetParams() { return params_; }
 
     // プリセット (水/ハチミツ/スライム をワンクリック適用)
@@ -87,6 +103,9 @@ private:
     TuboEngine::Math::Matrix4x4 viewProj_ = {};
 
     InstancedMeshRenderer renderer_;   // Object3d パイプラインで 1 DrawCall 描画
+
+    // ---- SDF 障害物 ----
+    std::vector<SdfObstacle> obstacles_;
 
     // ---- 再生コントロール ----
     bool  paused_            = false;  // 一時停止中は物理を進めない
