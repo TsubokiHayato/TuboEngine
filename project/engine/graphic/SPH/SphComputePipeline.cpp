@@ -106,10 +106,15 @@ void SphComputePipeline::UploadInitialParticles(const std::vector<SphParticle>& 
     staging->Unmap(0, nullptr);
 
     // DEFAULT heap バッファへコピー
+    // 初回は COMMON 状態、2回目以降 (Reset) は Dispatch 後の UNORDERED_ACCESS 状態から遷移する
+    D3D12_RESOURCE_STATES stateBefore = particleBufUploaded_
+        ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS
+        : D3D12_RESOURCE_STATE_COMMON;
+
     D3D12_RESOURCE_BARRIER barrier{};
     barrier.Type                   = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Transition.pResource   = particleBuf_.Get();
-    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;   // バッファの初期状態
+    barrier.Transition.StateBefore = stateBefore;
     barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_COPY_DEST;
     barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
     cmd->ResourceBarrier(1, &barrier);
@@ -119,6 +124,7 @@ void SphComputePipeline::UploadInitialParticles(const std::vector<SphParticle>& 
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
     barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
     cmd->ResourceBarrier(1, &barrier);
+    particleBufUploaded_ = true;
 
     // ステージングバッファは CommandExecution 後に解放されるよう保持
     // (ここでは CommandExecution 後まで生き続けるよう dx 側に任せる)
