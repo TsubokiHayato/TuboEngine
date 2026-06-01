@@ -12,6 +12,9 @@ public:
     void Draw() override;
     void DrawImGui();
 
+    // BT オーバーライド：砲撃専用ツリーを構築
+    void BuildBehaviorTree() override;
+
     void SetMissileInterval(float sec) { missileInterval_ = sec; }
     void SetMissileSpawnHeight(float height) { missileSpawnHeight_ = height; }
     void SetMissileImpactRadius(float radius) { missileImpactRadius_ = radius; }

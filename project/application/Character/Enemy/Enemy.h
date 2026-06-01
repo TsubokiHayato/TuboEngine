@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm> // for std::clamp
+#include "AI/BehaviorTree.h"
 #include "Character/BaseCharacter.h"
 #include "Bullet/Enemy/EnemyNormalBullet.h"
 #include "MapChip/MapChipField.h"
@@ -57,6 +58,11 @@ public:
     void SetAttackRange(float range) { attackRange_ = (range < 0.0f) ? 0.0f : range; }
 
     enum class State { Idle, Alert, LookAround, Patrol, Chase, Attack };
+
+    // ---- ビヘイビアツリー ----
+    // BuildBehaviorTree() を Initialize() 末尾で呼ぶことで bt_ を構築する。
+    // サブクラスはオーバーライドして独自ツリーを持てる。
+    virtual void BuildBehaviorTree();
 
 protected: 
 	TuboEngine::Math::Vector3 position;
@@ -130,6 +136,12 @@ protected:
     Player* player_ = nullptr;
     void ClearPath() { currentPath_.clear(); pathCursor_ = 0; lastPathGoalIndex_ = -1; }
 	bool BuildPathTo(const TuboEngine::Math::Vector3& worldGoal);
+
+    // ---- BT 用フレームキャッシュ ----
+    std::unique_ptr<BT::BehaviorNode> bt_;  ///< ビヘイビアツリーのルートノード
+    bool  btCanSee_ = false;               ///< 今フレームのプレイヤー視認フラグ
+    float btDist_   = 0.0f;               ///< 今フレームのプレイヤーまでの距離
+    bool  btIsDoingLookAround_ = false;   ///< LookAround 継続中フラグ
 
     // 視認状態管理
     bool sawPlayerPrev_ = false;          // 前フレーム視認していたか
