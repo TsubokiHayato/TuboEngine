@@ -103,19 +103,23 @@ void DebugScene::Initialize() {
     if (!sphSimulator_) {
         sphSimulator_ = std::make_unique<SphSimulator>();
         SphSimulator::Params sphParams{};
-        sphParams.particleCount   = 256;
+        // ---- 物理整合パラメーター ----
+        // smoothingRadius=1.0, spacing≈0.55 のとき
+        // 近傍粒子数≈26, W_poly6≈0.532 → 密度≈mass×13.8
+        // restDensity を実密度に合わせることで爆発を防ぐ
+        sphParams.particleCount   = 1000;
         sphParams.smoothingRadius = 1.0f;
-        sphParams.restDensity     = 600.0f;
-        sphParams.stiffness       = 200.0f;
-        sphParams.viscosity       = 0.1f;
-        sphParams.particleMass    = 0.02f;
-        sphParams.gravity         = -9.8f;
-        sphParams.restitution     = 0.4f;
-        sphParams.particleRadius  = 0.15f;
-        sphParams.boundMin = {-3.0f, 0.0f, -3.0f};
-        sphParams.boundMax = { 3.0f, 6.0f,  3.0f};
-        sphSimulator_->Initialize(sphParams, "particle.png");
-		sphSimulator_->Update(0.0f, camera.get()); // 初期状態を反映させるために一度更新しておく
+        sphParams.particleMass    = 1.0f;    // mass×13.8 ≈ 13.8
+        sphParams.restDensity     = 14.0f;   // 実密度≈13.8 に近い値
+        sphParams.stiffness       = 50.0f;   // 穏やかな圧力
+        sphParams.viscosity       = 8.0f;    // 高粘性で安定
+        sphParams.gravity         = -3.0f;   // 緩やかな落下
+        sphParams.restitution     = 0.2f;
+        sphParams.particleRadius  = 0.18f;   // 1000個なので少し小さく
+        sphParams.boundMin = {-5.0f, 0.0f, -5.0f};
+        sphParams.boundMax = { 5.0f, 8.0f,  5.0f};
+        sphSimulator_->Initialize(sphParams, camera.get(),
+                                   "sphere/sphere.obj");
     }
 }
 
@@ -141,7 +145,7 @@ void DebugScene::Update() {
     // Particles
     pm->Update(1.0f / 60.0f, camera.get());
 
-    // SPH 更新
+    // SPH 更新 (GPU Compute + InstancedMeshRenderer 更新)
     if (sphSimulator_) {
         sphSimulator_->Update(1.0f / 60.0f, camera.get());
     }
@@ -164,8 +168,13 @@ void DebugScene::Finalize() {
 }
 
 void DebugScene::Object3DDraw() {
+    // SPH: Object3d パイプラインでインスタンシング描画 (1 DrawCall)
+    if (sphSimulator_) {
+        sphSimulator_->Draw();
+        sphSimulator_->DrawBounds({0.3f, 0.8f, 1.0f, 1.0f});
+    }
 
-	TuboEngine::LineManager::GetInstance()->DrawGrid(16.0f, 8, TuboEngine::Math::Vector3{}, TuboEngine::Math::Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+    TuboEngine::LineManager::GetInstance()->DrawGrid(16.0f, 8, TuboEngine::Math::Vector3{}, TuboEngine::Math::Vector4{1.0f, 1.0f, 1.0f, 1.0f});
 }
 
 void DebugScene::SpriteDraw() {
@@ -199,9 +208,4 @@ void DebugScene::ImGuiDraw() {
 
 void DebugScene::ParticleDraw() {
     TuboEngine::ParticleManager::GetInstance()->Draw();
-
-    // SPH 描画 (ParticlePSO が有効なので続けて呼べる)
-    if (sphSimulator_) {
-        sphSimulator_->Draw();
-    }
 }
