@@ -104,9 +104,9 @@ void SphSimulator::DrawImGui() {
     ImGui::Separator();
     ImGui::Text("[シミュレーション]");
     ImGui::DragFloat("影響半径",     &params_.smoothingRadius, 0.01f,  0.1f,  5.0f);
-    ImGui::DragFloat("静止密度",     &params_.restDensity,     0.5f,   1.0f, 200.0f);
+    ImGui::DragFloat("静止密度",     &params_.restDensity,     0.1f,   1.0f, 30.0f);
     ImGui::DragFloat("圧力剛性",     &params_.stiffness,       1.0f,   1.0f, 500.0f);
-    ImGui::DragFloat("粘性係数",     &params_.viscosity,       0.1f,   0.0f,  50.0f);
+    ImGui::DragFloat("粘性係数",     &params_.viscosity,       0.01f,  0.0f,  10.0f);
     ImGui::DragFloat("粒子質量",     &params_.particleMass,    0.05f,  0.01f, 10.0f);
     ImGui::DragFloat("重力",         &params_.gravity,         0.1f, -30.0f,   0.0f);
     ImGui::DragFloat("壁反発係数",   &params_.restitution,     0.01f,  0.0f,   1.0f);
