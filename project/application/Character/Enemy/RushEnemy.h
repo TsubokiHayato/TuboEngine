@@ -20,6 +20,9 @@ public:
     void DrawImGui();           // パラメータ調整用
     void OnCollision(Collider* other) override; // プレイヤー接触時のノックバック & 追加リアクション
 
+    // BT オーバーライド：突進専用ツリーを構築
+    void BuildBehaviorTree() override;
+
 
 
 public:
