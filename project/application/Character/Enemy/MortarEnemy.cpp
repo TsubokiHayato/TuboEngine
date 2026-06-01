@@ -45,6 +45,9 @@ void MortarEnemy::Initialize() {
     // 砲台も同系色に
     artilleryObject_->SetModelColor({0.6f, 0.1f, 0.8f, 1.0f});
 
+    // ビヘイビアツリー構築
+    BuildBehaviorTree();
+
     // --- 発射エフェクト用 ---
     if (!fireEmitter_) {
         ParticlePreset p{};
@@ -66,6 +69,125 @@ void MortarEnemy::Initialize() {
     }
 }
 
+
+// =============================================================================
+// MortarEnemy::BuildBehaviorTree
+// 砲撃エネミー専用ビヘイビアツリーを構築する。
+//
+// ツリー構造:
+//
+//  Selector [ルート]
+//  ├─ Sequence [プレイヤー視認中 → 向いて砲撃]
+//  │   ├─ Condition: btCanSee_
+//  │   └─ Action: DoAttack（向く + TryFireMissile）
+//  ├─ Sequence [警戒 or 見回し]
+//  │   ├─ Condition: lastSeenTimer > 0 || btIsDoingLookAround_
+//  │   └─ Selector
+//  │       ├─ Sequence [Alert]
+//  │       │   ├─ Condition: lastSeenTimer > 0
+//  │       │   └─ Action: DoAlert（最終目撃位置を向く）
+//  │       └─ Action: DoLookAround（スキャン完了で Success）
+//  └─ Action: DoIdle（移動なし・待機）
+// =============================================================================
+void MortarEnemy::BuildBehaviorTree() {
+    using namespace BT;
+
+    // ---- 向き補間ヘルパー ----
+    auto FaceToward = [this](const TuboEngine::Math::Vector3& target) {
+        TuboEngine::Math::Vector3 toTarget = target - position;
+        float angleZ = std::atan2(toTarget.y, toTarget.x);
+        float diff   = NormalizeAngle(angleZ - rotation.z);
+        if (std::fabs(diff) < turnSpeed_) {
+            rotation.z = angleZ;
+        } else {
+            rotation.z += (diff > 0.0f ? 1.0f : -1.0f) * turnSpeed_;
+            rotation.z = NormalizeAngle(rotation.z);
+        }
+    };
+
+    // [DoAttack] 視認中：向いてミサイル発射
+    auto doAttack = Act([this, FaceToward]() {
+        state_ = State::Attack;
+        btIsDoingLookAround_ = false;
+        if (player_) FaceToward(player_->GetPosition());
+        TryFireMissile(true, 1.0f / 60.0f);
+    });
+
+    // [DoAlert] 警戒：最終目撃位置を向いて待つ
+    auto doAlert = Act([this, FaceToward]() {
+        state_ = State::Alert;
+        btIsDoingLookAround_ = false;
+        FaceToward(lastSeenPlayerPos);
+    });
+
+    // [DoLookAround] 見回し：左右スキャン
+    auto doLookAround = Action([this]() -> NodeStatus {
+        state_ = State::LookAround;
+        btIsDoingLookAround_ = true;
+
+        if (!lookAroundInitialized) {
+            lookAroundBaseAngle   = rotation.z;
+            lookAroundTargetAngle = lookAroundBaseAngle + lookAroundAngleWidth;
+            lookAroundDirection   = 1;
+            lookAroundCount       = 0;
+            lookAroundInitialized = true;
+        }
+        float diff = NormalizeAngle(lookAroundTargetAngle - rotation.z);
+        float turn = std::clamp(diff, -lookAroundSpeed, lookAroundSpeed);
+        rotation.z = NormalizeAngle(rotation.z + turn);
+
+        if (std::fabs(diff) < 0.02f) {
+            lookAroundDirection   *= -1;
+            lookAroundTargetAngle  = lookAroundBaseAngle + lookAroundDirection * lookAroundAngleWidth;
+            lookAroundCount++;
+            if (lookAroundCount >= lookAroundMaxCount) {
+                lookAroundInitialized = false;
+                btIsDoingLookAround_  = false;
+                return NodeStatus::Success;
+            }
+        }
+        return NodeStatus::Running;
+    });
+
+    // [DoIdle] 待機（砲撃エネミーは移動しない）
+    auto doIdle = Act([this]() {
+        state_ = State::Idle;
+        btIsDoingLookAround_ = false;
+    });
+
+    // =========================================================
+    // ツリー構築
+    // =========================================================
+
+    // 視認中 → Attack
+    auto seePlayerSeq = Sequence();
+    seePlayerSeq->AddChild(Condition([this]() { return btCanSee_; }));
+    seePlayerSeq->AddChild(std::move(doAttack));
+
+    // Alert or LookAround
+    auto alertOrLookSel = Selector();
+    {
+        auto alertSeq = Sequence();
+        alertSeq->AddChild(Condition([this]() { return lastSeenTimer > 0.0f; }));
+        alertSeq->AddChild(std::move(doAlert));
+        alertOrLookSel->AddChild(std::move(alertSeq));
+    }
+    alertOrLookSel->AddChild(std::move(doLookAround));
+
+    auto alertSeqOuter = Sequence();
+    alertSeqOuter->AddChild(Condition([this]() {
+        return lastSeenTimer > 0.0f || btIsDoingLookAround_;
+    }));
+    alertSeqOuter->AddChild(std::move(alertOrLookSel));
+
+    // ルート
+    auto root = Selector();
+    root->AddChild(std::move(seePlayerSeq));
+    root->AddChild(std::move(alertSeqOuter));
+    root->AddChild(std::move(doIdle));
+
+    bt_ = std::move(root);
+}
 
 void MortarEnemy::Update() {
     if (!isAlive) {
@@ -159,33 +281,16 @@ void MortarEnemy::Update() {
         }
     }
 
+    // ---- BT フレームデータ更新 ----
+    btCanSee_ = canSeePlayer;
+    btDist_   = 0.0f;
     if (player_) {
-        if (canSeePlayer) {
-            state_ = State::Attack;
-        } else if (lastSeenTimer > 0.0f) {
-            state_ = State::Alert;
-        } else if (state_ == State::Alert) {
-            state_ = State::LookAround;
-        } else if (state_ != State::LookAround) {
-            state_ = State::Idle;
-        }
+        TuboEngine::Math::Vector3 toP = player_->GetPosition() - position;
+        btDist_ = std::sqrt(toP.x * toP.x + toP.y * toP.y + toP.z * toP.z);
     }
 
-    if (player_ && (state_ == State::Attack || state_ == State::Alert)) {
-        TuboEngine::Math::Vector3 targetPos = (canSeePlayer) ? player_->GetPosition() : lastSeenPlayerPos;
-        TuboEngine::Math::Vector3 toTarget = targetPos - position;
-        float angleZ = std::atan2(toTarget.y, toTarget.x);
-        float diff = NormalizeAngle(angleZ - rotation.z);
-        float maxTurn = turnSpeed_;
-        if (std::fabs(diff) < maxTurn) {
-            rotation.z = angleZ;
-        } else {
-            rotation.z += (diff > 0 ? 1 : -1) * maxTurn;
-            rotation.z = NormalizeAngle(rotation.z);
-        }
-    }
-
-    TryFireMissile(canSeePlayer, dt);
+    // ---- ビヘイビアツリー実行（状態選択・向き・射撃を管理）----
+    if (bt_) bt_->Tick();
 
     if (missile_ && missile_->GetIsAlive()) {
         missile_->Update();
