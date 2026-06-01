@@ -81,6 +81,12 @@ void SphSimulator::Update(float dt, TuboEngine::Camera* camera) {
     gp.colorHigh[2] = params_.colorHigh.z; gp.colorHigh[3] = params_.colorHigh.w;
     gp.particleRadius = params_.particleRadius;
     gp.xsphCoeff      = params_.xsphCoeff;
+    gp.extForcePosX     = params_.extForcePos.x;
+    gp.extForcePosY     = params_.extForcePos.y;
+    gp.extForcePosZ     = params_.extForcePos.z;
+    gp.extForceRadius   = params_.extForceRadius;
+    gp.extForceStrength = params_.extForceStrength;
+    gp.extForceActive   = params_.extForceActive ? 1 : 0;
     gp.viewProj = viewProj_;
 
     // GPU 上で全計算 (Density → Force → Integrate) × substeps + PrepareInstances
@@ -125,6 +131,12 @@ void SphSimulator::DrawImGui() {
     ImGui::DragFloat3("最小座標", &params_.boundMin.x, 0.1f);
     ImGui::DragFloat3("最大座標", &params_.boundMax.x, 0.1f);
     ImGui::Separator();
+    ImGui::Text("[外力]");
+    ImGui::Checkbox("外力 有効",   &params_.extForceActive);
+    ImGui::DragFloat3("外力 位置", &params_.extForcePos.x,    0.1f);
+    ImGui::DragFloat("外力 半径",  &params_.extForceRadius,   0.1f,  0.1f,   20.0f);
+    ImGui::DragFloat("外力 強さ",  &params_.extForceStrength, 1.0f, -300.0f, 300.0f);
+    ImGui::Separator();
     if (ImGui::Button("リセット")) Reset();
     ImGui::End();
 #endif
@@ -156,6 +168,16 @@ void SphSimulator::DrawBounds(const TuboEngine::Math::Vector4& color) {
     lm->DrawLine({mx.x, mn.y, mn.z}, {mx.x, mx.y, mn.z}, color);
     lm->DrawLine({mx.x, mn.y, mx.z}, {mx.x, mx.y, mx.z}, color);
     lm->DrawLine({mn.x, mn.y, mx.z}, {mn.x, mx.y, mx.z}, color);
+
+    // 外力点の可視化 (有効時、力点に影響半径サイズの十字を描画)
+    if (params_.extForceActive) {
+        const V3&   c  = params_.extForcePos;
+        const float r  = params_.extForceRadius;
+        const TuboEngine::Math::Vector4 fc = {1.0f, 0.4f, 0.1f, 1.0f}; // オレンジ
+        lm->DrawLine({c.x - r, c.y, c.z}, {c.x + r, c.y, c.z}, fc);
+        lm->DrawLine({c.x, c.y - r, c.z}, {c.x, c.y + r, c.z}, fc);
+        lm->DrawLine({c.x, c.y, c.z - r}, {c.x, c.y, c.z + r}, fc);
+    }
 }
 
 // ============================================================
