@@ -45,7 +45,13 @@ struct alignas(16) SphGpuParams {
     int    gridDimX, gridDimY, gridDimZ;  // 188
     float  cellSize;                       // 192
     float  gridMinX, gridMinY, gridMinZ;  // 204
-    int    maxPerCell;                     // 208 bytes total
+    int    maxPerCell;                     // 208
+    // ---- 外力 ----
+    float  extForcePosX, extForcePosY, extForcePosZ;  // 220
+    float  extForceRadius;                 // 224
+    float  extForceStrength;               // 228
+    int    extForceActive;                 // 232
+    float  _pad3, _pad4;                   // 240 bytes total
 };
 
 /// @brief SPH GPU コンピュートパイプライン

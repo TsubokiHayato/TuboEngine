@@ -98,5 +98,16 @@ void main(uint3 tid : SV_DispatchThreadID)
             fPressure += KernelSpikyGrad(rij, r, g_H) * (-g_Mass * (pri + pri) / (2.0f * rho));
     }
 
-    g_Particles[i].force = fPressure + fViscosity + fGravity;
+    // ---- 外力 (力点から放射状に押す/引く) ----
+    float3 fExternal = float3(0, 0, 0);
+    if (g_ExtForceActive != 0) {
+        float3 toP = pi - g_ExtForcePos;
+        float  d   = length(toP);
+        if (d < g_ExtForceRadius && d > 1e-4f) {
+            float falloff = 1.0f - d / g_ExtForceRadius;  // 中心ほど強い
+            fExternal = (toP / d) * (g_ExtForceStrength * falloff * rho);
+        }
+    }
+
+    g_Particles[i].force = fPressure + fViscosity + fGravity + fExternal;
 }
