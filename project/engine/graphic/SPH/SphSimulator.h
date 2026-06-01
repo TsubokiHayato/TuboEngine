@@ -34,10 +34,12 @@ public:
         float particleMass    = 1.0f;           // 粒子質量
         float gravity         = -3.0f;          // 重力
         float restitution     = 0.02f;          // 壁反発係数 (液体は跳ねない)
-        float particleRadius  = 0.12f;          // 描画半径 (粒子数増加に合わせて小さく)
+        float particleRadius  = 0.12f;          // 描画半径
         float speedMax        = 5.0f;           // 色補間の最大速度
-        TuboEngine::Math::Vector3 boundMin = {-5.0f, 0.0f, -5.0f};
-        TuboEngine::Math::Vector3 boundMax = { 5.0f, 8.0f,  5.0f};
+        // ボックスは流体体積(N*m/ρ₀≈1667unit³)の3倍以上必要
+        // 16×20×16=5120unit³ → 流体が底部1/3を満たす水槽になる
+        TuboEngine::Math::Vector3 boundMin = {-8.0f,  0.0f, -8.0f};
+        TuboEngine::Math::Vector3 boundMax = { 8.0f, 20.0f,  8.0f};
         TuboEngine::Math::Vector4 colorLow  = {0.4f, 0.7f, 1.0f, 1.0f};
         TuboEngine::Math::Vector4 colorHigh = {0.0f, 0.2f, 1.0f, 1.0f};
         int   substeps        = 3;
