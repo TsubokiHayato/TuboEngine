@@ -110,6 +110,20 @@ void SphSimulator::Update(float dt, TuboEngine::Camera* camera) {
     gp.extForceStrength = params_.extForceStrength;
     gp.extForceActive   = params_.extForceActive ? 1 : 0;
     gp.surfaceTension   = params_.surfaceTension;
+    // SDF 障害物を GPU パラメーターに転送
+    gp.sdfCount = std::min((int)obstacles_.size(), kMaxSdfShapes);
+    for (int i = 0; i < gp.sdfCount; ++i) {
+        const auto& obs = obstacles_[i];
+        auto&       dst = gp.sdfShapes[i];
+        dst.center[0]      = obs.center.x;
+        dst.center[1]      = obs.center.y;
+        dst.center[2]      = obs.center.z;
+        dst.type           = (obs.type == SdfObstacle::Type::Sphere) ? 0 : 1;
+        dst.halfExtents[0] = obs.halfExtents.x;
+        dst.halfExtents[1] = obs.halfExtents.y;
+        dst.halfExtents[2] = obs.halfExtents.z;
+        dst._pad           = 0.0f;
+    }
     gp.viewProj = viewProj_;
 
     // GPU 上で全計算 (Density → Force → Integrate) × substeps + PrepareInstances
@@ -218,6 +232,61 @@ void SphSimulator::DrawImGui() {
         HelpMarker("正=押し出す(噴水)、負=引き寄せる(集める)");
     }
 
+    // ---- SDF 障害物 ----
+    if (ImGui::CollapsingHeader("障害物 (SDF)")) {
+        // 登録済み障害物の一覧・編集・削除
+        for (int i = 0; i < (int)obstacles_.size(); ++i) {
+            ImGui::PushID(i);
+            auto& obs = obstacles_[i];
+            const char* typeName = (obs.type == SdfObstacle::Type::Sphere) ? "球" : "箱";
+            bool open = ImGui::TreeNode("obs", "[%d] %s (%s)", i, obs.label.c_str(), typeName);
+            if (open) {
+                ImGui::DragFloat3("中心", &obs.center.x, 0.1f);
+                if (obs.type == SdfObstacle::Type::Sphere) {
+                    ImGui::DragFloat("半径", &obs.halfExtents.x, 0.1f, 0.1f, 20.0f);
+                } else {
+                    ImGui::DragFloat3("半辺長", &obs.halfExtents.x, 0.1f, 0.1f, 20.0f);
+                }
+                if (ImGui::Button("削除")) {
+                    obstacles_.erase(obstacles_.begin() + i);
+                    ImGui::TreePop();
+                    ImGui::PopID();
+                    break;
+                }
+                ImGui::TreePop();
+            }
+            ImGui::PopID();
+        }
+
+        // 新規追加フォーム (球)
+        ImGui::Separator();
+        ImGui::Text("追加: 球");
+        static float sSphCenter[3] = {0, 5, 0};
+        static float sSphRadius    = 2.0f;
+        ImGui::DragFloat3("中心##sph", sSphCenter, 0.1f);
+        ImGui::DragFloat("半径##sph",  &sSphRadius, 0.1f, 0.1f, 20.0f);
+        if (ImGui::Button("球を追加") && (int)obstacles_.size() < kMaxSdfShapes)
+            AddSphere({sSphCenter[0], sSphCenter[1], sSphCenter[2]}, sSphRadius);
+
+        // 新規追加フォーム (箱)
+        ImGui::Separator();
+        ImGui::Text("追加: 箱");
+        static float sBoxCenter[3] = {0, 5, 0};
+        static float sBoxHalf[3]   = {2, 2, 2};
+        ImGui::DragFloat3("中心##box",  sBoxCenter, 0.1f);
+        ImGui::DragFloat3("半辺長##box", sBoxHalf, 0.1f, 0.1f, 20.0f);
+        if (ImGui::Button("箱を追加") && (int)obstacles_.size() < kMaxSdfShapes)
+            AddBox({sBoxCenter[0], sBoxCenter[1], sBoxCenter[2]},
+                   {sBoxHalf[0], sBoxHalf[1], sBoxHalf[2]});
+
+        if (!obstacles_.empty()) {
+            ImGui::Separator();
+            if (ImGui::Button("全削除")) obstacles_.clear();
+        }
+
+        ImGui::TextDisabled("最大 %d 個", kMaxSdfShapes);
+    }
+
     ImGui::End();
 #endif
 }
@@ -253,10 +322,42 @@ void SphSimulator::DrawBounds(const TuboEngine::Math::Vector4& color) {
     if (params_.extForceActive) {
         const V3&   c  = params_.extForcePos;
         const float r  = params_.extForceRadius;
-        const TuboEngine::Math::Vector4 fc = {1.0f, 0.4f, 0.1f, 1.0f}; // オレンジ
+        const TuboEngine::Math::Vector4 fc = {1.0f, 0.4f, 0.1f, 1.0f};
         lm->DrawLine({c.x - r, c.y, c.z}, {c.x + r, c.y, c.z}, fc);
         lm->DrawLine({c.x, c.y - r, c.z}, {c.x, c.y + r, c.z}, fc);
         lm->DrawLine({c.x, c.y, c.z - r}, {c.x, c.y, c.z + r}, fc);
+    }
+
+    // SDF 障害物の可視化 (オレンジ)
+    const TuboEngine::Math::Vector4 oc = {1.0f, 0.5f, 0.0f, 1.0f};
+    for (const auto& obs : obstacles_) {
+        if (obs.type == SdfObstacle::Type::Box) {
+            V3 omn = { obs.center.x - obs.halfExtents.x,
+                       obs.center.y - obs.halfExtents.y,
+                       obs.center.z - obs.halfExtents.z };
+            V3 omx = { obs.center.x + obs.halfExtents.x,
+                       obs.center.y + obs.halfExtents.y,
+                       obs.center.z + obs.halfExtents.z };
+            lm->DrawLine({omn.x, omn.y, omn.z}, {omx.x, omn.y, omn.z}, oc);
+            lm->DrawLine({omx.x, omn.y, omn.z}, {omx.x, omn.y, omx.z}, oc);
+            lm->DrawLine({omx.x, omn.y, omx.z}, {omn.x, omn.y, omx.z}, oc);
+            lm->DrawLine({omn.x, omn.y, omx.z}, {omn.x, omn.y, omn.z}, oc);
+            lm->DrawLine({omn.x, omx.y, omn.z}, {omx.x, omx.y, omn.z}, oc);
+            lm->DrawLine({omx.x, omx.y, omn.z}, {omx.x, omx.y, omx.z}, oc);
+            lm->DrawLine({omx.x, omx.y, omx.z}, {omn.x, omx.y, omx.z}, oc);
+            lm->DrawLine({omn.x, omx.y, omx.z}, {omn.x, omx.y, omn.z}, oc);
+            lm->DrawLine({omn.x, omn.y, omn.z}, {omn.x, omx.y, omn.z}, oc);
+            lm->DrawLine({omx.x, omn.y, omn.z}, {omx.x, omx.y, omn.z}, oc);
+            lm->DrawLine({omx.x, omn.y, omx.z}, {omx.x, omx.y, omx.z}, oc);
+            lm->DrawLine({omn.x, omn.y, omx.z}, {omn.x, omx.y, omx.z}, oc);
+        } else {
+            // 球: 3 軸の十字線で表示
+            const V3&   c = obs.center;
+            const float r = obs.halfExtents.x;
+            lm->DrawLine({c.x - r, c.y, c.z}, {c.x + r, c.y, c.z}, oc);
+            lm->DrawLine({c.x, c.y - r, c.z}, {c.x, c.y + r, c.z}, oc);
+            lm->DrawLine({c.x, c.y, c.z - r}, {c.x, c.y, c.z + r}, oc);
+        }
     }
 }
 
@@ -374,5 +475,35 @@ void SphSimulator::UpdateMouseForce() {
         params_.extForceActive = false;
         mouseDriving_          = false;
     }
+}
+
+// ============================================================
+//  AddSphere / AddBox / ClearObstacles — SDF 障害物管理
+// ============================================================
+void SphSimulator::AddSphere(const TuboEngine::Math::Vector3& center, float radius,
+                              const std::string& label) {
+    if ((int)obstacles_.size() >= kMaxSdfShapes) return;
+    SdfObstacle obs;
+    obs.type        = SdfObstacle::Type::Sphere;
+    obs.center      = center;
+    obs.halfExtents = { radius, radius, radius };
+    obs.label       = label.empty() ? "Sphere" : label;
+    obstacles_.push_back(obs);
+}
+
+void SphSimulator::AddBox(const TuboEngine::Math::Vector3& center,
+                           const TuboEngine::Math::Vector3& halfExtents,
+                           const std::string& label) {
+    if ((int)obstacles_.size() >= kMaxSdfShapes) return;
+    SdfObstacle obs;
+    obs.type        = SdfObstacle::Type::Box;
+    obs.center      = center;
+    obs.halfExtents = halfExtents;
+    obs.label       = label.empty() ? "Box" : label;
+    obstacles_.push_back(obs);
+}
+
+void SphSimulator::ClearObstacles() {
+    obstacles_.clear();
 }
 
