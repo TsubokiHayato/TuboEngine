@@ -9,15 +9,18 @@ void main(uint3 tid : SV_DispatchThreadID)
     uint i = tid.x;
     if ((int)i >= g_ParticleCount) return;
 
-    float3 pos = g_Particles[i].position;
-    float3 vel = g_Particles[i].velocity;
-    float3 f   = g_Particles[i].force;
-    float  rho = g_Particles[i].density;
+    float3 pos  = g_Particles[i].position;
+    float3 vel  = g_Particles[i].velocity;
+    float3 f    = g_Particles[i].force;
+    float  rho  = g_Particles[i].density;
+    float3 xsph = g_Particles[i].xsph;
 
-    // セミインプリシット Euler
+    // セミインプリシット Euler + XSPH 位置補正
+    // 速度本体は補正せず、位置更新にのみ近傍平均速度を加える (Monaghan XSPH)
+    // → 粒子が個別にバラけず、連続した流体のように動く
     float3 accel = f / rho;
     vel += accel * g_Dt;
-    pos += vel   * g_Dt;
+    pos += (vel + xsph) * g_Dt;
 
     // AABB 境界反射
     if (pos.x < g_BoundMin.x) { pos.x = g_BoundMin.x; vel.x =  abs(vel.x) * g_Restitution; }

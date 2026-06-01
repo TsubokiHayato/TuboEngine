@@ -79,6 +79,7 @@ void SphSimulator::Update(float dt, TuboEngine::Camera* camera) {
     gp.colorHigh[0] = params_.colorHigh.x; gp.colorHigh[1] = params_.colorHigh.y;
     gp.colorHigh[2] = params_.colorHigh.z; gp.colorHigh[3] = params_.colorHigh.w;
     gp.particleRadius = params_.particleRadius;
+    gp.xsphCoeff      = params_.xsphCoeff;
     gp.viewProj = viewProj_;
 
     // GPU 上で全計算 (Density → Force → Integrate) × substeps + PrepareInstances
@@ -107,6 +108,7 @@ void SphSimulator::DrawImGui() {
     ImGui::DragFloat("静止密度",     &params_.restDensity,     0.1f,   1.0f, 30.0f);
     ImGui::DragFloat("圧力剛性",     &params_.stiffness,       1.0f,   1.0f, 500.0f);
     ImGui::DragFloat("粘性係数",     &params_.viscosity,       0.01f,  0.0f,  10.0f);
+    ImGui::DragFloat("XSPH補正",     &params_.xsphCoeff,       0.01f,  0.0f,   1.0f);
     ImGui::DragFloat("粒子質量",     &params_.particleMass,    0.05f,  0.01f, 10.0f);
     ImGui::DragFloat("重力",         &params_.gravity,         0.1f, -30.0f,   0.0f);
     ImGui::DragFloat("壁反発係数",   &params_.restitution,     0.01f,  0.0f,   1.0f);
