@@ -23,6 +23,11 @@ struct SdfObstacle {
     TuboEngine::Math::Vector3 center;
     TuboEngine::Math::Vector3 halfExtents;  // sphere: x=radius; box: 各軸の半辺長
     std::string label;
+
+    // ---- Phase 2: 剛体物理 ----
+    bool    dynamic  = false;  // true → 浮力・抵抗・重力で動く
+    float   mass     = 1.0f;  // 質量 (kg 相当)
+    TuboEngine::Math::Vector3 velocity = {};  // 現在の線速度
 };
 
 /// @brief SPH 流体シミュレーター (GPU Compute 版)
@@ -79,6 +84,12 @@ public:
     void AddBox(const TuboEngine::Math::Vector3& center,
                 const TuboEngine::Math::Vector3& halfExtents,
                 const std::string& label = "");
+    // 物理剛体として追加するショートカット
+    void AddDynamicSphere(const TuboEngine::Math::Vector3& center, float radius,
+                          float mass, const std::string& label = "");
+    void AddDynamicBox(const TuboEngine::Math::Vector3& center,
+                       const TuboEngine::Math::Vector3& halfExtents,
+                       float mass, const std::string& label = "");
     void ClearObstacles();
 
     Params& GetParams() { return params_; }
@@ -90,7 +101,8 @@ public:
 private:
     // 初期グリッド配置を CPU で生成して GPU にアップロード
     std::vector<SphParticle> GenerateInitialParticles() const;
-    void UpdateMouseForce();  // マウスドラッグで外力点を操作
+    void UpdateMouseForce();      // マウスドラッグで外力点を操作
+    void IntegrateRigidBodies(float dt);  // 剛体の物理積分 (浮力・抵抗・重力)
 
     // 描画用 UV 球メッシュ
     void BuildGeometry();
