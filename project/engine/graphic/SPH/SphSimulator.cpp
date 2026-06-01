@@ -19,8 +19,9 @@ void SphSimulator::Initialize(const Params& params, TuboEngine::Camera* camera,
 
     viewProj_ = TuboEngine::Math::MakeIdentity4x4();
 
-    // GPU Compute パイプライン
-    compute_.Initialize(params_.particleCount);
+    // GPU Compute パイプライン (セルサイズ = smoothingRadius で空間ハッシュ構築)
+    compute_.Initialize(params_.particleCount, params_.boundMin, params_.boundMax,
+                        params_.smoothingRadius);
 
     // 初期粒子データを GPU にアップロード
     auto initialParticles = GenerateInitialParticles();
