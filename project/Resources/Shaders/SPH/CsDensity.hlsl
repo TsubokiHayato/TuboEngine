@@ -1,7 +1,9 @@
-// CsDensity.hlsl — 密度・圧力計算パス (O(N²) on GPU)
+// CsDensity.hlsl — 密度・圧力計算パス (空間ハッシュで近傍探索)
 #include "SphCommon.hlsli"
 
-RWStructuredBuffer<SphParticle> g_Particles : register(u0);
+RWStructuredBuffer<SphParticle> g_Particles  : register(u0);
+RWStructuredBuffer<int>         g_GridCounts : register(u2);
+RWStructuredBuffer<int>         g_GridCells  : register(u3);
 
 [numthreads(256, 1, 1)]
 void main(uint3 tid : SV_DispatchThreadID)
@@ -12,10 +14,21 @@ void main(uint3 tid : SV_DispatchThreadID)
     float3 pi = g_Particles[i].position;
     float density = 0.0f;
 
-    for (int j = 0; j < g_ParticleCount; ++j) {
-        float3 rij = pi - g_Particles[j].position;
-        float  r2  = dot(rij, rij);
-        density += g_Mass * KernelPoly6(r2, g_H);
+    // ---- 空間ハッシュ: 周囲 27 セルのみ探索 (O(N²)→O(N×近傍数)) ----
+    int3 cc = SphCellCoord(pi);
+    for (int dz = -1; dz <= 1; ++dz)
+    for (int dy = -1; dy <= 1; ++dy)
+    for (int dx = -1; dx <= 1; ++dx) {
+        int3 nc = cc + int3(dx, dy, dz);
+        if (any(nc < int3(0, 0, 0)) || any(nc >= g_GridDim)) continue;
+        int cell = SphCellIndex(nc);
+        int cnt  = min(g_GridCounts[cell], g_MaxPerCell);
+        for (int s = 0; s < cnt; ++s) {
+            int j = g_GridCells[cell * g_MaxPerCell + s];
+            float3 rij = pi - g_Particles[j].position;
+            float  r2  = dot(rij, rij);
+            density += g_Mass * KernelPoly6(r2, g_H);
+        }
     }
 
     // ---- ミラーパーティクル法 (Surface Deficiency 対策) ----
