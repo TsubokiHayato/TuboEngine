@@ -30,13 +30,18 @@ public:
         float smoothingRadius = 1.0f;           // 影響半径 h
         float restDensity     = 6.0f;           // 静止密度 (カーネル積分から計算した実際の値)
         float stiffness       = 200.0f;         // 圧力剛性 (Tait方程式用)
-        float viscosity       = 0.3f;           // 粘性係数 (水は低粘性)
+        float viscosity       = 10.0f;           // 粘性係数 (水は低粘性)
         float particleMass    = 1.0f;           // 粒子質量
-        float gravity         = -3.0f;          // 重力
+        float gravity         = -9.8f;          // 重力
         float restitution     = 0.02f;          // 壁反発係数 (液体は跳ねない)
-        float particleRadius  = 0.12f;          // 描画半径
+        float particleRadius  = 0.3f;          // 描画半径
         float speedMax        = 5.0f;           // 色補間の最大速度
         float xsphCoeff       = 0.15f;          // XSPH 速度補正係数 (0=無効, 0.1〜0.3が標準)
+        // ---- 外力 (力点から放射状に押す/引く) ----
+        bool  extForceActive   = false;
+        TuboEngine::Math::Vector3 extForcePos = {0.0f, 5.0f, 0.0f};
+        float extForceRadius   = 4.0f;
+        float extForceStrength = 50.0f;         // 正=押し出し, 負=引き寄せ
         // ボックスは流体体積(N*m/ρ₀≈1667unit³)の3倍以上必要
         // 16×20×16=5120unit³ → 流体が底部1/3を満たす水槽になる
         TuboEngine::Math::Vector3 boundMin = {-8.0f,  0.0f, -8.0f};
