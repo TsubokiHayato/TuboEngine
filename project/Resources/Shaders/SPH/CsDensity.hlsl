@@ -19,13 +19,6 @@ void main(uint3 tid : SV_DispatchThreadID)
     }
 
     density = max(density, 1e-6f);
-    g_Particles[i].density = density;
-
-    // Tait方程式: p = k * ((ρ/ρ₀)^7 - 1)
-    // 線形式より非圧縮性が高く、液体らしい固まり感が得られる
-    float ratio = density / g_RestDensity;
-    float ratio2 = ratio  * ratio;
-    float ratio4 = ratio2 * ratio2;
-    float ratio7 = ratio4 * ratio2 * ratio;
-    g_Particles[i].pressure = g_Stiffness * (ratio7 - 1.0f);
+    g_Particles[i].density  = density;
+    g_Particles[i].pressure = g_Stiffness * (density - g_RestDensity);
 }

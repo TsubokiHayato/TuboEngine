@@ -78,8 +78,6 @@ void SphSimulator::Update(float dt, TuboEngine::Camera* camera) {
     gp.colorLow[2]  = params_.colorLow.z;  gp.colorLow[3]  = params_.colorLow.w;
     gp.colorHigh[0] = params_.colorHigh.x; gp.colorHigh[1] = params_.colorHigh.y;
     gp.colorHigh[2] = params_.colorHigh.z; gp.colorHigh[3] = params_.colorHigh.w;
-    gp.surfaceTension = params_.surfaceTension;
-    gp.particleRadius = params_.particleRadius;
     gp.viewProj = viewProj_;
 
     // GPU 上で全計算 (Density → Force → Integrate) × substeps + PrepareInstances
@@ -111,7 +109,6 @@ void SphSimulator::DrawImGui() {
     ImGui::DragFloat("Particle Mass",    &params_.particleMass,    0.05f,  0.01f, 10.0f);
     ImGui::DragFloat("Gravity",          &params_.gravity,         0.1f, -30.0f,   0.0f);
     ImGui::DragFloat("Restitution",      &params_.restitution,     0.01f,  0.0f,   1.0f);
-    ImGui::DragFloat("Surface Tension",  &params_.surfaceTension,  0.001f, 0.0f,   1.0f);
     ImGui::SliderInt("Substeps",         &params_.substeps,        1, 5);
     ImGui::Separator();
     ImGui::Text("[Rendering]");
