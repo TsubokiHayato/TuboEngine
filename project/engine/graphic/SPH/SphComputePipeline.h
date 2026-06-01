@@ -38,7 +38,8 @@ struct alignas(16) SphGpuParams {
     float  colorLow[4];        // 80 bytes
     float  colorHigh[4];       // 96 bytes
     float  particleRadius;     // 粒子描画半径
-    float  _pad0, _pad1, _pad2;// 112 bytes (Matrix4x4 の 16-byte アライメント確保)
+    float  xsphCoeff;          // XSPH 速度補正係数 ε
+    float  _pad1, _pad2;       // 112 bytes (Matrix4x4 の 16-byte アライメント確保)
     TuboEngine::Math::Matrix4x4 viewProj; // 176 bytes total
 };
 
