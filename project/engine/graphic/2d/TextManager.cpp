@@ -128,7 +128,7 @@ void TextManager::DrawImGui() {
 
     // レイアウトのロード/セーブ
     if (ImGui::CollapsingHeader("Layout")) {
-        static char layoutPathBuf[256] = "Resources/Text/layout.json";
+        static char layoutPathBuf[256] = "Resources/Text/Debug.json";
         ImGui::InputText("Layout Path", layoutPathBuf, sizeof(layoutPathBuf));
         if (ImGui::Button("Load Layout")) {
             if (!LoadTextLayout(layoutPathBuf)) {
