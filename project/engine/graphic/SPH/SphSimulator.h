@@ -36,6 +36,7 @@ public:
         float restitution     = 0.02f;          // 壁反発係数 (液体は跳ねない)
         float particleRadius  = 0.12f;          // 描画半径
         float speedMax        = 5.0f;           // 色補間の最大速度
+        float xsphCoeff       = 0.15f;          // XSPH 速度補正係数 (0=無効, 0.1〜0.3が標準)
         // ボックスは流体体積(N*m/ρ₀≈1667unit³)の3倍以上必要
         // 16×20×16=5120unit³ → 流体が底部1/3を満たす水槽になる
         TuboEngine::Math::Vector3 boundMin = {-8.0f,  0.0f, -8.0f};
