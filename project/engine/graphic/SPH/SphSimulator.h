@@ -66,9 +66,14 @@ public:
 
     Params& GetParams() { return params_; }
 
+    // プリセット (水/ハチミツ/スライム をワンクリック適用)
+    enum class Preset { Water, Honey, Slime };
+    void ApplyPreset(Preset preset);
+
 private:
     // 初期グリッド配置を CPU で生成して GPU にアップロード
     std::vector<SphParticle> GenerateInitialParticles() const;
+    void UpdateMouseForce();  // マウスドラッグで外力点を操作
 
     // 描画用 UV 球メッシュ
     void BuildGeometry();
@@ -81,4 +86,12 @@ private:
     TuboEngine::Math::Matrix4x4 viewProj_ = {};
 
     InstancedMeshRenderer renderer_;   // Object3d パイプラインで 1 DrawCall 描画
+
+    // ---- 再生コントロール ----
+    bool  paused_            = false;  // 一時停止中は物理を進めない
+    bool  stepOnce_          = false;  // コマ送り: 次の1フレームだけ進める
+    float timeScale_         = 1.0f;   // 再生速度 (0=停止, 1=等速)
+    // ---- マウス外力 ----
+    bool  mouseForceEnabled_ = false;  // マウスドラッグで外力を操作するか
+    bool  mouseDriving_      = false;  // 現在マウスが外力を駆動中か
 };
