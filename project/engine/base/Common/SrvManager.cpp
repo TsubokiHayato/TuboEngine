@@ -61,6 +61,22 @@ void TuboEngine::SrvManager::CreateSRVForStructuredBuffer(uint32_t index, Micros
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 	TuboEngine::DirectXCommon::GetInstance()->GetDevice()->CreateShaderResourceView(pResource.Get(), &srvDesc, GetCPUDescriptorHandle(index));
 }
+void TuboEngine::SrvManager::CreateUAVForStructuredBuffer(
+    uint32_t index, ID3D12Resource* pResource,
+    UINT elementCount, UINT structureByteStride)
+{
+    D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+    uavDesc.Format                      = DXGI_FORMAT_UNKNOWN;
+    uavDesc.ViewDimension               = D3D12_UAV_DIMENSION_BUFFER;
+    uavDesc.Buffer.FirstElement         = 0;
+    uavDesc.Buffer.NumElements          = elementCount;
+    uavDesc.Buffer.StructureByteStride  = structureByteStride;
+    uavDesc.Buffer.CounterOffsetInBytes = 0;
+    uavDesc.Buffer.Flags                = D3D12_BUFFER_UAV_FLAG_NONE;
+    TuboEngine::DirectXCommon::GetInstance()->GetDevice()->CreateUnorderedAccessView(
+        pResource, nullptr, &uavDesc, GetCPUDescriptorHandle(index));
+}
+
 void TuboEngine::SrvManager::PreDraw() {
 	//ディスクリプタヒープのインデックスをリセット
 	ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap.Get() };
