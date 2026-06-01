@@ -140,6 +140,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\Particle\ParticleManager.cpp" />
     <ClCompile Include="engine\graphic\SPH\SphSimulator.cpp" />
     <ClCompile Include="engine\graphic\SPH\SphComputePipeline.cpp" />
+    <ClCompile Include="engine\graphic\SPH\SphFluidRenderer.cpp" />
     <ClCompile Include="engine\graphic\SPH\InstancedMeshRenderer.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\Effects\Bloom\BloomEffect.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.cpp" />
