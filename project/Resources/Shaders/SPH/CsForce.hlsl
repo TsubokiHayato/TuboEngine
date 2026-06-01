@@ -36,5 +36,48 @@ void main(uint3 tid : SV_DispatchThreadID)
     }
 
     float3 fGravity = float3(0.0f, g_Gravity * rho, 0.0f);
+
+    // ---- ミラーパーティクル法 (境界圧力補正) ----
+    // 鏡像粒子は静止・同圧力・同密度と仮定し圧力力のみ追加
+    // 粘性項は速度0のミラー粒子から計算すると減衰過多になるため省略
+    {
+        float3 p = pi;
+        float3 mirrorPos;
+        float3 rij;
+        float  r;
+
+        // マクロ的に6面書くと冗長なので関数的に記述
+        // X-
+        mirrorPos = float3(2.0f*g_BoundMin.x - p.x, p.y, p.z);
+        rij = p - mirrorPos; r = length(rij);
+        if (r < g_H && r > 1e-6f)
+            fPressure += KernelSpikyGrad(rij, r, g_H) * (-g_Mass * (pri + pri) / (2.0f * rho));
+        // X+
+        mirrorPos = float3(2.0f*g_BoundMax.x - p.x, p.y, p.z);
+        rij = p - mirrorPos; r = length(rij);
+        if (r < g_H && r > 1e-6f)
+            fPressure += KernelSpikyGrad(rij, r, g_H) * (-g_Mass * (pri + pri) / (2.0f * rho));
+        // Y- (床)
+        mirrorPos = float3(p.x, 2.0f*g_BoundMin.y - p.y, p.z);
+        rij = p - mirrorPos; r = length(rij);
+        if (r < g_H && r > 1e-6f)
+            fPressure += KernelSpikyGrad(rij, r, g_H) * (-g_Mass * (pri + pri) / (2.0f * rho));
+        // Y+ (天井)
+        mirrorPos = float3(p.x, 2.0f*g_BoundMax.y - p.y, p.z);
+        rij = p - mirrorPos; r = length(rij);
+        if (r < g_H && r > 1e-6f)
+            fPressure += KernelSpikyGrad(rij, r, g_H) * (-g_Mass * (pri + pri) / (2.0f * rho));
+        // Z-
+        mirrorPos = float3(p.x, p.y, 2.0f*g_BoundMin.z - p.z);
+        rij = p - mirrorPos; r = length(rij);
+        if (r < g_H && r > 1e-6f)
+            fPressure += KernelSpikyGrad(rij, r, g_H) * (-g_Mass * (pri + pri) / (2.0f * rho));
+        // Z+
+        mirrorPos = float3(p.x, p.y, 2.0f*g_BoundMax.z - p.z);
+        rij = p - mirrorPos; r = length(rij);
+        if (r < g_H && r > 1e-6f)
+            fPressure += KernelSpikyGrad(rij, r, g_H) * (-g_Mass * (pri + pri) / (2.0f * rho));
+    }
+
     g_Particles[i].force = fPressure + fViscosity + fGravity;
 }

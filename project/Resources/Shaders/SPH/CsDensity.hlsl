@@ -18,6 +18,23 @@ void main(uint3 tid : SV_DispatchThreadID)
         density += g_Mass * KernelPoly6(r2, g_H);
     }
 
+    // ---- ミラーパーティクル法 (Surface Deficiency 対策) ----
+    // 各壁の鏡像位置に仮想粒子を置き、境界近くの密度不足を補正する
+    // 鏡像粒子との距離 = 2 * (粒子と壁の距離)
+    {
+        float3 p = g_Particles[i].position;
+        float dx, dy, dz;
+        // X 壁
+        dx = p.x - g_BoundMin.x; if (dx < g_H) density += g_Mass * KernelPoly6(4.0f*dx*dx, g_H);
+        dx = g_BoundMax.x - p.x; if (dx < g_H) density += g_Mass * KernelPoly6(4.0f*dx*dx, g_H);
+        // Y 壁 (床・天井)
+        dy = p.y - g_BoundMin.y; if (dy < g_H) density += g_Mass * KernelPoly6(4.0f*dy*dy, g_H);
+        dy = g_BoundMax.y - p.y; if (dy < g_H) density += g_Mass * KernelPoly6(4.0f*dy*dy, g_H);
+        // Z 壁
+        dz = p.z - g_BoundMin.z; if (dz < g_H) density += g_Mass * KernelPoly6(4.0f*dz*dz, g_H);
+        dz = g_BoundMax.z - p.z; if (dz < g_H) density += g_Mass * KernelPoly6(4.0f*dz*dz, g_H);
+    }
+
     density = max(density, 1e-6f);
     g_Particles[i].density = density;
 
