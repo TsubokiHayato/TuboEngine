@@ -17,7 +17,7 @@ struct SphGPUInstance {
     TuboEngine::Math::Vector4   color;
 };
 
-/// @brief SPH シミュレーションパラメーター (GPU 定数バッファ / 176 bytes)
+/// @brief SPH シミュレーションパラメーター (GPU 定数バッファ / 112 bytes)
 struct alignas(16) SphGpuParams {
     int    particleCount;
     float  h;
@@ -35,12 +35,9 @@ struct alignas(16) SphGpuParams {
     float  boundMaxX, boundMaxY, boundMaxZ;
     float  speedMax;
     // 64 bytes
-    float  colorLow[4];        // 80
-    float  colorHigh[4];       // 96
-    float  surfaceTension;     // 表面張力係数 σ
-    float  particleRadius;     // 描画半径
-    float  _pad0, _pad1;       // 112 bytes (16-byte aligned)
-    TuboEngine::Math::Matrix4x4 viewProj; // 176 bytes total
+    float  colorLow[4];   // 80
+    float  colorHigh[4];  // 96
+    TuboEngine::Math::Matrix4x4 viewProj; // 160 bytes total
 };
 
 /// @brief SPH GPU コンピュートパイプライン
