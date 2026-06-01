@@ -31,6 +31,9 @@
 #include "Effects/Ring/RingEmitter.h"
 #include "engine/graphic/Particle/Effects/Original/OriginalEmitter.h"
 #include "Effects/Cylinder/CylinderEmitter.h"
+
+// SPH 流体シミュレーション
+#include "engine/graphic/SPH/SphSimulator.h"
 #undef min
 #undef max
 
@@ -50,7 +53,6 @@ public:
 	TuboEngine::Camera* GetMainCamera() const { return camera.get(); }
 
 private:
-	std::unique_ptr<TuboEngine::Audio> audio = nullptr;
 
 	std::unique_ptr<TuboEngine::Camera> camera = nullptr;
 	TuboEngine::Math::Vector3 cameraPosition = {0.0f, 1.0f, -15.0f};
@@ -67,16 +69,14 @@ private:
 	TuboEngine::Math::Vector4 pointLightColor = {1.0f, 1.0f, 1.0f, 1.0f};
 	float pointLightIntensity = 1.0f;
 
-	std::unique_ptr<TuboEngine::SkyBox> skyBox = nullptr;
-
-	std::unique_ptr<SceneChangeAnimation> sceneChangeAnimation = nullptr;
-	bool isRequestSceneChange = false;
-
 	// テキストテスト用
 	TuboEngine::TextObject* testText_ = nullptr;
 
 	// 変更: 生ポインタ配列 → 名前配列
 	std::vector<std::string> emitterNames_;
 	bool particleInitialized_ = false;
+
+	// SPH 流体シミュレーション
+	std::unique_ptr<SphSimulator> sphSimulator_;
 };
 

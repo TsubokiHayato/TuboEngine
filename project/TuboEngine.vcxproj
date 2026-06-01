@@ -138,6 +138,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\graphic\Particle\Effects\ClearFirework\ClearFireworkEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\IParticleEmitter.cpp" />
     <ClCompile Include="engine\graphic\Particle\ParticleManager.cpp" />
+    <ClCompile Include="engine\graphic\SPH\SphSimulator.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\Effects\Bloom\BloomEffect.cpp" />
     <ClCompile Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.cpp" />
     <ClCompile Include="engine\graphic\PSO\Blend\BlendPSO.cpp" />
