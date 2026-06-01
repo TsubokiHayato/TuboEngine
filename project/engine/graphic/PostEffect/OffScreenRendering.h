@@ -96,6 +96,9 @@ public:
 public:
 	void SetCamera(TuboEngine::Camera* camera) { this->camera_ = camera; }
 
+	// SSFR 用: オフスクリーン RTV ハンドルを公開
+	D3D12_CPU_DESCRIPTOR_HANDLE GetOffscreenRtvHandle() const { return offscreenRtvHandle; }
+
 	// Dash演出用: 一時的にRadialBlurへ切り替えて強度をブーストする
 	// enable=false にすると元のポストエフェクトへ戻す
 	void SetDashPostEffectEnabled(bool enable);

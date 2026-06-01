@@ -10,6 +10,7 @@
 #include "VertexData.h"
 #include "SphParticle.h"
 #include "SphComputePipeline.h"
+#include "SphFluidRenderer.h"
 #include "InstancedMeshRenderer.h"
 #include "LineManager.h"
 #include <string>
@@ -73,6 +74,13 @@ public:
                     const std::string& texture   = "particle.png");
     void Update(float dt, TuboEngine::Camera* camera);
     void Draw();       // Object3DDraw() パス内で呼ぶ (InstancedMeshRenderer 使用)
+
+    /// SSFR で流体を描画する (Draw() の代わりに呼ぶ)
+    /// @param targetRTV  合成先の RTV (例: OffScreenRendering::GetOffscreenRtvHandle())
+    /// @param targetDSV  合成先の DSV (例: DirectXCommon::GetDSVCPUDescriptorHandle(0))
+    void DrawFluid(D3D12_CPU_DESCRIPTOR_HANDLE targetRTV,
+                   D3D12_CPU_DESCRIPTOR_HANDLE targetDSV);
+
     void DrawBounds(const TuboEngine::Math::Vector4& color = {0.3f, 0.8f, 1.0f, 1.0f});
     void DrawImGui();
     void Reset();
@@ -94,6 +102,9 @@ public:
 
     Params& GetParams() { return params_; }
 
+    // SSFR レンダラーへのアクセス (パラメータ調整用)
+    SphFluidRenderer& GetFluidRenderer() { return fluidRenderer_; }
+
     // プリセット (水/ハチミツ/スライム をワンクリック適用)
     enum class Preset { Water, Honey, Slime };
     void ApplyPreset(Preset preset);
@@ -113,8 +124,11 @@ private:
     SphComputePipeline      compute_;      // GPU Compute 管理
 
     TuboEngine::Math::Matrix4x4 viewProj_ = {};
+    TuboEngine::Math::Matrix4x4 view_     = {};  // SSFR 用 (view のみ)
+    TuboEngine::Math::Matrix4x4 proj_     = {};  // SSFR 用 (proj のみ)
 
     InstancedMeshRenderer renderer_;   // Object3d パイプラインで 1 DrawCall 描画
+    SphFluidRenderer      fluidRenderer_;  // SSFR
 
     // ---- SDF 障害物 ----
     std::vector<SdfObstacle> obstacles_;
