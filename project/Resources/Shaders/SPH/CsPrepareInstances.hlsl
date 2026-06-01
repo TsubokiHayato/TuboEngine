@@ -39,7 +39,7 @@ void main(uint3 tid : SV_DispatchThreadID)
     float4 col = lerp(g_ColorLow, g_ColorHigh, t);
 
     // World = Scale × Translate (球は回転不要)
-    float4x4 scale     = MakeScale(/* particleRadius = g_H * 0.25 近似 */ g_H * 0.25f);
+    float4x4 scale     = MakeScale(g_ParticleRadius);
     float4x4 translate = MakeTranslate(pos);
     float4x4 world     = mul(scale, translate);
     float4x4 wvp       = mul(world, g_ViewProj);
