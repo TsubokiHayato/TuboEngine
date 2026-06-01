@@ -51,7 +51,8 @@ struct alignas(16) SphGpuParams {
     float  extForceRadius;                 // 224
     float  extForceStrength;               // 228
     int    extForceActive;                 // 232
-    float  _pad3, _pad4;                   // 240 bytes total
+    float  surfaceTension;                 // 236  表面張力係数 σ
+    float  _pad4;                          // 240 bytes total
 };
 
 /// @brief SPH GPU コンピュートパイプライン
