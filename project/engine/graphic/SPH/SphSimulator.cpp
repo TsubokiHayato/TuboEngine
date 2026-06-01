@@ -110,6 +110,9 @@ void SphSimulator::Update(float dt, TuboEngine::Camera* camera) {
     gp.extForceStrength = params_.extForceStrength;
     gp.extForceActive   = params_.extForceActive ? 1 : 0;
     gp.surfaceTension   = params_.surfaceTension;
+    // 剛体物理を先に積分し、障害物の位置を更新してから GPU へ送る
+    IntegrateRigidBodies(simDt);
+
     // SDF 障害物を GPU パラメーターに転送
     gp.sdfCount = std::min((int)obstacles_.size(), kMaxSdfShapes);
     for (int i = 0; i < gp.sdfCount; ++i) {
@@ -239,13 +242,22 @@ void SphSimulator::DrawImGui() {
             ImGui::PushID(i);
             auto& obs = obstacles_[i];
             const char* typeName = (obs.type == SdfObstacle::Type::Sphere) ? "球" : "箱";
-            bool open = ImGui::TreeNode("obs", "[%d] %s (%s)", i, obs.label.c_str(), typeName);
+            const char* dynLabel = obs.dynamic ? " [剛体]" : "";
+            bool open = ImGui::TreeNode("obs", "[%d] %s (%s)%s", i, obs.label.c_str(), typeName, dynLabel);
             if (open) {
                 ImGui::DragFloat3("中心", &obs.center.x, 0.1f);
                 if (obs.type == SdfObstacle::Type::Sphere) {
                     ImGui::DragFloat("半径", &obs.halfExtents.x, 0.1f, 0.1f, 20.0f);
                 } else {
                     ImGui::DragFloat3("半辺長", &obs.halfExtents.x, 0.1f, 0.1f, 20.0f);
+                }
+                ImGui::Separator();
+                ImGui::Checkbox("物理剛体", &obs.dynamic);
+                HelpMarker("ON にすると重力・浮力・抵抗で動く。質量 < 流体密度×体積 なら浮く");
+                if (obs.dynamic) {
+                    ImGui::DragFloat("質量", &obs.mass, 0.1f, 0.01f, 200.0f);
+                    ImGui::Text("速度: (%.2f, %.2f, %.2f)", obs.velocity.x, obs.velocity.y, obs.velocity.z);
+                    if (ImGui::Button("静止")) obs.velocity = {};
                 }
                 if (ImGui::Button("削除")) {
                     obstacles_.erase(obstacles_.begin() + i);
@@ -505,5 +517,122 @@ void SphSimulator::AddBox(const TuboEngine::Math::Vector3& center,
 
 void SphSimulator::ClearObstacles() {
     obstacles_.clear();
+}
+
+void SphSimulator::AddDynamicSphere(const TuboEngine::Math::Vector3& center, float radius,
+                                     float mass, const std::string& label) {
+    AddSphere(center, radius, label);
+    obstacles_.back().dynamic = true;
+    obstacles_.back().mass    = mass;
+}
+
+void SphSimulator::AddDynamicBox(const TuboEngine::Math::Vector3& center,
+                                  const TuboEngine::Math::Vector3& halfExtents,
+                                  float mass, const std::string& label) {
+    AddBox(center, halfExtents, label);
+    obstacles_.back().dynamic = true;
+    obstacles_.back().mass    = mass;
+}
+
+// ============================================================
+//  IntegrateRigidBodies — 浮力・粘性抵抗・重力で剛体を積分
+//
+//  流体 → 剛体 の力:
+//    F_buoy = ρ_fluid × V_submerged × |g|  (アルキメデスの原理)
+//    F_drag = -k × v  (速度に比例する粘性抵抗)
+//  剛体 → 流体 の力:
+//    CsIntegrate の SDF 押し出しがすでに担当 (Phase 1)
+//    剛体が動けば次フレームの SDF 位置が変わり、流体が押し出される
+// ============================================================
+void SphSimulator::IntegrateRigidBodies(float dt) {
+    if (dt <= 0.0f) return;
+
+    using V3 = TuboEngine::Math::Vector3;
+    const float g    = std::abs(params_.gravity);     // 重力加速度 (正値)
+    const float rho0 = params_.restDensity;           // 流体の静止密度
+
+    // 流体表面の高さを推定 (粒子総体積 ÷ 水槽断面積)
+    const float fluidVolume = float(params_.particleCount) * params_.particleMass / rho0;
+    const float tankArea    = (params_.boundMax.x - params_.boundMin.x)
+                            * (params_.boundMax.z - params_.boundMin.z);
+    const float hFluid      = params_.boundMin.y + fluidVolume / (tankArea + 1e-6f);
+
+    for (auto& obs : obstacles_) {
+        if (!obs.dynamic) continue;
+
+        // ---- 浮力: 水没体積 × ρ_fluid × g (上向き) ----
+        float vSub = 0.0f;
+        if (obs.type == SdfObstacle::Type::Sphere) {
+            const float R = obs.halfExtents.x;
+            // 球の下端から流体面までの浸水深さ (0 〜 2R)
+            const float hSub = std::max(0.0f,
+                               std::min(2.0f * R, hFluid - (obs.center.y - R)));
+            // 球面帽の体積: π h² (3R - h) / 3
+            vSub = kPi * hSub * hSub * (3.0f * R - hSub) / 3.0f;
+        } else {
+            // 箱: 浸水高さ × 底面積
+            const float yBot = obs.center.y - obs.halfExtents.y;
+            const float yTop = obs.center.y + obs.halfExtents.y;
+            const float hSub = std::max(0.0f, std::min(yTop, hFluid) - yBot);
+            vSub = hSub * (2.0f * obs.halfExtents.x) * (2.0f * obs.halfExtents.z);
+        }
+        const float fBuoy = rho0 * vSub * g;  // 上向き
+
+        // ---- 粘性抵抗: -k × v (流体の粘性に比例) ----
+        // 代表断面積を形状から推定してストークス則に近い係数を得る
+        float crossSection;
+        if (obs.type == SdfObstacle::Type::Sphere) {
+            crossSection = kPi * obs.halfExtents.x * obs.halfExtents.x;
+        } else {
+            // 最大断面積 (各軸ペア)
+            crossSection = std::max({obs.halfExtents.x * obs.halfExtents.y,
+                                     obs.halfExtents.y * obs.halfExtents.z,
+                                     obs.halfExtents.z * obs.halfExtents.x}) * 4.0f;
+        }
+        const float kDrag = params_.viscosity * 0.04f * crossSection;
+
+        // ---- 合力・積分 ----
+        const float ax = (-kDrag * obs.velocity.x)                 / obs.mass;
+        const float ay = (-obs.mass * g + fBuoy - kDrag * obs.velocity.y) / obs.mass;
+        const float az = (-kDrag * obs.velocity.z)                 / obs.mass;
+
+        obs.velocity.x += ax * dt;
+        obs.velocity.y += ay * dt;
+        obs.velocity.z += az * dt;
+        obs.center.x   += obs.velocity.x * dt;
+        obs.center.y   += obs.velocity.y * dt;
+        obs.center.z   += obs.velocity.z * dt;
+
+        // ---- AABB 壁との衝突反射 ----
+        const V3 he = (obs.type == SdfObstacle::Type::Sphere)
+                      ? V3{obs.halfExtents.x, obs.halfExtents.x, obs.halfExtents.x}
+                      : obs.halfExtents;
+        const float rest = params_.restitution;
+
+        if (obs.center.x - he.x < params_.boundMin.x) {
+            obs.center.x = params_.boundMin.x + he.x;
+            obs.velocity.x =  std::abs(obs.velocity.x) * rest;
+        }
+        if (obs.center.x + he.x > params_.boundMax.x) {
+            obs.center.x = params_.boundMax.x - he.x;
+            obs.velocity.x = -std::abs(obs.velocity.x) * rest;
+        }
+        if (obs.center.y - he.y < params_.boundMin.y) {
+            obs.center.y = params_.boundMin.y + he.y;
+            obs.velocity.y =  std::abs(obs.velocity.y) * rest;
+        }
+        if (obs.center.y + he.y > params_.boundMax.y) {
+            obs.center.y = params_.boundMax.y - he.y;
+            obs.velocity.y = -std::abs(obs.velocity.y) * rest;
+        }
+        if (obs.center.z - he.z < params_.boundMin.z) {
+            obs.center.z = params_.boundMin.z + he.z;
+            obs.velocity.z =  std::abs(obs.velocity.z) * rest;
+        }
+        if (obs.center.z + he.z > params_.boundMax.z) {
+            obs.center.z = params_.boundMax.z - he.z;
+            obs.velocity.z = -std::abs(obs.velocity.z) * rest;
+        }
+    }
 }
 
