@@ -162,12 +162,16 @@ std::vector<SphParticle> SphSimulator::GenerateInitialParticles() const {
     std::vector<SphParticle> particles;
     particles.reserve(params_.particleCount);
 
-    const float spacing = params_.smoothingRadius * 0.55f;
-    const int   dim     = static_cast<int>(std::cbrt(float(params_.particleCount))) + 1;
+    const float spacing    = params_.smoothingRadius * 0.55f;
+    const int   dim        = static_cast<int>(std::cbrt(float(params_.particleCount))) + 1;
+    const float gridExtent = (dim - 1) * spacing;
+
+    // グリッドをボックス中央(XZ)・底面(Y)に配置
+    // ボックス外に粒子が出ないよう中央揃え
     const TuboEngine::Math::Vector3 start = {
-        params_.boundMin.x + spacing,
-        (params_.boundMin.y + params_.boundMax.y) * 0.5f,
-        params_.boundMin.z + spacing
+        (params_.boundMin.x + params_.boundMax.x) * 0.5f - gridExtent * 0.5f,
+        params_.boundMin.y + spacing,   // 底面から積み上げる (重力で落下するので自然)
+        (params_.boundMin.z + params_.boundMax.z) * 0.5f - gridExtent * 0.5f
     };
 
     int added = 0;
