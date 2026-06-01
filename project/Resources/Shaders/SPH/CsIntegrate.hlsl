@@ -20,6 +20,15 @@ void main(uint3 tid : SV_DispatchThreadID)
     // → 粒子が個別にバラけず、連続した流体のように動く
     float3 accel = f / rho;
     vel += accel * g_Dt;
+
+    // 速度クランプ (CFL 的な上限): 1 ステップで影響半径の半分以上動かさない
+    // → 高速時の数値爆発を防ぐ。g_Dt=0 (一時停止) のときはクランプしない
+    if (g_Dt > 1e-8f) {
+        float vmax  = 0.5f * g_H / g_Dt;
+        float speed = length(vel);
+        if (speed > vmax) vel *= vmax / speed;
+    }
+
     pos += (vel + xsph) * g_Dt;
 
     // AABB 境界反射

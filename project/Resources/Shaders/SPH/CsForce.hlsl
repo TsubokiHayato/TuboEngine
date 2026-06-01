@@ -19,6 +19,8 @@ void main(uint3 tid : SV_DispatchThreadID)
     float3 fPressure  = float3(0, 0, 0);
     float3 fViscosity = float3(0, 0, 0);
     float3 xsphSum    = float3(0, 0, 0);
+    float3 colorGrad  = float3(0, 0, 0);  // 表面張力: カラーフィールド勾配 ∇c
+    float  colorLap   = 0.0f;             // 表面張力: カラーフィールド ラプラシアン ∇²c
 
     // ---- 空間ハッシュ: 周囲 27 セルのみ探索 (O(N²)→O(N×近傍数)) ----
     int3 cc = SphCellCoord(pi);
@@ -48,6 +50,9 @@ void main(uint3 tid : SV_DispatchThreadID)
             fViscosity += (vj - vi) * (g_Viscosity * g_Mass / rhoj * KernelViscLap(r, g_H));
             // XSPH 速度補正: 近傍との速度差を Poly6 で重み付け平均
             xsphSum    += (vj - vi) * (g_Mass / rhoj * KernelPoly6(r * r, g_H));
+            // 表面張力: カラーフィールドの勾配・ラプラシアン
+            colorGrad  += KernelSpikyGrad(rij, r, g_H) * (g_Mass / rhoj);
+            colorLap   += KernelViscLap(r, g_H) * (g_Mass / rhoj);
         }
     }
 
@@ -109,5 +114,13 @@ void main(uint3 tid : SV_DispatchThreadID)
         }
     }
 
-    g_Particles[i].force = fPressure + fViscosity + fGravity + fExternal;
+    // ---- 表面張力 (Müller 2003 カラーフィールド法) ----
+    // 表面付近 (|∇c| が大きい) の粒子に、曲率に比例した内向きの力を加える
+    float3 fSurface = float3(0, 0, 0);
+    float  nLen = length(colorGrad);
+    if (nLen > 0.5f) {  // 表面付近のみ (内部は ∇c がほぼ 0)
+        fSurface = -g_SurfaceTension * colorLap * (colorGrad / nLen);
+    }
+
+    g_Particles[i].force = fPressure + fViscosity + fGravity + fExternal + fSurface;
 }

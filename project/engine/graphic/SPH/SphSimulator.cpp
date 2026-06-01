@@ -109,6 +109,7 @@ void SphSimulator::Update(float dt, TuboEngine::Camera* camera) {
     gp.extForceRadius   = params_.extForceRadius;
     gp.extForceStrength = params_.extForceStrength;
     gp.extForceActive   = params_.extForceActive ? 1 : 0;
+    gp.surfaceTension   = params_.surfaceTension;
     gp.viewProj = viewProj_;
 
     // GPU 上で全計算 (Density → Force → Integrate) × substeps + PrepareInstances
@@ -180,6 +181,8 @@ void SphSimulator::DrawImGui() {
         HelpMarker("ねばり。低い=サラサラ(水)、高い=とろとろ(ハチミツ)");
         ImGui::DragFloat("XSPH補正",   &params_.xsphCoeff, 0.01f, 0.0f, 1.0f);
         HelpMarker("粒子の足並みを揃える。高いほど一体感のある流れになる");
+        ImGui::DragFloat("表面張力",   &params_.surfaceTension, 0.05f, 0.0f, 20.0f);
+        HelpMarker("水面のまとまり。高いほど水滴が丸まり、しずくになりやすい");
         ImGui::DragFloat("粒子質量",   &params_.particleMass, 0.05f, 0.01f, 10.0f);
         ImGui::DragFloat("重力",       &params_.gravity, 0.1f, -30.0f, 0.0f);
         ImGui::DragFloat("壁反発係数", &params_.restitution, 0.01f, 0.0f, 1.0f);
@@ -297,22 +300,25 @@ std::vector<SphParticle> SphSimulator::GenerateInitialParticles() const {
 void SphSimulator::ApplyPreset(Preset preset) {
     switch (preset) {
     case Preset::Water:   // サラサラの水
-        params_.viscosity   = 1.0f;
-        params_.stiffness   = 200.0f;
-        params_.xsphCoeff   = 0.15f;
-        params_.restitution = 0.02f;
+        params_.viscosity      = 1.0f;
+        params_.stiffness      = 200.0f;
+        params_.xsphCoeff      = 0.15f;
+        params_.restitution    = 0.02f;
+        params_.surfaceTension = 2.0f;
         break;
     case Preset::Honey:   // とろとろのハチミツ
-        params_.viscosity   = 40.0f;
-        params_.stiffness   = 150.0f;
-        params_.xsphCoeff   = 0.30f;
-        params_.restitution = 0.0f;
+        params_.viscosity      = 40.0f;
+        params_.stiffness      = 150.0f;
+        params_.xsphCoeff      = 0.30f;
+        params_.restitution    = 0.0f;
+        params_.surfaceTension = 1.0f;
         break;
-    case Preset::Slime:   // ぷるぷるのスライム
-        params_.viscosity   = 15.0f;
-        params_.stiffness   = 250.0f;
-        params_.xsphCoeff   = 0.45f;
-        params_.restitution = 0.0f;
+    case Preset::Slime:   // ぷるぷるのスライム (高めの表面張力で丸まる)
+        params_.viscosity      = 15.0f;
+        params_.stiffness      = 250.0f;
+        params_.xsphCoeff      = 0.45f;
+        params_.restitution    = 0.0f;
+        params_.surfaceTension = 8.0f;
         break;
     }
 }
