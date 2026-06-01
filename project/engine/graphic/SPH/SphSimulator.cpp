@@ -6,6 +6,7 @@
 #include <cmath>
 #include <cstring>
 #include <numbers>
+#include <algorithm>
 #undef min
 #undef max
 
@@ -43,12 +44,18 @@ void SphSimulator::Initialize(const Params& params, TuboEngine::Camera* camera,
     // InstancedMeshRenderer — Object3d パイプライン + 1 DrawCall
     renderer_.Initialize(modelPath, params_.particleCount, camera);
     renderer_.SetLightType(1);   // Phong
+
+    // SSFR レンダラー
+    const int w = TuboEngine::WinApp::GetInstance()->GetClientWidth();
+    const int h = TuboEngine::WinApp::GetInstance()->GetClientHeight();
+    fluidRenderer_.Initialize(w, h);
 }
 
 // ============================================================
 //  Finalize
 // ============================================================
 void SphSimulator::Finalize() {
+    fluidRenderer_.Finalize();
     renderer_.Finalize();
     compute_.Finalize();
 }
@@ -67,6 +74,8 @@ void SphSimulator::Reset() {
 void SphSimulator::Update(float dt, TuboEngine::Camera* camera) {
     if (camera) {
         viewProj_ = camera->GetViewProjectionMatrix();
+        view_     = camera->GetViewMatrix();
+        proj_     = camera->GetProjectionMatrix();
     }
     renderer_.Update(camera);
 
@@ -140,6 +149,24 @@ void SphSimulator::Update(float dt, TuboEngine::Camera* camera) {
 void SphSimulator::Draw() {
     renderer_.Draw(compute_.GetInstanceBufferGPUAddr(),
                    static_cast<uint32_t>(compute_.GetParticleCount()));
+}
+
+// ============================================================
+//  DrawFluid — SSFR 3 パスを実行
+//  Draw() の代わりに呼ぶ (両方を同時に呼ばないこと)
+// ============================================================
+void SphSimulator::DrawFluid(D3D12_CPU_DESCRIPTOR_HANDLE targetRTV,
+                              D3D12_CPU_DESCRIPTOR_HANDLE targetDSV) {
+    if (!fluidRenderer_.enabled) {
+        // SSFR が無効なら通常描画にフォールバック
+        Draw();
+        return;
+    }
+    fluidRenderer_.DrawDepthPass(compute_.GetInstancingSrvIndex(),
+                                  compute_.GetParticleCount(),
+                                  view_, proj_);
+    fluidRenderer_.DrawBlurPass();
+    fluidRenderer_.DrawShadePass(targetRTV, targetDSV, view_);
 }
 
 // ============================================================
@@ -233,6 +260,26 @@ void SphSimulator::DrawImGui() {
         ImGui::DragFloat("外力 半径",  &params_.extForceRadius, 0.1f, 0.1f, 20.0f);
         ImGui::DragFloat("外力 強さ",  &params_.extForceStrength, 1.0f, -300.0f, 300.0f);
         HelpMarker("正=押し出す(噴水)、負=引き寄せる(集める)");
+    }
+
+    // ---- スクリーンスペース流体描画 (SSFR) ----
+    if (ImGui::CollapsingHeader("流体描画 (SSFR)")) {
+        auto& fp = fluidRenderer_.GetParams();
+        ImGui::Checkbox("SSFR 有効", &fluidRenderer_.enabled);
+        HelpMarker("ON=スムーズな水面描画 / OFF=球メッシュ描画");
+        if (fluidRenderer_.enabled) {
+            ImGui::DragFloat("ブラー半径",  &fp.blurRadius,   0.1f, 1.0f, 5.0f);
+            HelpMarker("粒子の境界を繋ぐブラーの強さ (1-5 テクセル)");
+            ImGui::DragFloat("ブラー強度",  &fp.blurFalloff,  0.1f, 0.0f, 5.0f);
+            HelpMarker("バイラテラルの深度エッジ保持 (小さいほど均一にブレる)");
+            ImGui::DragFloat("法線スケール",&fp.normalScale,  5.0f, 1.0f, 200.0f);
+            HelpMarker("深度勾配の増幅率 (大きいほど波紋が鮮明)");
+            ImGui::DragFloat("鏡面反射",    &fp.specPower,    4.0f, 4.0f, 256.0f);
+            ImGui::DragFloat("フレネル",    &fp.fresnelBias,  0.01f,0.0f, 1.0f);
+            HelpMarker("最小不透明度。0=縁が完全透明、1=常に不透明");
+            ImGui::ColorEdit4("水色",       &fp.waterColor.x);
+            ImGui::DragFloat3("ライト方向", &fp.lightDir.x,   0.1f);
+        }
     }
 
     // ---- SDF 障害物 ----
