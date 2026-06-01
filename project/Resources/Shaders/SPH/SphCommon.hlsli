@@ -41,6 +41,11 @@ cbuffer SphParams : register(b0) {
     float  g_XsphCoeff;        // XSPH 速度補正係数 ε
     float  _cbPad1, _cbPad2;
     float4x4 g_ViewProj;       // view-projection matrix (16-byte aligned)
+    // ---- 空間ハッシュ (近傍探索高速化) ----
+    int3   g_GridDim;          // グリッド各軸セル数
+    float  g_CellSize;         // セルサイズ (= 初期 smoothingRadius)
+    float3 g_GridMin;          // グリッド原点 (= 初期 boundMin)
+    int    g_MaxPerCell;       // セルあたり最大粒子数
 };
 
 // ---- SPH カーネル ----
@@ -59,4 +64,16 @@ float3 KernelSpikyGrad(float3 rij, float r, float h) {
 float KernelViscLap(float r, float h) {
     if (r >= h) return 0.0f;
     return (45.0f / (SPH_PI * pow(h, 6.0f))) * (h - r);
+}
+
+// ---- 空間ハッシュ ヘルパー ----
+// 粒子位置からグリッドセル座標を求める (範囲外は端セルにクランプ)
+int3 SphCellCoord(float3 pos) {
+    int3 c = (int3)floor((pos - g_GridMin) / g_CellSize);
+    return clamp(c, int3(0, 0, 0), g_GridDim - int3(1, 1, 1));
+}
+
+// セル座標を 1 次元インデックスに変換
+int SphCellIndex(int3 c) {
+    return c.x + c.y * g_GridDim.x + c.z * g_GridDim.x * g_GridDim.y;
 }

@@ -40,7 +40,12 @@ struct alignas(16) SphGpuParams {
     float  particleRadius;     // 粒子描画半径
     float  xsphCoeff;          // XSPH 速度補正係数 ε
     float  _pad1, _pad2;       // 112 bytes (Matrix4x4 の 16-byte アライメント確保)
-    TuboEngine::Math::Matrix4x4 viewProj; // 176 bytes total
+    TuboEngine::Math::Matrix4x4 viewProj; // 176 bytes
+    // ---- 空間ハッシュ ----
+    int    gridDimX, gridDimY, gridDimZ;  // 188
+    float  cellSize;                       // 192
+    float  gridMinX, gridMinY, gridMinZ;  // 204
+    int    maxPerCell;                     // 208 bytes total
 };
 
 /// @brief SPH GPU コンピュートパイプライン
@@ -52,7 +57,12 @@ struct alignas(16) SphGpuParams {
 ///   4. CsPrepareInstances — WVP 行列を GPU 上で計算
 class SphComputePipeline {
 public:
-    void Initialize(int particleCount);
+    /// @param cellSize    グリッドセルサイズ (= 初期 smoothingRadius)
+    /// @param maxPerCell  1 セルあたりの最大粒子数 (超過分は近傍探索で無視)
+    void Initialize(int particleCount,
+                    const TuboEngine::Math::Vector3& boundMin,
+                    const TuboEngine::Math::Vector3& boundMax,
+                    float cellSize, int maxPerCell = 64);
     void Finalize();
 
     /// 初期粒子データを GPU バッファにアップロード
@@ -88,17 +98,32 @@ private:
     Microsoft::WRL::ComPtr<ID3D12PipelineState>  psoForce_;
     Microsoft::WRL::ComPtr<ID3D12PipelineState>  psoIntegrate_;
     Microsoft::WRL::ComPtr<ID3D12PipelineState>  psoPrepare_;
+    Microsoft::WRL::ComPtr<ID3D12PipelineState>  psoClearGrid_;  // 空間ハッシュ: カウンタクリア
+    Microsoft::WRL::ComPtr<ID3D12PipelineState>  psoBuildGrid_;  // 空間ハッシュ: 粒子登録
 
     // ---- GPU バッファ ----
     Microsoft::WRL::ComPtr<ID3D12Resource> particleBuf_;   // RWStructuredBuffer
     Microsoft::WRL::ComPtr<ID3D12Resource> instanceBuf_;   // RWStructuredBuffer
     Microsoft::WRL::ComPtr<ID3D12Resource> paramsCbuf_;    // ConstantBuffer (UPLOAD)
+    Microsoft::WRL::ComPtr<ID3D12Resource> gridCountsBuf_; // u2: セルごとの粒子数
+    Microsoft::WRL::ComPtr<ID3D12Resource> gridCellsBuf_;  // u3: セル内の粒子インデックス
     SphGpuParams* paramsMapped_ = nullptr;
 
     // ---- ディスクリプタ ----
     int particleUavIndex_   = -1;  // UAV  : u0 (particle buffer)
     int instanceUavIndex_   = -1;  // UAV  : u1 (instance buffer)
     int instancingSrvIndex_ = -1;  // SRV  : VS が読む
+    int gridCountsUav_      = -1;  // UAV  : u2 (grid counts)
+    int gridCellsUav_       = -1;  // UAV  : u3 (grid cells)
+
+    // ---- 空間ハッシュ次元 (Initialize で確定) ----
+    int   gridDimX_   = 0;
+    int   gridDimY_   = 0;
+    int   gridDimZ_   = 0;
+    int   numCells_   = 0;
+    int   maxPerCell_ = 64;
+    float cellSize_   = 1.0f;
+    TuboEngine::Math::Vector3 gridMin_ = {0.0f, 0.0f, 0.0f};
 
     int particleCount_ = 0;
     bool initialized_          = false;
