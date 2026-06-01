@@ -24,18 +24,29 @@ cbuffer SphParams : register(b0) {
     int    g_ParticleCount;    // 粒子数
     float  g_H;                // smoothingRadius
     float  g_RestDensity;      // restDensity
-    float  g_Stiffness;        // stiffness
+    float  g_Stiffness;        // stiffness (Tait方程式係数)
+    // 16 bytes
     float  g_Viscosity;        // viscosity
     float  g_Mass;             // particleMass
     float  g_Gravity;          // gravity (Y)
     float  g_Restitution;      // restitution
+    // 32 bytes
     float3 g_BoundMin;         // boundMin
     float  g_Dt;               // dt per substep
+    // 48 bytes
     float3 g_BoundMax;         // boundMax
     float  g_SpeedMax;         // 色補間最大速度
+    // 64 bytes
     float4 g_ColorLow;         // colorLow
+    // 80 bytes
     float4 g_ColorHigh;        // colorHigh
-    float4x4 g_ViewProj;       // view-projection matrix
+    // 96 bytes
+    float  g_SurfaceTension;   // 表面張力係数 σ
+    float  g_ParticleRadius;   // 描画半径
+    float  _cbPad0;
+    float  _cbPad1;
+    // 112 bytes
+    float4x4 g_ViewProj;       // view-projection matrix (16-byte aligned)
 };
 
 // ---- SPH カーネル ----
