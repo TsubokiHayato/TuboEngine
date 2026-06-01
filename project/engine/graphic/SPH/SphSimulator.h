@@ -29,13 +29,12 @@ public:
         int   particleCount   = 1000;
         float smoothingRadius = 1.0f;
         float restDensity     = 14.0f;
-        float stiffness       = 200.0f;    // Tait方程式向けに高めに設定 (非圧縮性向上)
-        float viscosity       = 0.5f;      // 水は低粘性 (旧: 8.0f)
+        float stiffness       = 50.0f;
+        float viscosity       = 8.0f;
         float particleMass    = 1.0f;
         float gravity         = -3.0f;
-        float restitution     = 0.03f;     // 液体は壁で跳ねない (旧: 0.2f)
+        float restitution     = 0.2f;
         float particleRadius  = 0.18f;
-        float surfaceTension  = 0.0728f;   // 表面張力係数 σ (水 ≈ 0.0728 N/m)
         TuboEngine::Math::Vector3 boundMin = {-5.0f, 0.0f, -5.0f};
         TuboEngine::Math::Vector3 boundMax = { 5.0f, 8.0f,  5.0f};
         TuboEngine::Math::Vector4 colorLow  = {0.4f, 0.7f, 1.0f, 1.0f};
