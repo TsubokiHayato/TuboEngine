@@ -37,6 +37,7 @@ public:
         float particleRadius  = 0.3f;          // 描画半径
         float speedMax        = 5.0f;           // 色補間の最大速度
         float xsphCoeff       = 0.15f;          // XSPH 速度補正係数 (0=無効, 0.1〜0.3が標準)
+        float surfaceTension  = 2.0f;           // 表面張力係数 (0=無効, 大きいほど水滴が丸まる)
         // ---- 外力 (力点から放射状に押す/引く) ----
         bool  extForceActive   = false;
         TuboEngine::Math::Vector3 extForcePos = {0.0f, 5.0f, 0.0f};

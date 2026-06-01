@@ -51,7 +51,8 @@ cbuffer SphParams : register(b0) {
     float  g_ExtForceRadius;   // 影響半径
     float  g_ExtForceStrength; // 強さ (正=押し出し, 負=引き寄せ)
     int    g_ExtForceActive;   // 有効フラグ
-    float  _extPad0, _extPad1;
+    float  g_SurfaceTension;   // 表面張力係数 σ
+    float  _extPad1;
 };
 
 // ---- SPH カーネル ----
