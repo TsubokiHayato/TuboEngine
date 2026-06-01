@@ -1,4 +1,5 @@
 #include "DebugScene.h"
+#include "OffscreenRendering.h"
 #include "ParticleManager.h"
 #include "Effects/Primitive/PrimitiveEmitter.h"
 #include "Effects/Ring/RingEmitter.h"
@@ -154,9 +155,11 @@ void DebugScene::Finalize() {
 }
 
 void DebugScene::Object3DDraw() {
-    // SPH: Object3d パイプラインでインスタンシング描画 (1 DrawCall)
     if (sphSimulator_) {
-        sphSimulator_->Draw();
+        // SSFR が有効なら DrawFluid()、無効なら Draw() にフォールバック
+        auto rtvHandle = OffScreenRendering::GetInstance()->GetOffscreenRtvHandle();
+        auto dsvHandle = TuboEngine::DirectXCommon::GetInstance()->GetDSVCPUDescriptorHandle(0);
+        sphSimulator_->DrawFluid(rtvHandle, dsvHandle);
         sphSimulator_->DrawBounds({0.3f, 0.8f, 1.0f, 1.0f});
     }
 
