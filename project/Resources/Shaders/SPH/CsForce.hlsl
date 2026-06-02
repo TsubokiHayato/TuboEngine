@@ -103,14 +103,18 @@ void main(uint3 tid : SV_DispatchThreadID)
             fPressure += KernelSpikyGrad(rij, r, g_H) * (-g_Mass * (pri + pri) / (2.0f * rho));
     }
 
-    // ---- SDF 障害物: 境界ミラー粒子による圧力補正 ----
-    // 障害物表面から h/2 以内の粒子に、鏡像圧力力を追加する
+    // ---- SDF 境界ミラー粒子による圧力補正 ----
+    // 障害物: 表面の外側 h/2 以内 (d > 0)
+    // コンテナ: 壁の内側 h/2 以内 (d < 0)  ← 符号が逆なだけで同じ式が使える
     for (int si = 0; si < g_SdfCount; ++si) {
-        float  d = SdfEval(g_SdfShapes[si], pi);
-        if (d > 0.0f && d < g_H * 0.5f) {
+        float  d   = SdfEval(g_SdfShapes[si], pi);
+        bool   isC = SdfIsContainer(g_SdfShapes[si]);
+        bool   apply = isC ? (d < 0.0f && d > -g_H * 0.5f)
+                           : (d > 0.0f && d <  g_H * 0.5f);
+        if (apply) {
             float3 n     = SdfNormal(g_SdfShapes[si], pi);
-            float3 rij_m = n * (2.0f * d);  // ミラー粒子 → pi ベクトル (外向き)
-            float  r_m   = 2.0f * d;
+            float3 rij_m = n * (2.0f * d);  // d>0: 外向き / d<0: 内向き (自然に反転)
+            float  r_m   = abs(2.0f * d);
             fPressure   += KernelSpikyGrad(rij_m, r_m, g_H) *
                            (-g_Mass * (pri + pri) / (2.0f * rho));
         }

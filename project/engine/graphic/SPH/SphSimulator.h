@@ -18,17 +18,31 @@
 #undef min
 #undef max
 
-/// @brief SDF 障害物の記述 (CPU 側インターフェース)
+/// @brief SDF 障害物 / コンテナの記述 (CPU 側インターフェース)
 struct SdfObstacle {
-    enum class Type { Sphere, Box } type;
+    enum class Type {
+        // ---- 障害物 (流体を外へ押し出す) ----
+        Sphere = 0, Box = 1,
+        // ---- コンテナ (流体を内へ押し戻す / 任意形状の水槽) ----
+        SphereContainer = 2, BoxContainer = 3, CylinderContainer = 4
+    } type;
     TuboEngine::Math::Vector3 center;
-    TuboEngine::Math::Vector3 halfExtents;  // sphere: x=radius; box: 各軸の半辺長
+    // Sphere/SphereContainer : x = radius
+    // Box/BoxContainer       : xyz = half-sizes
+    // CylinderContainer      : x = radius, y = half-height
+    TuboEngine::Math::Vector3 halfExtents;
     std::string label;
 
-    // ---- Phase 2: 剛体物理 ----
-    bool    dynamic  = false;  // true → 浮力・抵抗・重力で動く
-    float   mass     = 1.0f;  // 質量 (kg 相当)
-    TuboEngine::Math::Vector3 velocity = {};  // 現在の線速度
+    // ---- 剛体物理 (obstacle のみ有効) ----
+    bool    dynamic  = false;
+    float   mass     = 1.0f;
+    TuboEngine::Math::Vector3 velocity = {};
+
+    bool IsContainer() const {
+        return type == Type::SphereContainer
+            || type == Type::BoxContainer
+            || type == Type::CylinderContainer;
+    }
 };
 
 /// @brief SPH 流体シミュレーター (GPU Compute 版)
@@ -86,18 +100,31 @@ public:
     void Reset();
     void Finalize();
 
-    // ---- SDF 障害物管理 ----
+    // ---- SDF 障害物 ----
     void AddSphere(const TuboEngine::Math::Vector3& center, float radius,
                    const std::string& label = "");
     void AddBox(const TuboEngine::Math::Vector3& center,
                 const TuboEngine::Math::Vector3& halfExtents,
                 const std::string& label = "");
-    // 物理剛体として追加するショートカット
     void AddDynamicSphere(const TuboEngine::Math::Vector3& center, float radius,
                           float mass, const std::string& label = "");
     void AddDynamicBox(const TuboEngine::Math::Vector3& center,
                        const TuboEngine::Math::Vector3& halfExtents,
                        float mass, const std::string& label = "");
+
+    // ---- SDF コンテナ (任意形状の水槽) ----
+    /// 球形の水槽。AABB は自動で合わせる
+    void AddContainerSphere(const TuboEngine::Math::Vector3& center, float radius,
+                            const std::string& label = "");
+    /// 箱形の水槽
+    void AddContainerBox(const TuboEngine::Math::Vector3& center,
+                         const TuboEngine::Math::Vector3& halfExtents,
+                         const std::string& label = "");
+    /// 円柱形の水槽 (Y 軸方向)
+    void AddContainerCylinder(const TuboEngine::Math::Vector3& center,
+                              float radius, float halfHeight,
+                              const std::string& label = "");
+
     void ClearObstacles();
 
     Params& GetParams() { return params_; }
