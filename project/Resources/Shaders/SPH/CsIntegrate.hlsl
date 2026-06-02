@@ -39,15 +39,27 @@ void main(uint3 tid : SV_DispatchThreadID)
     if (pos.z < g_BoundMin.z) { pos.z = g_BoundMin.z; vel.z =  abs(vel.z) * g_Restitution; }
     if (pos.z > g_BoundMax.z) { pos.z = g_BoundMax.z; vel.z = -abs(vel.z) * g_Restitution; }
 
-    // ---- SDF 障害物境界: 障害物内部への侵入を押し出す ----
+    // ---- SDF 境界 ----
     for (int si = 0; si < g_SdfCount; ++si) {
         float  d = SdfEval(g_SdfShapes[si], pos);
-        if (d < 0.0f) {
-            float3 n = SdfNormal(g_SdfShapes[si], pos);
-            pos -= d * n;                          // 表面まで押し出す (d<0 なので -d>0)
-            float  vn = dot(vel, n);
-            if (vn < 0.0f)                         // 障害物へ向かっている場合のみ反射
-                vel -= (1.0f + g_Restitution) * vn * n;
+        float3 n = SdfNormal(g_SdfShapes[si], pos);
+
+        if (!SdfIsContainer(g_SdfShapes[si])) {
+            // 障害物: 内部に侵入したら外へ押し出す
+            if (d < 0.0f) {
+                pos -= d * n;                       // d<0 なので -d>0 → 外向き
+                float vn = dot(vel, n);
+                if (vn < 0.0f)
+                    vel -= (1.0f + g_Restitution) * vn * n;
+            }
+        } else {
+            // コンテナ: 外部に出たら内へ押し戻す
+            if (d > 0.0f) {
+                pos -= d * n;                       // d>0, n=外向き → 内向きに戻す
+                float vn = dot(vel, n);
+                if (vn > 0.0f)                      // 外へ向かっている速度を反射
+                    vel -= (1.0f + g_Restitution) * vn * n;
+            }
         }
     }
 
