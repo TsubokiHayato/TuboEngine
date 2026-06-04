@@ -3,6 +3,7 @@
 #include "Bullet/Enemy/CircusBullet.h"
 #include <vector>
 #include <memory>
+#include <random>
 
 class CircusEnemy : public Enemy {
 public:
@@ -26,6 +27,8 @@ public:
     void ClearAllBullets(); // ジャスト回避時に画面上の全弾を消去する
 
 private:
+    bool UseNormalBullet() const override { return false; }
+
     void TryFireMissiles(bool canSeePlayer, float dt);
     void FireSingleMissile(const TuboEngine::Math::Vector3& launchDir, float speed);
 
@@ -135,4 +138,7 @@ private:
     TuboEngine::Math::Vector3 dashStart_;
     TuboEngine::Math::Vector3 dashTarget_;
     float dashShakeTimer_     = 0.0f;  // 到着後の小揺れ用
+
+    std::mt19937 rng_{std::random_device{}()};
+    bool disabledBaseBullet_ = false;
 };

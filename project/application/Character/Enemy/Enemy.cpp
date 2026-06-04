@@ -73,10 +73,14 @@ void Enemy::Initialize() {
 	idleBackHoldTimer = 0.0f;
 	idleBackStartAngle = rotation.z;
 	idleBackTargetAngle = rotation.z;
+	btIsDoingLookAround_ = false;
 
 	// ヒットシェイク初期化
 	hitShakeTimer_ = 0.0f;
 	hitShakeOffset_ = {0.0f, 0.0f, 0.0f};
+
+	// ビヘイビアツリー構築
+	BuildBehaviorTree();
 
 	// --- 追加: 演出用エミッタ生成 ---
 	// ヒット時: 小さなスパーク（既存）
@@ -374,6 +378,232 @@ bool Enemy::BuildPathTo(const TuboEngine::Math::Vector3& worldGoal) {
 	return !currentPath_.empty();
 }
 
+// =============================================================================
+// Enemy::BuildBehaviorTree
+// 基底Enemyのビヘイビアツリーを構築する。
+//
+// ツリー構造（Selector = OR、Sequence = AND）:
+//
+//  Selector [ルート]
+//  ├─ Sequence [プレイヤー視認 && 射程内]
+//  │   ├─ Condition: btCanSee_ && btDist_ <= moveStartDistance_
+//  │   └─ Selector [距離別行動]
+//  │       ├─ Sequence [Attack: 攻撃射程内で停止して射撃]
+//  │       │   ├─ Condition: attackRange_ > 0 && btDist_ <= attackRange_
+//  │       │   └─ Action: DoAttack（向く + 射撃）
+//  │       └─ Action: DoChase（向く + 追跡 + 射撃）
+//  ├─ Sequence [警戒 or 見回し]
+//  │   ├─ Condition: lastSeenTimer > 0 || btIsDoingLookAround_
+//  │   └─ Selector
+//  │       ├─ Sequence [Alert: 最終目撃位置へ向く]
+//  │       │   ├─ Condition: lastSeenTimer > 0
+//  │       │   └─ Action: DoAlert
+//  │       └─ Action: DoLookAround（スキャン完了で btIsDoingLookAround_=false）
+//  └─ Action: DoIdle（待機中の首振りアニメ）
+// =============================================================================
+void Enemy::BuildBehaviorTree() {
+	using namespace BT;
+
+	constexpr float kDt = 1.0f / 60.0f;
+
+	// ---- 共通ヘルパー：目標方向へ一定速度で回転 ----
+	auto FaceToward = [this](const TuboEngine::Math::Vector3& target) {
+		TuboEngine::Math::Vector3 toTarget = target - position;
+		float angleZ = std::atan2(toTarget.y, toTarget.x);
+		float diff   = NormalizeAngle(angleZ - rotation.z);
+		if (std::fabs(diff) < turnSpeed_) {
+			rotation.z = angleZ;
+		} else {
+			rotation.z += (diff > 0.0f ? 1.0f : -1.0f) * turnSpeed_;
+			rotation.z = NormalizeAngle(rotation.z);
+		}
+	};
+
+	// ---- 共通ヘルパー：弾発射試行 ----
+	auto TryFireNormal = [this]() {
+		if (!UseNormalBullet()) return;
+		wantShoot_ = true;
+		bulletTimer_ += 1.0f / 60.0f;
+		if (bullet && bullet->GetIsAlive()) return;
+		if (bullet && !bullet->GetIsAlive()) bullet.reset();
+		if (bulletTimer_ < EnemyNormalBullet::s_fireInterval) return;
+		bulletTimer_ = 0.0f;
+		bullet = std::make_unique<EnemyNormalBullet>();
+		bullet->Initialize(position);
+		bullet->SetEnemyPosition(position);
+		bullet->SetEnemyRotation(rotation);
+		bullet->SetPlayer(player_);
+		bullet->SetCamera(camera_);
+		bullet->SetMapChipField(mapChipField);
+	};
+
+	// =========================================================
+	// リーフアクション定義
+	// =========================================================
+
+	// [DoIdle] 待機：定期的に後ろを向いて戻る首振りアニメ
+	auto doIdle = Act([this]() {
+		state_               = State::Idle;
+		idleBackPhase_       = idleBackPhase_; // そのまま維持
+		btIsDoingLookAround_ = false;
+		wantShoot_           = false;
+
+		switch (idleBackPhase_) {
+		case IdleBackPhase::None:
+			idleLookAroundTimer -= 1.0f / 60.0f;
+			if (idleLookAroundTimer <= 0.0f) {
+				idleBackStartAngle  = rotation.z;
+				idleBackTargetAngle = NormalizeAngle(idleBackStartAngle + kPI);
+				idleBackHoldTimer   = idleBackHoldSec;
+				idleBackPhase_      = IdleBackPhase::ToBack;
+			}
+			break;
+		case IdleBackPhase::ToBack: {
+			float diff = NormalizeAngle(idleBackTargetAngle - rotation.z);
+			float turn = std::clamp(diff, -idleBackTurnSpeed, idleBackTurnSpeed);
+			rotation.z = NormalizeAngle(rotation.z + turn);
+			if (std::fabs(diff) < 0.01f) {
+				rotation.z     = idleBackTargetAngle;
+				idleBackPhase_ = IdleBackPhase::Hold;
+			}
+		} break;
+		case IdleBackPhase::Hold:
+			idleBackHoldTimer -= 1.0f / 60.0f;
+			if (idleBackHoldTimer <= 0.0f) idleBackPhase_ = IdleBackPhase::Return;
+			break;
+		case IdleBackPhase::Return: {
+			float diff = NormalizeAngle(idleBackStartAngle - rotation.z);
+			float turn = std::clamp(diff, -idleBackTurnSpeed, idleBackTurnSpeed);
+			rotation.z = NormalizeAngle(rotation.z + turn);
+			if (std::fabs(diff) < 0.01f) {
+				rotation.z          = idleBackStartAngle;
+				idleBackPhase_      = IdleBackPhase::None;
+				idleLookAroundTimer = idleLookAroundIntervalSec;
+			}
+		} break;
+		}
+	});
+
+	// [DoAlert] 警戒：最終目撃位置を向いて待つ
+	auto doAlert = Act([this, FaceToward]() {
+		state_         = State::Alert;
+		idleBackPhase_ = IdleBackPhase::None;
+		wantShoot_     = false;
+		FaceToward(lastSeenPlayerPos);
+	});
+
+	// [DoLookAround] 見回し：左右スキャン。完了したら Success を返して Idle へ
+	auto doLookAround = Action([this]() -> NodeStatus {
+		state_               = State::LookAround;
+		idleBackPhase_       = IdleBackPhase::None;
+		btIsDoingLookAround_ = true;
+		wantShoot_           = false;
+
+		if (!lookAroundInitialized) {
+			lookAroundBaseAngle   = rotation.z;
+			lookAroundTargetAngle = lookAroundBaseAngle + lookAroundAngleWidth;
+			lookAroundDirection   = 1;
+			lookAroundCount       = 0;
+			lookAroundInitialized = true;
+		}
+		float diff = NormalizeAngle(lookAroundTargetAngle - rotation.z);
+		float turn = std::clamp(diff, -lookAroundSpeed, lookAroundSpeed);
+		rotation.z = NormalizeAngle(rotation.z + turn);
+
+		if (std::fabs(diff) < 0.02f) {
+			lookAroundDirection    *= -1;
+			lookAroundTargetAngle   = lookAroundBaseAngle + lookAroundDirection * lookAroundAngleWidth;
+			lookAroundCount++;
+			if (lookAroundCount >= lookAroundMaxCount) {
+				// スキャン完了 → 次フレームから Idle へ
+				lookAroundInitialized = false;
+				btIsDoingLookAround_  = false;
+				return NodeStatus::Success;
+			}
+		}
+		return NodeStatus::Running; // まだスキャン中
+	});
+
+	// [DoChase] 追跡：プレイヤーへ向いて近づきながら射撃
+	auto doChase = Act([this, FaceToward, TryFireNormal]() {
+		state_               = State::Chase;
+		idleBackPhase_       = IdleBackPhase::None;
+		btIsDoingLookAround_ = false;
+
+		if (player_) {
+			FaceToward(player_->GetPosition());
+			TuboEngine::Math::Vector3 dir = player_->GetPosition() - position;
+			dir.z = 0.0f;
+			float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+			if (len > 0.1f) {
+				dir.x /= len;
+				dir.y /= len;
+				MoveWithCollision(position, {dir.x * moveSpeed_, dir.y * moveSpeed_, 0.0f}, mapChipField);
+			}
+		}
+		TryFireNormal();
+	});
+
+	// [DoAttack] 攻撃：その場で向いて射撃（攻撃射程内で停止）
+	auto doAttack = Act([this, FaceToward, TryFireNormal]() {
+		state_               = State::Attack;
+		idleBackPhase_       = IdleBackPhase::None;
+		btIsDoingLookAround_ = false;
+
+		if (player_) FaceToward(player_->GetPosition());
+		TryFireNormal();
+	});
+
+	// =========================================================
+	// ツリー構築
+	// =========================================================
+
+	// 内側：距離別行動 Selector（Chase or Attack）
+	auto combatSelector = Selector();
+	{
+		// Attack ブランチ：攻撃射程内なら停止射撃
+		auto attackSeq = Sequence();
+		attackSeq->AddChild(Condition([this]() {
+			return attackRange_ > 0.0f && btDist_ <= attackRange_;
+		}));
+		attackSeq->AddChild(std::move(doAttack));
+		combatSelector->AddChild(std::move(attackSeq));
+	}
+	combatSelector->AddChild(std::move(doChase));
+
+	// プレイヤー視認ブランチ
+	auto seePlayerSeq = Sequence();
+	seePlayerSeq->AddChild(Condition([this]() {
+		return btCanSee_ && btDist_ <= moveStartDistance_;
+	}));
+	seePlayerSeq->AddChild(std::move(combatSelector));
+
+	// 内側：Alert or LookAround
+	auto alertOrLookSelector = Selector();
+	{
+		auto alertSeq = Sequence();
+		alertSeq->AddChild(Condition([this]() { return lastSeenTimer > 0.0f; }));
+		alertSeq->AddChild(std::move(doAlert));
+		alertOrLookSelector->AddChild(std::move(alertSeq));
+	}
+	alertOrLookSelector->AddChild(std::move(doLookAround));
+
+	// 警戒/見回しブランチ（タイマーが残っているか見回し中のとき有効）
+	auto alertSeqOuter = Sequence();
+	alertSeqOuter->AddChild(Condition([this]() {
+		return lastSeenTimer > 0.0f || btIsDoingLookAround_;
+	}));
+	alertSeqOuter->AddChild(std::move(alertOrLookSelector));
+
+	// ルート
+	auto root = Selector();
+	root->AddChild(std::move(seePlayerSeq));
+	root->AddChild(std::move(alertSeqOuter));
+	root->AddChild(std::move(doIdle));
+
+	bt_ = std::move(root);
+}
+
 void Enemy::Update() {
 	// 死亡後 (完全に消えた後) は何もしない
 	if (!isAlive) {
@@ -456,168 +686,18 @@ void Enemy::Update() {
 			exclamationTimer_ = 0.0f;
 	}
 
-	if (player_) {
-		if (canSeePlayer) {
-			// 射撃エネミーは「見えている限り遠距離でも射撃」
-			// 追跡/停止の切替は attackRange_ で決める
-			if (attackRange_ <= 0.0f) {
-				// attackRange_==0: 常に追跡しつつ射撃
-				state_ = (distanceToPlayer > moveStartDistance_) ? State::Idle : State::Chase;
-			} else {
-				if (distanceToPlayer > moveStartDistance_) {
-					state_ = State::Idle;
-				} else if (distanceToPlayer > attackRange_) {
-					state_ = State::Chase;
-				} else {
-					state_ = State::Attack;
-				}
-			}
-		} else if (lastSeenTimer > 0.0f)
-			state_ = State::Alert;
-		else if (state_ == State::Alert)
-			state_ = State::LookAround;
-		else if (state_ != State::LookAround)
-			state_ = State::Idle;
-	}
+	// ---- BT フレームデータ更新 ----
+	btCanSee_ = canSeePlayer;
+	btDist_   = distanceToPlayer;
 
-	// プレイヤーの方向を向く（一定速度で回転）
-	if (player_ && (state_ == State::Chase || state_ == State::Attack || state_ == State::Alert)) {
-		TuboEngine::Math::Vector3 targetPos = (canSeePlayer) ? player_->GetPosition() : lastSeenPlayerPos;
-		TuboEngine::Math::Vector3 toTarget = targetPos - position;
-		float angleZ = std::atan2(toTarget.y, toTarget.x);
-		float diff = NormalizeAngle(angleZ - rotation.z);
-		float maxTurn = turnSpeed_;
-		if (std::fabs(diff) < maxTurn)
-			rotation.z = angleZ;
-		else {
-			rotation.z += (diff > 0 ? 1 : -1) * maxTurn;
-			rotation.z = NormalizeAngle(rotation.z);
-		}
-	}
+	// ---- ビヘイビアツリー実行（状態選択・向き・移動・射撃を一括管理）----
+	if (bt_) bt_->Tick();
 
-	// --- 射撃条件評価 ---
-	// 見えている限り、距離に関係なく射撃を試行する（射撃エネミーの遠距離攻撃）
-	wantShoot_ = (canSeePlayer && (state_ == State::Chase || state_ == State::Attack));
-
-	// クールダウンタイマー更新
-	if (wantShoot_)
-		bulletTimer_ += dt;
-	else
+	// BT が射撃しなかったフレームはタイマーをクランプ（次回即射撃できるように上限保持）
+	if (!wantShoot_) {
 		bulletTimer_ = std::min(bulletTimer_, EnemyNormalBullet::s_fireInterval);
-	auto TryFire = [this]() {
-		if (!wantShoot_)
-			return;
-		if (bullet && bullet->GetIsAlive())
-			return;
-		if (bullet && !bullet->GetIsAlive())
-			bullet.reset();
-		if (bulletTimer_ < EnemyNormalBullet::s_fireInterval)
-			return;
-		bulletTimer_ = 0.0f;
-		bullet = std::make_unique<EnemyNormalBullet>();
-		bullet->Initialize(position);
-		bullet->SetEnemyPosition(position);
-		bullet->SetEnemyRotation(rotation);
-		bullet->SetPlayer(player_);
-		bullet->SetCamera(camera_);
-		bullet->SetMapChipField(mapChipField);
-	};
-
-	// 状態ごとの行動（ノックバック中も自律移動は行うが、速度が小さくなる）
-	switch (state_) {
-	case State::Idle: {
-		switch (idleBackPhase_) {
-		case IdleBackPhase::None:
-			idleLookAroundTimer -= dt;
-			if (idleLookAroundTimer <= 0.0f) {
-				idleBackStartAngle = rotation.z;
-				idleBackTargetAngle = NormalizeAngle(idleBackStartAngle + kPI);
-				idleBackHoldTimer = idleBackHoldSec;
-				idleBackPhase_ = IdleBackPhase::ToBack;
-			}
-			break;
-		case IdleBackPhase::ToBack: {
-			float diff = NormalizeAngle(idleBackTargetAngle - rotation.z);
-			float turn = std::clamp(diff, -idleBackTurnSpeed, idleBackTurnSpeed);
-			rotation.z = NormalizeAngle(rotation.z + turn);
-			if (std::fabs(diff) < 0.01f) {
-				rotation.z = idleBackTargetAngle;
-				idleBackPhase_ = IdleBackPhase::Hold;
-			}
-		} break;
-		case IdleBackPhase::Hold:
-			idleBackHoldTimer -= dt;
-			if (idleBackHoldTimer <= 0.0f)
-				idleBackPhase_ = IdleBackPhase::Return;
-			break;
-		case IdleBackPhase::Return: {
-			float diff = NormalizeAngle(idleBackStartAngle - rotation.z);
-			float turn = std::clamp(diff, -idleBackTurnSpeed, idleBackTurnSpeed);
-			rotation.z = NormalizeAngle(rotation.z + turn);
-			if (std::fabs(diff) < 0.01f) {
-				rotation.z = idleBackStartAngle;
-				idleBackPhase_ = IdleBackPhase::None;
-				idleLookAroundTimer = idleLookAroundIntervalSec;
-			}
-		} break;
-		}
-		break;
 	}
-	case State::Alert: {
-		idleBackPhase_ = IdleBackPhase::None;
-		break;
-	}
-	case State::LookAround: {
-		idleBackPhase_ = IdleBackPhase::None;
-		if (!lookAroundInitialized) {
-			lookAroundBaseAngle = rotation.z;
-			lookAroundTargetAngle = lookAroundBaseAngle + lookAroundAngleWidth;
-			lookAroundDirection = 1;
-			lookAroundCount = 0;
-			lookAroundInitialized = true;
-		}
-		float diff = NormalizeAngle(lookAroundTargetAngle - rotation.z);
-		float turn = std::clamp(diff, -lookAroundSpeed, lookAroundSpeed);
-		// 誤って固定値加算/二重更新されていたので、1回だけ更新
-		rotation.z = NormalizeAngle(rotation.z + turn);
-		if (std::fabs(diff) < 0.02f) {
-			lookAroundDirection *= -1;
-			lookAroundTargetAngle = lookAroundBaseAngle + lookAroundDirection * lookAroundAngleWidth;
-			lookAroundCount++;
-			if (lookAroundCount >= lookAroundMaxCount) {
-				lookAroundInitialized = false;
-				state_ = State::Patrol;
-			}
-		}
-		break;
-	}
-	case State::Patrol: {
-		idleBackPhase_ = IdleBackPhase::None;
-		state_ = State::Idle;
-		break;
-	}
-	case State::Chase: {
-		idleBackPhase_ = IdleBackPhase::None;
-		if (player_) {
-			TuboEngine::Math::Vector3 dir = player_->GetPosition() - position;
-			dir.z = 0.0f;
-			float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-			if (len > 0.1f) {
-				dir.x /= len;
-				dir.y /= len;
-				TuboEngine::Math::Vector3 desiredMove{dir.x * moveSpeed_, dir.y * moveSpeed_, 0.0f};
-				MoveWithCollision(position, desiredMove, mapChipField);
-			}
-		}
-		TryFire();
-		break;
-	}
-	case State::Attack: {
-		idleBackPhase_ = IdleBackPhase::None;
-		TryFire();
-		break;
-	}
-	}
+	wantShoot_ = false; // 次フレームのためリセット
 
 	if (bullet && bullet->GetIsAlive())
 		bullet->Update();
