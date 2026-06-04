@@ -181,15 +181,20 @@ void SphComputePipeline::Dispatch(const SphGpuParams& params, int substeps) {
         instanceBufInSRV_ = false;
     }
 
-    // パラメーターを定数バッファに書き込む (グリッド次元を埋める)
+    // パラメーターを定数バッファに書き込む
+    // gridMin は現在の boundMin に追従させる (境界移動でグリッドがズレるのを防ぐ)
+    // gridDim はバッファ確保サイズ上限でキャップ (境界拡大しすぎた場合に安全に劣化)
     SphGpuParams p = params;
-    p.gridDimX   = gridDimX_;
-    p.gridDimY   = gridDimY_;
-    p.gridDimZ   = gridDimZ_;
+    p.gridMinX   = params.boundMinX;
+    p.gridMinY   = params.boundMinY;
+    p.gridMinZ   = params.boundMinZ;
     p.cellSize   = cellSize_;
-    p.gridMinX   = gridMin_.x;
-    p.gridMinY   = gridMin_.y;
-    p.gridMinZ   = gridMin_.z;
+    p.gridDimX   = std::min(gridDimX_,
+                       std::max(1, (int)std::ceil((params.boundMaxX - params.boundMinX) / cellSize_)));
+    p.gridDimY   = std::min(gridDimY_,
+                       std::max(1, (int)std::ceil((params.boundMaxY - params.boundMinY) / cellSize_)));
+    p.gridDimZ   = std::min(gridDimZ_,
+                       std::max(1, (int)std::ceil((params.boundMaxZ - params.boundMinZ) / cellSize_)));
     p.maxPerCell = maxPerCell_;
     std::memcpy(paramsMapped_, &p, sizeof(SphGpuParams));
 
