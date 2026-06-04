@@ -1,5 +1,6 @@
 #include "StageManager.h"
 #include "application/MapChip/MapChipField.h"
+#include "WinApp.h"
 #include "TextureManager.h"
 #include "ParticleManager.h"
 #include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
@@ -124,7 +125,7 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
             if (sShouldShowRestartMessage) {
                 auto* tm = TuboEngine::TextManager::GetInstance();
                 if (!saveMessageText_) {
-                    saveMessageText_ = tm->CreateText(TuboEngine::TextManager::PresetFontNames::YasashisaGothicBold, "RESTART FROM CHECKPOINT", { 640.0f, 200.0f });
+                    saveMessageText_ = tm->CreateText(TuboEngine::TextManager::PresetFontNames::YasashisaGothicBold, "RESTART FROM CHECKPOINT", { TuboEngine::WinApp::GetInstance()->GetClientWidth() * 0.5f, 200.0f });
                     if (saveMessageText_) {
                         saveMessageText_->SetHorizontalAlign(1);
                         saveMessageText_->SetVerticalAlign(1);
@@ -315,7 +316,7 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
 void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
 	TuboEngine::Camera* cam = followCamera ? followCamera->GetCamera() : nullptr;
     followCamera_ = followCamera;
-    const float dt = 0.016f;
+    const float dt = 1.0f / 60.0f;
     globalTimer_ += dt;
 
     // セーブメッセージの更新
@@ -375,7 +376,7 @@ void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
                     // セーブメッセージを表示
                     auto* tm = TuboEngine::TextManager::GetInstance();
                     if (!saveMessageText_) {
-                        saveMessageText_ = tm->CreateText(TuboEngine::TextManager::PresetFontNames::YasashisaGothicBold, "CHECKPOINT SAVED", { 640.0f, 100.0f });
+                        saveMessageText_ = tm->CreateText(TuboEngine::TextManager::PresetFontNames::YasashisaGothicBold, "CHECKPOINT SAVED", { TuboEngine::WinApp::GetInstance()->GetClientWidth() * 0.5f, 100.0f });
                         if (saveMessageText_) {
                             saveMessageText_->SetHorizontalAlign(1); // Center
                             saveMessageText_->SetVerticalAlign(1);   // Middle

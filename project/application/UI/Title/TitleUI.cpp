@@ -2,6 +2,7 @@
 #include"TextureManager.h"
 #include "Input.h"
 #include <cmath>
+#include <numbers>
 
 ///-------------------------------------------///
 /// デストラクタ
@@ -128,7 +129,7 @@ void TitleUI::Update() {
 	//-----------------------------
 	// アニメーション用タイマー更新
 	//-----------------------------
-	const float deltaTime = 1.0f / 60.0f; // 仮に60FPS固定
+	const float deltaTime = 1.0f / 60.0f;
 	UpdateSelectorAnimTime(deltaTime);
 
 	//-----------------------------
@@ -221,10 +222,10 @@ void TitleUI::UpdateSelectorSprite() {
 	if (selectorDecisionAnime_) {
 		// 決定時は一瞬大きくしてから戻す
 		float t = selectorDecisionAnimeTime_ / 0.3f;
-		scale = 1.0f + 0.5f * std::sin(t * 3.14159f); // 0→1→0
+		scale = 1.0f + 0.5f * std::sin(t * std::numbers::pi_v<float>); // 0→1→0
 	} else {
 		// 通常はゆっくり拡大縮小
-		scale = 1.0f + 0.1f * std::sin(selectorAnimeTime_ * 2.0f * 3.14159f); // 1±0.1
+		scale = 1.0f + 0.1f * std::sin(selectorAnimeTime_ * 2.0f * std::numbers::pi_v<float>); // 1±0.1
 	}
 	(void)scale;
 }
