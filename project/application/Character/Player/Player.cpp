@@ -5,6 +5,7 @@
 #include "ImGuiManager.h"
 #include "Input.h"
 #include "Effects/OrbitTrail/OrbitTrailEmitter.h"
+#include "Particle/CharacterParticlePresets.h"
 #include "TextureManager.h"
 #include "engine/graphic/Particle/ParticleManager.h"
 #include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
@@ -93,46 +94,15 @@ void Player::Initialize() {
 	// 弾のクリア
 	bullets.clear();
 
-	// --- 追加: 軌道トレイル用パーティクルエミッター生成 ---
+	// --- 演出用エミッタ生成 ---
+	auto* pm = TuboEngine::ParticleManager::GetInstance();
 	if (!trailEmitter_) {
-		ParticlePreset p{};
-		p.name = "PlayerTrail";    // 自動で一意名に調整される可能性あり
-		p.texture = "circle2.png"; // 好みで変更
-		p.autoEmit = true;         // 自動発生
-		p.emitRate = 60.0f;        // 毎秒粒子
-		p.lifeMin = 0.35f;
-		p.lifeMax = 0.6f;
-		p.scaleStart = {0.7f, 0.7f, 0.7f};
-		p.scaleEnd = {0.6f, 0.6f, 0.6f};
-		p.colorStart = {0.6f, 0.8f, 1.0f, 0.9f};
-		p.colorEnd = {0.2f, 0.4f, 1.0f, 0.0f};
-		p.maxInstances = 512; // 移動で多発するので少し多め
-		p.billboard = true;
-		p.simulateInWorldSpace = true;
-		p.center = position; // 初期中心
-		trailEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<OrbitTrailEmitter>(p);
+		trailEmitter_ = pm->CreateEmitter<OrbitTrailEmitter>(CharacterParticlePresets::PlayerTrail(position));
 		prevPositionTrail_ = position;
 	}
-
-	// ダッシュリングエミッタ作成
 	if (!dashRingEmitter_) {
 		TuboEngine::TextureManager::GetInstance()->LoadTexture("gradationLine.png");
-		ParticlePreset p{};
-		p.name = "PlayerDashRing";
-		p.texture = "gradationLine.png";
-		p.maxInstances = 16;
-		p.autoEmit = false;
-		p.burstCount = 1;
-		p.lifeMin = 0.35f;
-		p.lifeMax = 0.6f;
-		p.scaleStart = {0.6f, 0.6f, 1.0f};
-		p.scaleEnd = {1.2f, 1.2f, 1.0f};
-		p.colorStart = {0.9f, 0.95f, 1.0f, 0.85f};
-		p.colorEnd = {0.9f, 0.95f, 1.0f, 0.0f};
-		p.center = GetPosition();
-		// エミッタ中心に追従させる（ワールド空間で独立しない）
-		p.simulateInWorldSpace = false;
-		dashRingEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
+		dashRingEmitter_ = pm->CreateEmitter<RingEmitter>(CharacterParticlePresets::PlayerDashRing(GetPosition()));
 	}
 }
 

@@ -5,8 +5,8 @@
 #include "LineManager.h"
 #include "MapChip/MapChipField.h"
 #include "engine/graphic/Particle/Effects/Primitive/PrimitiveEmitter.h"
-#include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
 #include "engine/graphic/Particle/ParticleManager.h"
+#include "Particle/CharacterParticlePresets.h"
 #include <algorithm>
 #include <cmath>
 
@@ -92,42 +92,11 @@ void RushEnemy::Initialize() {
 	drillObject_->SetLightType(5);
 
 	// --- 演出用エミッタ生成 ---
-	if (!chargingEmitter_) {
-		ParticlePreset p{};
-		p.name = "RushCharge";
-		p.texture = "particle.png";
-		p.maxInstances = 128;
-		p.autoEmit = false;
-		p.burstCount = 4;
-		p.lifeMin = 0.1f;
-		p.lifeMax = 0.25f;
-		p.scaleStart = {0.2f, 0.2f, 0.2f};
-		p.scaleEnd = {0.05f, 0.05f, 0.05f};
-		p.colorStart = {1.0f, 0.7f, 0.2f, 1.0f};
-		p.colorEnd = {1.0f, 0.4f, 0.1f, 0.0f};
-		p.velMin = {-3.0f, -3.0f, -3.0f};
-		p.velMax = {3.0f, 3.0f, 3.0f};
-		p.gravity = {0, 0, 0};
-		chargingEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
-	}
-	if (!trailEmitter_) {
-		ParticlePreset p{};
-		p.name = "RushTrail";
-		p.texture = "particle.png";
-		p.maxInstances = 256;
-		p.autoEmit = false;
-		p.burstCount = 2;
-		p.lifeMin = 0.3f;
-		p.lifeMax = 0.5f;
-		p.scaleStart = {0.4f, 0.4f, 0.4f};
-		p.scaleEnd = {0.8f, 0.8f, 0.8f};
-		p.colorStart = {0.8f, 0.8f, 0.8f, 0.5f};
-		p.colorEnd = {0.6f, 0.6f, 0.6f, 0.0f};
-		p.velMin = {-0.6f, -0.6f, -0.6f};
-		p.velMax = {0.6f, 0.6f, 0.6f};
-		p.gravity = {0, 0, 0};
-		trailEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
-	}
+	auto* pm = TuboEngine::ParticleManager::GetInstance();
+	if (!chargingEmitter_)
+		chargingEmitter_ = pm->CreateEmitter<PrimitiveEmitter>(CharacterParticlePresets::RushCharge(position));
+	if (!trailEmitter_)
+		trailEmitter_    = pm->CreateEmitter<PrimitiveEmitter>(CharacterParticlePresets::RushTrail(position));
 }
 
 // =============================================================================
