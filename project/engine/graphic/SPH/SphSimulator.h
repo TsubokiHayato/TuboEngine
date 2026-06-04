@@ -161,10 +161,25 @@ private:
     std::vector<SdfObstacle> obstacles_;
 
     // ---- 再生コントロール ----
-    bool  paused_            = false;  // 一時停止中は物理を進めない
-    bool  stepOnce_          = false;  // コマ送り: 次の1フレームだけ進める
-    float timeScale_         = 1.0f;   // 再生速度 (0=停止, 1=等速)
+    bool  paused_            = false;
+    bool  stepOnce_          = false;
+    float timeScale_         = 1.0f;
     // ---- マウス外力 ----
-    bool  mouseForceEnabled_ = false;  // マウスドラッグで外力を操作するか
-    bool  mouseDriving_      = false;  // 現在マウスが外力を駆動中か
+    bool  mouseForceEnabled_ = false;
+    bool  mouseDriving_      = false;
+
+    // ---- ImGui 追加フォーム用 UI 状態 ----
+    struct ImGuiState {
+        float sphCenter[3]    = {0.f, 5.f, 0.f};
+        float sphRadius       = 2.0f;
+        float boxCenter[3]    = {0.f, 5.f, 0.f};
+        float boxHalf[3]      = {2.f, 2.f, 2.f};
+        float cntSphCenter[3] = {0.f, 8.f, 0.f};
+        float cntSphRadius    = 7.0f;
+        float cntBoxCenter[3] = {0.f, 8.f, 0.f};
+        float cntBoxHalf[3]   = {6.f, 8.f, 6.f};
+        float cntCylCenter[3] = {0.f, 8.f, 0.f};
+        float cntCylRadius    = 6.0f;
+        float cntCylHalfH     = 8.0f;
+    } ui_;
 };
