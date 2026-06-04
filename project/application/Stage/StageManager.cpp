@@ -337,7 +337,8 @@ void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
         }
     }
 
-    for (auto& inst : stageInstances_) {
+    for (int instIndex = 0; instIndex < static_cast<int>(stageInstances_.size()); ++instIndex) {
+        auto& inst = stageInstances_[instIndex];
         if (!inst.visible) continue;
         for (auto& t : inst.tiles) {
             if (cam) t->SetCamera(cam);
@@ -369,7 +370,6 @@ void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
             if (hasEnemy && !anyAlive) {
                 inst.isCleared = true;
                 // セーブポイント: このチャンクがクリアされたことを保存
-                int instIndex = static_cast<int>(&inst - &stageInstances_[0]);
                 if (instIndex > sLastClearedChunkIndex) {
                     sLastClearedChunkIndex = instIndex;
 
