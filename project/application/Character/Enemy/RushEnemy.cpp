@@ -42,7 +42,6 @@ static void MoveWithCollisionImpl(TuboEngine::Math::Vector3& position, const Tub
 	float moveLen2D = std::sqrt(desiredMove.x * desiredMove.x + desiredMove.y * desiredMove.y);
 	int subSteps = std::max(1, int(std::ceil(moveLen2D / (tile * 0.5f))));
 
-	// LineManager::GetInstance()->DrawLine(position, position + desiredMove, {1,0,0,1});
 	TuboEngine::Math::Vector3 step = desiredMove / float(subSteps);
 	for (int i = 0; i < subSteps; ++i) {
 		TuboEngine::Math::Vector3 nextX = position;

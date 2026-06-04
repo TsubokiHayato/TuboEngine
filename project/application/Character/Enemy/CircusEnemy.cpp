@@ -2,6 +2,7 @@
 #include "Character/Player/Player.h"
 #include "ImguiManager.h"
 #include <cmath>
+#include <numbers>
 #include <random>
 #include "engine/graphic/Particle/ParticleManager.h"
 
@@ -331,7 +332,7 @@ void CircusEnemy::ClearAllBullets() {
 
 void CircusEnemy::EmitHpParticle(const TuboEngine::Math::Vector2& pos) {
     std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
-    std::uniform_real_distribution<float> angleDist(0.0f, 3.14159f * 2.0f);
+    std::uniform_real_distribution<float> angleDist(0.0f, std::numbers::pi_v<float> * 2.0f);
 
     for (auto& p : hpParticles_) {
         if (!p.active) {
@@ -395,7 +396,7 @@ void CircusEnemy::UpdateBossMovement(float dt) {
 
     moveTime_ += dt;
 
-    const float kPi = 3.14159265f;
+    const float kPi = std::numbers::pi_v<float>;
     bool isEnraged = (HP <= maxHp_ / 2);
 
     // ===== (4) フェーズダッシュ（激怒突入時に一度だけ） =====
@@ -564,7 +565,7 @@ void CircusEnemy::ExecuteAttack(AttackType type) {
 
     case AttackType::Spiral:
         for (int i = 0; i < actualMissileCount; ++i) {
-            float angle = (2.0f * 3.14159f / actualMissileCount) * i + spiralAngle_;
+            float angle = (2.0f * std::numbers::pi_v<float> / actualMissileCount) * i + spiralAngle_;
             TuboEngine::Math::Vector3 dir;
             dir.x = std::cos(angle);
             dir.y = std::sin(angle);
@@ -577,7 +578,7 @@ void CircusEnemy::ExecuteAttack(AttackType type) {
 
     case AttackType::Cross:
         for (int i = 0; i < 4; ++i) {
-            float baseAngle = (3.14159f / 2.0f) * i;
+            float baseAngle = (std::numbers::pi_v<float> / 2.0f) * i;
             for (int j = 0; j < actualMissileCount / 4; ++j) {
                 float angle = baseAngle + dist(gen) * 0.2f;
                 TuboEngine::Math::Vector3 dir;
