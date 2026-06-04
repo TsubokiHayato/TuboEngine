@@ -12,8 +12,8 @@ public:
     void Draw() override;
     void DrawImGui();
 
-    // BT オーバーライド：砲撃専用ツリーを構築
     void BuildBehaviorTree() override;
+    TuboEngine::Math::Vector4 GetModelColor() const override { return {0.8f, 0.2f, 1.0f, 1.0f}; }
 
     void SetMissileInterval(float sec) { missileInterval_ = sec; }
     void SetMissileSpawnHeight(float height) { missileSpawnHeight_ = height; }

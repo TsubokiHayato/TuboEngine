@@ -64,6 +64,9 @@ public:
     // サブクラスはオーバーライドして独自ツリーを持てる。
     virtual void BuildBehaviorTree();
 
+    // サブクラスでオーバーライドしてモデルカラーを変える
+    virtual TuboEngine::Math::Vector4 GetModelColor() const { return {1.0f, 0.0f, 0.0f, 1.0f}; }
+
 protected: 
 	TuboEngine::Math::Vector3 position;
 	TuboEngine::Math::Vector3 rotation;
