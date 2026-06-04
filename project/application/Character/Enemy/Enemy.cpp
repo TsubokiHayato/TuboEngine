@@ -546,7 +546,11 @@ void Enemy::BuildBehaviorTree() {
 }
 
 void Enemy::Update() {
-	// 死亡後 (完全に消えた後) は何もしない
+	// 発射済みの弾は敵が死んでいても飛び続ける
+	if (bullet && bullet->GetIsAlive())
+		bullet->Update();
+
+	// 死亡後 (完全に消えた後) は敵本体の処理をしない
 	if (!isAlive) {
 		return;
 	}
@@ -639,9 +643,6 @@ void Enemy::Update() {
 		bulletTimer_ = std::min(bulletTimer_, EnemyNormalBullet::s_fireInterval);
 	}
 	wantShoot_ = false; // 次フレームのためリセット
-
-	if (bullet && bullet->GetIsAlive())
-		bullet->Update();
 
 	object3d->SetPosition(position + hitShakeOffset_);
 
