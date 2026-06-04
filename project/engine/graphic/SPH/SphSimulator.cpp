@@ -6,7 +6,6 @@
 #include <cmath>
 #include <cstring>
 #include <numbers>
-#include <algorithm>
 #undef min
 #undef max
 
@@ -320,53 +319,43 @@ void SphSimulator::DrawImGui() {
         // ---- 追加フォーム: 障害物 ----
         ImGui::Separator();
         ImGui::TextColored({1,0.6f,0,1}, "障害物 (流体を押しのける)");
-        static float sSphCenter[3] = {0, 5, 0};
-        static float sSphRadius    = 2.0f;
-        ImGui::DragFloat3("中心##sph", sSphCenter, 0.1f);
-        ImGui::DragFloat("半径##sph",  &sSphRadius, 0.1f, 0.1f, 20.0f);
+        ImGui::DragFloat3("中心##sph", ui_.sphCenter, 0.1f);
+        ImGui::DragFloat("半径##sph",  &ui_.sphRadius, 0.1f, 0.1f, 20.0f);
         if (ImGui::Button("球を追加") && (int)obstacles_.size() < kMaxSdfShapes)
-            AddSphere({sSphCenter[0], sSphCenter[1], sSphCenter[2]}, sSphRadius);
+            AddSphere({ui_.sphCenter[0], ui_.sphCenter[1], ui_.sphCenter[2]}, ui_.sphRadius);
 
         ImGui::Spacing();
-        static float sBoxCenter[3] = {0, 5, 0};
-        static float sBoxHalf[3]   = {2, 2, 2};
-        ImGui::DragFloat3("中心##box",  sBoxCenter, 0.1f);
-        ImGui::DragFloat3("半辺長##box", sBoxHalf, 0.1f, 0.1f, 20.0f);
+        ImGui::DragFloat3("中心##box",   ui_.boxCenter, 0.1f);
+        ImGui::DragFloat3("半辺長##box", ui_.boxHalf,   0.1f, 0.1f, 20.0f);
         if (ImGui::Button("箱を追加") && (int)obstacles_.size() < kMaxSdfShapes)
-            AddBox({sBoxCenter[0], sBoxCenter[1], sBoxCenter[2]},
-                   {sBoxHalf[0], sBoxHalf[1], sBoxHalf[2]});
+            AddBox({ui_.boxCenter[0], ui_.boxCenter[1], ui_.boxCenter[2]},
+                   {ui_.boxHalf[0],   ui_.boxHalf[1],   ui_.boxHalf[2]});
 
         // ---- 追加フォーム: コンテナ ----
         ImGui::Separator();
         ImGui::TextColored({0,0.8f,0.8f,1}, "コンテナ (水槽 — この形の中に流体が入る)");
         HelpMarker("コンテナを追加すると AABB が自動で合わせられます。追加後にリセットを推奨");
 
-        static float sCntSphCenter[3] = {0, 8, 0};
-        static float sCntSphRadius    = 7.0f;
-        ImGui::DragFloat3("中心##csph",  sCntSphCenter, 0.1f);
-        ImGui::DragFloat("半径##csph",   &sCntSphRadius, 0.1f, 1.0f, 30.0f);
+        ImGui::DragFloat3("中心##csph",  ui_.cntSphCenter, 0.1f);
+        ImGui::DragFloat("半径##csph",   &ui_.cntSphRadius, 0.1f, 1.0f, 30.0f);
         if (ImGui::Button("球コンテナを追加") && (int)obstacles_.size() < kMaxSdfShapes)
-            AddContainerSphere({sCntSphCenter[0], sCntSphCenter[1], sCntSphCenter[2]}, sCntSphRadius);
+            AddContainerSphere({ui_.cntSphCenter[0], ui_.cntSphCenter[1], ui_.cntSphCenter[2]},
+                               ui_.cntSphRadius);
 
         ImGui::Spacing();
-        static float sCntBoxCenter[3] = {0, 8, 0};
-        static float sCntBoxHalf[3]   = {6, 8, 6};
-        ImGui::DragFloat3("中心##cbox",   sCntBoxCenter, 0.1f);
-        ImGui::DragFloat3("半辺長##cbox", sCntBoxHalf,   0.1f, 1.0f, 30.0f);
+        ImGui::DragFloat3("中心##cbox",   ui_.cntBoxCenter, 0.1f);
+        ImGui::DragFloat3("半辺長##cbox", ui_.cntBoxHalf,   0.1f, 1.0f, 30.0f);
         if (ImGui::Button("箱コンテナを追加") && (int)obstacles_.size() < kMaxSdfShapes)
-            AddContainerBox({sCntBoxCenter[0], sCntBoxCenter[1], sCntBoxCenter[2]},
-                            {sCntBoxHalf[0], sCntBoxHalf[1], sCntBoxHalf[2]});
+            AddContainerBox({ui_.cntBoxCenter[0], ui_.cntBoxCenter[1], ui_.cntBoxCenter[2]},
+                            {ui_.cntBoxHalf[0],   ui_.cntBoxHalf[1],   ui_.cntBoxHalf[2]});
 
         ImGui::Spacing();
-        static float sCntCylCenter[3] = {0, 8, 0};
-        static float sCntCylRadius    = 6.0f;
-        static float sCntCylHalfH     = 8.0f;
-        ImGui::DragFloat3("中心##ccyl",  sCntCylCenter, 0.1f);
-        ImGui::DragFloat("半径##ccyl",   &sCntCylRadius, 0.1f, 1.0f, 30.0f);
-        ImGui::DragFloat("半高さ##ccyl", &sCntCylHalfH,  0.1f, 1.0f, 30.0f);
+        ImGui::DragFloat3("中心##ccyl",  ui_.cntCylCenter, 0.1f);
+        ImGui::DragFloat("半径##ccyl",   &ui_.cntCylRadius, 0.1f, 1.0f, 30.0f);
+        ImGui::DragFloat("半高さ##ccyl", &ui_.cntCylHalfH,  0.1f, 1.0f, 30.0f);
         if (ImGui::Button("円柱コンテナを追加") && (int)obstacles_.size() < kMaxSdfShapes)
-            AddContainerCylinder({sCntCylCenter[0], sCntCylCenter[1], sCntCylCenter[2]},
-                                 sCntCylRadius, sCntCylHalfH);
+            AddContainerCylinder({ui_.cntCylCenter[0], ui_.cntCylCenter[1], ui_.cntCylCenter[2]},
+                                 ui_.cntCylRadius, ui_.cntCylHalfH);
 
         if (!obstacles_.empty()) {
             ImGui::Separator();
