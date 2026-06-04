@@ -5,6 +5,7 @@
 #include "Camera/FollowTopDownCamera.h"
 #include "LineManager.h"
 #include <algorithm>
+#include <numbers>
 
 using TuboEngine::Math::Vector3;
 
@@ -118,7 +119,7 @@ void StageTransitionState::Update(StageScene* scene) {
 
 	// 位置イージング（XY平面）+ ジャンプ（Z軸の放物線）
 	// sin(t * PI) で 0→1→0 の弧を描く（t=0.5 で頂点）
-	float jumpArc = std::sin(t * 3.14159265f) * jumpHeight_;
+	float jumpArc = std::sin(t * std::numbers::pi_v<float>) * jumpHeight_;
 	Vector3 newPos = {
 		startPos_.x + (targetPos_.x - startPos_.x) * eased,
 		startPos_.y + (targetPos_.y - startPos_.y) * eased,
@@ -133,9 +134,8 @@ void StageTransitionState::Update(StageScene* scene) {
 		dir.x /= len;
 		dir.y /= len;
 		float angle = std::atan2(dir.x, -dir.y);
-		// Player.cpp の Rotate() と同じように Z軸回転を設定 (モデルの初期姿勢 3.12f 等は GetRotation に含まれるため上書きに注意しつつ、Zのみ更新)
 		Vector3 currentRot = player->GetRotation();
-		currentRot.z = 3.12f + angle;
+		currentRot.z = std::numbers::pi_v<float> + angle;
 		player->SetRotation(currentRot);
 	}
 
