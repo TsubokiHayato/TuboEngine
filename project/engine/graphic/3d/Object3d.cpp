@@ -194,7 +194,11 @@ void TuboEngine::Object3d::Update() {
 	}
 	// 行列を更新する
 	TuboEngine::Math::Matrix4x4 localMatrix = model_->GetRootNodeLocalMatrix();
-	transformMatrixData->WVP = model_->GetRootNodeLocalMatrix() * worldMatrix * Multiply(viewMatrix, projectionMatrix);
+	if (camera) {
+		transformMatrixData->WVP = model_->GetRootNodeLocalMatrix() * worldMatrix * camera->GetViewProjectionMatrix();
+	} else {
+		transformMatrixData->WVP = model_->GetRootNodeLocalMatrix() * worldMatrix * Multiply(viewMatrix, projectionMatrix);
+	}
 	transformMatrixData->World = model_->GetRootNodeLocalMatrix() * worldMatrix;
 
 	commandList = TuboEngine::DirectXCommon::GetInstance()->GetCommandList();

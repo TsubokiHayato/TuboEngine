@@ -1,4 +1,5 @@
 #include "DebugScene.h"
+#include "OffscreenRendering.h"
 #include "ParticleManager.h"
 #include "Effects/Primitive/PrimitiveEmitter.h"
 #include "Effects/Ring/RingEmitter.h"
@@ -17,25 +18,13 @@ void DebugScene::Initialize() {
 
     std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
 
-    // Audio
-    const std::string audioFileName = "fanfare.wav";
-    audio = std::make_unique<Audio>();
-    audio->Initialize(audioFileName);
-
-    // SkyBox
-	skyBox = std::make_unique<TuboEngine::SkyBox>();
-    skyBox->Initialize(testDDSTextureHandle);
-
     // Camera
 	camera = std::make_unique<TuboEngine::Camera>();
     camera->SetTranslate(cameraPosition);
     camera->setRotation(cameraRotation);
     camera->setScale(cameraScale);
 
-    // SceneChange
-    sceneChangeAnimation = std::make_unique<SceneChangeAnimation>(1280, 720, 80, 1.5f, "barrier.png");
-    sceneChangeAnimation->Initialize();
-
+   
     // TextManager。
     TuboEngine::TextManager* textManager = TuboEngine::TextManager::GetInstance();
  
@@ -110,6 +99,15 @@ void DebugScene::Initialize() {
 
         particleInitialized_ = true;
     }
+
+    // SPH シミュレーター初期化
+    if (!sphSimulator_) {
+        sphSimulator_ = std::make_unique<SphSimulator>();
+        // SphSimulator::Params のデフォルト値をそのまま使用
+        // パラメータ調整は SphSimulator.h か ImGui で行う
+        sphSimulator_->Initialize({}, camera.get(),
+                                   "sphere/sphere.obj");
+    }
 }
 
 void DebugScene::Update() {
@@ -120,17 +118,7 @@ void DebugScene::Update() {
     camera->setScale(cameraScale);
     camera->Update();
 
-    // SkyBox
-    skyBox->SetCamera(camera.get());
-    skyBox->Update();
-
-    // Scene change（ここでは SPACE 入力はコメントアウト済み）
-    sceneChangeAnimation->Update(1.0f / 60.0f);
-    if (isRequestSceneChange && sceneChangeAnimation->IsFinished()) {
-        SceneManager::GetInstance()->ChangeScene(SCENE::TITLE);
-        isRequestSceneChange = false;
-    }
-
+    
     // エミッター存在チェック
     TuboEngine::ParticleManager* pm = TuboEngine::ParticleManager::GetInstance();
     for (size_t i = 0; i < emitterNames_.size();) {
@@ -143,6 +131,12 @@ void DebugScene::Update() {
 
     // Particles
     pm->Update(1.0f / 60.0f, camera.get());
+
+    // SPH 更新 (GPU Compute + InstancedMeshRenderer 更新)
+    if (sphSimulator_) {
+        sphSimulator_->Update(1.0f / 60.0f, camera.get());
+    }
+
 	TuboEngine::LineManager::GetInstance()->SetDefaultCamera(camera.get());
 
     // TextManager Update
@@ -154,16 +148,26 @@ void DebugScene::Finalize() {
         TuboEngine::TextManager::GetInstance()->RemoveText(testText_);
         testText_ = nullptr;
     }
+    if (sphSimulator_) {
+        sphSimulator_->Finalize();
+        sphSimulator_.reset();
+    }
 }
 
 void DebugScene::Object3DDraw() {
-    // 必要に応じて
-    // skyBox->Draw();
-	TuboEngine::LineManager::GetInstance()->DrawGrid(16.0f, 8, TuboEngine::Math::Vector3{}, TuboEngine::Math::Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+    if (sphSimulator_) {
+        // SSFR が有効なら DrawFluid()、無効なら Draw() にフォールバック
+        auto rtvHandle = OffScreenRendering::GetInstance()->GetOffscreenRtvHandle();
+        auto dsvHandle = TuboEngine::DirectXCommon::GetInstance()->GetDSVCPUDescriptorHandle(0);
+        sphSimulator_->DrawFluid(rtvHandle, dsvHandle);
+        sphSimulator_->DrawBounds({0.3f, 0.8f, 1.0f, 1.0f});
+    }
+
+    TuboEngine::LineManager::GetInstance()->DrawGrid(16.0f, 8, TuboEngine::Math::Vector3{}, TuboEngine::Math::Vector4{1.0f, 1.0f, 1.0f, 1.0f});
 }
 
 void DebugScene::SpriteDraw() {
-    sceneChangeAnimation->Draw();
+   
     
     // TextManager Draw
     TuboEngine::TextManager::GetInstance()->DrawAll();
@@ -184,7 +188,11 @@ void DebugScene::ImGuiDraw() {
 
     // パーティクル管理 UI とシーンチェンジ UI
     TuboEngine::ParticleManager::GetInstance()->DrawImGui();
-    sceneChangeAnimation->DrawImGui();
+    
+    // SPH ImGui
+    if (sphSimulator_) {
+        sphSimulator_->DrawImGui();
+    }
 }
 
 void DebugScene::ParticleDraw() {

@@ -29,6 +29,15 @@ void ImGuiManager::Initialize() {
 	HRESULT result = TuboEngine::DirectXCommon::GetInstance()->GetDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&srvHeap));
 	assert(SUCCEEDED(result));
 
+	// 日本語フォントの設定 (ImGui_ImplDX12_Init より前に行う必要がある)
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->AddFontFromFileTTF(
+	    "C:/Windows/Fonts/msgothic.ttc",
+	    16.0f,
+	    nullptr,
+	    io.Fonts->GetGlyphRangesJapanese()
+	);
+
 	ImGui_ImplDX12_Init(
 	    TuboEngine::DirectXCommon::GetInstance()->GetDevice().Get(), static_cast<int>(TuboEngine::DirectXCommon::GetInstance()->GetBackBufferCount()), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, srvHeap.Get(),
 	    srvHeap->GetCPUDescriptorHandleForHeapStart(), srvHeap->GetGPUDescriptorHandleForHeapStart());
