@@ -5,10 +5,9 @@
 #include <algorithm>
 #include <random>
 #include "engine/graphic/Particle/ParticleManager.h"
+#include "GameConstants.h"
 
-namespace {
-    constexpr float kFixedDeltaTime = 1.0f / 60.0f;
-}
+using GameConstants::kFixedDeltaTime;
 
 void CircusBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
     Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon));
