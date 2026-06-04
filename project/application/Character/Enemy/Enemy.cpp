@@ -46,7 +46,7 @@ void Enemy::Initialize() {
 		object3d->SetRotation(drawRot);
 	}
 	object3d->SetScale(scale);
-	object3d->SetModelColor({1.0f, 0.0f, 0.0f, 1.0f});
+	object3d->SetModelColor(GetModelColor());
 
 	std::string particleTextureHandle = "gradationLine.png";
 	TuboEngine::TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
