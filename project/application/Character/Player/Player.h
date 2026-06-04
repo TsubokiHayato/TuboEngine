@@ -150,10 +150,12 @@ public:
 	void SetAutoMoveDirection(const TuboEngine::Math::Vector3& dir) { autoMoveDir_ = dir; }
 	void SetAutoShoot(bool enabled) { autoShoot_ = enabled; }
 
-	// 近くの敵への向き（XY平面の正規化ベクトル）を設定
-	void SetAutoAimDirection(const TuboEngine::Math::Vector3& dir) { autoAimDir_ = dir; }
-	// 自動操作で回避開始
+	// 近くの敵への向き（XY平面の正規化ベクトル）を設定（補間ターゲットに書き込む）
+	void SetAutoAimDirection(const TuboEngine::Math::Vector3& dir) { autoAimTarget_ = dir; }
+	// 自動操作で回避開始（方向なし: 現在の入力方向で回避）
 	void AutoStartDodge() { StartDodge(); }
+	// 自動操作で回避開始（方向指定: AIが計算した方向で回避）
+	void AutoStartDodgeDir(const TuboEngine::Math::Vector3& dir);
 
 	// --- 回避可能か ---
 	bool CanDodge() const;
@@ -234,4 +236,6 @@ private:
 
 	//オートエイム用の方向（XY平面の正規化ベクトル）
 	TuboEngine::Math::Vector3 autoAimDir_{0.0f, -1.0f, 0.0f};
+	// AI目標エイム方向（スムーズ計算用ターゲット）
+	TuboEngine::Math::Vector3 autoAimTarget_{0.0f, -1.0f, 0.0f};
 };

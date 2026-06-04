@@ -28,7 +28,7 @@ void StageReadyState::Enter(StageScene* scene) {
 	// カメラ初期化
 	if (followCam && player) {
 		followCam->Initialize(player, TuboEngine::Math::Vector3{0.0f, 0.0f, -70.0f}, 0.08f);
-		followCam->SetZoomLimits(0.1f, 1.0f);
+		followCam->SetZoomLimits(0.1f, 5.0f);
 		followCam->SetZoom(0.1f);
 		followCam->SnapToTarget();
 		followCam->StartIntroZoom(0.1f, 1.0f, 0.8f);
@@ -179,8 +179,9 @@ void StageReadyState::Object3DDraw(StageScene* scene) {
 		sky->Draw();
 	}
 
-	Player* player = scene->GetPlayer();
-	player->Draw();
+    if (auto* player = scene->GetPlayer()) {
+		player->Draw();
+	}
 }
 
 void StageReadyState::SpriteDraw(StageScene* scene) {

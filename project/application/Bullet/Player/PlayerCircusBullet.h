@@ -1,6 +1,7 @@
 #pragma once
 #include "Bullet/Player/PlayerBullet.h"
 #include <vector>
+#include <random>
 
 class Enemy;
 
@@ -36,4 +37,6 @@ private:
 
     std::vector<Enemy*> enemies_;
     Enemy* currentTarget_ = nullptr;
+
+    std::mt19937 rng_{std::random_device{}()};
 };
