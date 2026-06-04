@@ -1,6 +1,7 @@
 #include "PauseState.h"
 
 #include "ImGuiManager.h"
+#include <numbers>
 #include "Input.h"
 #include "StageScene.h"
 #include "Stage/StageManager.h"
@@ -190,7 +191,7 @@ void PauseState::Update(StageScene* scene) {
 	}
 	const float floatY = gPoseAnimEnabled ? (std::sinf(gPoseAnimTime * gPoseFloatSpeed) * gPoseFloatAmp) : 0.0f;
 	const float rotDeg = gPoseAnimEnabled ? (std::sinf(gPoseAnimTime * gPoseRotSpeed) * gPoseRotDegAmp) : 0.0f;
-	const float rotRad = rotDeg * 3.14159265f / 180.0f;
+	const float rotRad = rotDeg * std::numbers::pi_v<float> / 180.0f;
 	float pulse = 0.0f;
 	if (gPoseAnimEnabled && gPoseColorPulse) {
 		pulse = std::sinf(gPoseAnimTime * gPoseColorPulseSpeed) * gPoseColorPulseAmp;

@@ -7,7 +7,8 @@
 
 
 namespace {
-constexpr float kPI = 3.14159265358979323846f;
+#include <numbers>
+constexpr float kPI = std::numbers::pi_v<float>;
 constexpr float kMortarEnemyModelRotOffsetX = 0.0f;
 constexpr float kMortarEnemyModelRotOffsetY = 0.0f;
 constexpr float kMortarEnemyModelRotOffsetZ = -kPI * 0.5f;

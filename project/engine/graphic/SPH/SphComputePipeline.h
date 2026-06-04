@@ -65,12 +65,10 @@ struct alignas(16) SphGpuParams {
     int    extForceActive;                 // 232
     float  surfaceTension;                 // 236  表面張力係数 σ
     int    sdfCount;                       // 240  SDF 障害物数 (0..kMaxSdfShapes)
-    // ここまで 244 bytes → 次の 16-byte 境界 = 256 bytes に pad される
-    float  _pad3, _pad4, _pad5;           // 244-255
-    SdfShapeGpu sdfShapes[kMaxSdfShapes]; // 256  16×32 = 512 bytes → 合計 768 bytes
+    // sdfCount の終端 = byte 240 = 16-byte 境界のため追加パディング不要
+    SdfShapeGpu sdfShapes[kMaxSdfShapes]; // 240  16×32 = 512 bytes → 合計 752 bytes
 };
-static_assert(offsetof(SphGpuParams, sdfShapes) % 16 == 0,
-              "sdfShapes must be 16-byte aligned for GPU cbuffer");
+static_assert(offsetof(SphGpuParams, sdfShapes) == 240, "sdfShapes offset mismatch — HLSL cbuffer と要一致");
 static_assert(offsetof(SphGpuParams, viewProj)  == 112, "viewProj offset mismatch");
 static_assert(sizeof(SdfShapeGpu) == 32, "SdfShapeGpu size mismatch");
 
@@ -100,6 +98,11 @@ public:
     /// DrawInstanced 用インスタンシング SRV インデックス (ParticlePSO 向け)
     int GetInstancingSrvIndex() const { return instancingSrvIndex_; }
     int GetParticleCount()      const { return particleCount_; }
+
+    /// 初期化時に確保したグリッドが覆える最大サイズ (各軸: dim * cellSize)
+    float GetGridMaxSizeX() const { return gridDimX_ * cellSize_; }
+    float GetGridMaxSizeY() const { return gridDimY_ * cellSize_; }
+    float GetGridMaxSizeZ() const { return gridDimZ_ * cellSize_; }
 
     /// Object3d インスタンシング用 — InstanceData バッファの GPU アドレス
     /// SphComputePipeline::Dispatch() 後に有効 (UAV→SRV 遷移済み)
