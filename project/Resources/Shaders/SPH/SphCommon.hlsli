@@ -63,8 +63,8 @@ cbuffer SphParams : register(b0) {
     int    g_ExtForceActive;   // 有効フラグ
     float  g_SurfaceTension;   // 表面張力係数 σ
     int    g_SdfCount;         // SDF 障害物数 (0..SPH_MAX_SDF_SHAPES)
-    // g_SdfCount (byte 240-243) の後、SdfShape の 16-byte align により 256 まで自動パディング
-    SdfShape g_SdfShapes[SPH_MAX_SDF_SHAPES]; // 256 + 16×32=512 bytes → 合計 768 bytes
+    // g_SdfCount の終端 = byte 240 = 16-byte 境界のため追加パディング不要
+    SdfShape g_SdfShapes[SPH_MAX_SDF_SHAPES]; // 240 + 16×32=512 bytes → 合計 752 bytes
 };
 
 // ---- SPH カーネル ----
