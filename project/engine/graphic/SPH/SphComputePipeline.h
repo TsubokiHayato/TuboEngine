@@ -17,6 +17,7 @@ struct SphGPUInstance {
     TuboEngine::Math::Vector4   color;
 };
 
+// SphCommon.hlsli の SPH_MAX_SDF_SHAPES と必ず一致させること
 static constexpr int kMaxSdfShapes = 16;
 
 /// @brief SDF 障害物形状 (SphCommon.hlsli の SdfShape と完全一致, 32 bytes)
@@ -62,11 +63,16 @@ struct alignas(16) SphGpuParams {
     float  extForceRadius;                 // 224
     float  extForceStrength;               // 228
     int    extForceActive;                 // 232
-    float  surfaceTension;                 // 232  表面張力係数 σ
-    int    sdfCount;                       // 236  SDF 障害物数 (0..kMaxSdfShapes)
-    // ここまで 240 bytes (16-byte aligned) ─ 以下に配列を続ける
-    SdfShapeGpu sdfShapes[kMaxSdfShapes]; // 240  16×32 = 512 bytes → 合計 752 bytes
+    float  surfaceTension;                 // 236  表面張力係数 σ
+    int    sdfCount;                       // 240  SDF 障害物数 (0..kMaxSdfShapes)
+    // ここまで 244 bytes → 次の 16-byte 境界 = 256 bytes に pad される
+    float  _pad3, _pad4, _pad5;           // 244-255
+    SdfShapeGpu sdfShapes[kMaxSdfShapes]; // 256  16×32 = 512 bytes → 合計 768 bytes
 };
+static_assert(offsetof(SphGpuParams, sdfShapes) % 16 == 0,
+              "sdfShapes must be 16-byte aligned for GPU cbuffer");
+static_assert(offsetof(SphGpuParams, viewProj)  == 112, "viewProj offset mismatch");
+static_assert(sizeof(SdfShapeGpu) == 32, "SdfShapeGpu size mismatch");
 
 /// @brief SPH GPU コンピュートパイプライン
 ///
