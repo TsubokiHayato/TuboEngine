@@ -248,6 +248,22 @@ void SphSimulator::DrawImGui() {
         ImGui::DragFloat3("最小座標", &params_.boundMin.x, 0.1f);
         ImGui::DragFloat3("最大座標", &params_.boundMax.x, 0.1f);
         HelpMarker("変更後はリセットで粒子を再配置すると綺麗");
+
+        // 現在の境界サイズがグリッドバッファの上限を超えていたら警告
+        float sx = params_.boundMax.x - params_.boundMin.x;
+        float sy = params_.boundMax.y - params_.boundMin.y;
+        float sz = params_.boundMax.z - params_.boundMin.z;
+        if (sx > compute_.GetGridMaxSizeX() ||
+            sy > compute_.GetGridMaxSizeY() ||
+            sz > compute_.GetGridMaxSizeZ()) {
+            ImGui::TextColored({1, 0.3f, 0.3f, 1},
+                "! 境界が初期グリッド(%.1f x %.1f x %.1f)を超えています",
+                compute_.GetGridMaxSizeX(),
+                compute_.GetGridMaxSizeY(),
+                compute_.GetGridMaxSizeZ());
+            ImGui::TextColored({1, 0.3f, 0.3f, 1},
+                "  近傍探索が劣化します。初期サイズを大きく設定してください");
+        }
     }
 
     // ---- 外力 ----
