@@ -1,5 +1,6 @@
 #include "Player.h"
-#include "PlayerAutoController.h" // 追加
+#include "PlayerAutoController.h"
+#include <numbers>
 #include "Collider/CollisionTypeId.h"
 #include "ImGuiManager.h"
 #include "Input.h"
@@ -44,7 +45,7 @@ void Player::Initialize() {
 	// プレイヤーの初期位置
 	position = TuboEngine::Math::Vector3(0.0f, 0.0f, 0.0f);
 	// プレイヤーの初期回転
-	rotation = TuboEngine::Math::Vector3(1.56f, 0.0f, 3.12f);
+	rotation = TuboEngine::Math::Vector3(std::numbers::pi_v<float> / 2.0f, 0.0f, std::numbers::pi_v<float>);
 	// プレイヤーの初期スケール
 	scale = TuboEngine::Math::Vector3(1.0f, 1.0f, 1.0f);
 
@@ -178,7 +179,7 @@ void Player::Update() {
 				autoAimDir_.y = ly / len;
 			}
 			float angle = std::atan2(autoAimDir_.x, -autoAimDir_.y);
-			rotation.z = 3.12f + angle;
+			rotation.z = std::numbers::pi_v<float> + angle;
 		} else if (!wantCaptureMouse) {
 			// 手動時は従来通りマウス方向
 			Rotate();
@@ -508,7 +509,7 @@ void Player::Rotate() {
 		// autoMoveDir_ が 0 でなければ更新
 		if (autoMoveDir_.x != 0.0f || autoMoveDir_.y != 0.0f) {
 			float angle = std::atan2(autoMoveDir_.x, -autoMoveDir_.y);
-			rotation.z = 3.12f + angle;
+			rotation.z = std::numbers::pi_v<float> + angle;
 		}
 		return;
 	}

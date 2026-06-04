@@ -13,7 +13,8 @@
 #include <limits>
 #include <queue>
 
-constexpr float kPI = 3.14159265358979323846f;
+#include <numbers>
+constexpr float kPI = std::numbers::pi_v<float>;
 
 // Enemyモデルの軸補正（モデルの向きがゲーム座標系と一致しない場合のための定数）
 // 90度ズレが「Z軸(ヨー)」ではなく「X軸/ Y軸」で起きるケースがあるため、軸ごとに分けて補正する。
@@ -28,7 +29,7 @@ Enemy::~Enemy() {}
 void Enemy::Initialize() {
 	Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kEnemy));
 	position = {0.0f, 0.0f, 5.0f};
-	rotation = TuboEngine::Math::Vector3(1.56f, 0.0f, 0.0f);
+	rotation = TuboEngine::Math::Vector3(kPI / 2.0f, 0.0f, 0.0f);
 	scale = {1.0f, 1.0f, 1.0f};
 
 	object3d = std::make_unique<TuboEngine::Object3d>();

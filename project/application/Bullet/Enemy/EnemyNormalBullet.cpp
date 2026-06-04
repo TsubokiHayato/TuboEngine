@@ -5,7 +5,8 @@
 #include "ImGuiManager.h"
 #include <cmath>
 
-constexpr float kPI = 3.14159265358979323846f;
+#include <numbers>
+constexpr float kPI = std::numbers::pi_v<float>;
 
 namespace {
 constexpr float kDefaultBulletSpeed   = 0.5f;                       // デフォルトの弾の速度
