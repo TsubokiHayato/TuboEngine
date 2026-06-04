@@ -561,12 +561,15 @@ void Enemy::Update() {
 		deathTimer_ -= dt;
 		if (mistEmitter_) {
 			mistEmitter_->GetPreset().center = position;
-			mistEmitter_->Emit(4); // 継続的にミストを出す
+			mistEmitter_->Emit(4);
 		}
-		// 縮小 (スケールはインスタンスごとなので安全)
 		float t = std::clamp(deathTimer_ / kDeathDuration, 0.0f, 1.0f);
 		object3d->SetScale(scale * t);
 		object3d->Update();
+
+		// 死亡演出中も発射済みの弾は飛び続ける
+		if (bullet && bullet->GetIsAlive())
+			bullet->Update();
 
 		if (deathTimer_ <= 0.0f) {
 			isAlive = false;
