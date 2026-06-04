@@ -7,6 +7,7 @@
 #include "TextureManager.h"
 #include "engine/graphic/Particle/Effects/Primitive/PrimitiveEmitter.h"
 #include "engine/graphic/Particle/Effects/Ring/RingEmitter.h"
+#include "Particle/CharacterParticlePresets.h"
 #include "engine/graphic/Particle/ParticleManager.h"
 #include <algorithm>
 #include <cmath>
@@ -83,77 +84,16 @@ void Enemy::Initialize() {
 	// ビヘイビアツリー構築
 	BuildBehaviorTree();
 
-	// --- 追加: 演出用エミッタ生成 ---
-	// ヒット時: 小さなスパーク（既存）
-	if (!hitEmitter_) {
-		ParticlePreset p{};
-		p.name = "EnemyHit";
-		p.texture = "particle.png";
-		p.maxInstances = 64;
-		p.autoEmit = false;
-		p.burstCount = 12;
-		p.lifeMin = 0.25f;
-		p.lifeMax = 0.35f;
-		p.scaleStart = {0.15f, 0.15f, 0.15f};
-		p.scaleEnd = {0.05f, 0.05f, 0.05f};
-		p.colorStart = {1.0f, 0.6f, 0.2f, 0.9f};
-		p.colorEnd = {1.0f, 1.0f, 0.4f, 0.0f};
-		p.center = position;
-		hitEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
-	}
-	// 追加: ヒット時の小さなリングを別エミッタで生成（既存と併用）
-	if (!hitRingEmitter_) {
-		ParticlePreset p{};
-		p.name = "EnemyHitRing";
-		p.texture = "gradationLine.png";
-		p.maxInstances = 16;
-		p.autoEmit = false;
-		p.burstCount = 1;
-		p.lifeMin = 0.25f;
-		p.lifeMax = 0.45f;
-		p.scaleStart = {0.4f, 0.4f, 1.0f};
-		p.scaleEnd = {0.4f, 0.4f, 1.0f};
-		p.colorStart = {1.0f, 0.5f, 0.2f, 0.9f};
-		p.colorEnd = {1.0f, 0.9f, 0.6f, 0.0f};
-		p.center = position;
-		hitRingEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
-	}
-	// 死亡時: 大きなリング (一度だけ)
-	if (!deathEmitter_) {
-		ParticlePreset p{};
-		p.name = "EnemyDeath";
-		p.texture = "gradationLine.png";
-		p.maxInstances = 8;
-		p.autoEmit = false;
-		p.burstCount = 1;
-		p.lifeMin = 0.6f;
-		p.lifeMax = 0.9f;
-		p.scaleStart = {0.6f, 0.6f, 0.6f};
-		p.scaleEnd = {1.4f, 1.4f, 1.4f};
-		p.colorStart = {1.0f, 0.3f, 0.2f, 0.9f};
-		p.colorEnd = {1.0f, 0.8f, 0.1f, 0.0f};
-		p.center = position;
-		deathEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<RingEmitter>(p);
-	}
-	// 霧散演出用ミスト
-	if (!mistEmitter_) {
-		ParticlePreset p{};
-		p.name = "EnemyMist";
-		p.texture = "particle.png";
-		p.maxInstances = 256;
-		p.autoEmit = false;
-		p.burstCount = 12;
-		p.lifeMin = 0.4f;
-		p.lifeMax = 0.7f;
-		p.scaleStart = {0.15f, 0.15f, 0.15f};
-		p.scaleEnd = {0.5f, 0.5f, 0.5f};
-		p.colorStart = {0.7f, 0.7f, 0.7f, 0.6f};
-		p.colorEnd = {0.3f, 0.3f, 0.3f, 0.0f};
-		p.velMin = {-1.2f, -1.2f, -1.2f};
-		p.velMax = {1.2f, 1.2f, 1.2f};
-		p.center = position;
-		mistEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitter<PrimitiveEmitter>(p);
-	}
+	// --- 演出用エミッタ生成 ---
+	auto* pm = TuboEngine::ParticleManager::GetInstance();
+	if (!hitEmitter_)
+		hitEmitter_    = pm->CreateEmitter<PrimitiveEmitter>(CharacterParticlePresets::EnemyHit(position));
+	if (!hitRingEmitter_)
+		hitRingEmitter_ = pm->CreateEmitter<RingEmitter>(CharacterParticlePresets::EnemyHitRing(position));
+	if (!deathEmitter_)
+		deathEmitter_  = pm->CreateEmitter<RingEmitter>(CharacterParticlePresets::EnemyDeath(position));
+	if (!mistEmitter_)
+		mistEmitter_   = pm->CreateEmitter<PrimitiveEmitter>(CharacterParticlePresets::EnemyMist(position));
 }
 
 
