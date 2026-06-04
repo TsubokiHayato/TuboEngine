@@ -757,13 +757,15 @@ void Enemy::OnCollision(Collider* other) {
 }
 
 void Enemy::Draw() {
+	// 弾は敵が死んでも飛び続けるため、isAlive チェックより先に描画する
+	if (bullet)
+		bullet->Draw();
+
 	if (isAlive == false) { /* 死亡後は通常モデル非表示 */
 		return;
 	}
 	if (object3d)
 		object3d->Draw();
-	if (bullet)
-		bullet->Draw();
 	DrawViewCone();
 	DrawLastSeenMark();
 	DrawStateIcon();
