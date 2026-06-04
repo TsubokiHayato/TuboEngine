@@ -1,9 +1,8 @@
 #include "PlayerEvasion.h"
 #include <cmath>
+#include "GameConstants.h"
 
-namespace {
-    constexpr float kFixedDeltaTime = 1.0f / 60.0f;
-}
+using GameConstants::kFixedDeltaTime;
 
 PlayerEvasion::PlayerEvasion() {}
 

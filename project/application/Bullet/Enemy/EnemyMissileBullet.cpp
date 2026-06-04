@@ -8,15 +8,18 @@
 #include "engine/graphic/Particle/ParticleManager.h"
 
 
+#include "GameConstants.h"
+
 namespace {
-constexpr float kDefaultFallSpeed = 40.0f;
+constexpr float kDefaultFallSpeed    = 40.0f;
 constexpr float kDefaultImpactRadius = 2.0f;
-constexpr TuboEngine::Math::Vector3 kDefaultScale = {1.0f, 1.0f, 1.0f};
+constexpr TuboEngine::Math::Vector3 kDefaultScale    = {1.0f, 1.0f, 1.0f};
 constexpr TuboEngine::Math::Vector3 kDefaultRotation = {0.0f, 0.0f, 0.0f};
-constexpr float kFixedDeltaTime = 1.0f / 60.0f;
-constexpr float kMinApexHeight = 14.0f;
+constexpr float kMinApexHeight   = 14.0f;
 constexpr float kExtraApexHeight = 10.0f;
 }
+
+using GameConstants::kFixedDeltaTime;
 
 float EnemyMissileBullet::s_fallSpeed = kDefaultFallSpeed;
 float EnemyMissileBullet::s_impactRadius = kDefaultImpactRadius;

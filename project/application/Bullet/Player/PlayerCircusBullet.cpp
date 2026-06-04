@@ -4,10 +4,9 @@
 #include <cmath>
 #include <random>
 #include "engine/graphic/Particle/ParticleManager.h"
+#include "GameConstants.h"
 
-namespace {
-    constexpr float kFixedDeltaTime = 1.0f / 60.0f;
-}
+using GameConstants::kFixedDeltaTime;
 
 #include "Character/Enemy/CircusEnemy.h"
 

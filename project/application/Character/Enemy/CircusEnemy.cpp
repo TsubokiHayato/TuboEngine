@@ -1,6 +1,7 @@
 #include "CircusEnemy.h"
 #include "Character/Player/Player.h"
 #include "ImguiManager.h"
+#include "WinApp.h"
 #include <cmath>
 #include <numbers>
 #include <random>
@@ -136,8 +137,7 @@ void CircusEnemy::Update() {
     const float dt = 1.0f / 60.0f;
 
     // ボスHPバーの更新
-    // 基準位置 (1280x720の画面中央ベース)
-    float baseX = 640.0f;
+    float baseX = TuboEngine::WinApp::GetInstance()->GetClientWidth() * 0.5f;
     float baseY = 60.0f;
 
     // サイズに基づいて左端(LeftX)を揃える
@@ -151,8 +151,6 @@ void CircusEnemy::Update() {
         bossHpFrameSprite_->Update();
     }
 
-    // Barの基準（左端座標は同じく計算済み）
-    // float barLeftX = baseX - hpBarSizeBase_.x * 0.5f + hpBarOffset_.x; // (上で計算)
     float barY = baseY + hpBarOffset_.y;
 
     float hpRatio = static_cast<float>(HP) / static_cast<float>(maxHp_); 
