@@ -15,6 +15,7 @@
 #include "Collider/Collider.h"
 
 #include "Camera/FollowTopDownCamera.h"
+#include "DebugCamera.h"
 
 #include "Block/Block.h"
 
@@ -143,6 +144,7 @@ private:
 	std::unique_ptr<CollisionManager> collisionManager_;
 
 	std::unique_ptr<FollowTopDownCamera> followCamera;
+	TuboEngine::DebugCamera debugCamera_; // デバッグ用フリーカメラ（F2でON/OFF）
 	std::unique_ptr<TuboEngine::Camera> camera = nullptr;
 	TuboEngine::Math::Vector3 cameraPosition = {0.0f, 0.0f, -5.0f};
 	TuboEngine::Math::Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};

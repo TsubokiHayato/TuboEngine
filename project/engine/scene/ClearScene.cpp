@@ -331,6 +331,9 @@ void ClearScene::Update() {
     camera->setScale(cameraTransform.scale);
     camera->Update();
 
+    // デバッグカメラ（F2でON/OFF）。有効中はメインカメラを乗っ取る
+    debugCamera_.Update(camera.get());
+
     // SceneChangeAnimation 更新
     if (sceneChangeAnimation_) {
         sceneChangeAnimation_->Update(delta);
@@ -392,6 +395,9 @@ void ClearScene::ImGuiDraw() {
     ImGui::DragFloat3("Camera Rotate", &cameraTransform.rotate.x, 0.01f);
     ImGui::DragFloat3("Camera Scale", &cameraTransform.scale.x, 0.01f);
     ImGui::End();
+
+    // デバッグカメラ操作UI
+    debugCamera_.DrawImGui();
 
     ImGui::Begin("Entrance Control");
 

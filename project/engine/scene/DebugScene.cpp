@@ -118,7 +118,10 @@ void DebugScene::Update() {
     camera->setScale(cameraScale);
     camera->Update();
 
-    
+    // デバッグカメラ（F2でON/OFF）。有効中はメインカメラを乗っ取る
+    debugCamera_.Update(camera.get());
+
+
     // エミッター存在チェック
     TuboEngine::ParticleManager* pm = TuboEngine::ParticleManager::GetInstance();
     for (size_t i = 0; i < emitterNames_.size();) {
@@ -181,6 +184,9 @@ void DebugScene::ImGuiDraw() {
     ImGui::DragFloat3("Rotation", &cameraRotation.x, 0.1f);
     ImGui::DragFloat3("Scale",    &cameraScale.x,    0.1f);
     ImGui::End();
+
+    // デバッグカメラ操作UI
+    debugCamera_.DrawImGui();
 
     // テキスト関連の ImGui は TextManager 側に任せる
     TuboEngine::TextManager::GetInstance()->DrawImGui();

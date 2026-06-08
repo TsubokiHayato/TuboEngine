@@ -98,6 +98,9 @@ void OverScene::Update() {
 	camera->setScale(cameraTransform.scale);
 	camera->Update();
 
+	// デバッグカメラ（F2でON/OFF）。有効中はメインカメラを乗っ取る
+	debugCamera_.Update(camera.get());
+
 	// 落下＋バウンスをイージングで
 	const float dt = 1.0f/60.0f;
 	animTime_ += dt;
@@ -206,6 +209,9 @@ void OverScene::ImGuiDraw() {
 	ImGui::DragFloat3("Camera Rotate", &cameraTransform.rotate.x, 0.01f);
 	ImGui::DragFloat3("Camera Scale", &cameraTransform.scale.x, 0.01f);
 	ImGui::End();
+
+	// デバッグカメラ操作UI
+	debugCamera_.DrawImGui();
 #endif // USE_IMGUI
 }
 

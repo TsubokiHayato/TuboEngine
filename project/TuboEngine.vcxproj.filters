@@ -126,6 +126,9 @@
     <ClCompile Include="engine\camera\Camera.cpp">
       <Filter>projects\engine\graphic\2d\camera</Filter>
     </ClCompile>
+    <ClCompile Include="engine\camera\DebugCamera.cpp">
+      <Filter>projects\engine\graphic\2d\camera</Filter>
+    </ClCompile>
     <ClCompile Include="engine\audio\AudioCommon.cpp">
       <Filter>projects\engine\audio</Filter>
     </ClCompile>
@@ -537,6 +540,9 @@
       <Filter>projects\application\StageState\StageReady</Filter>
     </ClInclude>
     <ClInclude Include="engine\camera\Camera.h">
+      <Filter>projects\engine\graphic\2d\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\camera\DebugCamera.h">
       <Filter>projects\engine\graphic\2d\camera</Filter>
     </ClInclude>
     <ClInclude Include="engine\audio\AudioCommon.h">
