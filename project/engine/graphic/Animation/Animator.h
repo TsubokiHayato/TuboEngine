@@ -213,7 +213,7 @@ private:
 
 	// キューブマップのSRVハンドル
 	// デフォルト : ロストック・ラージ空港の4Kキューブマップ
-	std::string cubeMapFilePath_ = "rostock_laage_airport_4k.dds";
+	std::string cubeMapFilePath_ = "DDS/rostock_laage_airport_4k.dds";
 
 	// アニメーション
 

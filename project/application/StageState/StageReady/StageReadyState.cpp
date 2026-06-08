@@ -70,8 +70,8 @@ void StageReadyState::Enter(StageScene* scene) {
 	const float screenH = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientHeight());
 	const TuboEngine::Math::Vector2 center = {screenW * 0.5f, screenH * 0.5f};
 
-	const std::string readyTex = "ready.png";
-	const std::string startTex = "start.png";
+	const std::string readyTex = "InGame/ready.png";
+	const std::string startTex = "InGame/start.png";
 	TuboEngine::TextureManager::GetInstance()->LoadTexture(readyTex);
 	TuboEngine::TextureManager::GetInstance()->LoadTexture(startTex);
 

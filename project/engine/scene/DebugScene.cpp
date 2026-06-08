@@ -16,7 +16,7 @@
 
 void DebugScene::Initialize() {
 
-    std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
+    std::string testDDSTextureHandle = "DDS/rostock_laage_airport_4k.dds";
 
     // Camera
 	camera = std::make_unique<TuboEngine::Camera>();
