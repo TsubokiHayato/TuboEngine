@@ -10,6 +10,7 @@
 #include "Vector4.h"
 #include "VertexData.h"
 #include <list>
+#include <memory>
 #include <random>
 #include <string>
 #include <unordered_map>
@@ -86,7 +87,7 @@ private:
 
 	std::unordered_map<std::string, ParticleGroup> particleGroups;
 
-	TuboEngine::Camera* camera_ = nullptr;
+	std::unique_ptr<TuboEngine::Camera> camera_;
 
 	// カスタムサイズ指定（>0 のときテクスチャサイズを上書き）
 	TuboEngine::Math::Vector2 customTextureSize{0, 0};

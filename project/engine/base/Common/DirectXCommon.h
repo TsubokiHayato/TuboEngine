@@ -20,7 +20,6 @@ namespace TuboEngine {
 class DirectXCommon {
 
 private:
-	static DirectXCommon* instance;
 	// シングルトン用
 	DirectXCommon() = default;
 	~DirectXCommon() = default;
@@ -32,11 +31,9 @@ private:
 public:
 	// インスタンス取得
 	static DirectXCommon* GetInstance() {
-		// インスタンスがない場合は作成する
-		if (instance == nullptr) {
-			instance = new DirectXCommon;
-		}
-		return instance;
+		// 静的ローカル変数によるシングルトン（new/delete 不要）
+		static DirectXCommon instance;
+		return &instance;
 	}
 
 public:

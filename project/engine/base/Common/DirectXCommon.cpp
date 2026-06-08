@@ -8,7 +8,6 @@
 
 namespace TuboEngine {
 using namespace Microsoft::WRL;
-DirectXCommon* DirectXCommon::instance = nullptr; // シングルトンインスタンス
 void DirectXCommon::Initialize() {
 
 	// FPS固定初期化
@@ -39,8 +38,47 @@ void DirectXCommon::Initialize() {
 }
 
 void DirectXCommon::Finalize() {
-	delete instance;
-	instance = nullptr;
+	// Meyers シングルトン（静的ローカル変数）はプログラム終了時まで破棄されないため、
+	// D3D12/DXGI リソースをこの時点で明示的に解放する。
+	// （旧来の delete instance と同じ解放タイミングを保証し、リークチェッカーの
+	//   ReportLiveObjects 実行前にデバイス参照を 0 にするための処理）
+
+	// DXC 関連（生 COM ポインタ）の解放
+	if (includeHandler) {
+		includeHandler->Release();
+		includeHandler = nullptr;
+	}
+	if (dxcCompiler) {
+		dxcCompiler->Release();
+		dxcCompiler = nullptr;
+	}
+	if (dxcUtils) {
+		dxcUtils->Release();
+		dxcUtils = nullptr;
+	}
+
+	// 各種リソース（デバイスの子オブジェクト）を先に解放する
+	depthStencilResource.Reset();
+	for (auto& resource : swapChainResources) {
+		resource.Reset();
+	}
+	backBuffers.clear();
+
+	rtvDescriptorHeap.Reset();
+	srvDescriptorHeap.Reset();
+	dsvDescriptorHeap.Reset();
+
+	fence.Reset();
+	swapChain.Reset();
+
+	commandList.Reset();
+	commandAllocator.Reset();
+	commandQueue.Reset();
+
+	dxgiFactory.Reset();
+
+	// 最後にデバイス本体を解放する
+	device.Reset();
 }
 
 void DirectXCommon::Device_Initialize() {

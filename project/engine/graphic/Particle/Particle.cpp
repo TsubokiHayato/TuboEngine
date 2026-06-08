@@ -32,9 +32,7 @@ Particle::~Particle() {
 		materialBuffer_->Unmap(0, nullptr);
 		materialData_ = nullptr;
 	}
-	// カメラの delete
-	delete camera_;
-	camera_ = nullptr;
+	// camera_ は std::unique_ptr のため自動的に解放される
 }
 
 /// <summary>
@@ -70,7 +68,7 @@ void Particle::Initialize( ParticleType particleType) {
 	// 頂点データをリソースにコピー
 	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(TuboEngine::VertexData) * modelData_.vertices.size());
 
-	camera_ = new TuboEngine::Camera;
+	camera_ = std::make_unique<TuboEngine::Camera>();
 	camera_->SetTranslate({ 0.0f,0.0f,-5.0f });
 	camera_->setRotation({ 0.0f,0.0f,0.0f });
 	camera_->setScale({ 1.0f,1.0f,1.0f });
