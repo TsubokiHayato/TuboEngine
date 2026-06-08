@@ -145,10 +145,10 @@ void StageScene::Initialize() {
 
 	// HP UI (Player)
 	hpUI_ = std::make_unique<HpUI>();
-	TuboEngine::TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("InGame/HPBarFrame.png");
 	TuboEngine::TextureManager::GetInstance()->LoadTexture("HP.png");
 	int maxHp = 5; // Player 初期HPに合わせる
-	hpUI_->Initialize("HPBarFrame.png", "HP.png", maxHp);
+	hpUI_->Initialize("InGame/HPBarFrame.png", "HP.png", maxHp);
 	hpUI_->SetPosition({20.0f, 20.0f});
 	hpUI_->SetSpacing(4.0f);
 	hpUI_->SetScale(0.8f);
@@ -156,9 +156,9 @@ void StageScene::Initialize() {
 
 	// Enemy HP UI
 	enemyHpUI_ = std::make_unique<EnemyHpUI>();
-	TuboEngine::TextureManager::GetInstance()->LoadTexture("HPBarFrame.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("InGame/HPBarFrame.png");
 	TuboEngine::TextureManager::GetInstance()->LoadTexture("HP.png");
-	enemyHpUI_->Initialize("HPBarFrame.png", "HP.png");
+	enemyHpUI_->Initialize("InGame/HPBarFrame.png", "HP.png");
 	enemyHpUI_->SetYOffset(-24.0f);
 	enemyHpUI_->SetScale(0.45f);
 	enemyHpUI_->SetSpacing(0.0f);

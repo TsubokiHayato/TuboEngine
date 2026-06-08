@@ -52,16 +52,16 @@ void Enemy::Initialize() {
 	TuboEngine::TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
 
 	// Icons
-	TuboEngine::TextureManager::GetInstance()->LoadTexture("Question.png");
-	TuboEngine::TextureManager::GetInstance()->LoadTexture("Exclamation.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("InGame/Question.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("InGame/Exclamation.png");
 
 	questionIcon_ = std::make_unique<TuboEngine::Sprite>();
-	questionIcon_->Initialize("Question.png");
+	questionIcon_->Initialize("InGame/Question.png");
 	questionIcon_->SetGetIsAdjustTextureSize(false);
 	questionIcon_->SetAnchorPoint({0.5f, 0.5f});
 
 	exclamationIcon_ = std::make_unique<TuboEngine::Sprite>();
-	exclamationIcon_->Initialize("Exclamation.png");
+	exclamationIcon_->Initialize("InGame/Exclamation.png");
 	exclamationIcon_->SetGetIsAdjustTextureSize(false);
 	exclamationIcon_->SetAnchorPoint({0.5f, 0.5f});
 
