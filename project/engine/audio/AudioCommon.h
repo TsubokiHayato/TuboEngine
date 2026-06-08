@@ -16,8 +16,6 @@
 class AudioCommon
 {
 private:
-	
-	static AudioCommon* instance;//シングルトン
 
 	AudioCommon() = default;//コンストラクタ隠蔽
 	~AudioCommon() = default;//デストラクタ隠蔽
