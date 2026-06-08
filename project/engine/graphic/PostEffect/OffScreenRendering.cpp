@@ -78,6 +78,10 @@ void OffScreenRendering::Initialize() {
 	// Dash用: effectNames の並びに合わせて RadialBlur の index は 8
 	// （OffScreenRendering::DrawImGui の配列と揃えておく）
 	dashEffectIndex_ = 8;
+
+	// VHS用: effectNames の並びに合わせて VHS の index は 14（最後に追加）
+	// （未設定だと SetVHSEffect が常に早期 return して効果が出ない）
+	vhsEffectIndex_ = 14;
 }
 
 void OffScreenRendering::SetDashPostEffectEnabled(bool enable) {
