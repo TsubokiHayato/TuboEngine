@@ -1,4 +1,6 @@
 #include "OverScene.h"
+#include <algorithm>
+#include <cmath>
 #include"OffScreenRendering.h"
 #include"TextManager.h"
 #include "WinApp.h"
@@ -49,36 +51,11 @@ void OverScene::Initialize() {
 	player->SetRotation({0.0f, 0.0f, 0.0f});
 	animTime_ = 0.0f;
 
-	// GAME OVER 文字列（1文字ごとに個別テクスチャ: "G.png" など）
-	const char* text = "GAMEOVER"; // 8文字
-	letters_.clear();
-	int count = 0; while (text[count] != '\0') ++count;
-	float clientW = static_cast<float>(TuboEngine::WinApp::GetInstance()->GetClientWidth());
-	float totalW = count * letterSize_.x + (count - 1) * lettersGap_;
-	float startX = (clientW - totalW) * 0.5f; // 中央寄せ
-	float x = startX;
-	for (int i=0; text[i] != '\0'; ++i){
-		LetterAnim la;
-		la.sprite = std::make_unique<TuboEngine::Sprite>();
-		// 文字に対応するテクスチャ "<prefix><Letter>.png" を使用
-		std::string texPath = letterTexturePrefix_ + std::string(1, text[i]) + ".png";
-		la.sprite->Initialize(texPath);
-		la.sprite->SetSize(letterSize_);
-		la.start = { x, lettersStartY_ };
-		la.end   = { x, lettersRowY_ };
-		la.delay = i * letterStagger_;
-		la.time = 0.0f;
-		la.sprite->SetPosition(la.start);
-		letters_.push_back(std::move(la));
-		x += letterSize_.x + lettersGap_;
-	}
-
-	//TextManager
+	//TextManager（案内テキストは JSON、GAME OVER 見出しはコードで生成して演出する）
 	TuboEngine::TextManager::GetInstance()->Initialize();
 	if (!TuboEngine::TextManager::GetInstance()->LoadTextLayout("Resources/Text/GameOver.json")) {
-		// もしファイルが無ければデフォルトで作成する
-		auto* font = TuboEngine::TextManager::GetInstance()->GetOrCreateFontSized(TuboEngine::TextManager::PresetFontNames::Best10, 48.0f);
-		if (font) {
+		// JSON が無ければ案内テキストをコードで生成する
+		if (TuboEngine::TextManager::GetInstance()->GetOrCreateFontSized(TuboEngine::TextManager::PresetFontNames::Best10, 48.0f)) {
 			auto* textObj = TuboEngine::TextManager::GetInstance()->CreateText(
 				TuboEngine::TextManager::PresetFontNames::Best10 + "_48",
 				"Push SPACE to Return Stage",
@@ -90,6 +67,23 @@ void OverScene::Initialize() {
 				textObj->SetHorizontalAlign(1); // 1 = Center
 				textObj->SetVerticalAlign(1);   // 1 = Middle
 			}
+		}
+	}
+
+	// GAME OVER 見出し（演出対象）。ポインタを保持して Update で動かす。
+	gameOverText_ = nullptr;
+	goAnimTime_ = 0.0f;
+	if (TuboEngine::TextManager::GetInstance()->GetOrCreateFontSized(TuboEngine::TextManager::PresetFontNames::Best10, 128.0f)) {
+		gameOverText_ = TuboEngine::TextManager::GetInstance()->CreateText(
+			TuboEngine::TextManager::PresetFontNames::Best10 + "_128",
+			"GAME OVER",
+			goStartPos_,                    // 画面外上から開始
+			{ 1.0f, 0.15f, 0.15f, 0.0f },   // 赤・透明から
+			goStartScale_                   // 大きめから着地でインパクト
+		);
+		if (gameOverText_) {
+			gameOverText_->SetHorizontalAlign(1); // 1 = Center
+			gameOverText_->SetVerticalAlign(1);   // 1 = Middle
 		}
 	}
 }
@@ -134,19 +128,39 @@ void OverScene::Update() {
 		player->SetRotation({0.0f,0.0f,0.0f});
 	}
 
-	// 文字アニメ（各文字を遅延つきで落とす）
-	for (auto& l : letters_){
-		l.time += dt;
-		float tt = std::clamp((l.time - l.delay)/letterDuration_, 0.0f, 1.0f);
-		float by2 = SmoothStep(tt); // 落下はスムーズ、必要ならBounceに変更
-		TuboEngine::Math::Vector2 p = {l.start.x + (l.end.x - l.start.x) * by2,
-					l.start.y + (l.end.y - l.start.y) * by2 };
-		l.sprite->SetPosition(p);
-		l.sprite->Update();
-	}
 	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		StageManager::SetShowRestartMessage(true);
 		SceneManager::GetInstance()->ChangeScene(STAGE);
+	}
+
+	// GAME OVER 文字の演出：上から落下→バウンド着地→赤いネオン風フリッカー
+	if (gameOverText_) {
+		goAnimTime_ += dt;
+		float gt = goDropDuration_ > 0.0f ? std::min(goAnimTime_ / goDropDuration_, 1.0f) : 1.0f;
+
+		// Y はバウンスで落下、X は中央固定
+		float by = EaseOutBounce(gt);
+		float gy = goStartPos_.y + (goEndPos_.y - goStartPos_.y) * by;
+		gameOverText_->SetPosition({ goEndPos_.x, gy });
+
+		// スケールは大→等倍でインパクトを演出
+		float gs = goStartScale_ + (goEndScale_ - goStartScale_) * SmoothStep(gt);
+		gameOverText_->SetScale(gs);
+
+		// フェードイン（最初の0.3秒で出現）
+		float fadeIn = SmoothStep(std::min(goAnimTime_ / 0.3f, 1.0f));
+
+		// 着地後は不気味なネオン風フリッカー
+		float flicker = 1.0f;
+		if (gt >= 1.0f) {
+			float ft = goAnimTime_ - goDropDuration_;
+			flicker = 0.72f + 0.28f * std::sin(ft * 17.0f) * std::sin(ft * 2.3f + 0.5f);
+		}
+
+		// 赤いゲームオーバーカラー（明滅で緑青成分を僅かに揺らす）
+		float g = 0.10f + 0.12f * flicker;
+		float b = 0.10f + 0.12f * flicker;
+		gameOverText_->SetColor({ 1.0f, g, b, fadeIn * flicker });
 	}
 
 
@@ -160,13 +174,12 @@ void OverScene::Finalize() {
 
 	// 次のシーンへ行く前に、テキストをすべてリセット（クリア）して持ち越さないようにする
 	TuboEngine::TextManager::GetInstance()->ClearAllTexts();
+	gameOverText_ = nullptr; // ClearAllTexts で破棄されるため参照を切る
 }
 
 void OverScene::Object3DDraw() { player->Draw(); }
 
 void OverScene::SpriteDraw() {
-	for (auto& l : letters_) { l.sprite->Draw(); }
-
 	 // TextManager Draw
 	TuboEngine::TextManager::GetInstance()->DrawAll();
 }
@@ -186,18 +199,6 @@ void OverScene::ImGuiDraw() {
 	ImGui::DragFloat("X Offset", &xOffset_, 0.01f, -5.0f, 5.0f);
 	ImGui::DragFloat("TiltTargetRad", &tiltTargetRad_, 0.01f, 0.0f, 3.14f);
 	ImGui::SliderInt("TiltSign (+Right/-Left)", &tiltSign_, -1, 1);
-
-	ImGui::Separator();
-	ImGui::Text("GAME OVER UI");
-	ImGui::DragFloat("LetterDuration", &letterDuration_, 0.01f, 0.05f, 2.0f);
-	ImGui::DragFloat("LetterStagger", &letterStagger_, 0.005f, 0.0f, 0.5f);
-	ImGui::DragFloat2("LetterSize", &letterSize_.x, 1.0f, 8.0f, 512.0f);
-	ImGui::DragFloat("LettersRowY", &lettersRowY_, 1.0f, -200.0f, 700.0f);
-	ImGui::DragFloat("LettersStartY", &lettersStartY_, 1.0f, -700.0f, 0.0f);
-	ImGui::DragFloat("LettersGap", &lettersGap_, 0.5f, 0.0f, 50.0f);
-	if (ImGui::Button("Reset Letters")) {
-		Initialize();
-	}
 	ImGui::End();
 
 	ImGui::Begin("Camera");
