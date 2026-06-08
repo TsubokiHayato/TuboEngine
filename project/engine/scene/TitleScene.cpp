@@ -147,6 +147,9 @@ void TitleScene::Update() {
 	camera->setScale(cameraScale);
 	camera->Update();
 
+	// デバッグカメラ（F2でON/OFF）。有効中はメインカメラを乗っ取る
+	debugCamera_.Update(camera.get());
+
 	// LineManager にカメラを渡し、Line の内部更新を行う（カメラが未設定だとスクリーン変換されない）
 	TuboEngine::LineManager::GetInstance()->SetDefaultCamera(camera.get());
 	TuboEngine::LineManager::GetInstance()->Update();
@@ -264,6 +267,9 @@ void TitleScene::ImGuiDraw() {
 	ImGui::DragFloat3("Rotation", &cameraRotation.x, 0.01f);
 	ImGui::DragFloat3("Scale", &cameraScale.x, 0.01f);
 	ImGui::End();
+
+	// デバッグカメラ操作UI
+	debugCamera_.DrawImGui();
 
 	if (sceneChangeAnimation) {
 		sceneChangeAnimation->DrawImGui();

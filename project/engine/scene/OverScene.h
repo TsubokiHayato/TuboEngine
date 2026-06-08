@@ -1,5 +1,6 @@
 #pragma once
 #include "Camera.h"
+#include "DebugCamera.h"
 #include "IScene.h"
 #include "LineManager.h"
 #include "Object3d.h"
@@ -55,6 +56,8 @@ public:
 private:
 	std::unique_ptr<TuboEngine::Camera> camera; // カメラ
 	TuboEngine::Transform cameraTransform;      // 変形情報
+
+	TuboEngine::DebugCamera debugCamera_;       // デバッグ用フリーカメラ（F2でON/OFF）
 
 	std::unique_ptr<Player> player; // プレイヤー
 
