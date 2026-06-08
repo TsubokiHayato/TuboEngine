@@ -7,6 +7,7 @@
 #include "Input.h"
 #include"Audio.h"
 #include"Camera.h"
+#include"DebugCamera.h"
 #include"Sprite.h"
 #include"Object3d.h"
 #include"Model.h"
@@ -55,6 +56,7 @@ public:
 private:
 
 	std::unique_ptr<TuboEngine::Camera> camera = nullptr;
+	TuboEngine::DebugCamera debugCamera_; // デバッグ用フリーカメラ（F2でON/OFF）
 	TuboEngine::Math::Vector3 cameraPosition = {0.0f, 1.0f, -15.0f};
 	TuboEngine::Math::Vector3 cameraRotation = {0.0f, 0.0f, 0.0f};
 	TuboEngine::Math::Vector3 cameraScale = {1.0f, 1.0f, 1.0f};
