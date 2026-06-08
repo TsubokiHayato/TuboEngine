@@ -3,7 +3,6 @@
 #include<iostream>
 
 
-TuboEngine::TextureManager* TuboEngine::TextureManager::instance = nullptr;
 uint32_t TuboEngine::TextureManager::kSRVIndexTop = 1;
 void TuboEngine::TextureManager::Initialize() {
 	
@@ -125,17 +124,13 @@ uint32_t TuboEngine::TextureManager::GetSrvIndex(const std::string& filePath) {
 
 
 TuboEngine::TextureManager* TuboEngine::TextureManager::GetInstance() {
-	if (instance == nullptr) {
-		instance = new TextureManager;
-	}
-	return instance;
+	// 静的ローカル変数によるシングルトン（new/delete 不要）
+	static TextureManager instance;
+	return &instance;
 }
 
 void TuboEngine::TextureManager::Finalize() {
 
 
 	textureDatas.clear();
-
-	delete instance;
-	instance = nullptr;
 }

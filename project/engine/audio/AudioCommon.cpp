@@ -7,22 +7,16 @@
 #include <wrl/client.h>
 #pragma comment(lib,"xaudio2.lib")
 
-// シングルトンインスタンスの初期化
-AudioCommon* AudioCommon::instance = nullptr;
-
 //サウンドデータコンテナの開始位置
 const uint32_t kStartSoundDataIndex = 1;
 
 //サウンドデータのコンテナ
 AudioCommon* AudioCommon::GetInstance()
 {
-	//インスタンスがない場合は作成
-	if (instance == nullptr) {
-		//インスタンス作成
-		instance = new AudioCommon;
-	}
+	//静的ローカル変数によるシングルトン（new/delete 不要）
+	static AudioCommon instance;
 	//インスタンスを返す
-	return instance;
+	return &instance;
 }
 
 void AudioCommon::Initialize()
@@ -42,8 +36,6 @@ void AudioCommon::Finalize()
 	ShutdownContainer();
 	//XAudio2の解放
 	xAudio2_.Reset();
-	delete instance;
-	instance = nullptr;
 }
 
 uint32_t AudioCommon::SoundLoadWave(const std::string& filename)
