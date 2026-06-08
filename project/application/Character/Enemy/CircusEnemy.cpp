@@ -102,7 +102,7 @@ void CircusEnemy::Initialize() {
 
     // ボス用巨大HPバーのスプライト初期化
     bossHpFrameSprite_ = std::make_unique<TuboEngine::Sprite>();
-    bossHpFrameSprite_->Initialize("HpBarFrame.png");
+    bossHpFrameSprite_->Initialize("InGame/HpBarFrame.png");
     bossHpFrameSprite_->SetSize(hpFrameSizeBase_);
     // Frame用のアンカーを左端(0.0)に統一する（ズレる原因を排除）
     bossHpFrameSprite_->SetAnchorPoint({0.0f, 0.5f});

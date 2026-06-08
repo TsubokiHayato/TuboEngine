@@ -54,7 +54,7 @@ void TuboEngine::Framework::Initialize() {
 	// ラインマネージャーの初期化
 	LineManager::GetInstance()->Initialize();
 
-	std::string testDDSTextureHandle = "rostock_laage_airport_4k.dds";
+	std::string testDDSTextureHandle = "DDS/rostock_laage_airport_4k.dds";
 	TuboEngine::TextureManager::GetInstance()->LoadTexture(testDDSTextureHandle);
 
 	// TextManagerの初期化

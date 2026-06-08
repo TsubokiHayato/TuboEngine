@@ -60,7 +60,7 @@ void Player::Initialize() {
 	// モデルファイルパス
 	const std::string modelFileNamePath = "player/Player.obj";
 	// スプライトファイルパス
-	const std::string reticleFileNamePath = "2D_Reticle.png";
+	const std::string reticleFileNamePath = "InGame/2D_Reticle.png";
 
 	// 3Dオブジェクト生成・初期化
 	object3d = std::make_unique<TuboEngine::Object3d>();
