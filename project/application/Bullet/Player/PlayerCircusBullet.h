@@ -24,11 +24,12 @@ private:
     float elapsedTime_ = 0.0f;
     float speed_ = 1.0f;
     float turnSpeed_ = 0.12f;
-    float chaosAmplitude_ = 0.8f;
-    float chaosFrequency_ = 10.0f;
+    float swerveAmplitude_ = 0.8f;
+    float swerveFrequency_ = 10.0f;
     float phase1Duration_ = 0.4f;
 
     TuboEngine::Math::Vector3 swerveOffset_{0, 0, 0};
+    TuboEngine::Math::Vector3 lastTrailPos_{0, 0, 0}; // トレイルを隙間なく繋ぐための前回エミット位置
     
     class IParticleEmitter* trailEmitter_ = nullptr;
     class IParticleEmitter* explosionEmitter_ = nullptr;

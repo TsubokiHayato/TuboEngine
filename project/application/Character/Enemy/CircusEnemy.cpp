@@ -626,8 +626,8 @@ void CircusEnemy::FireSingleMissile(const TuboEngine::Math::Vector3& launchDir, 
     // ImGuiからの調整値を反映
     bullet->SetSpeed(actualSpeed);
     bullet->SetTurnSpeed(actualTurnSpeed);
-    bullet->SetChaosAmplitude(bulletChaosAmp_);
-    bullet->SetChaosFrequency(bulletChaosFreq_);
+    bullet->SetSwerveAmplitude(bulletSwerveAmp_);
+    bullet->SetSwerveFrequency(bulletSwerveFreq_);
     bullet->SetPhase1Duration(bulletPhase1Duration_);
     bullet->SetTargetDelayFrames(bulletTargetDelayFrames_); // ★追加
 
@@ -685,8 +685,8 @@ void CircusEnemy::DrawImGui() {
     if (ImGui::CollapsingHeader("Bullet Tuning", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::DragFloat("Base Speed", &bulletSpeed_, 0.01f, 0.1f, 2.0f);
         ImGui::DragFloat("Turn Speed", &bulletTurnSpeed_, 0.001f, 0.01f, 0.5f);
-        ImGui::DragFloat("Chaos Amplitude", &bulletChaosAmp_, 0.01f, 0.0f, 2.0f);
-        ImGui::DragFloat("Chaos Frequency", &bulletChaosFreq_, 0.1f, 0.0f, 20.0f);
+        ImGui::DragFloat("Swerve Amplitude", &bulletSwerveAmp_, 0.01f, 0.0f, 2.0f);
+        ImGui::DragFloat("Swerve Frequency", &bulletSwerveFreq_, 0.1f, 0.0f, 20.0f);
         ImGui::DragFloat("Delay (Phase1)", &bulletPhase1Duration_, 0.05f, 0.0f, 2.0f);
         ImGui::DragInt("Target Delay Frames", &bulletTargetDelayFrames_, 1, 0, 180, "%d frames");
     }

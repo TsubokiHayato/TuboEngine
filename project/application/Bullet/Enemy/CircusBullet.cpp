@@ -12,16 +12,17 @@ using GameConstants::kFixedDeltaTime;
 void CircusBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
     Collider::SetTypeID(static_cast<uint32_t>(CollisionTypeId::kEnemyWeapon));
     position = startPos;
+    lastTrailPos_ = startPos;
     isAlive = true;
     elapsedTime_ = 0.0f;
     Collider::SetRadius(0.8f);
 
     // イタノサーカスらしさを出すための極端なパラメータ設定
-    speed_ = 1.0f;           // 速度を少し抑えて追尾を甘く
-    turnSpeed_ = 0.12f;      // 旋回性能を落として甘く
-    chaosAmplitude_ = 0.8f;  // 揺らぎを適度に
-    chaosFrequency_ = 10.0f; // 振動数
-    phase1Duration_ = 0.4f;  // 発射後0.4秒間のタメを作る
+    speed_ = 1.0f;            // 速度を少し抑えて追尾を甘く
+    turnSpeed_ = 0.12f;       // 旋回性能を落として甘く
+    swerveAmplitude_ = 0.8f;  // うねりの振れ幅
+    swerveFrequency_ = 10.0f; // うねりの回転速度
+    phase1Duration_ = 0.4f;   // 発射後0.4秒間のタメを作る
 
     std::uniform_real_distribution<float> dist(0.0f, 6.283185f); // 0 ~ 2PI
     swerveOffset_ = {dist(rng_), dist(rng_), dist(rng_)};
@@ -31,14 +32,14 @@ void CircusBullet::Initialize(const TuboEngine::Math::Vector3& startPos) {
     if (!trailEmitter_) {
         ParticlePreset p{};
         p.name = "CircusSharedTrail";
-        p.texture = "particle.png"; 
-        p.maxInstances = 4000;
+        p.texture = "particle.png";
+        p.maxInstances = 12000;     // 補間エミットで本数が増えるので上限を拡大
         p.autoEmit = false;
-        p.lifeMin = 0.4f;
-        p.lifeMax = 0.7f;
-        p.scaleStart = {0.4f, 0.4f, 0.4f};
+        p.lifeMin = 0.5f;           // ほどよく尾を引かせる（視認性優先で控えめ）
+        p.lifeMax = 0.9f;
+        p.scaleStart = {0.55f, 0.55f, 0.55f}; // 弾を覆い隠さない太さ
         p.scaleEnd = {0.0f, 0.0f, 0.0f};
-        p.colorStart = {0.9f, 0.9f, 0.9f, 0.5f};
+        p.colorStart = {0.95f, 0.95f, 0.95f, 0.45f}; // 薄めにして弾本体を見やすく
         p.colorEnd = {0.4f, 0.4f, 0.4f, 0.0f};
         trailEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitterByType("Default", p);
     }
@@ -137,16 +138,25 @@ void CircusBullet::Update() {
         
         // 旋回強度（タメ終了後からの経過時間で徐々に強める）
         float homingStrength = turnSpeed_ * std::min(1.5f, (elapsedTime_ - phase1Duration_) * 2.0f);
-        
-        // カオス軌道の計算（ウネウネ）
-        // 各軸に異なる位相・周波数のサイン波をかけて大きく揺らぐベクトルを作る
-        TuboEngine::Math::Vector3 chaosVec;
-        chaosVec.x = std::sin(elapsedTime_ * chaosFrequency_ + swerveOffset_.x);
-        chaosVec.y = std::sin(elapsedTime_ * chaosFrequency_ * 1.2f + swerveOffset_.y); // 軸によって周波数や位相を少しずらす
-        chaosVec.z = std::cos(elapsedTime_ * chaosFrequency_ * 0.8f + swerveOffset_.z);
 
-        // 直進 + ターゲットへの補正 + ウネウネ補正
-        TuboEngine::Math::Vector3 finalDir = currentDir + (targetDir * homingStrength) + (chaosVec * chaosAmplitude_ * 0.1f);
+        // 直進 + ターゲットへの補正で「芯」となる進行方向を作る
+        TuboEngine::Math::Vector3 coreDir = currentDir + (targetDir * homingStrength);
+        coreDir.Normalize();
+
+        // 進行軸まわりにらせん（コークスクリュー）を巻かせるための直交基底を作る
+        // coreDir がほぼ垂直のときは基準軸を切り替えて外積の破綻を防ぐ
+        TuboEngine::Math::Vector3 reference = (std::abs(coreDir.z) > 0.99f)
+            ? TuboEngine::Math::Vector3{0.0f, 1.0f, 0.0f}
+            : TuboEngine::Math::Vector3{0.0f, 0.0f, 1.0f};
+        TuboEngine::Math::Vector3 right = TuboEngine::Math::Vector3::Normalize(TuboEngine::Math::Vector3::Cross(coreDir, reference));
+        TuboEngine::Math::Vector3 up = TuboEngine::Math::Vector3::Cross(right, coreDir);
+
+        // 進行軸のまわりを回るうねりオフセット（弾ごとに位相をずらして群れがバラける）
+        float swervePhase = elapsedTime_ * swerveFrequency_ + swerveOffset_.x;
+        TuboEngine::Math::Vector3 swerveVec = right * std::cos(swervePhase) + up * std::sin(swervePhase);
+
+        // 芯の方向に進行軸まわりのらせんを加えて、ねじれながら殺到させる
+        TuboEngine::Math::Vector3 finalDir = coreDir + (swerveVec * swerveAmplitude_ * 0.1f);
         finalDir.Normalize();
         
         // ホーミング開始後はスピードリミットへ
@@ -157,10 +167,18 @@ void CircusBullet::Update() {
     // トレイル（煙）とバーナー（推進器の炎）の発生
     if (isAlive) {
         if (trailEmitter_) {
-            ParticlePreset preset = trailEmitter_->GetPreset();
-            preset.center = position;
-            trailEmitter_->GetPreset() = preset;
-            trailEmitter_->Emit(1);
+            // 前回位置から現在位置までを細かく刻んでエミットし、高速移動でも途切れない太い白煙リボンにする
+            TuboEngine::Math::Vector3 segment = position - lastTrailPos_;
+            float dist = segment.Length();
+            const float kTrailSpacing = 0.45f; // この間隔ごとに1粒（密度を抑えて視認性を確保）
+            int steps = std::max(1, static_cast<int>(dist / kTrailSpacing));
+            steps = std::min(steps, 32); // 暴発防止の上限
+            for (int i = 1; i <= steps; ++i) {
+                float t = static_cast<float>(i) / static_cast<float>(steps);
+                trailEmitter_->GetPreset().center = lastTrailPos_ + segment * t;
+                trailEmitter_->Emit(1);
+            }
+            lastTrailPos_ = position;
         }
         if (burnerEmitter_ && velocity.LengthSquared() > 0.001f) {
             // ミサイルの進行方向の逆側に少しずらして炎を吹かせる
