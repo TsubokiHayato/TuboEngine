@@ -202,6 +202,9 @@ void StageScene::Update() {
 		stateManager_->Update(this);
 	}
 
+	// デバッグカメラ（F2でON/OFF）。各ステートがFollowCameraを更新した後に乗っ取る
+	debugCamera_.Update(followCamera->GetCamera());
+
 	// デフォルトカメラをFollowCameraに設定
 	TuboEngine::LineManager::GetInstance()->SetDefaultCamera(followCamera->GetCamera());
 	// 衝突マネージャの更新
@@ -366,6 +369,8 @@ void StageScene::ImGuiDraw() {
 	#ifdef USE_IMGUI
 
 	TuboEngine::LineManager::GetInstance()->DrawImGui();
+	// デバッグカメラ操作UI
+	debugCamera_.DrawImGui();
 	stateManager_->DrawImGui(this);
 	// StageManager の各チャンク情報を表示
 	if (stageManager_) {
