@@ -7,6 +7,9 @@
 #include "Sprite.h"
 #include <vector>
 #include <string>
+
+namespace TuboEngine { class TextObject; }
+
 class OverScene : public IScene {
 public:
 	/// <summary>
@@ -67,23 +70,13 @@ private:
 	float tiltTargetRad_ = 1.57f;      // 目標角度（ラジアン）
 	int tiltSign_ = 1;                // +1で右、-1で左
 
-	// GAME OVER UI（各文字のドロップ演出）
-	struct LetterAnim {
-		std::unique_ptr<TuboEngine::Sprite> sprite;
-		TuboEngine::Math::Vector2 start;
-		TuboEngine::Math::Vector2 end;
-		float delay = 0.0f;
-		float time = 0.0f;
-	};
-	std::vector<LetterAnim> letters_;
-	float letterDuration_ = 0.6f;   // 各文字のドロップ時間
-	float letterStagger_ = 0.08f;   // 文字ごとの遅延
-	TuboEngine::Math::Vector2 letterSize_ = {96.0f, 96.0f};
-	float lettersRowY_ = 80.0f;     // 到着Y
-	float lettersStartY_ = -120.0f; // 開始Y（画面外上）
-	float lettersGap_ = 6.0f;       // 文字間隔
-
-	// 画像ファイルパスのプレフィックス（例: "Resources/UI/GameOver/")
-	std::string letterTexturePrefix_ = "";
+	// GAME OVER 文字列は TextManager で表示し、ここで演出する
+	TuboEngine::TextObject* gameOverText_ = nullptr; // 演出対象（TextManager が所有）
+	float goAnimTime_ = 0.0f;                         // 演出の経過時間
+	TuboEngine::Math::Vector2 goStartPos_{640.0f, -120.0f}; // 落下開始（画面外上）
+	TuboEngine::Math::Vector2 goEndPos_{640.0f, 200.0f};    // 着地位置
+	float goDropDuration_ = 0.9f;  // 落下＋バウンドの時間
+	float goStartScale_ = 3.0f;    // 落下開始時のスケール（インパクト用に大きく）
+	float goEndScale_ = 1.0f;      // 着地後のスケール
 
 };
