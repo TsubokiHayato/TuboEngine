@@ -19,8 +19,8 @@ public:
     // ジャスト回避時の同期・消去用
     float GetBulletSpeed() const { return bulletSpeed_; }
     float GetBulletTurnSpeed() const { return bulletTurnSpeed_; }
-    float GetBulletChaosAmp() const { return bulletChaosAmp_; }
-    float GetBulletChaosFreq() const { return bulletChaosFreq_; }
+    float GetBulletSwerveAmp() const { return bulletSwerveAmp_; }
+    float GetBulletSwerveFreq() const { return bulletSwerveFreq_; }
     float GetBulletPhase1Duration() const { return bulletPhase1Duration_; }
     
     void ClearBulletsNear(const TuboEngine::Math::Vector3& center, float radius);
@@ -97,8 +97,8 @@ private:
     // 弾の調整パラメータ
     float bulletSpeed_ = 0.6f;
     float bulletTurnSpeed_ = 0.08f;
-    float bulletChaosAmp_ = 0.4f;
-    float bulletChaosFreq_ = 5.0f;
+    float bulletSwerveAmp_ = 0.4f;
+    float bulletSwerveFreq_ = 5.0f;
     float bulletPhase1Duration_ = 0.4f;
     int bulletTargetDelayFrames_ = 25; // ターゲットの遅延フレーム数
 
