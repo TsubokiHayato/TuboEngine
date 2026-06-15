@@ -15,27 +15,6 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="externals\imgui\imgui.cpp">
-      <Filter>projects\external\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_demo.cpp">
-      <Filter>projects\external\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_draw.cpp">
-      <Filter>projects\external\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp">
-      <Filter>projects\external\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
-      <Filter>projects\external\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_tables.cpp">
-      <Filter>projects\external\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_widgets.cpp">
-      <Filter>projects\external\imgui</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>projects</Filter>
     </ClCompile>
@@ -167,30 +146,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="externals\imgui\imconfig.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_dx12.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_win32.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_internal.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_truetype.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_rectpack.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_textedit.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
     <ClInclude Include="application\Animation\SceneChangeAnimation.h">
       <Filter>projects\application\Animation</Filter>
     </ClInclude>
@@ -351,9 +306,6 @@
     <Filter Include="projects\external">
       <UniqueIdentifier>{9cebf233-560c-4c9b-a633-268b6a53e7a3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="projects\external\imgui">
-      <UniqueIdentifier>{ca9916c7-7a71-4bb2-8abf-3ca9a1319bc9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="projects\application\Animation">
       <UniqueIdentifier>{c0ff4fb6-0caa-4c1b-9a72-2552688ea5ba}</UniqueIdentifier>
     </Filter>
@@ -445,8 +397,5 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="externals\imgui\LICENSE.txt">
-      <Filter>projects\external\imgui</Filter>
-    </Text>
   </ItemGroup>
 </Project>
