@@ -1,9 +1,51 @@
 # エンジン / アプリケーション分離 設計書
 
 - 作業ブランチ: `Ver20.0_feature/EngineSparation`（※名称タイポ "Separation" 要確認）
-- 起点: `Ver20.0_feature/DebugCamera`（※Develop基点に変えるか要確認）
-- ステータス: ドラフト（チームレビュー待ち。コード未変更）
-- 最終更新: 2026-06-15
+- 起点: `Ver20.0_feature/DebugCamera`
+- ステータス: **実装完了（フェーズA〜D）。チーム配布(packaging)を準備中**
+- 最終更新: 2026-06-16
+
+> §1〜§9 は当初の**設計**を記録として残したもの。実際に何をやったか・計画との差分は次の §0 を参照。
+
+---
+
+## 0. 実装状況（2026-06-16 時点）
+
+分離の Lv1（論理）・Lv2（ビルド＝`.lib`化）まで**完了**。ゲームは Debug/Release x64 とも 0エラーでビルドでき、従来通り動作する。残りはチーム配布の packaging のみ。
+
+### 完了したこと
+
+| フェーズ | 状態 | 主なコミット |
+|---------|------|-------------|
+| A: SceneManager 登録制対応 | ✅ | `0881169` |
+| B: 具体シーンを application へ移動＋登録制に切替 | ✅ | `0881169` |
+| C: Order を application へ移動 | ✅（B と同時に実施） | `0881169` |
+| D: engine を `.lib` 化しプロジェクト分割 | ✅ | `6daba58` ＋未コミット分 |
+| 昇格: BehaviorTree / Collider を engine へ | ✅ | `c79b286` |
+| 整理: CollisionTypeId を application へ戻す | ✅ | `ca5bcaf` |
+| imgui を EngineLib に取り込み | ✅ | 未コミット |
+| 出力先 generated\ 統一・フィルタ整理 | ✅ | 未コミット |
+
+### 検証結果
+- `grep` 依存チェック: engine→application の include **0件**、engine 内の具体シーン名 **0件**、engine 内のゲーム固有 enum（CollisionTypeId）**0件**。
+- ビルド: Debug/Release x64 とも **0エラー**。EngineLib.lib → `generated/outputs/`、Game.exe が ProjectReference で自動リンク。
+
+### 計画（§1〜§9）からの主な差分（実装メモ）
+1. **enum 名は `SCENE` のまま据え置き**（計画では `GameScene` にリネーム予定だったが、既存52ヶ所の参照を壊さないため `application/scene/GameScenes.h` に `enum SCENE` のまま移設）。
+2. **フェーズC を B と同時に実施**（Order をエンジンに残すと登録処理が engine→app 逆流を作るため、先に application へ移動）。
+3. **プロジェクト名は `EngineLib`**（`Engine` だと既存 `project/engine/` フォルダと**大文字小文字で衝突**するため）。`project/EngineLib/EngineLib.vcxproj`（StaticLibrary）。engine ソースは物理的に `project/engine/` のまま（`..\engine\` 参照、git履歴温存）。
+4. **`/Z7`（C7互換・デバッグ情報を.libに埋め込み）が必須**だった。既定の `/Zi`（別PDB）だと静的lib＋LTCGで型情報破損（LNK4020→LNK1218）になる。
+5. **EngineLib の設定はゲーム側とミラー**（RuntimeLibrary MT/MTd、`/utf-8`、`USE_IMGUI`(Debug)、stdcpp20、IncludeDirs は `$(SolutionDir)` 基点）。
+6. **imgui（externals/imgui）を EngineLib がコンパイル**するよう移管。これで EngineLib.lib(Debug) 単体で ImGui シンボルが解決する（Release は従来通り `ExcludedFromBuild`＝imgui非搭載）。
+7. **開始シーンのクセは温存**: `IScene::sceneNo` の静的初期値が実質の開始シーン(TITLE)を決めており、`Initialize(START)` 引数は捨てシーン用。挙動維持のため未修整（将来 `startSceneNo` を正しく効かせる余地あり）。
+
+### 残タスク（チーム配布）
+engine 単体では exe が作れないため、配布には以下が必要：
+- **最小スターター**（main＋Order＋空サンプルシーン＋SceneRegistration）
+- **外部依存の同梱**（assimp .lib＋ヘッダ＋DLL、DirectXTex .lib＋ヘッダ、dxcompiler/dxil.dll）
+- **リソース同梱**（`Resources/Shaders` の12 hlsl 等）
+- **ヘッダ一式**（`engine/**/*.h`）と**使い方ドキュメント**（include/link・/MT・v145・x64・シーンの足し方）
+- **配布形式の決定**（zip同梱 / テンプレ VS ソリューション / 別リポジトリ）
 
 ---
 
