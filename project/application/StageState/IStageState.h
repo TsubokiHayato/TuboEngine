@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "GameScenes.h" // シーン番号(SCENE)。各 State がシーン遷移で使用
 class StageScene;
 class IStageState {
 public:

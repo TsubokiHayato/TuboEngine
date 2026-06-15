@@ -11,8 +11,8 @@
 #include "TextureManager.h"
 #include "SceneManager.h"
 #include <memory>
-#include "Collider/CollisionManager.h"
-#include "Collider/Collider.h"
+#include "engine/Collider/CollisionManager.h"
+#include "engine/Collider/Collider.h"
 
 #include "Camera/FollowTopDownCamera.h"
 #include "DebugCamera.h"

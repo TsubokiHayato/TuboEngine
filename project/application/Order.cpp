@@ -1,8 +1,17 @@
 #include "Order.h"
 
+#include "SceneManager.h"
+#include "SceneRegistration.h"
+#include "GameScenes.h"
+
 void TuboEngine::Order::Initialize() {
-	// 初期化
+	// エンジン基盤の初期化（シーンには触れない）
 	TuboEngine::Framework::Initialize();
+
+	// ゲームのシーンを登録してから開始シーンを指定する
+	// （登録は SceneManager::Initialize より前に行うこと）
+	RegisterGameScenes();
+	SceneManager::GetInstance()->Initialize(STAGE);
 }
 
 void TuboEngine::Order::Update() {

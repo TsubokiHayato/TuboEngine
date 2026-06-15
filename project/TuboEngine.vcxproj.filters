@@ -75,10 +75,10 @@
     <ClCompile Include="application\Block\Block.cpp">
       <Filter>projects\application\Block</Filter>
     </ClCompile>
-    <ClCompile Include="application\Collider\Collider.cpp">
+    <ClCompile Include="engine\Collider\Collider.cpp">
       <Filter>projects\application\Collider</Filter>
     </ClCompile>
-    <ClCompile Include="application\Collider\CollisionManager.cpp">
+    <ClCompile Include="engine\Collider\CollisionManager.cpp">
       <Filter>projects\application\Collider</Filter>
     </ClCompile>
     <ClCompile Include="application\StageState\StageStateManager.cpp">
@@ -135,25 +135,10 @@
     <ClCompile Include="engine\audio\Audio.cpp">
       <Filter>projects\engine\audio</Filter>
     </ClCompile>
-    <ClCompile Include="engine\scene\ClearScene.cpp">
-      <Filter>projects\engine\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\DebugScene.cpp">
-      <Filter>projects\engine\scene</Filter>
-    </ClCompile>
     <ClCompile Include="engine\scene\IScene.cpp">
       <Filter>projects\engine\scene</Filter>
     </ClCompile>
-    <ClCompile Include="engine\scene\OverScene.cpp">
-      <Filter>projects\engine\scene</Filter>
-    </ClCompile>
     <ClCompile Include="engine\scene\SceneManager.cpp">
-      <Filter>projects\engine\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\StageScene.cpp">
-      <Filter>projects\engine\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\TitleScene.cpp">
       <Filter>projects\engine\scene</Filter>
     </ClCompile>
     <ClCompile Include="engine\leakChecker\D3DResourceLeakChecker.cpp">
@@ -166,9 +151,6 @@
       <Filter>projects\engine\imgui</Filter>
     </ClCompile>
     <ClCompile Include="engine\Framework\Framework.cpp">
-      <Filter>projects\engine\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Framework\Order.cpp">
       <Filter>projects\engine\Framework</Filter>
     </ClCompile>
     <ClCompile Include="engine\base\Utilities\Logger.cpp">
@@ -411,6 +393,17 @@
     <ClCompile Include="application\Character\Player\PlayerAutoController.cpp">
       <Filter>projects\application\Character\Player</Filter>
     </ClCompile>
+    <ClCompile Include="engine\graphic\SPH\SphSimulator.cpp" />
+    <ClCompile Include="engine\graphic\SPH\SphComputePipeline.cpp" />
+    <ClCompile Include="engine\graphic\SPH\SphFluidRenderer.cpp" />
+    <ClCompile Include="engine\graphic\SPH\InstancedMeshRenderer.cpp" />
+    <ClCompile Include="application\scene\ClearScene.cpp" />
+    <ClCompile Include="application\scene\DebugScene.cpp" />
+    <ClCompile Include="application\Order.cpp" />
+    <ClCompile Include="application\scene\StageScene.cpp" />
+    <ClCompile Include="application\scene\TitleScene.cpp" />
+    <ClCompile Include="application\scene\SceneRegistration.cpp" />
+    <ClCompile Include="application\scene\OverScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -479,17 +472,14 @@
     <ClInclude Include="application\Block\Block.h">
       <Filter>projects\application\Block</Filter>
     </ClInclude>
-    <ClInclude Include="application\Collider\Collider.h">
+    <ClInclude Include="engine\Collider\Collider.h">
       <Filter>projects\application\Collider</Filter>
     </ClInclude>
-    <ClInclude Include="application\Collider\CollisionManager.h">
+    <ClInclude Include="engine\Collider\CollisionManager.h">
       <Filter>projects\application\Collider</Filter>
     </ClInclude>
-    <ClInclude Include="application\Collider\CollisionTypeId.h">
+    <ClInclude Include="engine\Collider\CollisionTypeId.h">
       <Filter>projects\application\Collider</Filter>
-    </ClInclude>
-    <ClInclude Include="application\scene\StageState\ClearState.h">
-      <Filter>projects\application\StageState</Filter>
     </ClInclude>
     <ClInclude Include="application\StageState\StageStateManager.h">
       <Filter>projects\application\StageState</Filter>
@@ -551,25 +541,10 @@
     <ClInclude Include="engine\audio\Audio.h">
       <Filter>projects\engine\audio</Filter>
     </ClInclude>
-    <ClInclude Include="engine\scene\ClearScene.h">
-      <Filter>projects\engine\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\scene\DebugScene.h">
-      <Filter>projects\engine\scene</Filter>
-    </ClInclude>
     <ClInclude Include="engine\scene\IScene.h">
       <Filter>projects\engine\scene</Filter>
     </ClInclude>
-    <ClInclude Include="engine\scene\OverScene.h">
-      <Filter>projects\engine\scene</Filter>
-    </ClInclude>
     <ClInclude Include="engine\scene\SceneManager.h">
-      <Filter>projects\engine\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\scene\StageScene.h">
-      <Filter>projects\engine\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\scene\TitleScene.h">
       <Filter>projects\engine\scene</Filter>
     </ClInclude>
     <ClInclude Include="engine\scene\SceneType.h">
@@ -606,9 +581,6 @@
       <Filter>projects\engine\imgui</Filter>
     </ClInclude>
     <ClInclude Include="engine\Framework\Framework.h">
-      <Filter>projects\engine\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Framework\Order.h">
       <Filter>projects\engine\Framework</Filter>
     </ClInclude>
     <ClInclude Include="engine\base\Utilities\Logger.h">
@@ -893,6 +865,14 @@
     <ClInclude Include="application\Character\Player\PlayerAutoController.h">
       <Filter>projects\application\Character\Player</Filter>
     </ClInclude>
+    <ClInclude Include="application\scene\ClearScene.h" />
+    <ClInclude Include="application\scene\DebugScene.h" />
+    <ClInclude Include="application\scene\StageScene.h" />
+    <ClInclude Include="application\scene\TitleScene.h" />
+    <ClInclude Include="application\scene\GameScenes.h" />
+    <ClInclude Include="application\scene\SceneRegistration.h" />
+    <ClInclude Include="application\Order.h" />
+    <ClInclude Include="application\scene\OverScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli">

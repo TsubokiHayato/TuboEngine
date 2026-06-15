@@ -5,8 +5,9 @@
 #include"SpriteCommon.h"
 #include"ParticleCommon.h"
 #include"ImGuiManager.h"
-//シーン番号
-enum SCENE{DEBUG,TITLE,STAGE,TUTORIAL,CLEAR,OVER};
+// シーン番号の具体的な意味（enum SCENE）はゲーム側が持つ:
+//   application/scene/GameScenes.h
+// エンジンは sceneNo を単なる int として扱う。
 
 class IScene
 {
