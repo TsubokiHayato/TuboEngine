@@ -1,6 +1,6 @@
 #include "RushEnemy.h"
 #include "Character/Player/Player.h"
-#include "engine/Collider/CollisionTypeId.h"
+#include "Collider/CollisionTypeId.h"
 #include "ImGuiManager.h"
 #include "LineManager.h"
 #include "MapChip/MapChipField.h"

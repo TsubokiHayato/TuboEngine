@@ -316,7 +316,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\Bullet\BaseBullet.h" />
     <ClInclude Include="engine\Collider\Collider.h" />
     <ClInclude Include="engine\Collider\CollisionManager.h" />
-    <ClInclude Include="engine\Collider\CollisionTypeId.h" />
+    <ClInclude Include="application\Collider\CollisionTypeId.h" />
     <ClInclude Include="application\Character\Enemy\Enemy.h" />
     <ClInclude Include="application\Bullet\Enemy\EnemyNormalBullet.h" />
     <ClInclude Include="application\Block\Block.h" />
