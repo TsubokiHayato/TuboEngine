@@ -60,8 +60,8 @@ void TuboEngine::Framework::Initialize() {
 	// TextManagerの初期化
 	TuboEngine::TextManager::GetInstance()->Initialize();
 
-	// シーンマネージャーの初期化
-	SceneManager::GetInstance()->Initialize(STAGE); // タイトルシーンから開始
+	// シーンの登録と開始シーンの指定はゲーム側（Order::Initialize）で行う
+	// （エンジンは「どのシーンが存在するか／どこから始めるか」を決めない）
 }
 void TuboEngine::Framework::Update() {
 	// メッセージ処理

@@ -15,9 +15,9 @@
 #include "Character/Enemy/CircusEnemy.h"
 #include "Tile/Tile.h"
 #include "Camera/FollowTopDownCamera.h"
-#include "Collider/CollisionManager.h"
+#include "engine/Collider/CollisionManager.h"
 #include "ImGuiManager.h" 
-#include "engine/scene/StageScene.h" 
+#include "StageScene.h"
 #include "engine/graphic/data/InstanceData.h"
 #include <unordered_map>
 #include "engine/graphic/2d/TextManager.h"

@@ -1,4 +1,5 @@
 #include "TitleScene.h"
+#include "GameScenes.h"
 #include "StageScene.h" // 追加: isDemoModeフラグ操作のため
 #include "ImGuiManager.h"
 #include "Input.h"

@@ -1,6 +1,7 @@
 #include "StageScene.h"
+#include "GameScenes.h"
 #include "Camera/FollowTopDownCamera.h"
-#include "Collider/CollisionManager.h"
+#include "engine/Collider/CollisionManager.h"
 #include "LineManager.h"
 #include "ParticleManager.h" // 追加: パーティクル描画/更新
 #include"SceneType.h"

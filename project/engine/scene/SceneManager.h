@@ -1,5 +1,9 @@
 #pragma once
 #include<memory>
+#include<functional>
+#include<unordered_map>
+#include<map>
+#include<string>
 #include"IScene.h"
 class SceneManager
 {
@@ -26,8 +30,15 @@ private:
 
 
 public:
-	//初期化
-	void Initialize(int startSceneNo = TITLE);
+	// シーン生成関数の型（ゲーム側が登録する）
+	using SceneFactory = std::function<std::unique_ptr<IScene>()>;
+
+	// シーン番号→生成関数を登録する（ゲーム側が起動時に呼ぶ）
+	// debugName を渡すと ImGui のシーン選択に表示される
+	void RegisterScene(int sceneNo, SceneFactory factory, const std::string& debugName = "");
+
+	//初期化（開始シーン番号はゲーム側が指定する）
+	void Initialize(int startSceneNo);
 	//更新
 	void Update();
 	//終了処理
@@ -53,6 +64,12 @@ public:
 	}
 
 private:
+	// 登録テーブルからシーンを生成する（未登録なら nullptr）
+	std::unique_ptr<IScene> CreateScene(int sceneNo);
+
+	// シーン番号→生成関数 / デバッグ表示名
+	std::unordered_map<int, SceneFactory> factories_;
+	std::map<int, std::string> debugNames_; // 番号順に並ぶよう map を使用（ImGui表示用）
 
 	//現在のシーン
 	std::unique_ptr<IScene> currentScene = nullptr;

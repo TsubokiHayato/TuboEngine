@@ -1,10 +1,6 @@
 #include "SceneManager.h"
 #include"ImGuiManager.h"
-#include"DebugScene.h"
-#include"TitleScene.h"
-#include"StageScene.h"
-#include"ClearScene.h"
-#include"OverScene.h"
+// 具体シーンは include しない（どのシーンが存在するかはゲーム側が登録する）
 
 
 SceneManager* SceneManager::instance = nullptr; // シングルトンインスタンス
@@ -13,27 +9,13 @@ void SceneManager::Initialize(int startSceneNo) {
     currentSceneNo = startSceneNo;
     prevSceneNo = -1;
 
-    // シーン番号によってシーンを設定
-    if (currentSceneNo == DEBUG) {
-        currentScene = std::make_unique<DebugScene>();
-    } else if (currentSceneNo == TITLE) {
-        currentScene = std::make_unique<TitleScene>();
-    } else if (currentSceneNo == STAGE) {
-        currentScene = std::make_unique<StageScene>();
-    } else if (currentSceneNo == TUTORIAL) {
-        // TutorialもStageSceneを使い、内部StateでTutorialStateを動かす
-        currentScene = std::make_unique<StageScene>();
-    } else if (currentSceneNo == CLEAR) {
-        currentScene = std::make_unique<ClearScene>();
-	} else if (currentSceneNo == OVER) {
-		currentScene = std::make_unique<OverScene>();
-	}
-
+    // 登録テーブルから生成（どのシーンかはゲーム側が登録済み）
+    currentScene = CreateScene(currentSceneNo);
 
     if (currentScene) {
         currentScene->Initialize();
     }
-}	
+}
 
 void SceneManager::Update() {
 	//現在のシーンがnullptrでない場合
@@ -53,30 +35,9 @@ void SceneManager::Update() {
 			currentScene->Finalize();
 		}
 
-		//シーン番号によってシーンを設定
-		if (currentSceneNo == DEBUG) {
-			//デバッグシーンを設定
-			currentScene = std::make_unique<DebugScene>();
-			currentScene->Initialize();
-		} else if (currentSceneNo == TITLE) {
-			//タイトルシーンを設定
-			currentScene = std::make_unique<TitleScene>();
-			currentScene->Initialize();
-		} else if (currentSceneNo == STAGE) {
-			//ステージシーンを設定
-			currentScene = std::make_unique<StageScene>();
-			currentScene->Initialize();
-		} else if (currentSceneNo == TUTORIAL) {
-			// チュートリアルもStageSceneを使う
-			currentScene = std::make_unique<StageScene>();
-			currentScene->Initialize();
-		} else if (currentSceneNo == CLEAR) {
-			//クリアシーンを設定
-			currentScene = std::make_unique<ClearScene>();
-			currentScene->Initialize();
-        } else if (currentSceneNo == OVER) {
-			//クリアシーンを設定
-			currentScene = std::make_unique<OverScene>();
+		//登録テーブルから新しいシーンを生成
+		currentScene = CreateScene(currentSceneNo);
+		if (currentScene) {
 			currentScene->Initialize();
 		}
        forceReload_ = false;
@@ -124,26 +85,13 @@ void SceneManager::ImGuiDraw() {
 		currentScene->ImGuiDraw();
 	}
 
-	//シーン選択ウィンドウ
+	//シーン選択ウィンドウ（登録された名前からデータ駆動で生成）
 	ImGui::Begin("Scene");
-	if (ImGui::Button("Debug")) {
-		currentScene->SetSceneNo(DEBUG);
+	for (const auto& [no, name] : debugNames_) {
+		if (ImGui::Button(name.c_str())) {
+			currentScene->SetSceneNo(no);
+		}
 	}
-	if (ImGui::Button("Title")) {
-		currentScene->SetSceneNo(TITLE);
-	}
-	if (ImGui::Button("Stage")) {
-		currentScene->SetSceneNo(STAGE);
-	}
-	if (ImGui::Button("Tutorial")) {
-		currentScene->SetSceneNo(TUTORIAL);
-	}
-	if (ImGui::Button("Clear")) {
-		currentScene->SetSceneNo(CLEAR);
-	}
-	if (ImGui::Button("Over")) {
-		currentScene->SetSceneNo(OVER);
-	};
 	ImGui::End();
 
 	#endif // USE_IMGUI
@@ -167,4 +115,21 @@ void SceneManager::ParticleDraw() {
 		//パーティクル描画
 		currentScene->ParticleDraw();
 	}
+}
+
+void SceneManager::RegisterScene(int sceneNo, SceneFactory factory, const std::string& debugName) {
+	// シーン番号→生成関数を登録
+	factories_[sceneNo] = std::move(factory);
+	if (!debugName.empty()) {
+		debugNames_[sceneNo] = debugName;
+	}
+}
+
+std::unique_ptr<IScene> SceneManager::CreateScene(int sceneNo) {
+	// 登録テーブルを参照して生成（未登録なら nullptr）
+	auto it = factories_.find(sceneNo);
+	if (it != factories_.end() && it->second) {
+		return it->second();
+	}
+	return nullptr;
 }
