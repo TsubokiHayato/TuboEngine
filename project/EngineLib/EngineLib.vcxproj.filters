@@ -2,175 +2,181 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="projects">
-      <UniqueIdentifier>{698F02EE-0665-48B5-B8A7-337D0F1B8C22}</UniqueIdentifier>
+      <UniqueIdentifier>{D01150D4-0C97-40D7-B118-3042A5F35224}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine">
-      <UniqueIdentifier>{1C74AF24-061C-4F48-AE39-143916AA29F8}</UniqueIdentifier>
+      <UniqueIdentifier>{8DF65129-E426-4662-B0B6-5935F6022049}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\Collider">
-      <UniqueIdentifier>{0E9898D0-88FA-404B-8EAB-BB39B4A8A50E}</UniqueIdentifier>
+      <UniqueIdentifier>{84B5A44E-D964-4073-B407-30E773C87238}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\Framework">
-      <UniqueIdentifier>{1268AAD0-2951-46BD-86D6-57BF46EFF19B}</UniqueIdentifier>
+      <UniqueIdentifier>{9FAF324B-2244-4613-87D1-21D2DDBF1929}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\audio">
-      <UniqueIdentifier>{D7046197-0AC0-464A-A887-54E74D7A85C2}</UniqueIdentifier>
+      <UniqueIdentifier>{77B5BCA1-7516-4690-BA13-FBCFC427DF44}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\base">
-      <UniqueIdentifier>{2124BEB0-4AE6-479B-AA22-CF0809047105}</UniqueIdentifier>
+      <UniqueIdentifier>{573F6698-4B47-40B5-8C0D-BA7B7CAEFCE9}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\base\Common">
-      <UniqueIdentifier>{A619D570-91DC-4770-AA8B-FC74FE348562}</UniqueIdentifier>
+      <UniqueIdentifier>{8CC44AC1-5F09-42F6-BA48-E16B3B155B37}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\base\Utilities">
-      <UniqueIdentifier>{EC5B8E1C-3EDD-4197-A113-C10BB00D4597}</UniqueIdentifier>
+      <UniqueIdentifier>{0F7A1D93-AFE5-4BAF-8BF8-D027EC9A13CB}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\camera">
-      <UniqueIdentifier>{74E8E503-C730-449B-AC83-A86B31C576BC}</UniqueIdentifier>
+      <UniqueIdentifier>{5EE5F903-1FAE-4CAD-BF79-1F2145729677}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic">
-      <UniqueIdentifier>{111B72A2-93DC-4113-840A-5EB27A99F211}</UniqueIdentifier>
+      <UniqueIdentifier>{99358246-5BA5-4584-9FB9-EFC43202FC56}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\2d">
-      <UniqueIdentifier>{48A6B62B-AC51-4AFE-89D2-943827D11AFA}</UniqueIdentifier>
+      <UniqueIdentifier>{B7E34CA5-6FBC-4C32-8777-6312E92D9C60}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\3d">
-      <UniqueIdentifier>{5CE2477E-F7D3-4C74-96B3-F5B7F115F3E0}</UniqueIdentifier>
+      <UniqueIdentifier>{E9EDBB3D-2682-4B2E-80B3-8396D5904F49}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\Animation">
-      <UniqueIdentifier>{9D485900-E7F0-4CBB-93E0-74B3B4A8AA17}</UniqueIdentifier>
+      <UniqueIdentifier>{438FC000-93BC-4A26-A031-C0C4CA147872}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PSO">
-      <UniqueIdentifier>{695FDF49-0025-4A82-A300-C64296C6D469}</UniqueIdentifier>
+      <UniqueIdentifier>{B90DDF78-CF6B-4638-BE9B-620C68ACD64D}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PSO\Blend">
-      <UniqueIdentifier>{8799443C-C2DE-487A-BDC2-E3182373D530}</UniqueIdentifier>
+      <UniqueIdentifier>{E02B0FF8-CCB2-4262-A36E-AE0B72B3FF4D}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PSO\Line">
-      <UniqueIdentifier>{2FE781C0-A4CC-40DF-988F-FB0E45208404}</UniqueIdentifier>
+      <UniqueIdentifier>{7F1283BF-3144-401B-8B8F-44BCC46062A0}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PSO\Object">
-      <UniqueIdentifier>{4205480A-C2D6-42CB-BDB3-32413BE5E07C}</UniqueIdentifier>
+      <UniqueIdentifier>{73FB2F2D-BDF6-4A48-9FB9-A14A0FD50478}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PSO\Particle">
-      <UniqueIdentifier>{12188A07-9E50-4EE0-AABC-DF1812F64746}</UniqueIdentifier>
+      <UniqueIdentifier>{B125C4C8-0820-4E56-B6A5-7B1758633A47}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PSO\PostEffect">
-      <UniqueIdentifier>{11F625F1-1725-44E7-B561-B212F30AD056}</UniqueIdentifier>
+      <UniqueIdentifier>{37D6B515-C3C2-4FC4-922F-0EEE8EB0E945}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PSO\SkyBox">
-      <UniqueIdentifier>{0A7A7679-A221-48BA-883B-50E5E63F499F}</UniqueIdentifier>
+      <UniqueIdentifier>{15CEEC24-9EBB-4F50-89CF-BEE4B37D83D7}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\Particle">
-      <UniqueIdentifier>{A7B70042-105F-4AD3-BB8E-D6B0F49E7202}</UniqueIdentifier>
+      <UniqueIdentifier>{2E379223-FCE3-4929-9296-6333698B0AB8}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\Particle\Effects">
-      <UniqueIdentifier>{CB25A593-4CB7-4B7B-B65C-893D58FA1789}</UniqueIdentifier>
+      <UniqueIdentifier>{D2D72560-73CF-4E6C-9134-D20FBD78B7CE}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\Particle\Effects\Aura">
-      <UniqueIdentifier>{CD410143-2E59-483C-9386-86A290C7A94F}</UniqueIdentifier>
+      <UniqueIdentifier>{395BA042-5E37-4DEA-8DA5-DEA9C844325E}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\Particle\Effects\ClearConfetti">
-      <UniqueIdentifier>{5C26E757-5D2F-4253-ACDD-1D052F43E611}</UniqueIdentifier>
+      <UniqueIdentifier>{8F807CAB-AA12-4BB8-A22C-9AE4AD060015}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\Particle\Effects\ClearFirework">
-      <UniqueIdentifier>{932A5DB6-70CA-4937-89E9-8DFB8891BCB6}</UniqueIdentifier>
+      <UniqueIdentifier>{673AB374-101E-49D1-BBA3-BFA8E75029FD}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\Particle\Effects\Cylinder">
-      <UniqueIdentifier>{4F3C1ADA-50FB-447F-AE6C-90B2AF6C6FB8}</UniqueIdentifier>
+      <UniqueIdentifier>{2861DCD4-8C1B-42A3-8B9C-305AB7695240}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\Particle\Effects\Default">
-      <UniqueIdentifier>{A24FFAAA-4267-4165-BD23-E80206B66F77}</UniqueIdentifier>
+      <UniqueIdentifier>{5A3BCDC2-16AF-4516-8D27-2AA4A15B5FF1}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\Particle\Effects\OrbitTrail">
-      <UniqueIdentifier>{E688E23A-CED9-496F-BECC-F8E7BA7B6F05}</UniqueIdentifier>
+      <UniqueIdentifier>{51D47094-422D-480D-BC05-FBDA12094512}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\Particle\Effects\Original">
-      <UniqueIdentifier>{FCAC22FD-A14C-4D69-ABE2-A55850805DC2}</UniqueIdentifier>
+      <UniqueIdentifier>{EAD36C63-153A-41D8-A7CE-9A49C42D8251}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\Particle\Effects\Primitive">
-      <UniqueIdentifier>{673432D6-5D03-4CDD-9CDC-FE7C6D216D83}</UniqueIdentifier>
+      <UniqueIdentifier>{7BB01E03-10BB-425D-9CFA-835C4700E056}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\Particle\Effects\Ring">
-      <UniqueIdentifier>{4F6A0211-F252-4FB9-BAE3-13D0A5F3992A}</UniqueIdentifier>
+      <UniqueIdentifier>{2EDF9975-1825-4D41-99F5-B811192E416A}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect">
-      <UniqueIdentifier>{FB56DFAF-AF96-4EFE-9C05-63B94A3C016E}</UniqueIdentifier>
+      <UniqueIdentifier>{6CA67384-AF85-4677-AFA3-54B367F3DF7A}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects">
-      <UniqueIdentifier>{34D6ABE0-F94B-40A7-B946-23EA4CAB106D}</UniqueIdentifier>
+      <UniqueIdentifier>{8F1775E9-7674-4B64-8FD0-46C18C8A7890}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\Bloom">
-      <UniqueIdentifier>{42C63E6A-532F-41AC-AF0D-40D31BCE501B}</UniqueIdentifier>
+      <UniqueIdentifier>{93A1191E-7BCF-4E3A-B1F8-87135DE96166}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\DepthBasedOutline">
-      <UniqueIdentifier>{0F8DBE2A-B832-40B0-BA1A-E40EA8A1D02B}</UniqueIdentifier>
+      <UniqueIdentifier>{5B608368-5CF0-4D9F-9548-014E506FCA56}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\Dissolve">
-      <UniqueIdentifier>{1C4120F0-8775-445A-AC4E-058184A376E3}</UniqueIdentifier>
+      <UniqueIdentifier>{0B7E6D38-8B69-4369-A5C6-9D1E173DB53D}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\FlickerGlow">
-      <UniqueIdentifier>{6C2E92EE-9379-4922-9DBC-3A76840F651D}</UniqueIdentifier>
+      <UniqueIdentifier>{92D3A52D-E6D3-4843-8691-C927276479EB}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\GaussianBlurEffect">
-      <UniqueIdentifier>{C41782CD-2C73-4294-9B17-A10139D119F5}</UniqueIdentifier>
+      <UniqueIdentifier>{05D5DF65-3F18-40EF-9357-B41716759A0B}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\GrayScale">
-      <UniqueIdentifier>{652876FE-0A26-4AFD-A6DE-E5CC4B348650}</UniqueIdentifier>
+      <UniqueIdentifier>{C7CBBBC2-6CA0-4C8C-9612-E9D413F1B40B}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\None">
-      <UniqueIdentifier>{4C403B4C-EB67-4472-90D5-313081EB5D89}</UniqueIdentifier>
+      <UniqueIdentifier>{7BB57A94-62D4-47F1-B3B7-52AC0BBF6D68}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\Outline">
-      <UniqueIdentifier>{0E45DE81-8050-4A83-88C6-ACB0FE23A2BF}</UniqueIdentifier>
+      <UniqueIdentifier>{F7E1864D-4F19-46AC-91AA-B27BF1355B2C}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\RadialBlur">
-      <UniqueIdentifier>{885083EE-B3DE-4C47-9492-A0D1BBF3F089}</UniqueIdentifier>
+      <UniqueIdentifier>{8252F66B-2062-4253-836C-C1D6F03535E9}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\Sepia">
-      <UniqueIdentifier>{56B219F2-7251-4ED4-9E98-467CBDB8E8DD}</UniqueIdentifier>
+      <UniqueIdentifier>{C48F7A37-C087-4C9C-8E38-E38AD7D03345}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\Smoothing">
-      <UniqueIdentifier>{AF7D1A8A-12A6-4494-81DD-2E0A2963E9FB}</UniqueIdentifier>
+      <UniqueIdentifier>{67123B02-DF5F-459C-902E-22350714CC33}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\Toon">
-      <UniqueIdentifier>{FFB188DF-5EC0-43A9-8C28-258F371FEEAA}</UniqueIdentifier>
+      <UniqueIdentifier>{D0816C09-FE69-42E2-A3BB-713AB35AD5FB}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\VHS">
-      <UniqueIdentifier>{DCC925DB-04D2-4E50-A973-3F2BB0D69592}</UniqueIdentifier>
+      <UniqueIdentifier>{930299EE-49FD-44B5-BC6A-A73DC6324FCB}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\Vignette">
-      <UniqueIdentifier>{B87ECD7E-76C5-4DD4-9516-62C55AD3071D}</UniqueIdentifier>
+      <UniqueIdentifier>{CF76C33A-5E41-480C-B98C-5C4949DF7579}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\PostEffect\Effects\randam">
-      <UniqueIdentifier>{5C7E6426-E7AA-4FE0-9A8F-B4A2D3BF25BE}</UniqueIdentifier>
+      <UniqueIdentifier>{4F189620-8E8C-400B-B01D-0F600C4EC40D}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\SPH">
-      <UniqueIdentifier>{BE7CDEAD-BCAC-4708-B587-3EA26A10D520}</UniqueIdentifier>
+      <UniqueIdentifier>{F5DD7D20-887D-420D-BD68-A2E74ED8367C}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\SkyBox">
-      <UniqueIdentifier>{CC015232-03FA-4268-B5A8-DE5EC9765B69}</UniqueIdentifier>
+      <UniqueIdentifier>{02D54EEE-8CF5-4327-A5EB-54D7EDFD9547}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\data">
-      <UniqueIdentifier>{0E2C448E-FBA4-46FF-B939-E0F02C70AEEC}</UniqueIdentifier>
+      <UniqueIdentifier>{19137BE1-9B78-4384-9499-8956EA649B8B}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\graphic\line">
-      <UniqueIdentifier>{A9F2581D-4015-44CC-9024-03F10F15DA37}</UniqueIdentifier>
+      <UniqueIdentifier>{30C46A0F-9220-4059-A560-057B1C9B7A7D}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\imgui">
-      <UniqueIdentifier>{9FB09A50-D24F-4240-8B8D-3E7E4CF9F758}</UniqueIdentifier>
+      <UniqueIdentifier>{15DB14FD-84DE-49B4-9961-6822AFED76BF}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\input">
-      <UniqueIdentifier>{B1E40DC2-6D4D-46C2-ABF8-5F56485B82F9}</UniqueIdentifier>
+      <UniqueIdentifier>{DB30BC98-E6F8-474C-AB0A-06C7F4EF3CA7}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\leakChecker">
-      <UniqueIdentifier>{3535B742-ADF2-408C-A31E-5828823B2CA1}</UniqueIdentifier>
+      <UniqueIdentifier>{C242D2B8-3154-4615-874C-15E01487AE82}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\math">
-      <UniqueIdentifier>{1BB93AF8-B117-4F45-9B6E-6B85EF376F49}</UniqueIdentifier>
+      <UniqueIdentifier>{D7DFFF2C-C3A5-4CFE-97AC-8D2D2B189E9F}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\engine\scene">
-      <UniqueIdentifier>{903C9558-DE66-4CA9-8D70-F93BB24E800E}</UniqueIdentifier>
+      <UniqueIdentifier>{D9FA5F5D-CE3B-4E8B-94BC-D7813AA0918F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="projects\externals">
+      <UniqueIdentifier>{AF80A3BE-1793-4EA7-B01A-F5FF27AC4543}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="projects\externals\imgui">
+      <UniqueIdentifier>{05DB5C84-B030-4D89-AEAD-43FE68047554}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -434,6 +440,27 @@
     </ClCompile>
     <ClCompile Include="..\engine\graphic\PSO\PostEffect\VHSPSO.cpp">
       <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\externals\imgui\imgui.cpp">
+      <Filter>projects\externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\externals\imgui\imgui_demo.cpp">
+      <Filter>projects\externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\externals\imgui\imgui_draw.cpp">
+      <Filter>projects\externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\externals\imgui\imgui_impl_dx12.cpp">
+      <Filter>projects\externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\externals\imgui\imgui_impl_win32.cpp">
+      <Filter>projects\externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\externals\imgui\imgui_tables.cpp">
+      <Filter>projects\externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\externals\imgui\imgui_widgets.cpp">
+      <Filter>projects\externals\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -761,5 +788,34 @@
     <ClInclude Include="..\engine\graphic\PSO\PostEffect\VHSPSO.h">
       <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
     </ClInclude>
+    <ClInclude Include="..\externals\imgui\imconfig.h">
+      <Filter>projects\externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\externals\imgui\imgui.h">
+      <Filter>projects\externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\externals\imgui\imgui_impl_win32.h">
+      <Filter>projects\externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\externals\imgui\imgui_impl_dx12.h">
+      <Filter>projects\externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\externals\imgui\imgui_internal.h">
+      <Filter>projects\externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\externals\imgui\imstb_rectpack.h">
+      <Filter>projects\externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\externals\imgui\imstb_textedit.h">
+      <Filter>projects\externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\externals\imgui\imstb_truetype.h">
+      <Filter>projects\externals\imgui</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\externals\imgui\LICENSE.txt">
+      <Filter>projects\externals\imgui</Filter>
+    </Text>
   </ItemGroup>
 </Project>
