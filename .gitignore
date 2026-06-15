@@ -346,3 +346,6 @@ DirectXGame/imgui.ini
 # Allow 3D model .obj files
 !**/Resources/Models/**/*.obj
 
+
+# engine-core(submodule) から PreBuild でコピーされる実行時シェーダ
+/project/Resources/Shaders/

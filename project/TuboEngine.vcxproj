@@ -65,16 +65,19 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio;$(ProjectDir)engine\graphic\Particle;$(ProjectDir)engine\scene;$(ProjectDir)engine\base\Framework;$(ProjectDir)engine\base\Utilities;$(ProjectDir)engine\base\Common;$(ProjectDir)engine\graphic\data;$(ProjectDir)engine\graphic\PSO;$(ProjectDir)externals\assimp\include;$(ProjectDir)engine\graphic\PSO\Blend;$(ProjectDir)engine\graphic\PSO\PostEffect;$(ProjectDir)engine\graphic\PostEffect;$(ProjectDir)engine\graphic\SkyBox;$(ProjectDir)application;$(ProjectDir)application\scene;$(ProjectDir)engine\graphic\line;$(ProjectDir)engine\graphic\Animation;$(ProjectDir)externals\nlohmann</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)EngineCore\;$(ProjectDir)EngineCore\engine\base;$(ProjectDir)EngineCore\engine\graphic;$(ProjectDir)EngineCore\engine\graphic\2d;$(ProjectDir)EngineCore\engine\graphic\3d;$(ProjectDir)EngineCore\engine\input;$(ProjectDir)EngineCore\engine\leakChecker;$(ProjectDir)EngineCore\engine\math;$(ProjectDir)EngineCore\engine\imgui;$(ProjectDir)EngineCore\engine\camera;$(ProjectDir)EngineCore\engine\audio;$(ProjectDir)EngineCore\engine\graphic\Particle;$(ProjectDir)EngineCore\engine\scene;$(ProjectDir)EngineCore\engine\base\Framework;$(ProjectDir)EngineCore\engine\base\Utilities;$(ProjectDir)EngineCore\engine\base\Common;$(ProjectDir)EngineCore\engine\graphic\data;$(ProjectDir)EngineCore\engine\graphic\PSO;$(ProjectDir)EngineCore\externals\assimp\include;$(ProjectDir)EngineCore\engine\graphic\PSO\Blend;$(ProjectDir)EngineCore\engine\graphic\PSO\PostEffect;$(ProjectDir)EngineCore\engine\graphic\PostEffect;$(ProjectDir)EngineCore\engine\graphic\SkyBox;$(ProjectDir)application;$(ProjectDir)application\scene;$(ProjectDir)EngineCore\engine\graphic\line;$(ProjectDir)EngineCore\engine\graphic\Animation;$(ProjectDir)EngineCore\externals\nlohmann</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions>/ignore:4049 /ignore:4098 /ignore:4099 %(AdditionalOptions)</AdditionalOptions>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-      <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)EngineCore\externals\assimp\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy /E /I /Y /D /Q "$(ProjectDir)EngineCore\Resources\Shaders" "$(ProjectDir)Resources\Shaders\"</Command>
+    </PreBuildEvent>
     <PostBuildEvent>
       <Command>
       </Command>
@@ -93,7 +96,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\base;$(ProjectDir)engine\graphic;$(ProjectDir)engine\graphic\2d;$(ProjectDir)engine\graphic\3d;$(ProjectDir)engine\input;$(ProjectDir)engine\leakChecker;$(ProjectDir)engine\math;$(ProjectDir)engine\imgui;$(ProjectDir)engine\camera;$(ProjectDir)engine\audio;$(ProjectDir)engine\graphic\Particle;$(ProjectDir)engine\scene;$(ProjectDir)engine\base\Framework;$(ProjectDir)engine\base\Utilities;$(ProjectDir)engine\base\Common;$(ProjectDir)engine\graphic\data;$(ProjectDir)engine\graphic\PSO;$(ProjectDir)externals\assimp\include;$(ProjectDir)engine\graphic\PSO\Blend;$(ProjectDir)engine\graphic\PSO\PostEffect;$(ProjectDir)engine\graphic\PostEffect;$(ProjectDir)engine\graphic\SkyBox;$(ProjectDir)application;$(ProjectDir)application\scene;$(ProjectDir)engine\graphic\line;$(ProjectDir)engine\graphic\Animation;$(ProjectDir)externals\nlohmann</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)EngineCore\;$(ProjectDir)EngineCore\engine\base;$(ProjectDir)EngineCore\engine\graphic;$(ProjectDir)EngineCore\engine\graphic\2d;$(ProjectDir)EngineCore\engine\graphic\3d;$(ProjectDir)EngineCore\engine\input;$(ProjectDir)EngineCore\engine\leakChecker;$(ProjectDir)EngineCore\engine\math;$(ProjectDir)EngineCore\engine\imgui;$(ProjectDir)EngineCore\engine\camera;$(ProjectDir)EngineCore\engine\audio;$(ProjectDir)EngineCore\engine\graphic\Particle;$(ProjectDir)EngineCore\engine\scene;$(ProjectDir)EngineCore\engine\base\Framework;$(ProjectDir)EngineCore\engine\base\Utilities;$(ProjectDir)EngineCore\engine\base\Common;$(ProjectDir)EngineCore\engine\graphic\data;$(ProjectDir)EngineCore\engine\graphic\PSO;$(ProjectDir)EngineCore\externals\assimp\include;$(ProjectDir)EngineCore\engine\graphic\PSO\Blend;$(ProjectDir)EngineCore\engine\graphic\PSO\PostEffect;$(ProjectDir)EngineCore\engine\graphic\PostEffect;$(ProjectDir)EngineCore\engine\graphic\SkyBox;$(ProjectDir)application;$(ProjectDir)application\scene;$(ProjectDir)EngineCore\engine\graphic\line;$(ProjectDir)EngineCore\engine\graphic\Animation;$(ProjectDir)EngineCore\externals\nlohmann</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
     </ClCompile>
     <Link>
@@ -103,9 +106,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
       <AdditionalOptions>/ignore:4049 /ignore:4098 /ignore:4099 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalLibraryDirectories>$(ProjectDir)externals\assimp\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)EngineCore\externals\assimp\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy /E /I /Y /D /Q "$(ProjectDir)EngineCore\Resources\Shaders" "$(ProjectDir)Resources\Shaders\"</Command>
+    </PreBuildEvent>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"</Command>
@@ -204,10 +210,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\SkyDome\SkyDome.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
+    <ProjectReference Include="EngineCore\externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
       <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
     </ProjectReference>
-    <ProjectReference Include="EngineLib\EngineLib.vcxproj">
+    <ProjectReference Include="EngineCore\EngineLib\EngineLib.vcxproj">
       <Project>{45f1ca7d-c09e-4dcf-a59d-42cb5c2e6e82}</Project>
     </ProjectReference>
   </ItemGroup>
