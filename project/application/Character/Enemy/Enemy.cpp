@@ -1,7 +1,7 @@
 #include "Enemy.h"
 #include "Bullet/Player/PlayerBullet.h"
 #include "Character/Player/Player.h"
-#include "engine/Collider/CollisionTypeId.h"
+#include "Collider/CollisionTypeId.h"
 #include "ImGuiManager.h"
 #include "LineManager.h"
 #include "TextureManager.h"

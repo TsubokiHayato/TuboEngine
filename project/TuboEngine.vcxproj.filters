@@ -478,7 +478,7 @@
     <ClInclude Include="engine\Collider\CollisionManager.h">
       <Filter>projects\application\Collider</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Collider\CollisionTypeId.h">
+    <ClInclude Include="application\Collider\CollisionTypeId.h">
       <Filter>projects\application\Collider</Filter>
     </ClInclude>
     <ClInclude Include="application\StageState\StageStateManager.h">
