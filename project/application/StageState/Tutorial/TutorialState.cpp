@@ -178,7 +178,7 @@ void TutorialState::Update(StageScene* scene) {
 
 	// ESCでタイトルへ戻る
 	if (TuboEngine::Input::GetInstance()->TriggerKey(DIK_ESCAPE)) {
-		scene->SetSceneNo(TITLE);
+		scene->ChangeNextScene(TITLE);
 		return;
 	}
 

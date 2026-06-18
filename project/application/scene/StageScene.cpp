@@ -134,7 +134,9 @@ void StageScene::Initialize() {
 	isRequestSceneChange = false;
 
 	// 追加: TUTORIALシーンとして起動された場合はTutorialStateから開始
-	if (GetSceneNo() == TUTORIAL && stateManager_) {
+	//   currentSceneNo は新シーンの Initialize より前に更新されるため、
+	//   ここで現在シーン番号を見れば TUTORIAL/STAGE を判別できる。
+	if (SceneManager::GetInstance()->GetCurrentSceneNo() == TUTORIAL && stateManager_) {
 		stateManager_->ChangeState(StageType::Tutorial, this);
 	}
 
