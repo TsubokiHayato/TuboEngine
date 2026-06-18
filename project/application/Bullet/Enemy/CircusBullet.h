@@ -20,8 +20,8 @@ public:
     void SetTargetOffset(const TuboEngine::Math::Vector3& offset) { targetOffset_ = offset; }
     void SetSpeed(float speed) { speed_ = speed; }
     void SetTurnSpeed(float turnSpeed) { turnSpeed_ = turnSpeed; }
-    void SetChaosAmplitude(float amp) { chaosAmplitude_ = amp; }
-    void SetChaosFrequency(float freq) { chaosFrequency_ = freq; }
+    void SetSwerveAmplitude(float amp) { swerveAmplitude_ = amp; }
+    void SetSwerveFrequency(float freq) { swerveFrequency_ = freq; }
     void SetPhase1Duration(float duration) { phase1Duration_ = duration; }
     void SetTargetDelayFrames(int delayFrames) { targetDelayFrames_ = delayFrames; }
 
@@ -35,14 +35,15 @@ private:
     
     float speed_ = 0.6f;
     float turnSpeed_ = 0.08f;
-    float chaosAmplitude_ = 0.4f;
-    float chaosFrequency_ = 5.0f;
+    float swerveAmplitude_ = 0.4f;
+    float swerveFrequency_ = 5.0f;
     float phase1Duration_ = 0.5f;
     float elapsedTime_ = 0.0f;
     int targetDelayFrames_ = 25;
 
     TuboEngine::Math::Vector3 swerveOffset_{0, 0, 0};
     TuboEngine::Math::Vector3 targetOffset_{0, 0, 0};
+    TuboEngine::Math::Vector3 lastTrailPos_{0, 0, 0}; // トレイルを隙間なく繋ぐための前回エミット位置
     class IParticleEmitter* trailEmitter_ = nullptr;
     class IParticleEmitter* explosionEmitter_ = nullptr;
     class IParticleEmitter* burnerEmitter_ = nullptr;

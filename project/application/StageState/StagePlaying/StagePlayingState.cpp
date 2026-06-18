@@ -8,7 +8,7 @@
 #include <cmath>
 
 namespace {
-	constexpr const char* kPauseGuideTex = "Pose.png";
+	constexpr const char* kPauseGuideTex = "InGame/Pose.png";
 }
 
 void StagePlayingState::Enter(StageScene* scene) {

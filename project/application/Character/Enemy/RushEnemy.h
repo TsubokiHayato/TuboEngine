@@ -20,8 +20,8 @@ public:
     void DrawImGui();           // パラメータ調整用
     void OnCollision(Collider* other) override; // プレイヤー接触時のノックバック & 追加リアクション
 
-    // BT オーバーライド：突進専用ツリーを構築
     void BuildBehaviorTree() override;
+    TuboEngine::Math::Vector4 GetModelColor() const override { return {1.0f, 0.5f, 0.0f, 1.0f}; }
 
 
 

@@ -1,6 +1,7 @@
 #include "CircusEnemy.h"
 #include "Character/Player/Player.h"
 #include "ImguiManager.h"
+#include "WinApp.h"
 #include <cmath>
 #include <numbers>
 #include <random>
@@ -101,7 +102,7 @@ void CircusEnemy::Initialize() {
 
     // ボス用巨大HPバーのスプライト初期化
     bossHpFrameSprite_ = std::make_unique<TuboEngine::Sprite>();
-    bossHpFrameSprite_->Initialize("HpBarFrame.png");
+    bossHpFrameSprite_->Initialize("InGame/HpBarFrame.png");
     bossHpFrameSprite_->SetSize(hpFrameSizeBase_);
     // Frame用のアンカーを左端(0.0)に統一する（ズレる原因を排除）
     bossHpFrameSprite_->SetAnchorPoint({0.0f, 0.5f});
@@ -136,8 +137,7 @@ void CircusEnemy::Update() {
     const float dt = 1.0f / 60.0f;
 
     // ボスHPバーの更新
-    // 基準位置 (1280x720の画面中央ベース)
-    float baseX = 640.0f;
+    float baseX = TuboEngine::WinApp::GetInstance()->GetClientWidth() * 0.5f;
     float baseY = 60.0f;
 
     // サイズに基づいて左端(LeftX)を揃える
@@ -151,8 +151,6 @@ void CircusEnemy::Update() {
         bossHpFrameSprite_->Update();
     }
 
-    // Barの基準（左端座標は同じく計算済み）
-    // float barLeftX = baseX - hpBarSizeBase_.x * 0.5f + hpBarOffset_.x; // (上で計算)
     float barY = baseY + hpBarOffset_.y;
 
     float hpRatio = static_cast<float>(HP) / static_cast<float>(maxHp_); 
@@ -628,8 +626,8 @@ void CircusEnemy::FireSingleMissile(const TuboEngine::Math::Vector3& launchDir, 
     // ImGuiからの調整値を反映
     bullet->SetSpeed(actualSpeed);
     bullet->SetTurnSpeed(actualTurnSpeed);
-    bullet->SetChaosAmplitude(bulletChaosAmp_);
-    bullet->SetChaosFrequency(bulletChaosFreq_);
+    bullet->SetSwerveAmplitude(bulletSwerveAmp_);
+    bullet->SetSwerveFrequency(bulletSwerveFreq_);
     bullet->SetPhase1Duration(bulletPhase1Duration_);
     bullet->SetTargetDelayFrames(bulletTargetDelayFrames_); // ★追加
 
@@ -687,8 +685,8 @@ void CircusEnemy::DrawImGui() {
     if (ImGui::CollapsingHeader("Bullet Tuning", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::DragFloat("Base Speed", &bulletSpeed_, 0.01f, 0.1f, 2.0f);
         ImGui::DragFloat("Turn Speed", &bulletTurnSpeed_, 0.001f, 0.01f, 0.5f);
-        ImGui::DragFloat("Chaos Amplitude", &bulletChaosAmp_, 0.01f, 0.0f, 2.0f);
-        ImGui::DragFloat("Chaos Frequency", &bulletChaosFreq_, 0.1f, 0.0f, 20.0f);
+        ImGui::DragFloat("Swerve Amplitude", &bulletSwerveAmp_, 0.01f, 0.0f, 2.0f);
+        ImGui::DragFloat("Swerve Frequency", &bulletSwerveFreq_, 0.1f, 0.0f, 20.0f);
         ImGui::DragFloat("Delay (Phase1)", &bulletPhase1Duration_, 0.05f, 0.0f, 2.0f);
         ImGui::DragInt("Target Delay Frames", &bulletTargetDelayFrames_, 1, 0, 180, "%d frames");
     }
