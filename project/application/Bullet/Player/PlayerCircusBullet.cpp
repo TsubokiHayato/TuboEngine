@@ -2,12 +2,12 @@
 #include "Character/Enemy/Enemy.h"
 #include "Collider/CollisionTypeId.h"
 #include <cmath>
+#include <algorithm>
 #include <random>
 #include "engine/graphic/Particle/ParticleManager.h"
+#include "GameConstants.h"
 
-namespace {
-    constexpr float kFixedDeltaTime = 1.0f / 60.0f;
-}
+using GameConstants::kFixedDeltaTime;
 
 #include "Character/Enemy/CircusEnemy.h"
 
@@ -25,17 +25,18 @@ void PlayerCircusBullet::InitializeCircus(const TuboEngine::Math::Vector3& start
     Collider::SetRadius(0.8f);
 
     elapsedTime_ = 0.0f;
+    lastTrailPos_ = startPos;
     if (boss) {
         speed_ = boss->GetBulletSpeed();
         turnSpeed_ = boss->GetBulletTurnSpeed();
-        chaosAmplitude_ = boss->GetBulletChaosAmp();
-        chaosFrequency_ = boss->GetBulletChaosFreq();
+        swerveAmplitude_ = boss->GetBulletSwerveAmp();
+        swerveFrequency_ = boss->GetBulletSwerveFreq();
         phase1Duration_ = boss->GetBulletPhase1Duration();
     } else {
         speed_ = 1.0f;
         turnSpeed_ = 0.12f;
-        chaosAmplitude_ = 0.8f;
-        chaosFrequency_ = 10.0f;
+        swerveAmplitude_ = 0.8f;
+        swerveFrequency_ = 10.0f;
         phase1Duration_ = 0.4f;
     }
 
@@ -47,14 +48,14 @@ void PlayerCircusBullet::InitializeCircus(const TuboEngine::Math::Vector3& start
     if (!trailEmitter_) {
         ParticlePreset p{};
         p.name = "PlayerCircusTrail";
-        p.texture = "particle.png"; 
-        p.maxInstances = 4000;
+        p.texture = "particle.png";
+        p.maxInstances = 12000;     // 補間エミットで本数が増えるので上限を拡大
         p.autoEmit = false;
-        p.lifeMin = 0.4f;
-        p.lifeMax = 0.7f;
-        p.scaleStart = {0.4f, 0.4f, 0.4f};
+        p.lifeMin = 0.5f;           // ほどよく尾を引かせる（視認性優先で控えめ）
+        p.lifeMax = 0.9f;
+        p.scaleStart = {0.55f, 0.55f, 0.55f}; // 弾を覆い隠さない太さ
         p.scaleEnd = {0.0f, 0.0f, 0.0f};
-        p.colorStart = {0.9f, 0.9f, 1.0f, 0.5f};
+        p.colorStart = {0.9f, 0.9f, 1.0f, 0.45f}; // 薄めにして弾本体を見やすく
         p.colorEnd = {0.4f, 0.4f, 1.0f, 0.0f};
         trailEmitter_ = TuboEngine::ParticleManager::GetInstance()->CreateEmitterByType("Default", p);
     }
@@ -166,28 +167,38 @@ void PlayerCircusBullet::Update() {
         
         // プレイヤーのカウンター弾として爽快感・精度を高めるための調整
         float distanceToTarget = toTarget.Length();
-        float playerTurnSpeed = turnSpeed_ * 2.2f;    // 基本旋回速度を2.2倍に向上
-        float playerChaosAmp = chaosAmplitude_ * 0.4f; // うねり幅を4割に抑えて直線的かつ綺麗に曲げる
-        
+        float playerTurnSpeed = turnSpeed_ * 2.2f;     // 基本旋回速度を2.2倍に向上
+        float playerSwerveAmp = swerveAmplitude_ * 0.4f; // うねり幅を4割に抑えて直線的かつ綺麗に曲げる
+
         // 【ゲームフィール向上（近接補正）】
         // 敵に近づいた場合（距離6.0f以内）、ターゲットを回り込んで外さないようにうねりブレをゼロにフェードアウトさせ、
         // 旋回性能をさらに高めて確実にヒットさせるようにアシストします
         if (distanceToTarget < 6.0f) {
             float t = distanceToTarget / 6.0f; // 0.0f（密着）〜 1.0f（境界）
-            playerChaosAmp *= t;               // 近づくほどブレがゼロになる
+            playerSwerveAmp *= t;              // 近づくほどブレがゼロになる
             playerTurnSpeed *= (2.0f - t);     // 近づくほど旋回力が最大2倍に高まる
         }
-        
-        float homingStrength = playerTurnSpeed * std::min(2.5f, (elapsedTime_ - phase1Duration_) * 3.0f);
-        
-        TuboEngine::Math::Vector3 chaosVec;
-        chaosVec.x = std::sin(elapsedTime_ * chaosFrequency_ + swerveOffset_.x);
-        chaosVec.y = std::sin(elapsedTime_ * chaosFrequency_ * 1.2f + swerveOffset_.y); 
-        chaosVec.z = std::cos(elapsedTime_ * chaosFrequency_ * 0.8f + swerveOffset_.z);
 
-        TuboEngine::Math::Vector3 finalDir = currentDir + (targetDir * homingStrength) + (chaosVec * playerChaosAmp * 0.1f);
+        float homingStrength = playerTurnSpeed * std::min(2.5f, (elapsedTime_ - phase1Duration_) * 3.0f);
+
+        // 直進 + ターゲットへの補正で「芯」となる進行方向を作る
+        TuboEngine::Math::Vector3 coreDir = currentDir + (targetDir * homingStrength);
+        coreDir.Normalize();
+
+        // 進行軸まわりにらせん（コークスクリュー）を巻かせるための直交基底を作る
+        TuboEngine::Math::Vector3 reference = (std::abs(coreDir.z) > 0.99f)
+            ? TuboEngine::Math::Vector3{0.0f, 1.0f, 0.0f}
+            : TuboEngine::Math::Vector3{0.0f, 0.0f, 1.0f};
+        TuboEngine::Math::Vector3 right = TuboEngine::Math::Vector3::Normalize(TuboEngine::Math::Vector3::Cross(coreDir, reference));
+        TuboEngine::Math::Vector3 up = TuboEngine::Math::Vector3::Cross(right, coreDir);
+
+        // 進行軸のまわりを回るうねりオフセット
+        float swervePhase = elapsedTime_ * swerveFrequency_ + swerveOffset_.x;
+        TuboEngine::Math::Vector3 swerveVec = right * std::cos(swervePhase) + up * std::sin(swervePhase);
+
+        TuboEngine::Math::Vector3 finalDir = coreDir + (swerveVec * playerSwerveAmp * 0.1f);
         finalDir.Normalize();
-        vel = finalDir * speed_ * 60.0f; 
+        vel = finalDir * speed_ * 60.0f;
     }
 
     pos += vel * kFixedDeltaTime;
@@ -195,10 +206,18 @@ void PlayerCircusBullet::Update() {
     SetVelocity(vel);
 
     if (trailEmitter_) {
-        ParticlePreset preset = trailEmitter_->GetPreset();
-        preset.center = pos;
-        trailEmitter_->GetPreset() = preset;
-        trailEmitter_->Emit(1);
+        // 前回位置から現在位置までを細かく刻んでエミットし、高速移動でも途切れない太い航跡リボンにする
+        TuboEngine::Math::Vector3 segment = pos - lastTrailPos_;
+        float segLen = segment.Length();
+        const float kTrailSpacing = 0.45f; // この間隔ごとに1粒（密度を抑えて視認性を確保）
+        int steps = std::max(1, static_cast<int>(segLen / kTrailSpacing));
+        steps = std::min(steps, 32); // 暴発防止の上限
+        for (int i = 1; i <= steps; ++i) {
+            float t = static_cast<float>(i) / static_cast<float>(steps);
+            trailEmitter_->GetPreset().center = lastTrailPos_ + segment * t;
+            trailEmitter_->Emit(1);
+        }
+        lastTrailPos_ = pos;
     }
     if (burnerEmitter_ && vel.LengthSquared() > 0.001f) {
         TuboEngine::Math::Vector3 backDir = TuboEngine::Math::Vector3::Normalize(vel) * -0.5f; 

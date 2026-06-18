@@ -46,22 +46,22 @@ void Enemy::Initialize() {
 		object3d->SetRotation(drawRot);
 	}
 	object3d->SetScale(scale);
-	object3d->SetModelColor({1.0f, 0.0f, 0.0f, 1.0f});
+	object3d->SetModelColor(GetModelColor());
 
 	std::string particleTextureHandle = "gradationLine.png";
 	TuboEngine::TextureManager::GetInstance()->LoadTexture(particleTextureHandle);
 
 	// Icons
-	TuboEngine::TextureManager::GetInstance()->LoadTexture("Question.png");
-	TuboEngine::TextureManager::GetInstance()->LoadTexture("Exclamation.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("InGame/Question.png");
+	TuboEngine::TextureManager::GetInstance()->LoadTexture("InGame/Exclamation.png");
 
 	questionIcon_ = std::make_unique<TuboEngine::Sprite>();
-	questionIcon_->Initialize("Question.png");
+	questionIcon_->Initialize("InGame/Question.png");
 	questionIcon_->SetGetIsAdjustTextureSize(false);
 	questionIcon_->SetAnchorPoint({0.5f, 0.5f});
 
 	exclamationIcon_ = std::make_unique<TuboEngine::Sprite>();
-	exclamationIcon_->Initialize("Exclamation.png");
+	exclamationIcon_->Initialize("InGame/Exclamation.png");
 	exclamationIcon_->SetGetIsAdjustTextureSize(false);
 	exclamationIcon_->SetAnchorPoint({0.5f, 0.5f});
 
@@ -546,8 +546,11 @@ void Enemy::BuildBehaviorTree() {
 }
 
 void Enemy::Update() {
-	// 死亡後 (完全に消えた後) は何もしない
+	// 死亡後は弾だけ更新して終了
+	// (Draw より先に commandList を取得させるため、Update を Shoot より後に置く構造を維持)
 	if (!isAlive) {
+		if (bullet && bullet->GetIsAlive())
+			bullet->Update();
 		return;
 	}
 
@@ -558,12 +561,15 @@ void Enemy::Update() {
 		deathTimer_ -= dt;
 		if (mistEmitter_) {
 			mistEmitter_->GetPreset().center = position;
-			mistEmitter_->Emit(4); // 継続的にミストを出す
+			mistEmitter_->Emit(4);
 		}
-		// 縮小 (スケールはインスタンスごとなので安全)
 		float t = std::clamp(deathTimer_ / kDeathDuration, 0.0f, 1.0f);
 		object3d->SetScale(scale * t);
 		object3d->Update();
+
+		// 死亡演出中も発射済みの弾は飛び続ける
+		if (bullet && bullet->GetIsAlive())
+			bullet->Update();
 
 		if (deathTimer_ <= 0.0f) {
 			isAlive = false;
@@ -640,6 +646,7 @@ void Enemy::Update() {
 	}
 	wantShoot_ = false; // 次フレームのためリセット
 
+	// ShootBullet の後に Update することで、生成直後フレームの commandList も確保される
 	if (bullet && bullet->GetIsAlive())
 		bullet->Update();
 
@@ -753,13 +760,15 @@ void Enemy::OnCollision(Collider* other) {
 }
 
 void Enemy::Draw() {
+	// 弾は敵が死んでも飛び続けるため、isAlive チェックより先に描画する
+	if (bullet)
+		bullet->Draw();
+
 	if (isAlive == false) { /* 死亡後は通常モデル非表示 */
 		return;
 	}
 	if (object3d)
 		object3d->Draw();
-	if (bullet)
-		bullet->Draw();
 	DrawViewCone();
 	DrawLastSeenMark();
 	DrawStateIcon();

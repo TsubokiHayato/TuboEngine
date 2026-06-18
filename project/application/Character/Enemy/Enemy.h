@@ -1,6 +1,6 @@
 #pragma once
 #include <algorithm> // for std::clamp
-#include "BT/BehaviorTree.h"
+#include "engine/BT/BehaviorTree.h"
 #include "Character/BaseCharacter.h"
 #include "Bullet/Enemy/EnemyNormalBullet.h"
 #include "MapChip/MapChipField.h"
@@ -63,6 +63,9 @@ public:
     // BuildBehaviorTree() を Initialize() 末尾で呼ぶことで bt_ を構築する。
     // サブクラスはオーバーライドして独自ツリーを持てる。
     virtual void BuildBehaviorTree();
+
+    // サブクラスでオーバーライドしてモデルカラーを変える
+    virtual TuboEngine::Math::Vector4 GetModelColor() const { return {1.0f, 0.0f, 0.0f, 1.0f}; }
 
 protected: 
 	TuboEngine::Math::Vector3 position;

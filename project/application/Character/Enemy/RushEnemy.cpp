@@ -70,10 +70,6 @@ void RushEnemy::Initialize() {
 	isReacting_ = false;
 	reactionTimer_ = 0.0f;
 	reactionDir_ = {0, 0, 0};
-	// 本体をオレンジ系に変更
-	if (object3d) {
-		object3d->SetModelColor({1.0f, 0.5f, 0.0f, 1.0f});
-	}
 
 	endedRushWithoutWall_ = false;              // 新規追加フラグ初期化
 	rushStretchTimer_ = 0.0f;                   // 伸び演出初期化

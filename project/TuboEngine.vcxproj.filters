@@ -15,27 +15,6 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="externals\imgui\imgui.cpp">
-      <Filter>projects\external\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_demo.cpp">
-      <Filter>projects\external\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_draw.cpp">
-      <Filter>projects\external\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp">
-      <Filter>projects\external\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
-      <Filter>projects\external\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_tables.cpp">
-      <Filter>projects\external\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_widgets.cpp">
-      <Filter>projects\external\imgui</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>projects</Filter>
     </ClCompile>
@@ -74,12 +53,6 @@
     </ClCompile>
     <ClCompile Include="application\Block\Block.cpp">
       <Filter>projects\application\Block</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Collider\Collider.cpp">
-      <Filter>projects\application\Collider</Filter>
-    </ClCompile>
-    <ClCompile Include="application\Collider\CollisionManager.cpp">
-      <Filter>projects\application\Collider</Filter>
     </ClCompile>
     <ClCompile Include="application\StageState\StageStateManager.cpp">
       <Filter>projects\application\StageState</Filter>
@@ -123,257 +96,11 @@
     <ClCompile Include="application\StageState\StageReady\StageReadyState.cpp">
       <Filter>projects\application\StageState\StageReady</Filter>
     </ClCompile>
-    <ClCompile Include="engine\camera\Camera.cpp">
-      <Filter>projects\engine\graphic\2d\camera</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\audio\AudioCommon.cpp">
-      <Filter>projects\engine\audio</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\audio\Audio.cpp">
-      <Filter>projects\engine\audio</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\ClearScene.cpp">
-      <Filter>projects\engine\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\DebugScene.cpp">
-      <Filter>projects\engine\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\IScene.cpp">
-      <Filter>projects\engine\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\OverScene.cpp">
-      <Filter>projects\engine\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\SceneManager.cpp">
-      <Filter>projects\engine\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\StageScene.cpp">
-      <Filter>projects\engine\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\scene\TitleScene.cpp">
-      <Filter>projects\engine\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\leakChecker\D3DResourceLeakChecker.cpp">
-      <Filter>projects\engine\leakChecker</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\input\Input.cpp">
-      <Filter>projects\engine\input</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\imgui\ImGuiManager.cpp">
-      <Filter>projects\engine\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Framework\Framework.cpp">
-      <Filter>projects\engine\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Framework\Order.cpp">
-      <Filter>projects\engine\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\base\Utilities\Logger.cpp">
-      <Filter>projects\engine\base\Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\base\Utilities\StringUtility.cpp">
-      <Filter>projects\engine\base\Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\base\Common\DirectXCommon.cpp">
-      <Filter>projects\engine\base\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\base\Common\WinApp.cpp">
-      <Filter>projects\engine\base\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\base\Common\SrvManager.cpp">
-      <Filter>projects\engine\base\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\Animation\Animation.cpp">
-      <Filter>projects\engine\graphic\Animation</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\Animation\Animator.cpp">
-      <Filter>projects\engine\graphic\Animation</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\Blend\BlendPSO.cpp">
-      <Filter>projects\engine\graphic\PSO\Blend</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\Line\LinePSO.cpp">
-      <Filter>projects\engine\graphic\PSO\Line</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\Object\PSO.cpp">
-      <Filter>projects\engine\graphic\PSO\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\BloomPSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\DepthBasedOutlinePSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\DissolvePSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\GaussianBlurPSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\GrayScalePSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\Blend\NoneBlendPSO.cpp">
-      <Filter>projects\engine\graphic\PSO\Blend</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\NonePSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\OffScreenRenderingPSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\OutlinePSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\Particle\ParticlePSO.cpp">
-      <Filter>projects\engine\graphic\PSO\Particle</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\PostEffectPSOBase.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\RadialBlurPSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\randomPSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\SepiaPSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\SmoothingPSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\ToonPSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\VignettePSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\Particle\IParticleEmitter.cpp">
-      <Filter>projects\engine\graphic\Particle</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\Particle\ParticleEmitter.cpp">
-      <Filter>projects\engine\graphic\Particle</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\Bloom\BloomEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\DepthBasedOutline\DepthBasedOutlineEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\Dissolve\DissolveEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\GaussianBlurEffect\GaussianBlurEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\GrayScale\GrayScaleEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
     <ClCompile Include="application\StageState\IStageState.cpp">
       <Filter>projects\application\StageState</Filter>
     </ClCompile>
     <ClCompile Include="application\StageState\Tutorial\TutorialState.cpp">
       <Filter>projects\application\StageState\Tutorial</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\line\Line.cpp">
-      <Filter>projects\engine\graphic\line</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\line\LineCommon.cpp">
-      <Filter>projects\engine\graphic\line</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\line\LineManager.cpp">
-      <Filter>projects\engine\graphic\line</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\SkyBox\SkyBoxPSO.cpp">
-      <Filter>projects\engine\graphic\PSO\SkyBox</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\3d\Object3d.cpp">
-      <Filter>projects\engine\graphic\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\3d\Model.cpp">
-      <Filter>projects\engine\graphic\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\3d\ModelManager.cpp">
-      <Filter>projects\engine\graphic\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\3d\Object3dCommon.cpp">
-      <Filter>projects\engine\graphic\3d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\OffScreenRendering.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\None\NoneEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\Outline\OutlineEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\PostEffectBase.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\PostEffectManager.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\RadialBlur\RadialBlurEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\randam\randomEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\Sepia\SepiaEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\SkyBox\SkyBox.cpp">
-      <Filter>projects\engine\graphic\SkyBox</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\SkyBox\SkyBoxCommon.cpp">
-      <Filter>projects\engine\graphic\SkyBox</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\Smoothing\SmoothingEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\2d\TextureManager.cpp">
-      <Filter>projects\engine\graphic\2d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\2d\SpriteCommon.cpp">
-      <Filter>projects\engine\graphic\2d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\2d\Sprite.cpp">
-      <Filter>projects\engine\graphic\2d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\Toon\ToonEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\Vignette\VignetteEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\Particle\ParticleManager.cpp">
-      <Filter>projects\engine\graphic\Particle</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\Particle\ParticleCommon.cpp">
-      <Filter>projects\engine\graphic\Particle</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\Particle\Particle.cpp">
-      <Filter>projects\engine\graphic\Particle</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\Particle\Effects\Aura\AuraEmitter.cpp">
-      <Filter>projects\engine\graphic\Particle\Effects\Aura</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\Particle\Effects\ClearConfetti\ClearConfettiEmitter.cpp">
-      <Filter>projects\engine\graphic\Particle\Effects\ClearConfetti</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\Particle\Effects\ClearFirework\ClearFireworkEmitter.cpp">
-      <Filter>projects\engine\graphic\Particle\Effects\ClearFirework</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\2d\Font.cpp">
-      <Filter>projects\engine\graphic\2d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\2d\TextManager.cpp">
-      <Filter>projects\engine\graphic\2d</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\2d\TextObject.cpp">
-      <Filter>projects\engine\graphic\2d</Filter>
     </ClCompile>
     <ClCompile Include="application\Stage\StageManager.cpp">
       <Filter>projects\application\Stage</Filter>
@@ -387,20 +114,8 @@
     <ClCompile Include="application\Character\Enemy\CircusEnemy.cpp">
       <Filter>projects\application\Character\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PostEffect\Effects\VHS\VHSEffect.cpp">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClCompile>
     <ClCompile Include="application\StageState\StageTransition\StageTransitionState.cpp">
       <Filter>projects\application\StageState</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\VHSPSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.cpp">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
     </ClCompile>
     <ClCompile Include="application\Character\Enemy\MortarEnemy.cpp">
       <Filter>projects\application\Character\Enemy</Filter>
@@ -408,32 +123,29 @@
     <ClCompile Include="application\Character\Player\PlayerAutoController.cpp">
       <Filter>projects\application\Character\Player</Filter>
     </ClCompile>
+    <ClCompile Include="application\scene\ClearScene.cpp">
+      <Filter>projects\application\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\DebugScene.cpp">
+      <Filter>projects\application\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\OverScene.cpp">
+      <Filter>projects\application\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\SceneRegistration.cpp">
+      <Filter>projects\application\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\StageScene.cpp">
+      <Filter>projects\application\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="application\scene\TitleScene.cpp">
+      <Filter>projects\application\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="application\Order.cpp">
+      <Filter>projects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="externals\imgui\imconfig.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_dx12.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_win32.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_internal.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_truetype.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_rectpack.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_textedit.h">
-      <Filter>projects\external\imgui</Filter>
-    </ClInclude>
     <ClInclude Include="application\Animation\SceneChangeAnimation.h">
       <Filter>projects\application\Animation</Filter>
     </ClInclude>
@@ -476,17 +188,8 @@
     <ClInclude Include="application\Block\Block.h">
       <Filter>projects\application\Block</Filter>
     </ClInclude>
-    <ClInclude Include="application\Collider\Collider.h">
-      <Filter>projects\application\Collider</Filter>
-    </ClInclude>
-    <ClInclude Include="application\Collider\CollisionManager.h">
-      <Filter>projects\application\Collider</Filter>
-    </ClInclude>
     <ClInclude Include="application\Collider\CollisionTypeId.h">
       <Filter>projects\application\Collider</Filter>
-    </ClInclude>
-    <ClInclude Include="application\scene\StageState\ClearState.h">
-      <Filter>projects\application\StageState</Filter>
     </ClInclude>
     <ClInclude Include="application\StageState\StageStateManager.h">
       <Filter>projects\application\StageState</Filter>
@@ -536,332 +239,11 @@
     <ClInclude Include="application\StageState\StageReady\StageReadyState.h">
       <Filter>projects\application\StageState\StageReady</Filter>
     </ClInclude>
-    <ClInclude Include="engine\camera\Camera.h">
-      <Filter>projects\engine\graphic\2d\camera</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\audio\AudioCommon.h">
-      <Filter>projects\engine\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\audio\Audio.h">
-      <Filter>projects\engine\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\scene\ClearScene.h">
-      <Filter>projects\engine\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\scene\DebugScene.h">
-      <Filter>projects\engine\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\scene\IScene.h">
-      <Filter>projects\engine\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\scene\OverScene.h">
-      <Filter>projects\engine\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\scene\SceneManager.h">
-      <Filter>projects\engine\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\scene\StageScene.h">
-      <Filter>projects\engine\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\scene\TitleScene.h">
-      <Filter>projects\engine\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\scene\SceneType.h">
-      <Filter>projects\engine\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\math\Vector2.h">
-      <Filter>projects\engine\math</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\math\Vector3.h">
-      <Filter>projects\engine\math</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\math\Vector4.h">
-      <Filter>projects\engine\math</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\math\Quaternion.h">
-      <Filter>projects\engine\math</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\math\Matrix4x4.h">
-      <Filter>projects\engine\math</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\math\Matrix3x3.h">
-      <Filter>projects\engine\math</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\math\Matrix.h">
-      <Filter>projects\engine\math</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\leakChecker\D3DResourceLeakChecker.h">
-      <Filter>projects\engine\leakChecker</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\input\Input.h">
-      <Filter>projects\engine\input</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\imgui\ImGuiManager.h">
-      <Filter>projects\engine\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Framework\Framework.h">
-      <Filter>projects\engine\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Framework\Order.h">
-      <Filter>projects\engine\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\base\Utilities\Logger.h">
-      <Filter>projects\engine\base\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\base\Utilities\StringUtility.h">
-      <Filter>projects\engine\base\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\base\Common\DirectXCommon.h">
-      <Filter>projects\engine\base\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\base\Common\WinApp.h">
-      <Filter>projects\engine\base\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\base\Common\SrvManager.h">
-      <Filter>projects\engine\base\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Animation\Animation.h">
-      <Filter>projects\engine\graphic\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Animation\Animator.h">
-      <Filter>projects\engine\graphic\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\Blend\BlendPSO.h">
-      <Filter>projects\engine\graphic\PSO\Blend</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\Line\LinePSO.h">
-      <Filter>projects\engine\graphic\PSO\Line</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\Object\PSO.h">
-      <Filter>projects\engine\graphic\PSO\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\BloomPSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\DepthBasedOutlinePSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\DissolvePSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\GaussianBlurPSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\GrayScalePSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\Blend\NoneBlendPSO.h">
-      <Filter>projects\engine\graphic\PSO\Blend</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\NonePSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\OffScreenRenderingPSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\OutlinePSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\Particle\ParticlePSO.h">
-      <Filter>projects\engine\graphic\PSO\Particle</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\PostEffectPSOBase.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\RadialBlurPSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\randomPSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\SepiaPSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\SmoothingPSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\ToonPSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\VignettePSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\BlendMode.h">
-      <Filter>projects\engine\graphic\PSO\Blend</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Particle\IParticleEmitter.h">
-      <Filter>projects\engine\graphic\Particle</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Particle\ParticleEmitter.h">
-      <Filter>projects\engine\graphic\Particle</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\Bloom\BloomEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\DepthBasedOutline\DepthBasedOutlineEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\Dissolve\DissolveEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\GaussianBlurEffect\GaussianBlurEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\GrayScale\GrayScaleEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Animation\KeyFrame.h">
-      <Filter>projects\engine\graphic\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\data\CameraForGPU.h">
-      <Filter>projects\engine\graphic\data</Filter>
-    </ClInclude>
     <ClInclude Include="application\StageState\IStageState.h">
       <Filter>projects\application\StageState</Filter>
     </ClInclude>
     <ClInclude Include="application\StageState\Tutorial\TutorialState.h">
       <Filter>projects\application\StageState\Tutorial</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\line\Line.h">
-      <Filter>projects\engine\graphic\line</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\line\LineCommon.h">
-      <Filter>projects\engine\graphic\line</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\line\LineManager.h">
-      <Filter>projects\engine\graphic\line</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\SkyBox\SkyBoxPSO.h">
-      <Filter>projects\engine\graphic\PSO\SkyBox</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\data\MaterialData.h">
-      <Filter>projects\engine\graphic\data</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\3d\Object3d.h">
-      <Filter>projects\engine\graphic\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\3d\Model.h">
-      <Filter>projects\engine\graphic\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\data\ModelData.h">
-      <Filter>projects\engine\graphic\data</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\data\Material.h">
-      <Filter>projects\engine\graphic\data</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\3d\ModelManager.h">
-      <Filter>projects\engine\graphic\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\3d\Object3dCommon.h">
-      <Filter>projects\engine\graphic\3d</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\None\NoneEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\OffScreenRendering.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\Outline\OutlineEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\3d\ModelCommon.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\PostEffectBase.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\PostEffectManager.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\RadialBlur\RadialBlurEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\randam\randomEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\Sepia\SepiaEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\SkyBox\SkyBoxCommon.h">
-      <Filter>projects\engine\graphic\SkyBox</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\SkyBox\SkyBox.h">
-      <Filter>projects\engine\graphic\SkyBox</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\Smoothing\SmoothingEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\2d\TextureManager.h">
-      <Filter>projects\engine\graphic\2d</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\2d\SpriteCommon.h">
-      <Filter>projects\engine\graphic\2d</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\2d\Sprite.h">
-      <Filter>projects\engine\graphic\2d</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\data\VertexData.h">
-      <Filter>projects\engine\graphic\data</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\data\Transform.h">
-      <Filter>projects\engine\graphic\data</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\data\TransformationMatrix.h">
-      <Filter>projects\engine\graphic\data</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\Toon\ToonEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\Vignette\VignetteEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\data\Node.h">
-      <Filter>projects\engine\graphic\data</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Particle\ParticleManager.h">
-      <Filter>projects\engine\graphic\Particle</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Particle\ParticleCommon.h">
-      <Filter>projects\engine\graphic\Particle</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Particle\Particle.h">
-      <Filter>projects\engine\graphic\Particle</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Particle\Effects\Aura\AuraEmitter.h">
-      <Filter>projects\engine\graphic\Particle\Effects\Aura</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Particle\Effects\ClearConfetti\ClearConfettiEmitter.h">
-      <Filter>projects\engine\graphic\Particle\Effects\ClearConfetti</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Particle\Effects\ClearFirework\ClearFireworkEmitter.h">
-      <Filter>projects\engine\graphic\Particle\Effects\ClearFirework</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Particle\Effects\Cylinder\CylinderEmitter.h">
-      <Filter>projects\engine\graphic\Particle\Effects\Cylinder</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Particle\Effects\Default\DefaultEmitter.h">
-      <Filter>projects\engine\graphic\Particle\Effects\Default</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Particle\Effects\OrbitTrail\OrbitTrailEmitter.h">
-      <Filter>projects\engine\graphic\Particle\Effects\OrbitTrail</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Particle\Effects\Original\OriginalEmitter.h">
-      <Filter>projects\engine\graphic\Particle\Effects\Original</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Particle\Effects\Primitive\PrimitiveEmitter.h">
-      <Filter>projects\engine\graphic\Particle\Effects\Primitive</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\Particle\Effects\Ring\RingEmitter.h">
-      <Filter>projects\engine\graphic\Particle\Effects\Ring</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\2d\Font.h">
-      <Filter>projects\engine\graphic\2d</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\2d\TextManager.h">
-      <Filter>projects\engine\graphic\2d</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\2d\TextObject.h">
-      <Filter>projects\engine\graphic\2d</Filter>
     </ClInclude>
     <ClInclude Include="application\Stage\StageManager.h">
       <Filter>projects\application\Stage</Filter>
@@ -869,23 +251,35 @@
     <ClInclude Include="application\Bullet\Enemy\EnemyMissileBullet.h">
       <Filter>projects\application\Bullet\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\FlickerGlow\FlickerGlowEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PostEffect\Effects\VHS\VHSEffect.h">
-      <Filter>projects\engine\graphic\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\VHSPSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\graphic\PSO\PostEffect\FlickerGlowPSO.h">
-      <Filter>projects\engine\graphic\PSO\PostEffect</Filter>
-    </ClInclude>
     <ClInclude Include="application\Character\Enemy\MortarEnemy.h">
       <Filter>projects\application\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="application\Character\Player\PlayerAutoController.h">
       <Filter>projects\application\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\ClearScene.h">
+      <Filter>projects\application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\DebugScene.h">
+      <Filter>projects\application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\GameScenes.h">
+      <Filter>projects\application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\OverScene.h">
+      <Filter>projects\application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\SceneRegistration.h">
+      <Filter>projects\application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\StageScene.h">
+      <Filter>projects\application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\scene\TitleScene.h">
+      <Filter>projects\application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="application\Order.h">
+      <Filter>projects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -906,17 +300,11 @@
     <Filter Include="projects">
       <UniqueIdentifier>{b84f21f5-6a92-43fb-bb52-3f991fea161a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="projects\engine">
-      <UniqueIdentifier>{39d91e2b-dfbd-4639-a0e2-2aea71e1ac57}</UniqueIdentifier>
-    </Filter>
     <Filter Include="projects\application">
       <UniqueIdentifier>{ff7b79ee-203e-4b36-b515-f073f7876b53}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\external">
       <UniqueIdentifier>{9cebf233-560c-4c9b-a633-268b6a53e7a3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\external\imgui">
-      <UniqueIdentifier>{ca9916c7-7a71-4bb2-8abf-3ca9a1319bc9}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\application\Animation">
       <UniqueIdentifier>{c0ff4fb6-0caa-4c1b-9a72-2552688ea5ba}</UniqueIdentifier>
@@ -981,122 +369,11 @@
     <Filter Include="projects\application\StageState\StageReady">
       <UniqueIdentifier>{4df2269f-9841-484e-ab81-337f117e5707}</UniqueIdentifier>
     </Filter>
-    <Filter Include="projects\engine\audio">
-      <UniqueIdentifier>{753d56b7-5769-445f-9ffb-bb8db01bdf65}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\base">
-      <UniqueIdentifier>{74d623c0-1e8a-40ae-a3d9-e9de092e92f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\Framework">
-      <UniqueIdentifier>{6007b4af-9a01-4b58-8933-e711e2953d83}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic">
-      <UniqueIdentifier>{4e10c2a5-d2e6-47ff-a101-f4d43d07bfe1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\imgui">
-      <UniqueIdentifier>{521f8630-9719-4f17-b378-23a3ca0c0832}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\leakChecker">
-      <UniqueIdentifier>{a47667b3-aefe-4718-b3d9-a364f1c131f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\math">
-      <UniqueIdentifier>{09257c4b-8b89-4f1b-9ab5-463e0025b70c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\scene">
-      <UniqueIdentifier>{3305304c-a1a7-44e9-8062-d651274359f8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\input">
-      <UniqueIdentifier>{a0ee2c23-da7d-4069-be5c-8cd8d0e544ec}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\base\Common">
-      <UniqueIdentifier>{e8a42163-2ee5-49b5-9145-0a8dc43d0079}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\base\Utilities">
-      <UniqueIdentifier>{0d188ef6-4972-40be-8fbe-6c5060e94b94}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\2d">
-      <UniqueIdentifier>{e88f3d9f-6567-4f33-b74a-8a27c30c1c2f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\3d">
-      <UniqueIdentifier>{700c1a5d-b05c-4047-98d8-7931702fe2f1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\Animation">
-      <UniqueIdentifier>{caef7f40-6574-45fc-a23f-d86134169ba1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\line">
-      <UniqueIdentifier>{b4ea201c-2784-4063-b676-2112c887ebaf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\Particle">
-      <UniqueIdentifier>{69977dcf-5a5c-4e7f-98ce-b7b580d16218}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\PostEffect">
-      <UniqueIdentifier>{b17f52aa-975b-49f4-9ef9-722358e8060f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\PSO">
-      <UniqueIdentifier>{5bc2e873-7a51-40c4-a050-3caeecb4583f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\SkyBox">
-      <UniqueIdentifier>{ec1fd47c-87b6-4d48-9d0c-27dced420478}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\PSO\Blend">
-      <UniqueIdentifier>{ea2b5ddf-c788-4d41-8ce0-2405c92776e7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\PSO\Line">
-      <UniqueIdentifier>{53ec7efc-afc7-436e-910c-0fe40dcfb473}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\PSO\Object">
-      <UniqueIdentifier>{8e07fae7-824d-4852-a8b4-be2dc78a9537}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\PSO\Particle">
-      <UniqueIdentifier>{3dd10b07-6e02-493d-a0d4-99e4ce7546d7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\PSO\PostEffect">
-      <UniqueIdentifier>{82d2d45b-1f30-47d4-ad18-1d52b150e971}</UniqueIdentifier>
-    </Filter>
     <Filter Include="projects\application\StageState\Tutorial">
       <UniqueIdentifier>{8b30b789-72b0-4f30-b59d-a916b36862b3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="projects\engine\graphic\PSO\SkyBox">
-      <UniqueIdentifier>{69b31d25-9b90-4bb7-950f-8bbb4c8d00c4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\data">
-      <UniqueIdentifier>{359f45d1-cbd2-4acf-9fb9-d4c73ae8a681}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\Particle\Effects">
-      <UniqueIdentifier>{23231cb2-6c3e-43f8-92d8-615d63befdce}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\Particle\Effects\Aura">
-      <UniqueIdentifier>{d42b185f-a665-4239-94d1-68aeb8361930}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\Particle\Effects\ClearConfetti">
-      <UniqueIdentifier>{fa556c9d-d872-45d7-9a91-b3ca6c13e8e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\Particle\Effects\ClearFirework">
-      <UniqueIdentifier>{0129a6dc-0049-48bd-8d4d-a3b4c31d3b73}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\Particle\Effects\Cylinder">
-      <UniqueIdentifier>{a737f772-d508-4f9f-9718-930a3d8478a0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\Particle\Effects\Default">
-      <UniqueIdentifier>{59c03275-2d19-42e7-afb9-5da3036a2ed7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\Particle\Effects\OrbitTrail">
-      <UniqueIdentifier>{9d55d108-e1eb-4d2d-9ef6-a68f474dafd6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\Particle\Effects\Original">
-      <UniqueIdentifier>{d0b1c10d-6217-404d-be69-1fdfdd3123ba}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\Particle\Effects\Primitive">
-      <UniqueIdentifier>{44945a11-b474-4c3a-a820-42148c66acab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\Particle\Effects\Ring">
-      <UniqueIdentifier>{ef4ecd54-3ff9-4775-8531-d92809202767}</UniqueIdentifier>
-    </Filter>
     <Filter Include="projects\tools">
       <UniqueIdentifier>{d325ec7a-ae6a-4048-af89-69a69ef602dc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="projects\engine\graphic\2d\camera">
-      <UniqueIdentifier>{2ff74f3f-2b86-43d2-8b7a-7e2fa016aade}</UniqueIdentifier>
     </Filter>
     <Filter Include="projects\application\Stage">
       <UniqueIdentifier>{e5b2494b-4ec6-4375-a8ef-45d7004de744}</UniqueIdentifier>
@@ -1110,6 +387,9 @@
     <Filter Include="projects\application\Bullet\Player">
       <UniqueIdentifier>{fb18588c-34ec-4e26-a44d-d33dc25682ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="projects\application\Scene">
+      <UniqueIdentifier>{69db5661-e20a-4666-ad3e-b478f382de71}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TuboEngine.rc">
@@ -1117,8 +397,5 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="externals\imgui\LICENSE.txt">
-      <Filter>projects\external\imgui</Filter>
-    </Text>
   </ItemGroup>
 </Project>

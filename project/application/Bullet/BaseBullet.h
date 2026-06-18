@@ -2,36 +2,53 @@
 #include "Object3d.h"
 #include "Object3dCommon.h"
 #include "Vector3.h"
-#include "Collider/Collider.h"
+#include "engine/Collider/Collider.h"
 
-class BaseBullet :public Collider {
+class BaseBullet : public Collider {
 public:
-	virtual ~BaseBullet() = default;
+    virtual ~BaseBullet() = default;
 
-	virtual void Initialize(const TuboEngine::Math::Vector3& startPos) = 0;
-	virtual void Update() = 0;
-	virtual void Draw() = 0;
+    virtual void Initialize(const TuboEngine::Math::Vector3& startPos) = 0;
+    virtual void Update() = 0;
+    virtual void Draw()   = 0;
 
+    virtual void OnCollision(Collider* other) override;
+    virtual TuboEngine::Math::Vector3 GetCenterPosition() const override;
 
-	/// <summary>
-	///　衝突判定
-	/// </summary>
-	/// <param name="other"></param>
-	virtual void OnCollision(Collider* other) override;
+    // ---- 共通アクセサ ----
+    bool GetIsAlive() const { return isAlive; }
+    void SetIsAlive(bool alive) { isAlive = alive; }
 
-	/// <summary>
-	/// 当たり判定の中心座標を取得
-	virtual TuboEngine::Math::Vector3 GetCenterPosition() const override;
+    const TuboEngine::Math::Vector3& GetPosition() const { return position; }
+    void SetPosition(const TuboEngine::Math::Vector3& p) { position = p; }
 
-	bool IsAlive() const { return isAlive; }
+    const TuboEngine::Math::Vector3& GetRotation() const { return rotation; }
+    void SetRotation(const TuboEngine::Math::Vector3& r) { rotation = r; }
+
+    const TuboEngine::Math::Vector3& GetScale() const { return scale; }
+    void SetScale(const TuboEngine::Math::Vector3& s) { scale = s; }
+
+    const TuboEngine::Math::Vector3& GetVelocity() const { return velocity; }
+    void SetVelocity(const TuboEngine::Math::Vector3& v) { velocity = v; }
+
+    void SetCamera(TuboEngine::Camera* camera) { if (object3d) object3d->SetCamera(camera); }
 
 protected:
-	TuboEngine::Math::Vector3 position;
-	TuboEngine::Math::Vector3 velocity;
-	TuboEngine::Math::Vector3 rotation;
-	TuboEngine::Math::Vector3 scale;
-	bool isAlive = false;
-	int reflectCount = 0;    // 現在の反射回数
-	int maxReflectCount = 2; // 最大反射回数 (初期値を2に増やす)
-	std::unique_ptr<TuboEngine::Object3d> object3d;
+    TuboEngine::Math::Vector3 position;
+    TuboEngine::Math::Vector3 velocity;
+    TuboEngine::Math::Vector3 rotation;
+    TuboEngine::Math::Vector3 scale;
+
+    bool  isAlive     = false;
+    bool  isHit       = false;
+    float bulletSpeed = 0.0f;
+    float disappearZ  = 100.0f;
+
+    int reflectCount    = 0;
+    int maxReflectCount = 2;
+
+    std::unique_ptr<TuboEngine::Object3d> object3d;
+
+    // position/rotation/scale を object3d に反映して Update() する共通処理
+    void ApplyTransformToObject3d();
 };
