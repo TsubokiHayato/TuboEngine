@@ -21,6 +21,9 @@ namespace TuboEngine {
     class TextObject;
 }
 
+/// <summary>
+/// ゲームクリア画面のシーン。クリア演出の更新・描画とタイトルへの遷移を行う。
+/// </summary>
 class ClearScene : public IScene {
 public:
 	/// <summary>
@@ -63,6 +66,9 @@ public:
 	/// </summary>
 	TuboEngine::Camera* GetMainCamera() const { return camera.get(); }
 
+	/// <summary>
+	/// 指定シーン番号へ遷移する。
+	/// </summary>
 	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
 
 

@@ -2,8 +2,14 @@
 #include <memory>
 #include "GameScenes.h" // シーン番号(SCENE)。各 State がシーン遷移で使用
 class StageScene;
+/// <summary>
+/// ステージ内ステート（Ready/Playing/Clear など）の共通インターフェース。
+/// </summary>
 class IStageState {
 public:
+	/// <summary>
+	/// デストラクタ。
+	/// </summary>
 	virtual ~IStageState() = default;
 	virtual void Enter(StageScene* scene) = 0;        // 状態に入ったときの初期化
 	virtual void Update(StageScene* scene) = 0;       // 毎フレームの更新

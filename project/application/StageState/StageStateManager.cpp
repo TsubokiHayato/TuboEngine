@@ -12,9 +12,9 @@ void StageStateManager::Initialize(StageScene* scene) {
     states_[StageType::GameClear]    = std::make_unique<GameClearState>();
     states_[StageType::GameOver]     = std::make_unique<GameOverState>();
 
-    // 新規: TutorialState（他Stateと合併せず、独立して存在させる）
+    // TutorialState（他Stateと合併せず、独立して存在させる）
     states_[StageType::Tutorial]     = std::make_unique<TutorialState>();
-	// 新規: ステージ遷移用ステート
+	// ステージ遷移用ステート
 	states_[StageType::Transition]   = std::make_unique<StageTransitionState>();
 
     // 最初のステートをセットしてEnterのみ呼ぶ

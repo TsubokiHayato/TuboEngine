@@ -1,12 +1,27 @@
 #pragma once
 #include "Vector3.h"
 
+/// <summary>
+/// プレイヤーの回避（ドッジ）動作と、ジャスト回避の受付判定・クールタイム管理を行うクラス。
+/// </summary>
 class PlayerEvasion {
 public:
+    /// <summary>
+    /// コンストラクタ。
+    /// </summary>
     PlayerEvasion();
+    /// <summary>
+    /// デストラクタ。
+    /// </summary>
     ~PlayerEvasion() = default;
 
+    /// <summary>
+    /// 更新処理。
+    /// </summary>
     void Update();
+    /// <summary>
+    /// 回避（ドッジ）を開始する。
+    /// </summary>
     void StartDodge(const TuboEngine::Math::Vector3& inputDir);
 
     // --- 状態取得 ---
@@ -33,6 +48,9 @@ public:
     void SetDodgeCooldown(float seconds);
     void SetDodgeSpeed(float speed);
 
+ /// <summary>
+ /// DodgeDirection を取得する。
+ /// </summary>
  TuboEngine::Math::Vector3 GetDodgeDirection() const { return dodgeDirection_; }
 
 private:

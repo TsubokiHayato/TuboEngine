@@ -67,6 +67,9 @@ public:
 	/// </summary>
 	void DrawImGui();
 
+	/// <summary>
+	/// Phase を取得する。
+	/// </summary>
 	Phase GetPhase() const { return m_phase; }
 
 	/// <summary>

@@ -58,10 +58,19 @@ public:
 	// 移動処理
 	void Move();
 
+	/// <summary>
+	/// 回転処理。
+	/// </summary>
 	void Rotate();
 
+	/// <summary>
+	/// 照準（レティクル）の描画。
+	/// </summary>
 	void ReticleDraw();
 
+	/// <summary>
+	/// ダッシュ時のリングエフェクトを発生させる。
+	/// </summary>
 	void TriggerDashRing();
 
 	// 斜め視点でもレティクル通りに飛ばすための方向取得関数（地面へレイキャスト）
@@ -120,6 +129,9 @@ public:
 		object3d->SetCamera(camera);
 		camera_ = camera;
 	}
+	/// <summary>
+	/// DashRingOffset を設定する。
+	/// </summary>
 	void SetDashRingOffset(float forward) { dashRingOffsetForward_ = forward; }
 
 	// モデルのアルファ設定
@@ -137,6 +149,9 @@ public:
 	// 現在紐づいているマップチップフィールドを取得
 	MapChipField* GetMapChipField() const { return mapChipField; }
 
+	/// <summary>
+	/// MovementLocked を設定する。
+	/// </summary>
 	void SetMovementLocked(bool flag) { isMovementLocked = flag; }
 
 	// 自動操作を有効/無効
@@ -200,7 +215,7 @@ private:
 
 	bool isMovementLocked=false;
 
-	// --- 追加: 移動軌跡用パーティクルエミッター ---
+	// --- 移動軌跡用パーティクルエミッター ---
 	IParticleEmitter* trailEmitter_ = nullptr; // ParticleManager生成管理。解放はマネージャに委譲
 	TuboEngine::Math::Vector3 prevPositionTrail_{};              // 前フレーム位置
 	IParticleEmitter* dashRingEmitter_ = nullptr;

@@ -37,20 +37,23 @@
 #include "application/UI/HP/Enemy/EnemyHpUI.h"
 #include "application/UI/Guide/GuideUI.h"
 
-#include "application/Stage/StageManager.h" // 追加: StageManager の完全型定義
+#include "application/Stage/StageManager.h" // StageManager の完全型定義のため
 
 #include <string>
 #include <vector>
 
+/// <summary>
+/// ステージプレイシーン。プレイヤー・敵・マップチップ・カメラ・UIなど
+/// ステージ内のオブジェクトを統括し、更新・描画・当たり判定・シーン遷移を行う。
+/// </summary>
 class StageScene : public IScene {
 public:
 	// デモモードフラグ（タイトル画面で放置された場合にtrueになる）
 	static bool isDemoMode;
 
 	/// <summary>
-	/// 初期化
+	/// 初期化処理。
 	/// </summary>
-
 	void Initialize();
 
 	/// <summary>
@@ -88,6 +91,9 @@ public:
 	/// </summary>
 	TuboEngine::Camera* GetMainCamera() const { return followCamera->GetCamera(); }
 
+	/// <summary>
+	/// 指定シーン番号へ遷移する。
+	/// </summary>
 	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
 
 	/// <summary>
@@ -100,21 +106,44 @@ public:
 	///			引き渡し用変数
 	///-----------------------------------------------------------------------------------------
 
+	/// <summary>
+	/// プレイヤーの参照を取得する。
+	/// </summary>
 	Player* GetPlayer() const { return player_.get(); }
+	/// <summary>
+	/// マップチップフィールドの参照を取得する。
+	/// </summary>
 	MapChipField* GetMapChipField() const { return mapChipField_.get(); }
-	// Stage オブジェクトはすべて StageManager 管理に移行したため、
-	// 旧 blocks_/tile_/enemies の Getter は削除済み。
+	// Stage オブジェクト（ブロック・タイル・敵）は StageManager が一括管理する。
 
+	/// <summary>
+	/// FollowCamera を取得する。
+	/// </summary>
 	FollowTopDownCamera* GetFollowCamera() const { return followCamera.get(); }
+	/// <summary>
+	/// MapChipCsvFilePath を取得する。
+	/// </summary>
 	std::string& GetMapChipCsvFilePath() { return mapChipCsvFilePath_; }
+	/// <summary>
+	/// SkyDome を取得する。
+	/// </summary>
 	std::unique_ptr<SkyDome>& GetSkyDome() { return skyDome_; }
 
+	/// <summary>
+	/// StageStateManager を取得する。
+	/// </summary>
 	StageStateManager* GetStageStateManager() { return stateManager_.get(); }
+	/// <summary>
+	/// SceneChangeAnimation を取得する。
+	/// </summary>
 	SceneChangeAnimation* GetSceneChangeAnimation() { return sceneChangeAnimation_.get(); }
+	/// <summary>
+	/// シーンチェンジ要求フラグの取得・設定。
+	/// </summary>
 	bool GetIsRequestSceneChange() const { return isRequestSceneChange; }
 	void SetIsRequestSceneChange(bool request) { isRequestSceneChange = request; }
 
-	// 追加: 同一StageScene内のステート切替を、SceneChangeAnimationで
+	// 同一StageScene内のステート切替を、SceneChangeAnimationで
 	// 『覆い→ステート切替→開場』として扱うためのリクエストAPI
 	void RequestStateChangeWithTransition(StageType nextState);
 	bool IsStateChangeTransitionActive() const { return isStateChangeTransitionActive_; }
@@ -122,6 +151,9 @@ public:
 	// ------------------------
 	// Multi-stage layout
 	// ------------------------
+	/// <summary>
+	/// マルチステージレイアウトにおける1ステージの矩形範囲（ワールド座標の左右下上）を表す。
+	/// </summary>
 	struct StageBounds {
 		float left{};
 		float right{};
@@ -129,8 +161,14 @@ public:
 		float top{};
 	};
 
+	/// <summary>
+	/// StageManager を取得する。
+	/// </summary>
 	StageManager* GetStageManager() const { return stageManager_.get(); }
 
+	/// <summary>
+	/// 隣接ステージのプレビュー描画フラグの取得・設定。
+	/// </summary>
 	bool GetDrawPreviewStages() const { return drawPreviewStages_; }
 	void SetDrawPreviewStages(bool draw) { drawPreviewStages_ = draw; }
 
@@ -164,8 +202,6 @@ public:
 	// Demo用CSVパス取得
 	const std::string& GetDemoMapChipCsvFilePath() const { return demoMapChipCsvFilePath_; }
 
-	// 旧: blocks_/tile_/enemies は StageManager 統合により削除
-
 	std::unique_ptr<StageStateManager> stateManager_;
 
 	std::unique_ptr<SkyDome> skyDome_ = nullptr;
@@ -180,7 +216,7 @@ public:
 	void SetPendingNextScene(int sceneNo) { pendingNextSceneNo_ = sceneNo; }
 	int GetPendingNextScene() const { return pendingNextSceneNo_; }
 
-	// 追加: ステート切替(リスタート等)用のトランジション状態
+	// ステート切替(リスタート等)用のトランジション状態
 	bool isStateChangeTransitionActive_ = false;
 	StageType pendingNextState_ = StageType::Ready;
 	bool startDisappearingAfterStateChange_ = false;

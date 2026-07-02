@@ -524,6 +524,9 @@ bool StageManager::AdvanceToNextChunk() {
 void StageManager::Draw3D() {
     temporaryBuffers_.clear();
 
+    /// <summary>
+    /// モデル単位でインスタンシング描画をまとめるためのバッチ情報。
+    /// </summary>
     struct BatchInfo {
         std::vector<TuboEngine::InstanceData> instances;
         TuboEngine::Object3d* representative = nullptr;

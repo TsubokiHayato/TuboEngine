@@ -40,17 +40,44 @@
 
 # define PI 3.14159265359f
 
+/// <summary>
+/// エンジン機能の動作確認を行うデバッグ用シーン。
+/// </summary>
 class DebugScene :public IScene {
 
 public:
+	/// <summary>
+	/// 初期化処理。
+	/// </summary>
 	void Initialize() override;
+	/// <summary>
+	/// 更新処理。
+	/// </summary>
 	void Update() override;
+	/// <summary>
+	/// 終了処理。
+	/// </summary>
 	void Finalize() override;
+	/// <summary>
+	/// 3Dオブジェクト描画。
+	/// </summary>
 	void Object3DDraw() override;
+	/// <summary>
+	/// スプライト描画。
+	/// </summary>
 	void SpriteDraw() override;
+	/// <summary>
+	/// ImGui描画。
+	/// </summary>
 	void ImGuiDraw() override;
+	/// <summary>
+	/// パーティクル描画。
+	/// </summary>
 	void ParticleDraw() override;
 
+	/// <summary>
+	/// メインカメラを取得する。
+	/// </summary>
 	TuboEngine::Camera* GetMainCamera() const { return camera.get(); }
 
 private:

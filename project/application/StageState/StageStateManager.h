@@ -13,29 +13,62 @@
 
 
 
+/// <summary>
+/// ステージ内ステート（Ready/Playing/Clear など）の切り替えと、更新・描画の振り分けを行うクラス。
+/// </summary>
 class StageStateManager {
 
 	///---------------------------------------------------------
 	///				メンバ関数
 	///---------------------------------------------------------
 public:
+	/// <summary>
+	/// 初期化処理。
+	/// </summary>
 	void Initialize(StageScene* scene);
+	/// <summary>
+	/// 更新処理。
+	/// </summary>
 	void Update(StageScene* scene);
+	/// <summary>
+	/// 3Dオブジェクト描画。
+	/// </summary>
 	void Object3DDraw(StageScene* scene);
+	/// <summary>
+	/// スプライト描画。
+	/// </summary>
 	void SpriteDraw(StageScene* scene);
+	/// <summary>
+	/// パーティクル描画。
+	/// </summary>
 	void ParticleDraw(StageScene* scene);
+	/// <summary>
+	/// ImGuiによるデバッグ表示。
+	/// </summary>
 	void DrawImGui(StageScene* scene);
 
+	/// <summary>
+	/// ステートを切り替える。
+	/// </summary>
 	void ChangeState(StageType nextType, StageScene* scene);
+	/// <summary>
+	/// ステージ番号を進める。
+	/// </summary>
 	void NextStage() { ++stageNumber_; }
 
 	/// -----------------------------------------------------
 	///				ゲッター・セッター
 	/// -----------------------------------------------------
 public:
+	/// <summary>
+	/// State の取得・設定。
+	/// </summary>
 	void SetState(StageType state) { state_ = state; }
 	StageType GetState() const { return state_; }
 
+	/// <summary>
+	/// StageNumber の取得・設定。
+	/// </summary>
 	int GetStageNumber() const { return stageNumber_; }
 	void SetStageNumber(int num) { stageNumber_ = num; }
 

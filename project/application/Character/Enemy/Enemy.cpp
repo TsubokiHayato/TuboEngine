@@ -130,6 +130,9 @@ static void MoveWithCollision(TuboEngine::Math::Vector3& position, const TuboEng
 	}
 }
 
+/// <summary>
+/// A*経路探索におけるマップ1マス分の探索状態。
+/// </summary>
 struct AStarCell {
 	float g = std::numeric_limits<float>::infinity();
 	float f = std::numeric_limits<float>::infinity();
@@ -223,10 +226,16 @@ bool Enemy::BuildPathTo(const TuboEngine::Math::Vector3& worldGoal) {
 		return float(std::abs(x - gx) + std::abs(y - gy));
 	};
 
+	/// <summary>
+	/// A*の探索候補ノード（マップインデックスと評価値f）。
+	/// </summary>
 	struct Node {
 		int idx;
 		float f;
 	};
+	/// <summary>
+	/// 優先度付きキュー用の比較子。評価値fが小さいノードを先に取り出す。
+	/// </summary>
 	struct Cmp {
 		bool operator()(const Node& a, const Node& b) const { return a.f > b.f; }
 	};

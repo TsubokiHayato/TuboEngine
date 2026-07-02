@@ -15,6 +15,9 @@
 #include "Character/Player/Player.h"
 #include"application/SkyDome/SkyDome.h"
 
+/// <summary>
+/// タイトル画面のシーン。メニュー操作・デモ再生への移行・ステージシーンへの遷移を行う。
+/// </summary>
 class TitleScene : public IScene {
 public:
 	/// <summary>
@@ -57,6 +60,9 @@ public:
 	/// </summary>
 	TuboEngine::Camera* GetMainCamera() const { return camera.get(); }
 
+	/// <summary>
+	/// 指定シーン番号へ遷移する。
+	/// </summary>
 	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
 
 private:
@@ -82,7 +88,7 @@ private:
 	float playerIdleTime_ = 0.0f;
 	float time_ = 0.0f; // 背景アニメーション用タイマー
 
-	// 追加: デモモード遷移用タイマー
+	// デモモード遷移用タイマー
 	float demoTimer_ = 0.0f;
 	const float kDemoStartTime = 10.0f;
 	// アニメ経由での遷移先を保持する（UI以外からの要求、例: デモ）

@@ -11,7 +11,7 @@ void TuboEngine::Order::Initialize() {
 	// ゲームのシーンを登録してから開始シーンを指定する
 	// （登録は SceneManager::Initialize より前に行うこと）
 	RegisterGameScenes();
-	SceneManager::GetInstance()->Initialize(STAGE);
+	SceneManager::GetInstance()->Initialize(TITLE);
 }
 
 void TuboEngine::Order::Update() {
