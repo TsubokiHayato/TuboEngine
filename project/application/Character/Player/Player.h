@@ -215,7 +215,7 @@ private:
 
 	bool isMovementLocked=false;
 
-	// --- 追加: 移動軌跡用パーティクルエミッター ---
+	// --- 移動軌跡用パーティクルエミッター ---
 	IParticleEmitter* trailEmitter_ = nullptr; // ParticleManager生成管理。解放はマネージャに委譲
 	TuboEngine::Math::Vector3 prevPositionTrail_{};              // 前フレーム位置
 	IParticleEmitter* dashRingEmitter_ = nullptr;

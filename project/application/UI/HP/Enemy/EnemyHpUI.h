@@ -4,7 +4,7 @@
 #include "Sprite.h"
 #include "Vector3.h"
 #include"Camera.h"
-class Enemy; // ベースEnemyに変更
+class Enemy;
 
 
 /// <summary>

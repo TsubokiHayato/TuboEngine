@@ -12,7 +12,7 @@ enum class MapChipType {
 	kBlank,      // 空白
 	kBlock,      // ブロック
 	Player,      // プレイヤー
-	Enemy,       // 旧: 敵（互換用。今後は下の個別タイプを推奨）
+	Enemy,       // 敵（互換用の旧タイプ。今後は下の個別タイプを推奨）
 	EnemyRush,   // 突進敵
 	EnemyShoot,  // 射撃敵
 	EnemyMortar, // 迫撃砲敵
@@ -125,7 +125,7 @@ public:
 	/// </summary>
 	static void SetBlockSize(float s) { kBlockSize_ = s; }
 
-	// --- 追加: フィールド原点 ---
+	// --- フィールド原点 ---
 	void SetOrigin(const TuboEngine::Math::Vector3& origin) { origin_ = origin; }
 	const TuboEngine::Math::Vector3& GetOrigin() const { return origin_; }
 

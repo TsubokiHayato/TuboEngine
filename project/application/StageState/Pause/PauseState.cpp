@@ -22,10 +22,10 @@ namespace {
 	float gRestartY = 390.0f;
 	float gTitleY = 480.0f;
 	float gCursorOffsetX = 16.0f; // X方向オフセット
-	float gCursorOffsetY = 40.0f; // 追加: Y方向オフセット
+	float gCursorOffsetY = 40.0f; // Y方向オフセット
 	float gCursorSize = 26.0f;
 
-	// 追加: 背景（画面全体の半透明グレー）
+	// 背景（画面全体の半透明グレー）
 	float gBackgroundAlpha = 0.55f;
 
 	// PoseUI/Pose.png はサイズ固定（調整しない）。位置だけImGui対応。
@@ -39,7 +39,7 @@ namespace {
 	float gPoseFloatSpeed = 1.6f; // ふわふわ速度
 	float gPoseFadeSpeed = 6.0f;  // フェードイン速度
 	float gPoseAlpha = 0.0f;      // 現在アルファ（0..1）
-	// 追加: 回転・カラー
+	// 回転・カラー
 	float gPoseRotDegAmp = 3.0f;                  // 回転振幅(度)
 	float gPoseRotSpeed = 1.2f;                   // 回転速度
 	float gPoseBaseColor[3] = { 1.0f, 1.0f, 1.0f }; // RGB
@@ -64,7 +64,7 @@ void PauseState::Enter(StageScene* /*scene*/) {
 	TuboEngine::TextureManager::GetInstance()->LoadTexture("PoseUI/ReStart.png");
 	TuboEngine::TextureManager::GetInstance()->LoadTexture("PoseUI/ReturnTitle.png");
 
-	// 追加: 背景（半透明グレー）
+	// 背景（半透明グレー）
 	background_ = std::make_unique<TuboEngine::Sprite>();
 	background_->Initialize("barrier.png");
 	background_->SetAnchorPoint({ 0.0f, 0.0f });

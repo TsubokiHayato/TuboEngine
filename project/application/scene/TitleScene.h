@@ -88,7 +88,7 @@ private:
 	float playerIdleTime_ = 0.0f;
 	float time_ = 0.0f; // 背景アニメーション用タイマー
 
-	// 追加: デモモード遷移用タイマー
+	// デモモード遷移用タイマー
 	float demoTimer_ = 0.0f;
 	const float kDemoStartTime = 10.0f;
 	// アニメ経由での遷移先を保持する（UI以外からの要求、例: デモ）

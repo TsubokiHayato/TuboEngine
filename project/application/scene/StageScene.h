@@ -37,7 +37,7 @@
 #include "application/UI/HP/Enemy/EnemyHpUI.h"
 #include "application/UI/Guide/GuideUI.h"
 
-#include "application/Stage/StageManager.h" // 追加: StageManager の完全型定義
+#include "application/Stage/StageManager.h" // StageManager の完全型定義のため
 
 #include <string>
 #include <vector>
@@ -114,8 +114,7 @@ public:
 	/// マップチップフィールドの参照を取得する。
 	/// </summary>
 	MapChipField* GetMapChipField() const { return mapChipField_.get(); }
-	// Stage オブジェクトはすべて StageManager 管理に移行したため、
-	// 旧 blocks_/tile_/enemies の Getter は削除済み。
+	// Stage オブジェクト（ブロック・タイル・敵）は StageManager が一括管理する。
 
 	/// <summary>
 	/// FollowCamera を取得する。
@@ -139,12 +138,12 @@ public:
 	/// </summary>
 	SceneChangeAnimation* GetSceneChangeAnimation() { return sceneChangeAnimation_.get(); }
 	/// <summary>
-	/// IsRequestSceneChange の取得・設定。
+	/// シーンチェンジ要求フラグの取得・設定。
 	/// </summary>
 	bool GetIsRequestSceneChange() const { return isRequestSceneChange; }
 	void SetIsRequestSceneChange(bool request) { isRequestSceneChange = request; }
 
-	// 追加: 同一StageScene内のステート切替を、SceneChangeAnimationで
+	// 同一StageScene内のステート切替を、SceneChangeAnimationで
 	// 『覆い→ステート切替→開場』として扱うためのリクエストAPI
 	void RequestStateChangeWithTransition(StageType nextState);
 	bool IsStateChangeTransitionActive() const { return isStateChangeTransitionActive_; }
@@ -168,7 +167,7 @@ public:
 	StageManager* GetStageManager() const { return stageManager_.get(); }
 
 	/// <summary>
-	/// DrawPreviewStages の取得・設定。
+	/// 隣接ステージのプレビュー描画フラグの取得・設定。
 	/// </summary>
 	bool GetDrawPreviewStages() const { return drawPreviewStages_; }
 	void SetDrawPreviewStages(bool draw) { drawPreviewStages_ = draw; }
@@ -203,8 +202,6 @@ public:
 	// Demo用CSVパス取得
 	const std::string& GetDemoMapChipCsvFilePath() const { return demoMapChipCsvFilePath_; }
 
-	// 旧: blocks_/tile_/enemies は StageManager 統合により削除
-
 	std::unique_ptr<StageStateManager> stateManager_;
 
 	std::unique_ptr<SkyDome> skyDome_ = nullptr;
@@ -219,7 +216,7 @@ public:
 	void SetPendingNextScene(int sceneNo) { pendingNextSceneNo_ = sceneNo; }
 	int GetPendingNextScene() const { return pendingNextSceneNo_; }
 
-	// 追加: ステート切替(リスタート等)用のトランジション状態
+	// ステート切替(リスタート等)用のトランジション状態
 	bool isStateChangeTransitionActive_ = false;
 	StageType pendingNextState_ = StageType::Ready;
 	bool startDisappearingAfterStateChange_ = false;

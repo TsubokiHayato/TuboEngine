@@ -218,7 +218,7 @@ void Player::Update() {
 	reticleSprite->SetAnchorPoint(TuboEngine::Math::Vector2(0.5f, 0.5f)); // アンカーポイントを中央に設定
 	reticleSprite->Update();
 
-	// --- 追加: トレイルエミッター中心更新 (プレイヤー位置) ---
+	// --- トレイルエミッターの中心をプレイヤー位置に更新 ---
 	if (trailEmitter_) {
 		trailEmitter_->GetPreset().center = position;
 		prevPositionTrail_ = position;
@@ -601,7 +601,7 @@ void Player::DrawImGui() {
 		ImGui::Separator();
 		ImGui::Text("MapChip: %s", typeStr);
 	}
-	// 追加: トレイル調整
+	// トレイル調整
 	if (trailEmitter_) {
 		auto& preset = trailEmitter_->GetPreset();
 		ImGui::Separator();

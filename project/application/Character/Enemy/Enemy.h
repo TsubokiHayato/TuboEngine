@@ -203,7 +203,7 @@ protected:
     int lastPathGoalIndex_ = -1;
     float waypointArriveEps_ = 0.15f;
     IParticleEmitter* hitEmitter_ = nullptr;       // 既存: スパーク等
-    IParticleEmitter* hitRingEmitter_ = nullptr;   // 追加: ヒット時の小リング
+    IParticleEmitter* hitRingEmitter_ = nullptr;   // ヒット時の小リングエミッター
     IParticleEmitter* deathEmitter_ = nullptr;
     IParticleEmitter* mistEmitter_ = nullptr;      // 霧散演出用ミスト
     bool isDying_ = false;                         // 死亡演出中か
@@ -222,11 +222,11 @@ protected:
     MapChipField* mapChipField = nullptr;
     Player* player_ = nullptr;
     /// <summary>
-    /// Path を消去する。
+    /// 現在の経路情報を消去する。
     /// </summary>
     void ClearPath() { currentPath_.clear(); pathCursor_ = 0; lastPathGoalIndex_ = -1; }
 	/// <summary>
-	/// PathTo を構築する。
+	/// A*で指定地点への経路を構築する。成功時は true を返す。
 	/// </summary>
 	bool BuildPathTo(const TuboEngine::Math::Vector3& worldGoal);
 
@@ -263,7 +263,7 @@ protected:
     float hitShakeStrength_ = 0.3f;
     TuboEngine::Math::Vector3 hitShakeOffset_{0.0f, 0.0f, 0.0f};
     /// <summary>
-    /// HitShake を適用する。
+    /// 被弾時のシェイク（揺れ）演出を適用する。
     /// </summary>
     void ApplyHitShake(float dt);
 

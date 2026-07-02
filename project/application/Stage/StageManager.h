@@ -80,7 +80,7 @@ public:
     void RegisterChunkCsv(int id, const std::string& path) { idToCsvPath_[id] = path; }
 
     /// <summary>
-    /// MetaLayout の読み込み。
+    /// ステージ配置定義（メタCSV）の読み込み。
     /// </summary>
     void LoadMetaLayout(const std::string& metaCsvPath,
                         Player* player,
@@ -145,7 +145,7 @@ public:
 
 private:
     /// <summary>
-    /// ChunkFromId の生成。
+    /// ステージIDから1チャンク分のステージを生成する。
     /// </summary>
     void CreateChunkFromId(int id, int row, int col,
                            Player* player,
@@ -157,7 +157,7 @@ private:
     TuboEngine::Math::Vector3 ComputeOriginForChunk(int row, int col) const;
 
     /// <summary>
-    /// ObjectsForChunk を構築する。
+    /// チャンク内のオブジェクト（ブロック・敵・タイル）を構築する。
     /// </summary>
     void BuildObjectsForChunk(StageInstance& inst,
                               Player* player,

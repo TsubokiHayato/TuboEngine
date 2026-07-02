@@ -45,7 +45,7 @@ public:
 
 private:
 	/// <summary>
-	/// Cursor の更新。
+	/// メニューカーソルの更新。
 	/// </summary>
 	void UpdateCursor();
 

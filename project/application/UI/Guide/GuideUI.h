@@ -38,7 +38,7 @@ public:
 
 private:
 	/// <summary>
-	/// KeySpriteState の更新。
+	/// キーの押下状態に応じてスプライトのテクスチャを切り替える。
 	/// </summary>
 	void UpdateKeySpriteState(TuboEngine::Sprite* sprite, const std::string& normalTex, const std::string& outlineTex, bool pressed) const;
 	/// <summary>

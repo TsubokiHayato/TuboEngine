@@ -31,7 +31,7 @@ public:
 	);
 
 	/// <summary>
-	/// 終了処理
+	/// 更新処理
 	/// </summary>
 	virtual void Update();
 

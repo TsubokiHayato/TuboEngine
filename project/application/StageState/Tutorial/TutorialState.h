@@ -43,7 +43,7 @@ public:
 
 private:
 	/// <summary>
-	/// TutorialStage を構築する。
+	/// チュートリアル用ステージを構築する。
 	/// </summary>
 	void BuildTutorialStage(StageScene* scene);
 	/// <summary>

@@ -42,7 +42,7 @@ class StageScene;
 	void ParticleDraw(StageScene* scene) override;
 
 private:
-	std::unique_ptr<TuboEngine::Sprite> pauseGuideSprite_ = nullptr; // 追加: ポーズ誘導UI
+	std::unique_ptr<TuboEngine::Sprite> pauseGuideSprite_ = nullptr; // ポーズ誘導UI
 
 	// Playing用: PlayerAutoController の有効フラグ（ImGui から ON/OFF）
 	bool autoPlayEnabled_ = false;

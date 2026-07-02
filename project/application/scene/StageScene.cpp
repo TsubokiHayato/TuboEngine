@@ -3,7 +3,7 @@
 #include "Camera/FollowTopDownCamera.h"
 #include "engine/Collider/CollisionManager.h"
 #include "LineManager.h"
-#include "ParticleManager.h" // 追加: パーティクル描画/更新
+#include "ParticleManager.h" // パーティクル描画/更新
 #include"SceneType.h"
 #include "engine/graphic/2d/TextManager.h"
 
@@ -86,7 +86,7 @@ StageScene::StageBounds ComputeBoundsWorld(const TuboEngine::Math::Vector3& orig
 		lm->DrawLine(p3, p0, color);
 	}
 
-	// 追加: 指定MapChipFieldを走査してコールバック（StageScene内ImGui用）
+	// 指定MapChipFieldを走査してコールバック（StageScene内ImGui用）
 	template<typename Func>
 	void ForEachMapChipField(MapChipField* field, Func func) {
 		if (!field) {
@@ -133,7 +133,7 @@ void StageScene::Initialize() {
 	sceneChangeAnimation_->Initialize();
 	isRequestSceneChange = false;
 
-	// 追加: TUTORIALシーンとして起動された場合はTutorialStateから開始
+	// TUTORIALシーンとして起動された場合はTutorialStateから開始
 	//   currentSceneNo は新シーンの Initialize より前に更新されるため、
 	//   ここで現在シーン番号を見れば TUTORIAL/STAGE を判別できる。
 	if (SceneManager::GetInstance()->GetCurrentSceneNo() == TUTORIAL && stateManager_) {
@@ -155,7 +155,7 @@ void StageScene::Initialize() {
 	hpUI_->SetPosition({20.0f, 20.0f});
 	hpUI_->SetSpacing(4.0f);
 	hpUI_->SetScale(0.8f);
-	hpUI_->SetAlignRight(false); // 左揃えに変更
+	hpUI_->SetAlignRight(false); // 左揃えで表示
 
 	// Enemy HP UI
 	enemyHpUI_ = std::make_unique<EnemyHpUI>();
@@ -215,7 +215,7 @@ void StageScene::Update() {
 	// 全ての衝突をチェック
 	CheckAllCollisions();
 
-	// 追加: プレイヤーが存在すればパーティクル更新 (Trail 用)
+	// プレイヤーが存在すればパーティクル更新 (Trail 用)
 	TuboEngine::ParticleManager::GetInstance()->Update(1.0f / 60.0f, followCamera->GetCamera());
 
 	// 敵リストの取得とプレイヤーへの設定（ジャスト回避のホーミングやデモ操作に共有）
@@ -389,7 +389,7 @@ void StageScene::ParticleDraw() {
 	if (stateManager_) {
 		stateManager_->ParticleDraw(this);
 	}
-	// 追加: 全エミッター描画 (PlayerTrail 含む)
+	// 全エミッター描画 (PlayerTrail 含む)
 	TuboEngine::ParticleManager::GetInstance()->Draw();
 
 #ifdef USE_IMGUI
