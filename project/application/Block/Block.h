@@ -13,7 +13,13 @@
 /// </summary>
 class Block {
 public:
+	/// <summary>
+	/// コンストラクタ。
+	/// </summary>
 	Block();
+	/// <summary>
+	/// デストラクタ。
+	/// </summary>
 	~Block();
 
 	/// <summary>
@@ -75,6 +81,9 @@ public:
 	/// </summary>
 	void SetCamera(TuboEngine::Camera* camera);
 
+	/// <summary>
+	/// Object3d を取得する。
+	/// </summary>
 	TuboEngine::Object3d* GetObject3d() const { return object3d_.get(); }
 
 private:

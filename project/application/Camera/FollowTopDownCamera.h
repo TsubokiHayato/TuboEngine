@@ -7,20 +7,56 @@
 #include <cfloat>    // FLT_MAX
 #include <memory>
 
+/// <summary>
+/// プレイヤーを追従する見下ろし視点カメラ。ズーム・シェイク・移動範囲制限などの演出機能を持つ。
+/// </summary>
 class FollowTopDownCamera {
 public:
+	/// <summary>
+	/// コンストラクタ。
+	/// </summary>
 	FollowTopDownCamera();
+	/// <summary>
+	/// デストラクタ。
+	/// </summary>
 	~FollowTopDownCamera();
 
+	/// <summary>
+	/// 初期化処理。
+	/// </summary>
 	void Initialize(Player* target, const TuboEngine::Math::Vector3& offset, float followSpeed = 0.2f);
+	/// <summary>
+	/// 更新処理。
+	/// </summary>
 	void Update();
+	/// <summary>
+	/// ImGuiによるデバッグ表示。
+	/// </summary>
 	void DrawImGui();
 
+	/// <summary>
+	/// 回転を設定する。
+	/// </summary>
 	void SetRotation(const TuboEngine::Math::Vector3& rotation);
+	/// <summary>
+	/// 追従対象を設定する。
+	/// </summary>
 	void SetTarget(Player* target);
+	/// <summary>
+	/// オフセットを設定する。
+	/// </summary>
 	void SetOffset(const TuboEngine::Math::Vector3& offset);
+	/// <summary>
+	/// FollowSpeed を設定する。
+	/// </summary>
 	void SetFollowSpeed(float speed);
+	/// <summary>
+	/// LookAtOffset を設定する。
+	/// </summary>
 	void SetLookAtOffset(const TuboEngine::Math::Vector3& offset);
+	/// <summary>
+	/// Zoom を設定する。
+	/// </summary>
 	void SetZoom(float zoom);
 	// 一時ズーム（発射演出など）
 	void StartImpulseZoom(float targetZoom, float durationSec);
@@ -31,6 +67,9 @@ public:
 		zoomMin_ = minZoom;
 		zoomMax_ = maxZoom;
 	}
+	/// <summary>
+	/// ZoomSpeed を設定する。
+	/// </summary>
 	void SetZoomSpeed(float speed) { zoomSpeed_ = speed; }
 
 	// 開始時ズームアニメーション
@@ -41,12 +80,30 @@ public:
 	float GetIntroZoomCurve() const { return introZoomCurve_; }
 	bool IsIntroZoomPlaying() const { return introZoomPlaying_; }
 
+	/// <summary>
+	/// カメラを取得する。
+	/// </summary>
 	TuboEngine::Camera* GetCamera() const { return camera_.get(); }
+	/// <summary>
+	/// オフセットを取得する。
+	/// </summary>
 	TuboEngine::Math::Vector3 GetOffset() const { return offset_; }
+	/// <summary>
+	/// 回転を取得する。
+	/// </summary>
 	TuboEngine::Math::Vector3 GetRotation() const { return rotation_; }
+	/// <summary>
+	/// Zoom を取得する。
+	/// </summary>
 	float GetZoom() const { return zoom_; }
+	/// <summary>
+	/// ZoomMin を取得する。
+	/// </summary>
 	float GetZoomMin() const { return zoomMin_; }
 
+	/// <summary>
+	/// 追従対象の位置へ即座に移動する。
+	/// </summary>
 	void SnapToTarget();
 
 	// イントロズームアニメーションの進行状況

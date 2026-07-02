@@ -2,9 +2,18 @@
 #include "Object3d.h"
 #include "Vector3.h"
 
+/// <summary>
+/// ステージの床タイル1枚を表す3Dオブジェクト。
+/// </summary>
 class Tile {
 public:
+	/// <summary>
+	/// コンストラクタ。
+	/// </summary>
 	Tile();
+	/// <summary>
+	/// デストラクタ。
+	/// </summary>
 	~Tile();
 
 	// 初期化（位置・スケール・モデルファイル名など）
@@ -12,6 +21,9 @@ public:
 		const TuboEngine::Math::Vector3& scale = {1.0f, 1.0f, 1.0f},
 		const std::string& modelFileName = "tile/tile.gltf");
 
+	/// <summary>
+	/// 更新処理。
+	/// </summary>
 	void Update();
 	// 描画
 	void Draw();
@@ -42,6 +54,9 @@ public:
 	// カメラ設定
 	void SetCamera(TuboEngine::Camera* camera) { object3d_->SetCamera(camera); }
 
+	/// <summary>
+	/// Object3d を取得する。
+	/// </summary>
 	TuboEngine::Object3d* GetObject3d() const { return object3d_.get(); }
 
 private:

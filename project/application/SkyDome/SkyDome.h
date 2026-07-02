@@ -2,14 +2,26 @@
 #include "Object3d.h"
 #include "Vector3.h"
 
+/// <summary>
+/// ステージ背景として空を描画する天球（スカイドーム）オブジェクト。
+/// </summary>
 class SkyDome {
 public:
+	/// <summary>
+	/// コンストラクタ。
+	/// </summary>
 	SkyDome();
+	/// <summary>
+	/// デストラクタ。
+	/// </summary>
 	~SkyDome();
 
 	// 初期化（位置・スケール・モデルファイル名など）
 	void Initialize(const TuboEngine::Math::Vector3& position = {0.0f, 0.0f, 0.0f}, const TuboEngine::Math::Vector3& scale = {10.0f, 10.0f, 10.0f}, const std::string& modelFileName = "skyBox/skyBox.obj");
 
+	/// <summary>
+	/// 更新処理。
+	/// </summary>
 	void Update();
 	// 描画
 	void Draw();

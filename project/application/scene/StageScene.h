@@ -42,15 +42,18 @@
 #include <string>
 #include <vector>
 
+/// <summary>
+/// ステージプレイシーン。プレイヤー・敵・マップチップ・カメラ・UIなど
+/// ステージ内のオブジェクトを統括し、更新・描画・当たり判定・シーン遷移を行う。
+/// </summary>
 class StageScene : public IScene {
 public:
 	// デモモードフラグ（タイトル画面で放置された場合にtrueになる）
 	static bool isDemoMode;
 
 	/// <summary>
-	/// 初期化
+	/// 初期化処理。
 	/// </summary>
-
 	void Initialize();
 
 	/// <summary>
@@ -88,6 +91,9 @@ public:
 	/// </summary>
 	TuboEngine::Camera* GetMainCamera() const { return followCamera->GetCamera(); }
 
+	/// <summary>
+	/// 指定シーン番号へ遷移する。
+	/// </summary>
 	void ChangeNextScene(int sceneNo) { SceneManager::GetInstance()->ChangeScene(sceneNo); }
 
 	/// <summary>
@@ -100,17 +106,41 @@ public:
 	///			引き渡し用変数
 	///-----------------------------------------------------------------------------------------
 
+	/// <summary>
+	/// プレイヤーの参照を取得する。
+	/// </summary>
 	Player* GetPlayer() const { return player_.get(); }
+	/// <summary>
+	/// マップチップフィールドの参照を取得する。
+	/// </summary>
 	MapChipField* GetMapChipField() const { return mapChipField_.get(); }
 	// Stage オブジェクトはすべて StageManager 管理に移行したため、
 	// 旧 blocks_/tile_/enemies の Getter は削除済み。
 
+	/// <summary>
+	/// FollowCamera を取得する。
+	/// </summary>
 	FollowTopDownCamera* GetFollowCamera() const { return followCamera.get(); }
+	/// <summary>
+	/// MapChipCsvFilePath を取得する。
+	/// </summary>
 	std::string& GetMapChipCsvFilePath() { return mapChipCsvFilePath_; }
+	/// <summary>
+	/// SkyDome を取得する。
+	/// </summary>
 	std::unique_ptr<SkyDome>& GetSkyDome() { return skyDome_; }
 
+	/// <summary>
+	/// StageStateManager を取得する。
+	/// </summary>
 	StageStateManager* GetStageStateManager() { return stateManager_.get(); }
+	/// <summary>
+	/// SceneChangeAnimation を取得する。
+	/// </summary>
 	SceneChangeAnimation* GetSceneChangeAnimation() { return sceneChangeAnimation_.get(); }
+	/// <summary>
+	/// IsRequestSceneChange の取得・設定。
+	/// </summary>
 	bool GetIsRequestSceneChange() const { return isRequestSceneChange; }
 	void SetIsRequestSceneChange(bool request) { isRequestSceneChange = request; }
 
@@ -122,6 +152,9 @@ public:
 	// ------------------------
 	// Multi-stage layout
 	// ------------------------
+	/// <summary>
+	/// マルチステージレイアウトにおける1ステージの矩形範囲（ワールド座標の左右下上）を表す。
+	/// </summary>
 	struct StageBounds {
 		float left{};
 		float right{};
@@ -129,8 +162,14 @@ public:
 		float top{};
 	};
 
+	/// <summary>
+	/// StageManager を取得する。
+	/// </summary>
 	StageManager* GetStageManager() const { return stageManager_.get(); }
 
+	/// <summary>
+	/// DrawPreviewStages の取得・設定。
+	/// </summary>
 	bool GetDrawPreviewStages() const { return drawPreviewStages_; }
 	void SetDrawPreviewStages(bool draw) { drawPreviewStages_ = draw; }
 

@@ -8,19 +8,36 @@ class Player;
 class MapChipField;
 class Collider;
 
-// 突進専用エネミー: 射撃せず一定距離内で高速突進攻撃 + 準備(ため)時間
+/// <summary>
+/// 突進型の敵。索敵後、一定距離から高速突進攻撃と休憩（隙）を繰り返す。
+/// </summary>
 class RushEnemy : public Enemy {
 public:
+    /// <summary>
+    /// コンストラクタ。
+    /// </summary>
     RushEnemy() = default;
+    /// <summary>
+    /// デストラクタ。
+    /// </summary>
     ~RushEnemy() override = default;
     void Initialize() override; // 基底初期化 + パラメータ調整
     void Update() override;     // シーケンス制御
     void Draw() override;       // 弾描画なし
+	/// <summary>
+	/// スプライト描画。
+	/// </summary>
 	void DrawSprite();
     void DrawImGui();           // パラメータ調整用
     void OnCollision(Collider* other) override; // プレイヤー接触時のノックバック & 追加リアクション
 
+    /// <summary>
+    /// ビヘイビアツリーの構築。
+    /// </summary>
     void BuildBehaviorTree() override;
+    /// <summary>
+    /// モデルの色を取得する。
+    /// </summary>
     TuboEngine::Math::Vector4 GetModelColor() const override { return {1.0f, 0.5f, 0.0f, 1.0f}; }
 
 

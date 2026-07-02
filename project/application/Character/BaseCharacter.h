@@ -4,6 +4,9 @@
 #include"engine/Collider/Collider.h"
 
 
+/// <summary>
+/// キャラクター（プレイヤー・敵）の基底クラス。位置・回転などの共通状態と当たり判定（Collider）を提供する。
+/// </summary>
 class BaseCharacter : public Collider {
 
 public:
@@ -11,7 +14,13 @@ public:
 	///				メンバ関数
 	///--------------------------------------------------
 
+	/// <summary>
+	/// コンストラクタ。
+	/// </summary>
 	BaseCharacter();
+	/// <summary>
+	/// デストラクタ。
+	/// </summary>
 	virtual ~BaseCharacter();
 
 

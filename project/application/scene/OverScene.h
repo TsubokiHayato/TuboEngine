@@ -11,6 +11,9 @@
 
 namespace TuboEngine { class TextObject; }
 
+/// <summary>
+/// ゲームオーバー画面のシーン。演出の更新・描画とリトライ/タイトルへの遷移を行う。
+/// </summary>
 class OverScene : public IScene {
 public:
 	/// <summary>

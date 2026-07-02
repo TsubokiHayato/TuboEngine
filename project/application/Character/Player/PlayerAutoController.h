@@ -12,10 +12,19 @@ class Enemy;
 //  - 回避は「敵から逃げる方向」を計算してから発動
 //  - 敵なし時はゆっくり巡回
 //  - 適度なランダム性で機械的に見えないよう配慮
+/// <summary>
+/// デモプレイ用にプレイヤーを自動操作するコントローラ。適度なランダム性で機械的に見えないように動かす。
+/// </summary>
 class PlayerAutoController {
 public:
+	/// <summary>
+	/// 初期化処理。
+	/// </summary>
 	void Initialize(Player* owner) { owner_ = owner; }
 
+	/// <summary>
+	/// Enabled の取得・設定。
+	/// </summary>
 	void SetEnabled(bool enabled) { enabled_ = enabled; }
 	bool IsEnabled() const { return enabled_; }
 

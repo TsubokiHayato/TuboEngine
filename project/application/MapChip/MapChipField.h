@@ -48,20 +48,30 @@ public:
 	// インデックスからマップチップの座標を取得
 	TuboEngine::Math::Vector3 GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex) const;
 
+	/// <summary>
+	/// NumBlockVirtical を取得する。
+	/// </summary>
 	uint32_t GetNumBlockVirtical() const { return static_cast<uint32_t>(mapChipData_.data.size()); }
+	/// <summary>
+	/// NumBlockHorizontal を取得する。
+	/// </summary>
 	uint32_t GetNumBlockHorizontal() const { return mapChipData_.data.empty() ? 0 : static_cast<uint32_t>(mapChipData_.data[0].size()); }
 
 	///--------------------------------------------------
 	///				構造体
 	///--------------------------------------------------
 
-	// マップチップのインデックスセット
+	/// <summary>
+	/// マップチップのインデックス（x, y）の組。
+	/// </summary>
 	struct IndexSet {
 		uint32_t xIndex;
 		uint32_t yIndex;
 	};
 
-	// マップチップの矩形領域
+	/// <summary>
+	/// マップチップの矩形領域。
+	/// </summary>
 	struct Rect {
 		float left;
 		float right;
@@ -102,8 +112,17 @@ public:
 	static float GetBlockHeight() { return kBlockHeight_; }
 	static float GetBlockSize() { return kBlockSize_; }
 
+	/// <summary>
+	/// BlockWidth を設定する。
+	/// </summary>
 	static void SetBlockWidth(float w) { kBlockWidth_ = w; }
+	/// <summary>
+	/// BlockHeight を設定する。
+	/// </summary>
 	static void SetBlockHeight(float h) { kBlockHeight_ = h; }
+	/// <summary>
+	/// BlockSize を設定する。
+	/// </summary>
 	static void SetBlockSize(float s) { kBlockSize_ = s; }
 
 	// --- 追加: フィールド原点 ---

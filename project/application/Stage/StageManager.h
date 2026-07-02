@@ -20,7 +20,9 @@ namespace TuboEngine {
     class TextObject;
 }
 
-// StageScene の StageBounds 相当をここでも定義
+/// <summary>
+/// 1ステージの矩形範囲（ワールド座標の左右下上）。StageScene::StageBounds と同等の定義。
+/// </summary>
 struct StageBounds {
     float left{};
     float right{};
@@ -28,8 +30,14 @@ struct StageBounds {
     float top{};
 };
 
+/// <summary>
+/// 複数ステージ（チャンク）の読み込み・配置・表示切替・進行を統括するクラス。
+/// </summary>
 class StageManager {
 public:
+    /// <summary>
+    /// 1ステージ分のマップチップ・ブロック・敵・タイルなどをまとめて保持するデータ。
+    /// </summary>
     struct StageInstance {
         std::string csvPath;
         TuboEngine::Math::Vector3 origin{0.0f, 0.0f, 0.0f};
@@ -50,9 +58,18 @@ public:
     };
 
 public:
+    /// <summary>
+    /// コンストラクタ。
+    /// </summary>
     StageManager() = default;
+    /// <summary>
+    /// デストラクタ。
+    /// </summary>
     ~StageManager();
 
+    /// <summary>
+    /// 動作パラメータを設定する。
+    /// </summary>
     void Configure(uint32_t chunkWidth, uint32_t chunkHeight, float tileScale);
 
     // プレイヤーポインタを借りる（所有はしない）
@@ -62,10 +79,16 @@ public:
     // チャンクIDと使用するCSVパスを登録
     void RegisterChunkCsv(int id, const std::string& path) { idToCsvPath_[id] = path; }
 
+    /// <summary>
+    /// MetaLayout の読み込み。
+    /// </summary>
     void LoadMetaLayout(const std::string& metaCsvPath,
                         Player* player,
                         FollowTopDownCamera* followCamera);
 
+    /// <summary>
+    /// 更新処理。
+    /// </summary>
     void Update(Player* player, FollowTopDownCamera* followCamera);
 
     // チェックポイント（最後にクリアしたチャンク）をリセット
@@ -83,33 +106,59 @@ public:
     // 全チャンクの敵が全滅しているかを判定
     bool AreAllEnemiesDefeated() const;
 
+    /// <summary>
+    /// 3Dオブジェクト描画。
+    /// </summary>
     void Draw3D();
 
+    /// <summary>
+    /// PlayerStartPosition を取得する。
+    /// </summary>
     TuboEngine::Math::Vector3 GetPlayerStartPosition() const;
     MapChipField* GetPlayerStartField() const; // プレイヤー開始マスの属する Field
 
+    /// <summary>
+    /// 当たり判定を衝突マネージャに登録する。
+    /// </summary>
     void RegisterCollisions(CollisionManager* collisionManager,
                             Player* player);
 
+    /// <summary>
+    /// StageInstances を取得する。
+    /// </summary>
     const std::vector<StageInstance>& GetStageInstances() const { return stageInstances_; }
 
     // ImGui で各チャンクの情報を表示
     void DrawImGui();
 
-    // デバッグ用: 各チャンク内の敵数・生存数を取得
+    /// <summary>
+    /// デバッグ用: チャンクごとの敵数・撃破数の情報。
+    /// </summary>
     struct ChunkEnemyInfo {
         int total = 0;
         int alive = 0;
     };
+    /// <summary>
+    /// ChunkEnemyInfos を取得する。
+    /// </summary>
     std::vector<ChunkEnemyInfo> GetChunkEnemyInfos() const;
 
 private:
+    /// <summary>
+    /// ChunkFromId の生成。
+    /// </summary>
     void CreateChunkFromId(int id, int row, int col,
                            Player* player,
                            FollowTopDownCamera* followCamera);
 
+    /// <summary>
+    /// チャンク番号から配置原点を計算する。
+    /// </summary>
     TuboEngine::Math::Vector3 ComputeOriginForChunk(int row, int col) const;
 
+    /// <summary>
+    /// ObjectsForChunk を構築する。
+    /// </summary>
     void BuildObjectsForChunk(StageInstance& inst,
                               Player* player,
                               FollowTopDownCamera* followCamera,

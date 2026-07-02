@@ -13,38 +13,119 @@ class IParticleEmitter;
 
 class Player;
 
+/// <summary>
+/// 敵キャラクターの基底クラス。ビヘイビアツリーによるAI・索敵・弾の発射・被弾/死亡演出などを行う。
+/// </summary>
 class Enemy : public BaseCharacter {
 public:
+    /// <summary>
+    /// コンストラクタ。
+    /// </summary>
     Enemy();
+    /// <summary>
+    /// デストラクタ。
+    /// </summary>
     ~Enemy() override;
+    /// <summary>
+    /// 初期化処理。
+    /// </summary>
     void Initialize() override;
+    /// <summary>
+    /// 更新処理。
+    /// </summary>
     void Update() override;
+    /// <summary>
+    /// 描画処理。
+    /// </summary>
     void Draw() override;
+    /// <summary>
+    /// パーティクル描画。
+    /// </summary>
     void ParticleDraw();
+    /// <summary>
+    /// ImGuiによるデバッグ表示。
+    /// </summary>
     void DrawImGui();
+    /// <summary>
+    /// 移動処理。
+    /// </summary>
     void Move();
+    /// <summary>
+    /// プレイヤーを視認できるかどうかを判定する。
+    /// </summary>
     bool CanSeePlayer();
+    /// <summary>
+    /// 視界（視野角）の可視化描画。
+    /// </summary>
     void DrawViewCone();
+    /// <summary>
+    /// プレイヤーを最後に視認した位置のマーク描画。
+    /// </summary>
     void DrawLastSeenMark();
+    /// <summary>
+    /// 現在のAIステートを示すアイコン描画。
+    /// </summary>
     void DrawStateIcon();
+    /// <summary>
+    /// 被弾時のパーティクルを発生させる。
+    /// </summary>
     void EmitHitParticle();
+    /// <summary>
+    /// 死亡時のパーティクルを発生させる。
+    /// </summary>
     void EmitDeathParticle();
+    /// <summary>
+    /// 衝突時の処理。
+    /// </summary>
     void OnCollision(Collider* other) override;
+	/// <summary>
+	/// 中心座標を取得する。
+	/// </summary>
 	TuboEngine::Math::Vector3 GetCenterPosition() const override;
 
+    /// <summary>
+    /// カメラを設定する。
+    /// </summary>
     void SetCamera(TuboEngine::Camera* camera) { camera_ = camera; }
+	/// <summary>
+	/// 座標の取得・設定。
+	/// </summary>
 	TuboEngine::Math::Vector3 GetPosition() const { return position; }
 	void SetPosition(const TuboEngine::Math::Vector3& pos) { position = pos; }
+	/// <summary>
+	/// 回転の取得・設定。
+	/// </summary>
 	TuboEngine::Math::Vector3 GetRotation() const { return rotation; }
 	void SetRotation(const TuboEngine::Math::Vector3& rot) { rotation = rot; }
+	/// <summary>
+	/// スケールの取得・設定。
+	/// </summary>
 	TuboEngine::Math::Vector3 GetScale() const { return scale; }
 	void SetScale(const TuboEngine::Math::Vector3& scl) { scale = scl; }
+    /// <summary>
+    /// 生存フラグの取得・設定。
+    /// </summary>
     bool GetIsAlive() const { return isAlive; }
     void SetIsAlive(bool alive) { isAlive = alive; }
+    /// <summary>
+    /// プレイヤーの参照を設定する。
+    /// </summary>
     void SetPlayer(Player* player) { player_ = player; }
+    /// <summary>
+    /// マップチップフィールドの参照を設定する。
+    /// </summary>
     void SetMapChipField(MapChipField* field) { mapChipField = field; }
+    /// <summary>
+    /// FollowCamera を設定する。
+    /// </summary>
     void SetFollowCamera(FollowTopDownCamera* camera) { followCamera_ = camera; }
+    /// <summary>
+    /// HPを取得する。
+    /// </summary>
     int GetHP() const { return HP; }
+    /// <summary>
+    /// MaxHP を取得する。
+    /// </summary>
     int GetMaxHP() const { return 10; }
 
     // 視野角・距離の取得/設定
@@ -132,12 +213,21 @@ protected:
 
     FollowTopDownCamera* followCamera_ = nullptr;
 
+    /// <summary>
+    /// 通常弾を使用するかどうか。
+    /// </summary>
     virtual bool UseNormalBullet() const { return true; }
 
 	TuboEngine::Camera* camera_ = nullptr;
     MapChipField* mapChipField = nullptr;
     Player* player_ = nullptr;
+    /// <summary>
+    /// Path を消去する。
+    /// </summary>
     void ClearPath() { currentPath_.clear(); pathCursor_ = 0; lastPathGoalIndex_ = -1; }
+	/// <summary>
+	/// PathTo を構築する。
+	/// </summary>
 	bool BuildPathTo(const TuboEngine::Math::Vector3& worldGoal);
 
     // ---- BT 用フレームキャッシュ ----
@@ -172,6 +262,9 @@ protected:
     float hitShakeDuration_ = 0.15f;
     float hitShakeStrength_ = 0.3f;
     TuboEngine::Math::Vector3 hitShakeOffset_{0.0f, 0.0f, 0.0f};
+    /// <summary>
+    /// HitShake を適用する。
+    /// </summary>
     void ApplyHitShake(float dt);
 
 public:

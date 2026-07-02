@@ -5,15 +5,39 @@
 #include <memory>
 #include <random>
 
+/// <summary>
+/// 追尾弾（CircusBullet）を発射するタイプの敵。ジャスト回避時の弾消去にも対応する。
+/// </summary>
 class CircusEnemy : public Enemy {
 public:
+    /// <summary>
+    /// コンストラクタ。
+    /// </summary>
     CircusEnemy() = default;
+    /// <summary>
+    /// デストラクタ。
+    /// </summary>
     ~CircusEnemy() override = default;
 
+    /// <summary>
+    /// 初期化処理。
+    /// </summary>
     void Initialize() override;
+    /// <summary>
+    /// 更新処理。
+    /// </summary>
     void Update() override;
+    /// <summary>
+    /// 描画処理。
+    /// </summary>
     void Draw() override;
+    /// <summary>
+    /// スプライト描画。
+    /// </summary>
     void DrawSprite();
+    /// <summary>
+    /// ImGuiによるデバッグ表示。
+    /// </summary>
     void DrawImGui();
 
     // ジャスト回避時の同期・消去用
@@ -23,13 +47,25 @@ public:
     float GetBulletSwerveFreq() const { return bulletSwerveFreq_; }
     float GetBulletPhase1Duration() const { return bulletPhase1Duration_; }
     
+    /// <summary>
+    /// 指定座標付近の弾を消去する。
+    /// </summary>
     void ClearBulletsNear(const TuboEngine::Math::Vector3& center, float radius);
     void ClearAllBullets(); // ジャスト回避時に画面上の全弾を消去する
 
 private:
+    /// <summary>
+    /// 通常弾を使用するかどうか。
+    /// </summary>
     bool UseNormalBullet() const override { return false; }
 
+    /// <summary>
+    /// ミサイル発射を試みる。
+    /// </summary>
     void TryFireMissiles(bool canSeePlayer, float dt);
+    /// <summary>
+    /// ミサイルを1発発射する。
+    /// </summary>
     void FireSingleMissile(const TuboEngine::Math::Vector3& launchDir, float speed);
 
     bool isCharging_ = false;
@@ -47,7 +83,9 @@ private:
     std::unique_ptr<TuboEngine::Sprite> bossHpBarSprite_;
     std::unique_ptr<TuboEngine::Sprite> bossHpBarBgSprite_; // 遅延用の背景バー
 
-    // HPのUIパーティクル
+    /// <summary>
+    /// HPバーUI用の簡易パーティクル。
+    /// </summary>
     struct SimpleUIParticle {
         std::unique_ptr<TuboEngine::Sprite> sprite;
         TuboEngine::Math::Vector2 position;
@@ -58,8 +96,17 @@ private:
         bool active = false;
     };
     std::vector<SimpleUIParticle> hpParticles_;
+    /// <summary>
+    /// HpParticle を発生させる。
+    /// </summary>
     void EmitHpParticle(const TuboEngine::Math::Vector2& pos);
+    /// <summary>
+    /// HpParticles の更新。
+    /// </summary>
     void UpdateHpParticles(float dt);
+    /// <summary>
+    /// HpParticles の描画。
+    /// </summary>
     void DrawHpParticles();
 
     float animatedHp_ = 350.0f; // Initialize()で上書きされるが念のため
@@ -79,7 +126,13 @@ private:
         Targeted    // プレイヤーを狙って発射
     };
 
+    /// <summary>
+    /// 攻撃を実行する。
+    /// </summary>
     void ExecuteAttack(AttackType type);
+    /// <summary>
+    /// 攻撃サイクルの更新。
+    /// </summary>
     void UpdateAttackCycle(float dt);
 
 private:
