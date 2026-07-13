@@ -26,6 +26,37 @@
 int StageManager::sLastClearedChunkIndex = -1;
 bool StageManager::sShouldShowRestartMessage = false;
 
+// --- ステージ挙動チューニング用の定数（従来直書きしていたマジックナンバーを集約）---
+namespace {
+// 1フレームの経過時間（60FPS固定）。
+constexpr float kFrameDeltaSec = 1.0f / 60.0f;
+
+// チェックポイント/リスタートメッセージの表示時間（秒）。
+constexpr float kCheckpointMessageDuration = 2.0f;
+
+// クリア演出（波）の進行速度と、進行値の上限（波が端まで届くのに十分な値）。
+constexpr float kClearAnimSpeed = 0.02f;
+constexpr float kClearAnimMax   = 5.0f;
+
+// 描画カリングの基準半径（ワールド単位）。ズームで拡張される。
+constexpr float kBaseCullingRadius = 600.0f;
+
+// クリア波の伝播パラメータ。
+constexpr float kClearWaveSpeed     = 100.0f; // 広がる速さ
+constexpr float kClearWaveFadeWidth = 20.0f;  // 色が変わる境界のぼかし幅
+
+// タイルの色（通常時=明るめの紫、クリア時=マゼンタ、パルス=シアン）。
+constexpr TuboEngine::Math::Vector4 kTileBaseColor  = {0.25f, 0.15f, 0.45f, 1.0f};
+constexpr TuboEngine::Math::Vector4 kTileClearColor = {1.0f, 0.2f, 0.9f, 1.0f};
+constexpr TuboEngine::Math::Vector4 kTilePulseColor = {0.0f, 1.0f, 1.0f, 0.0f};
+
+// クリア後パルスの調整値。
+constexpr float kPulseTimeFreq    = 3.0f;  // 時間方向の周波数
+constexpr float kPulseDistFreq    = 0.1f;  // 距離方向の位相係数
+constexpr float kPulseAmplitude   = 0.5f;  // パルスの強さ
+constexpr float kPulseBrightBoost = 1.3f;  // パルス時の輝度ブースト
+} // namespace
+
 StageManager::~StageManager() {
     if (saveMessageText_) {
         TuboEngine::TextManager::GetInstance()->RemoveText(saveMessageText_);
@@ -133,7 +164,7 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
                         saveMessageText_->SetColor({ 1.0f, 1.0f, 0.5f, 1.0f }); // 少し黄色っぽくして区別
                     }
                 }
-                saveMessageTimer_ = 2.0f;
+                saveMessageTimer_ = kCheckpointMessageDuration;
                 sShouldShowRestartMessage = false; // フラグをリセット
             }
         } else {
@@ -316,16 +347,15 @@ void StageManager::BuildObjectsForChunk(StageInstance& inst,
 void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
 	TuboEngine::Camera* cam = followCamera ? followCamera->GetCamera() : nullptr;
     followCamera_ = followCamera;
-    const float dt = 1.0f / 60.0f;
+    const float dt = kFrameDeltaSec;
     globalTimer_ += dt;
 
     // セーブメッセージの更新
     if (saveMessageTimer_ > 0.0f) {
-        const float kMessageDuration = 2.0f;
         saveMessageTimer_ -= dt;
         if (saveMessageText_) {
             auto color = saveMessageText_->GetColor();
-            float alpha = std::clamp(saveMessageTimer_ / kMessageDuration, 0.0f, 1.0f);
+            float alpha = std::clamp(saveMessageTimer_ / kCheckpointMessageDuration, 0.0f, 1.0f);
             color.w = alpha;
             saveMessageText_->SetColor(color);
         }
@@ -386,17 +416,16 @@ void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
                     if (saveMessageText_) {
                         saveMessageText_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
                     }
-                    saveMessageTimer_ = 2.0f; // 2秒間表示
+                    saveMessageTimer_ = kCheckpointMessageDuration; // 一定時間表示
                 }
             }
         }
 
         // クリア演出アニメーション更新 (1枚ずつ広がるようにするため最大値を大きめに)
         if (inst.isCleared) {
-            const float kAnimSpeed = 0.02f; 
-            inst.clearAnimationT += kAnimSpeed;
-            if (inst.clearAnimationT > 5.0f) { // 波が端まで届くのに十分な時間
-                inst.clearAnimationT = 5.0f;
+            inst.clearAnimationT += kClearAnimSpeed;
+            if (inst.clearAnimationT > kClearAnimMax) {
+                inst.clearAnimationT = kClearAnimMax;
             }
         }
     }
@@ -540,7 +569,7 @@ void StageManager::Draw3D() {
     if (followCamera_) {
         zoom = followCamera_->GetZoom();
     }
-    float cullingRadius = 600.0f * std::max(1.0f, zoom);
+    float cullingRadius = kBaseCullingRadius * std::max(1.0f, zoom);
     const float kCullingRadiusSq = cullingRadius * cullingRadius;
 
     auto collectData = [&](StageInstance& inst, auto& list) {
@@ -569,35 +598,25 @@ void StageManager::Draw3D() {
             };
             float distance = std::sqrt((pos.x - center.x) * (pos.x - center.x) + (pos.y - center.y) * (pos.y - center.y));
             
-            // 波の伝播パラメータ
-            const float waveSpeed = 100.0f; // 広がる速さ
-            const float fadeWidth = 20.0f;  // 色が変わるときの境界のぼかし幅
-            
             // このタイル個別の進行度 (0.0 ~ 1.0)
-            float localTimer = inst.clearAnimationT * waveSpeed;
-            float localT = std::clamp((localTimer - distance) / fadeWidth, 0.0f, 1.0f);
-            
-            // 通常時: 明るめの紫
-            TuboEngine::Math::Vector4 baseColor = {0.25f, 0.15f, 0.45f, 1.0f}; 
-            // クリア時: マゼンタ
-            TuboEngine::Math::Vector4 clearColor = {1.0f, 0.2f, 0.9f, 1.0f}; 
-            
-            // 基本の色補間
-            data.Color.x = baseColor.x + (clearColor.x - baseColor.x) * localT;
-            data.Color.y = baseColor.y + (clearColor.y - baseColor.y) * localT;
-            data.Color.z = baseColor.z + (clearColor.z - baseColor.z) * localT;
+            float localTimer = inst.clearAnimationT * kClearWaveSpeed;
+            float localT = std::clamp((localTimer - distance) / kClearWaveFadeWidth, 0.0f, 1.0f);
+
+            // 基本の色補間（通常時=紫 → クリア時=マゼンタ）
+            data.Color.x = kTileBaseColor.x + (kTileClearColor.x - kTileBaseColor.x) * localT;
+            data.Color.y = kTileBaseColor.y + (kTileClearColor.y - kTileBaseColor.y) * localT;
+            data.Color.z = kTileBaseColor.z + (kTileClearColor.z - kTileBaseColor.z) * localT;
             data.Color.w = 1.0f;
 
             // クリア後のパルス (localT が 1.0 に達したタイルのみ)
             if (localT >= 1.0f) {
-                float pulse = (std::sin(globalTimer_ * 3.0f + distance * 0.1f) * 0.5f + 0.5f) * 0.5f; 
-                TuboEngine::Math::Vector4 pulseColor = {0.0f, 1.0f, 1.0f, 0.0f}; // シアン
-                data.Color.x += pulseColor.x * pulse;
-                data.Color.y += pulseColor.y * pulse;
-                data.Color.z += pulseColor.z * pulse;
-                data.Color.x *= 1.3f;
-                data.Color.y *= 1.3f;
-                data.Color.z *= 1.3f;
+                float pulse = (std::sin(globalTimer_ * kPulseTimeFreq + distance * kPulseDistFreq) * 0.5f + 0.5f) * kPulseAmplitude;
+                data.Color.x += kTilePulseColor.x * pulse;
+                data.Color.y += kTilePulseColor.y * pulse;
+                data.Color.z += kTilePulseColor.z * pulse;
+                data.Color.x *= kPulseBrightBoost;
+                data.Color.y *= kPulseBrightBoost;
+                data.Color.z *= kPulseBrightBoost;
             }
             
             auto& batch = instancedDataMap[model];

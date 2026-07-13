@@ -24,6 +24,28 @@ constexpr float kEnemyModelRotOffsetX = 0.0f;
 constexpr float kEnemyModelRotOffsetY = 0.0f;
 constexpr float kEnemyModelRotOffsetZ = -kPI * 0.5f; // 従来: yaw補正
 
+// --- 挙動チューニング用の定数（従来直書きしていたマジックナンバーを集約）---
+namespace {
+// 1フレームの経過時間（60FPS固定）。dt を直書きしないための共通値。
+constexpr float kFrameDeltaSec = 1.0f / 60.0f;
+// 衝突判定に使う当たり矩形の一辺（タイルサイズに対する割合）。
+constexpr float kAgentColliderTileRatio = 0.8f;
+// 移動を分割する際の1サブステップ長（タイルサイズに対する割合）。
+constexpr float kSubStepTileRatio = 0.5f;
+// 目的地が歩行不可のとき、近傍の歩行可タイルを探す最大半径（マス）。
+constexpr int kNearestWalkableSearchRadius = 6;
+// 待機時の首振り（ToBack/Return）で目標角に到達したとみなす閾値（ラジアン）。
+constexpr float kIdleTurnArriveEps = 0.01f;
+// 見回しスキャンで目標角に到達したとみなす閾値（ラジアン）。
+constexpr float kLookAroundArriveEps = 0.02f;
+// 視線遮蔽・視界サンプリングのレイ刻み幅（ワールド単位）。
+constexpr float kRaySampleStep = 0.5f;
+// 視界コーンの弧を描く分割数。
+constexpr int kViewConeArcDiv = 4;
+// 最終目撃マークの外周円の分割数。
+constexpr int kLastSeenCircleDiv = 8;
+} // namespace
+
 Enemy::Enemy() {}
 Enemy::~Enemy() {}
 
@@ -65,7 +87,7 @@ void Enemy::Initialize() {
 	exclamationIcon_->SetGetIsAdjustTextureSize(false);
 	exclamationIcon_->SetAnchorPoint({0.5f, 0.5f});
 
-	HP = 10; // 調整: 少し耐える
+	HP = kInitialHP; // 調整: 少し耐える
 
 	// 射撃エネミーの攻撃範囲(停止して撃つ距離)は従来値を初期値として保持
 	attackRange_ = shootDistance_;
@@ -111,10 +133,10 @@ static void MoveWithCollision(TuboEngine::Math::Vector3& position, const TuboEng
 		return;
 	}
 	const float tile = MapChipField::GetBlockSize();
-	const float width = tile * 0.8f;
-	const float height = tile * 0.8f;
+	const float width = tile * kAgentColliderTileRatio;
+	const float height = tile * kAgentColliderTileRatio;
 	float moveLen2D = std::sqrt(desiredMove.x * desiredMove.x + desiredMove.y * desiredMove.y);
-	int subSteps = std::max(1, int(std::ceil(moveLen2D / (tile * 0.5f))));
+	int subSteps = std::max(1, int(std::ceil(moveLen2D / (tile * kSubStepTileRatio))));
 	TuboEngine::Math::Vector3 step = desiredMove / float(subSteps);
 	for (int i = 0; i < subSteps; ++i) {
 		TuboEngine::Math::Vector3 nextX = position;
@@ -156,7 +178,7 @@ static int FindNearestWalkableIndex(MapChipField* field, int gx, int gy) {
 		return -1;
 	if (IsTileWalkable(field, (uint32_t)gx, (uint32_t)gy))
 		return Index1D(gx, gy, W);
-	const int maxRadius = 6;
+	const int maxRadius = kNearestWalkableSearchRadius;
 	for (int r = 1; r <= maxRadius; ++r) {
 		for (int dy = -r; dy <= r; ++dy) {
 			for (int dx = -r; dx <= r; ++dx) {
@@ -354,8 +376,6 @@ bool Enemy::BuildPathTo(const TuboEngine::Math::Vector3& worldGoal) {
 void Enemy::BuildBehaviorTree() {
 	using namespace BT;
 
-	constexpr float kDt = 1.0f / 60.0f;
-
 	// ---- 共通ヘルパー：目標方向へ一定速度で回転 ----
 	auto FaceToward = [this](const TuboEngine::Math::Vector3& target) {
 		TuboEngine::Math::Vector3 toTarget = target - position;
@@ -373,7 +393,7 @@ void Enemy::BuildBehaviorTree() {
 	auto TryFireNormal = [this]() {
 		if (!UseNormalBullet()) return;
 		wantShoot_ = true;
-		bulletTimer_ += 1.0f / 60.0f;
+		bulletTimer_ += kFrameDeltaSec;
 		if (bullet && bullet->GetIsAlive()) return;
 		if (bullet && !bullet->GetIsAlive()) bullet.reset();
 		if (bulletTimer_ < EnemyNormalBullet::s_fireInterval) return;
@@ -400,7 +420,7 @@ void Enemy::BuildBehaviorTree() {
 
 		switch (idleBackPhase_) {
 		case IdleBackPhase::None:
-			idleLookAroundTimer -= 1.0f / 60.0f;
+			idleLookAroundTimer -= kFrameDeltaSec;
 			if (idleLookAroundTimer <= 0.0f) {
 				idleBackStartAngle  = rotation.z;
 				idleBackTargetAngle = NormalizeAngle(idleBackStartAngle + kPI);
@@ -412,20 +432,20 @@ void Enemy::BuildBehaviorTree() {
 			float diff = NormalizeAngle(idleBackTargetAngle - rotation.z);
 			float turn = std::clamp(diff, -idleBackTurnSpeed, idleBackTurnSpeed);
 			rotation.z = NormalizeAngle(rotation.z + turn);
-			if (std::fabs(diff) < 0.01f) {
+			if (std::fabs(diff) < kIdleTurnArriveEps) {
 				rotation.z     = idleBackTargetAngle;
 				idleBackPhase_ = IdleBackPhase::Hold;
 			}
 		} break;
 		case IdleBackPhase::Hold:
-			idleBackHoldTimer -= 1.0f / 60.0f;
+			idleBackHoldTimer -= kFrameDeltaSec;
 			if (idleBackHoldTimer <= 0.0f) idleBackPhase_ = IdleBackPhase::Return;
 			break;
 		case IdleBackPhase::Return: {
 			float diff = NormalizeAngle(idleBackStartAngle - rotation.z);
 			float turn = std::clamp(diff, -idleBackTurnSpeed, idleBackTurnSpeed);
 			rotation.z = NormalizeAngle(rotation.z + turn);
-			if (std::fabs(diff) < 0.01f) {
+			if (std::fabs(diff) < kIdleTurnArriveEps) {
 				rotation.z          = idleBackStartAngle;
 				idleBackPhase_      = IdleBackPhase::None;
 				idleLookAroundTimer = idleLookAroundIntervalSec;
@@ -460,7 +480,7 @@ void Enemy::BuildBehaviorTree() {
 		float turn = std::clamp(diff, -lookAroundSpeed, lookAroundSpeed);
 		rotation.z = NormalizeAngle(rotation.z + turn);
 
-		if (std::fabs(diff) < 0.02f) {
+		if (std::fabs(diff) < kLookAroundArriveEps) {
 			lookAroundDirection    *= -1;
 			lookAroundTargetAngle   = lookAroundBaseAngle + lookAroundDirection * lookAroundAngleWidth;
 			lookAroundCount++;
@@ -563,7 +583,7 @@ void Enemy::Update() {
 		return;
 	}
 
-	const float dt = 1.0f / 60.0f;
+	const float dt = kFrameDeltaSec;
 
 	// --- 霧散演出中の処理 ---
 	if (isDying_) {
@@ -851,7 +871,7 @@ bool Enemy::CanSeePlayer() {
 	// レイ遮蔽物判定 (簡易サンプリング)
 	TuboEngine::Math::Vector2 start = {from.x, from.y};
 	TuboEngine::Math::Vector2 end = {to.x, to.y};
-	const float step = 0.5f;
+	const float step = kRaySampleStep;
 	TuboEngine::Math::Vector2 dir = end - start;
 	float length = std::sqrt(dir.x * dir.x + dir.y * dir.y);
 	if (length < 0.001f)
@@ -890,7 +910,7 @@ void Enemy::DrawViewCone() {
 	TuboEngine::LineManager::GetInstance()->DrawLine(center, pRight, coneColor);
 
 	// 扇状の弧を描く（分割数を下げて軽くする）
-	const int arcDiv = 4;
+	const int arcDiv = kViewConeArcDiv;
 	for (int i = 0; i < arcDiv; ++i) {
 		float a0 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i) / arcDiv);
 		float a1 = baseAngle - halfRad + (halfRad * 2.0f) * (float(i + 1) / arcDiv);
@@ -904,7 +924,7 @@ void Enemy::DrawViewCone() {
 	if (showRaySamples_ && player_ && mapChipField) {
 		TuboEngine::Math::Vector2 start = {center.x, center.y};
 		TuboEngine::Math::Vector2 end = {player_->GetPosition().x, player_->GetPosition().y};
-		const float step = 0.5f;
+		const float step = kRaySampleStep;
 		TuboEngine::Math::Vector2 dir = end - start;
 		float length = std::sqrt(dir.x * dir.x + dir.y * dir.y);
 		if (length > 0.001f) {
@@ -937,7 +957,7 @@ void Enemy::DrawLastSeenMark() {
 	TuboEngine::LineManager::GetInstance()->DrawLine(
 	    center + TuboEngine::Math::Vector3{0.0f, -kLastSeenMarkSize, 0.0f}, center + TuboEngine::Math::Vector3{0.0f, kLastSeenMarkSize, 0.0f}, kLastSeenColor);
 	// 外周円
-	constexpr int circleDiv = 8;
+	constexpr int circleDiv = kLastSeenCircleDiv;
 	for (int i = 0; i < circleDiv; ++i) {
 		float a0 = (2.0f * kPI) * (float(i) / circleDiv);
 		float a1 = (2.0f * kPI) * (float(i + 1) / circleDiv);
