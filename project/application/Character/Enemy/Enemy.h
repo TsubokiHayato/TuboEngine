@@ -126,7 +126,7 @@ public:
     /// <summary>
     /// MaxHP を取得する。
     /// </summary>
-    int GetMaxHP() const { return 10; }
+    int GetMaxHP() const { return kInitialHP; }
 
     // 視野角・距離の取得/設定
     float GetViewAngleDeg() const { return kViewAngleDeg; }
@@ -160,7 +160,9 @@ protected:
 
     // 0 なら常に Chase しつつ射撃（遠距離射撃）。
     float attackRange_ = 25.0f;
-    int HP = 100;
+    // 敵の初期HP兼MaxHP。Initialize() と GetMaxHP() の両方が参照する。
+    static constexpr int kInitialHP = 10;
+    int HP = kInitialHP;
     bool isAlive = true;
     bool isHit = false;
     bool wasHit = false;
