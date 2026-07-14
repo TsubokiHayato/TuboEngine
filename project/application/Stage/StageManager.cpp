@@ -34,6 +34,14 @@ constexpr float kFrameDeltaSec = 1.0f / 60.0f;
 // チェックポイント/リスタートメッセージの表示時間（秒）。
 constexpr float kCheckpointMessageDuration = 2.0f;
 
+// チェックポイント/リスタートメッセージの表示レイアウト。
+constexpr float kCheckpointMessageY     = 100.0f; // "CHECKPOINT SAVED" の表示Y座標
+constexpr float kRestartMessageY        = 200.0f; // "RESTART FROM CHECKPOINT" の表示Y座標
+constexpr float kCheckpointMessageScale = 1.2f;
+constexpr float kRestartMessageScale    = 1.0f;
+constexpr TuboEngine::Math::Vector4 kCheckpointMessageColor = {1.0f, 1.0f, 1.0f, 1.0f};
+constexpr TuboEngine::Math::Vector4 kRestartMessageColor    = {1.0f, 1.0f, 0.5f, 1.0f}; // 黄色っぽくして区別
+
 // クリア演出（波）の進行速度と、進行値の上限（波が端まで届くのに十分な値）。
 constexpr float kClearAnimSpeed = 0.02f;
 constexpr float kClearAnimMax   = 5.0f;
@@ -156,12 +164,12 @@ void StageManager::LoadMetaLayout(const std::string& metaCsvPath,
             if (sShouldShowRestartMessage) {
                 auto* tm = TuboEngine::TextManager::GetInstance();
                 if (!saveMessageText_) {
-                    saveMessageText_ = tm->CreateText(TuboEngine::TextManager::PresetFontNames::YasashisaGothicBold, "RESTART FROM CHECKPOINT", { TuboEngine::WinApp::GetInstance()->GetClientWidth() * 0.5f, 200.0f });
+                    saveMessageText_ = tm->CreateText(TuboEngine::TextManager::PresetFontNames::YasashisaGothicBold, "RESTART FROM CHECKPOINT", { TuboEngine::WinApp::GetInstance()->GetClientWidth() * 0.5f, kRestartMessageY });
                     if (saveMessageText_) {
                         saveMessageText_->SetHorizontalAlign(1);
                         saveMessageText_->SetVerticalAlign(1);
-                        saveMessageText_->SetScale(1.0f);
-                        saveMessageText_->SetColor({ 1.0f, 1.0f, 0.5f, 1.0f }); // 少し黄色っぽくして区別
+                        saveMessageText_->SetScale(kRestartMessageScale);
+                        saveMessageText_->SetColor(kRestartMessageColor); // 少し黄色っぽくして区別
                     }
                 }
                 saveMessageTimer_ = kCheckpointMessageDuration;
@@ -406,15 +414,15 @@ void StageManager::Update(Player* player, FollowTopDownCamera* followCamera) {
                     // セーブメッセージを表示
                     auto* tm = TuboEngine::TextManager::GetInstance();
                     if (!saveMessageText_) {
-                        saveMessageText_ = tm->CreateText(TuboEngine::TextManager::PresetFontNames::YasashisaGothicBold, "CHECKPOINT SAVED", { TuboEngine::WinApp::GetInstance()->GetClientWidth() * 0.5f, 100.0f });
+                        saveMessageText_ = tm->CreateText(TuboEngine::TextManager::PresetFontNames::YasashisaGothicBold, "CHECKPOINT SAVED", { TuboEngine::WinApp::GetInstance()->GetClientWidth() * 0.5f, kCheckpointMessageY });
                         if (saveMessageText_) {
                             saveMessageText_->SetHorizontalAlign(1); // Center
                             saveMessageText_->SetVerticalAlign(1);   // Middle
-                            saveMessageText_->SetScale(1.2f);
+                            saveMessageText_->SetScale(kCheckpointMessageScale);
                         }
                     }
                     if (saveMessageText_) {
-                        saveMessageText_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+                        saveMessageText_->SetColor(kCheckpointMessageColor);
                     }
                     saveMessageTimer_ = kCheckpointMessageDuration; // 一定時間表示
                 }
